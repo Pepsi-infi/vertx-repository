@@ -11,10 +11,7 @@
     <!-- 配置变量 -->
     <properties>
         <main.verticle>api.StartVerticle</main.verticle>
-        <thrift-version>0.9.2</thrift-version>
-        <search-recommendation-thrift>v1.3.3</search-recommendation-thrift>
         <commons-pool>1.6</commons-pool>
-        <vertx-version>3.4.1</vertx-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -31,22 +28,6 @@
             <groupId>xgroup</groupId>
             <artifactId>xservice-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.letv.search</groupId>
-            <artifactId>search-recommendation-thrift</artifactId>
-            <version>${search-recommendation-thrift}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-            <version>${thrift-version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>

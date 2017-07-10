@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for xservice-channel" enabled="true">
+        <sourceOutputDir name="src/main/generated" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="outputDirectory" value="$PROJECT_DIR$/xservice-channel/src/main" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <module name="xservice-channel" />
+      </profile>
+      <profile name="Annotation profile for xservice" enabled="true">
+        <sourceOutputDir name="src/main/generated" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <option name="outputDirectory" value="$PROJECT_DIR$/xservice-common/src/main" />
+        <processor name="io.vertx.codegen.CodeGenProcessor" />
+        <module name="xservice-common" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="xservice" target="1.8" />
+      <module name="xservice-channel" target="1.8" />
+      <module name="xservice-common" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -7,26 +7,15 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
-    <module>xservice-api-gateway</module>
     <module>xservice-common</module>
-    <module>xservice-play</module>
     <module>xservice-channel</module>
-    <module>xservice-dashboard</module>
-    <module>xservice-vip</module>
-    <module>xservice-metainfo</module>
-    <module>xservice-demo</module>
-    <module>xservice-cache</module>
-    <module>xservice-comment</module>
-    <module>xservice-user</module>
-    <module>xservice-spider</module>
-    <module>xservice-im</module>
   </modules>
 
   <!-- 配置变量 -->
   <properties>
     <!-- 插件版本 -->
     <maven-compiler-plugin>2.5.1</maven-compiler-plugin>
-    <vertx-version>3.4.0</vertx-version>
+    <vertx-version>3.4.2</vertx-version>
     <!-- tmp -->
     <main.verticle>api.StartVerticle</main.verticle>
     <grpc.version>1.1.2</grpc.version>

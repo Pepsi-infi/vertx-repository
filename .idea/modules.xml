@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/xservice.iml" filepath="$PROJECT_DIR$/xservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xservice-channel/xservice-channel.iml" filepath="$PROJECT_DIR$/xservice-channel/xservice-channel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xservice-common/xservice-common.iml" filepath="$PROJECT_DIR$/xservice-common/xservice-common.iml" />
+    </modules>
+  </component>
+</project>

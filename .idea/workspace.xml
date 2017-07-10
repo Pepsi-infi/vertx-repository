@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="42b1c70a-2565-459e-a048-8f5f838679e7" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-channel/xservice-channel.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/CacheService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/constants/CacheConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/constants/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/ActorCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/Album.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/AudioCodes.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/BaseCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/HotWordsCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/LinesCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/MusicCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/OstCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/Page.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/PageCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/PicAll.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/SeriesCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/SeriesPage.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/Stream.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/Video.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/dto/WatchingFocusCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cache/utils/TimeUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/CmsService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/BaseResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsBlockContent.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsBlockContentTpResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsBlockTpResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsPageTpResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsPageTpResponseData.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/CmsPageTpResponseFrag.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/ExtendJson.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/cms/response/ShowTagList.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/GetProtoFileMain.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/ZkServiceRegistration.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/GreeterGrpc.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/HelloReply.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/HelloReplyOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/HelloRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/HelloRequestOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/service/HelloWorldProto.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/ActorCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/ActorCacheOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/PicAll.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/PicAllOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/Stream.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/StreamOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/Video.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoDtoConverter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoIdsRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoIdsRequestOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoRequestOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoServiceGrpc.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideoServiceProto.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/Videos.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/VideosOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/WatchingFocusCache.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/grpc/videoservice/WatchingFocusCacheOrBuilder.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/inke/InkeMetaService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/inke/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/SearchService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/param/ParamForSearch.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/request/LecomSearchRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/request/SearchRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/response/BaseResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/response/SearchCategory.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/response/SearchMixResult.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/search/response/SearchMixResultTp.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/sysconfig/whitelist/WhiteListService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/sysconfig/whitelist/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/sysconfig/whitelist/request/WhiteListRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/sysconfig/whitelist/response/WhiteListResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/childlock/CommonChildLockService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/childlock/request/ChildLockRequest.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/childlock/response/ChildLockResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/childlock/response/ChildLockTpResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/commom/CommonParam.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/commom/CommonUserConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/user/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/video/VideoConstants.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/video/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/CommonParam.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/CommonVipService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/VipSignatureUtil.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/package-info.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/Discount.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/DiscountInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/GetVipInfoResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/LecomGetPackageByProductIdResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/PackageInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/PackageInfoResponse.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/TrialData.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/VipInfo.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/src/main/java/vip/response/VipInfo2.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice-common/xservice-common.iml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/xservice.iml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xservice-channel/pom.xml" afterPath="$PROJECT_DIR$/xservice-channel/pom.xml" />
+    </list>
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/xservice-channel/target/" />
+    <ignored path="$PROJECT_DIR$/xservice-common/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="336">
+              <caret line="57" column="33" lean-forward="true" selection-start-line="57" selection-start-column="33" selection-end-line="57" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/xservice-channel/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="1247" />
+    <option name="height" value="777" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice-common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice-common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice-common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xservice-channel" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="BashConfigurationType" factoryName="Bash">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="JarApplication" factoryName="JAR Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Java Scratch" factoryName="Java Scratch">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="SCRATCH_FILE_ID" value="0" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="xservice" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <setting name="useSbt" value="false" />
+      <setting name="useUiWithSbt" value="false" />
+      <classRegexps />
+      <testRegexps />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Specs2RunConfiguration" factoryName="Specs2">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <setting name="useSbt" value="false" />
+      <setting name="useUiWithSbt" value="false" />
+      <classRegexps />
+      <testRegexps />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="executeSpecs" factoryName="Gauge Execution">
+      <setting name="environment" value="" />
+      <setting name="specsToExecute" value="" />
+      <setting name="tags" value="" />
+      <setting name="parallelNodes" value="" />
+      <setting name="execInParallel" value="false" />
+      <setting name="programParameters" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="moduleName" value="" />
+      <envMap />
+      <setting name="rowsRange" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="uTestRunConfiguration" factoryName="utest">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="package" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="" />
+      <setting name="searchForTest" value="Across module dependencies" />
+      <setting name="testName" value="" />
+      <setting name="testKind" value="Class" />
+      <setting name="showProgressMessages" value="true" />
+      <setting name="useSbt" value="false" />
+      <setting name="useUiWithSbt" value="false" />
+      <classRegexps />
+      <testRegexps />
+      <envs />
+      <method />
+    </configuration>
+  </component>
+  <component name="SbtLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="42b1c70a-2565-459e-a048-8f5f838679e7" name="Default" comment="" />
+      <created>1499663920099</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1499663920099</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="23" width="1247" height="777" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24979253" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/xservice-common/src/main/resources/zookeeper-cn.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-common/src/main/resources/log4j2.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-357">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/bin/tv/start-cn.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="38" lean-forward="true" selection-start-line="16" selection-start-column="38" selection-end-line="16" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-common/src/main/resources/zookeeper-dev.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-common/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="37" lean-forward="false" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="31" column="20" lean-forward="false" selection-start-line="31" selection-start-column="20" selection-end-line="31" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="37" lean-forward="true" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="0">
+            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/src/main/java/api/RestTvLiveVerticle.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="36" column="55" lean-forward="true" selection-start-line="36" selection-start-column="55" selection-end-line="36" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/src/main/java/api/StartVerticle.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="32" column="50" lean-forward="true" selection-start-line="32" selection-start-column="50" selection-end-line="32" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/xservice-channel/src/main/java/test/LiveTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="19" column="44" lean-forward="true" selection-start-line="19" selection-start-column="44" selection-end-line="19" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="57" column="33" lean-forward="true" selection-start-line="57" selection-start-column="33" selection-end-line="57" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
