@@ -1,0 +1,2050 @@
+= Cheatsheets
+
+[[AddOnInfoDto]]
+== AddOnInfoDto
+
+++++
+ Created by zhushenghao1 on 17/1/3.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[addOnBackPic]]`addOnBackPic`|`String`|-
+|[[addOnDesc]]`addOnDesc`|`String`|-
+|[[addOnId]]`addOnId`|`Number (Integer)`|-
+|[[addOnLogoPic]]`addOnLogoPic`|`String`|-
+|[[addOnName]]`addOnName`|`String`|-
+|[[addOnPrice]]`addOnPrice`|`String`|-
+|[[addOnSubscribeStatus]]`addOnSubscribeStatus`|`Number (Integer)`|-
+|[[addOnTotalContentNum]]`addOnTotalContentNum`|`Number (Integer)`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|===
+
+[[AlbumInfoDto]]
+== AlbumInfoDto
+
+++++
+ Created by zhushenghao1 on 17/1/13.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[cornerLabel]]`cornerLabel`|`String`|-
+|[[dataType]]`dataType`|`Number (Integer)`|-
+|[[desc]]`desc`|`String`|-
+|[[director]]`director`|`String`|-
+|[[duration]]`duration`|`String`|-
+|[[episodes]]`episodes`|`String`|-
+|[[images]]`images`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[name]]`name`|`String`|-
+|[[nowEpisodes]]`nowEpisodes`|`String`|-
+|[[pay]]`pay`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[picAll]]`picAll`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[playCount]]`playCount`|`Number (Long)`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[score]]`score`|`Number (Float)`|-
+|[[star]]`star`|`String`|-
+|[[subCategory]]`subCategory`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[updateTime]]`updateTime`|`Number (Long)`|-
+|[[url]]`url`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|[[zid]]`zid`|`Number (Long)`|-
+|===
+
+[[AnchorDto]]
+== AnchorDto
+
+++++
+ Created by wanglonghu on 17/6/9.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[city]]`city`|`String`|-
+|[[id]]`id`|`String`|-
+|[[liveId]]`liveId`|`String`|-
+|[[nick]]`nick`|`String`|-
+|[[onlineNum]]`onlineNum`|`Number (Long)`|-
+|[[portrait]]`portrait`|`String`|-
+|[[source]]`source`|`Number (Integer)`|-
+|===
+
+[[AnchorListWapperDto]]
+== AnchorListWapperDto
+
+++++
+ Created by wanglonghu on 17/6/9.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`Array of link:dataobjects.html#AnchorPageDto[AnchorPageDto]`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[AnchorPageDto]]
+== AnchorPageDto
+
+++++
+ Created by wanglonghu on 17/6/9.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[banner]]`banner`|`Array of link:dataobjects.html#BannerDto[BannerDto]`|-
+|[[content]]`content`|`Array of link:dataobjects.html#AnchorDto[AnchorDto]`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[name]]`name`|`String`|-
+|[[page]]`page`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|===
+
+[[BannerDto]]
+== BannerDto
+
+++++
+ Created by wanglonghu on 17/6/12.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[img]]`img`|`String`|-
+|[[jump]]`jump`|`Number (Integer)`|-
+|[[roomId]]`roomId`|`String`|-
+|[[url]]`url`|`String`|-
+|===
+
+[[BaseChannel]]
+== BaseChannel
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[configInfo]]`configInfo`|`String`|-
+|[[cpCategoryId]]`cpCategoryId`|`String`|-
+|[[cpId]]`cpId`|`String`|-
+|[[dataType]]`dataType`|`Number (int)`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[globalId]]`globalId`|`String`|-
+|[[iconType]]`iconType`|`String`|-
+|[[jump]]`jump`|`link:dataobjects.html#JumpData[JumpData]`|-
+|[[titleDataType]]`titleDataType`|`Number (Integer)`|-
+|===
+
+[[BaseDto]]
+== BaseDto
+
+++++
+ Created by zhushenghao1 on 17/1/3.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[BaseResponse]]
+== BaseResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[innerCode]]`innerCode`|`String`|-
+|===
+
+[[BlockDataDto]]
+== BlockDataDto
+
+++++
+ Created by zhushenghao1 on 16/12/30.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[addOnId]]`addOnId`|`Number (Integer)`|-
+|[[albumName]]`albumName`|`String`|-
+|[[albumType]]`albumType`|`String`|-
+|[[area]]`area`|`String`|-
+|[[at]]`at`|`String`|-
+|[[audioId]]`audioId`|`Number (Long)`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[cmsid]]`cmsid`|`String`|-
+|[[cname]]`cname`|`String`|-
+|[[cornerLabel]]`cornerLabel`|`String`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[defaultStream]]`defaultStream`|`String`|-
+|[[description]]`description`|`String`|-
+|[[director]]`director`|`String`|-
+|[[duration]]`duration`|`String`|-
+|[[episode]]`episode`|`String`|-
+|[[guest]]`guest`|`String`|-
+|[[guestImgUrl]]`guestImgUrl`|`String`|-
+|[[homeImgUrl]]`homeImgUrl`|`String`|-
+|[[id]]`id`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[issue]]`issue`|`Number (Integer)`|-
+|[[liveCode]]`liveCode`|`String`|-
+|[[liveUrl]]`liveUrl`|`String`|-
+|[[liveid]]`liveid`|`String`|-
+|[[name]]`name`|`String`|-
+|[[nowEpisodes]]`nowEpisodes`|`String`|-
+|[[pageid]]`pageid`|`String`|-
+|[[pay]]`pay`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[picAll]]`picAll`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[playCount]]`playCount`|`String`|-
+|[[recArea]]`recArea`|`String`|-
+|[[recBucket]]`recBucket`|`String`|-
+|[[recFragId]]`recFragId`|`String`|-
+|[[recReid]]`recReid`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[score]]`score`|`Number (Float)`|-
+|[[singer]]`singer`|`String`|-
+|[[skipAppInfo]]`skipAppInfo`|`String`|-
+|[[source]]`source`|`Number (int)`|-
+|[[src]]`src`|`String`|-
+|[[subCategory]]`subCategory`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[tm]]`tm`|`String`|-
+|[[type]]`type`|`String`|-
+|[[updateTime]]`updateTime`|`Number (Long)`|-
+|[[varietyShow]]`varietyShow`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|[[videoType]]`videoType`|`String`|-
+|[[webUrl]]`webUrl`|`String`|-
+|[[webViewUrl]]`webViewUrl`|`String`|-
+|[[zid]]`zid`|`Number (Long)`|-
+|===
+
+[[Channel]]
+== Channel
+
+++++
+ 频道
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[albumId]]`albumId`|`Number (Integer)`|-
+|[[categoryId]]`categoryId`|`Number (Integer)`|-
+|[[channelCode]]`channelCode`|`String`|-
+|[[channelId]]`channelId`|`Number (Integer)`|-
+|[[channelName]]`channelName`|`String`|-
+|[[configInfo]]`configInfo`|`String`|-
+|[[cpCategoryId]]`cpCategoryId`|`String`|-
+|[[cpId]]`cpId`|`String`|-
+|[[dataType]]`dataType`|`Number (int)`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[defaultStream]]`defaultStream`|`String`|-
+|[[defaultStreamName]]`defaultStreamName`|`String`|-
+|[[globalId]]`globalId`|`String`|-
+|[[iconType]]`iconType`|`String`|-
+|[[img]]`img`|`String`|-
+|[[isSelected]]`isSelected`|`Number (Integer)`|-
+|[[jump]]`jump`|`link:dataobjects.html#JumpData[JumpData]`|-
+|[[name]]`name`|`String`|-
+|[[pageId]]`pageId`|`Number (Integer)`|-
+|[[parentChannelId]]`parentChannelId`|`Number (Integer)`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[pid]]`pid`|`Number (Integer)`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|[[productName]]`productName`|`String`|-
+|[[subName]]`subName`|`String`|-
+|[[subType]]`subType`|`Number (Integer)`|-
+|[[titleBgColor]]`titleBgColor`|`String`|-
+|[[titleDataType]]`titleDataType`|`Number (Integer)`|-
+|[[titleFocus1]]`titleFocus1`|`String`|-
+|[[titleFocus2]]`titleFocus2`|`String`|-
+|[[titleIcon]]`titleIcon`|`String`|-
+|===
+
+[[ChannelBlockDto]]
+== ChannelBlockDto
+
+++++
+ Created by zhushenghao1 on 16/12/27.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockType]]`blockType`|`String`|-
+|[[blockid]]`blockid`|`String`|-
+|[[cid]]`cid`|`String`|-
+|[[curPage]]`curPage`|`Number (Integer)`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[list]]`list`|`Array of link:dataobjects.html#BaseDto[BaseDto]`|-
+|[[name]]`name`|`String`|-
+|[[nextPage]]`nextPage`|`Number (Integer)`|-
+|[[recArea]]`recArea`|`String`|-
+|[[recBucket]]`recBucket`|`String`|-
+|[[recFragId]]`recFragId`|`String`|-
+|[[recReid]]`recReid`|`String`|-
+|[[recSrcType]]`recSrcType`|`String`|-
+|[[rectCName]]`rectCName`|`String`|-
+|[[rectCid]]`rectCid`|`String`|-
+|[[rectPageId]]`rectPageId`|`String`|-
+|[[rectType]]`rectType`|`String`|-
+|[[rectUrl]]`rectUrl`|`String`|-
+|[[rectVt]]`rectVt`|`String`|-
+|[[style]]`style`|`String`|-
+|[[total]]`total`|`Number (Integer)`|-
+|===
+
+[[ChannelData]]
+== ChannelData
+
+++++
+ 频道数据
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[advertisementImg]]`advertisementImg`|`String`|-
+|[[area]]`area`|`String`|-
+|[[blockType]]`blockType`|`String`|-
+|[[bucket]]`bucket`|`String`|-
+|[[channelId]]`channelId`|`Number (Integer)`|-
+|[[configInfo]]`configInfo`|`String`|-
+|[[cpCategoryId]]`cpCategoryId`|`String`|-
+|[[cpId]]`cpId`|`String`|-
+|[[dataList]]`dataList`|`Array of link:dataobjects.html#Channel[Channel]`|-
+|[[dataType]]`dataType`|`Number (int)`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[fragId]]`fragId`|`String`|-
+|[[globalId]]`globalId`|`String`|-
+|[[gmt]]`gmt`|`Number (Long)`|-
+|[[iconType]]`iconType`|`String`|-
+|[[img]]`img`|`String`|-
+|[[jump]]`jump`|`link:dataobjects.html#JumpData[JumpData]`|-
+|[[reid]]`reid`|`String`|-
+|[[subscribed]]`subscribed`|`Number (Integer)`|-
+|[[title]]`title`|`String`|-
+|[[titleAlbumId]]`titleAlbumId`|`Number (Integer)`|-
+|[[titleBgColor]]`titleBgColor`|`String`|-
+|[[titleChannelId]]`titleChannelId`|`Number (Integer)`|-
+|[[titleDataType]]`titleDataType`|`Number (Integer)`|-
+|[[titleSearchCondition]]`titleSearchCondition`|`String`|-
+|[[uiPlateType]]`uiPlateType`|`Number (Integer)`|-
+|===
+
+[[ChannelInfo]]
+== ChannelInfo
+
+++++
+ Created by zhushenghao1 on 16/12/21.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[addOnId]]`addOnId`|`String`|-
+|[[cmsId]]`cmsId`|`String`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[locked]]`locked`|`Number (Integer)`|-
+|[[mzcid]]`mzcid`|`String`|-
+|[[name]]`name`|`String`|-
+|[[pageid]]`pageid`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[skipType]]`skipType`|`Number (Integer)`|-
+|[[type]]`type`|`String`|-
+|[[url]]`url`|`String`|-
+|===
+
+[[ChannelList]]
+== ChannelList
+
+++++
+ 频道墙返回格式
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[channels]]`channels`|`Array of link:dataobjects.html#ChannelInfo[ChannelInfo]`|-
+|[[name]]`name`|`String`|-
+|===
+
+[[ChannelListResponse]]
+== ChannelListResponse
+
+++++
+ 直播频道列表返回
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[rows]]`rows`|`Array of link:dataobjects.html#ChannelResponse[ChannelResponse]`|-
+|===
+
+[[ChannelPage]]
+== ChannelPage
+
+++++
+ Created by zhushenghao1 on 16/12/27.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[backUrl]]`backUrl`|`String`|-
+|[[block]]`block`|`Array of link:dataobjects.html#ChannelBlockDto[ChannelBlockDto]`|-
+|[[focus]]`focus`|`Array of link:dataobjects.html#BaseDto[BaseDto]`|-
+|[[focusDataType]]`focusDataType`|`String`|-
+|===
+
+[[ChannelPageResponse]]
+== ChannelPageResponse
+
+++++
+ Created by zhushenghao1 on 16/12/30.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#ChannelPage[ChannelPage]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[ChannelResponse]]
+== ChannelResponse
+
+++++
+ 直播频道信息
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[beginTime]]`beginTime`|`String`|-
+|[[belongArea]]`belongArea`|`String`|-
+|[[belongBrand]]`belongBrand`|`String`|-
+|[[buyFlag]]`buyFlag`|`String`|-
+|[[ch]]`ch`|`String`|-
+|[[channelClass]]`channelClass`|`String`|-
+|[[channelDesc]]`channelDesc`|`String`|-
+|[[channelEname]]`channelEname`|`String`|-
+|[[channelId]]`channelId`|`String`|-
+|[[channelName]]`channelName`|`String`|-
+|[[chatRoomNum]]`chatRoomNum`|`String`|-
+|[[childLock]]`childLock`|`String`|-
+|[[cibnChannelName]]`cibnChannelName`|`String`|-
+|[[cibnWatermarkUrl]]`cibnWatermarkUrl`|`String`|-
+|[[copyright]]`copyright`|`String`|-
+|[[defaultLogo]]`defaultLogo`|`String`|-
+|[[demandId]]`demandId`|`String`|-
+|[[drmFlag]]`drmFlag`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[is3D]]`is3D`|`String`|-
+|[[is4K]]`is4K`|`String`|-
+|[[isChat]]`isChat`|`String`|-
+|[[isCollect]]`isCollect`|`String`|-
+|[[isCopyRight]]`isCopyRight`|`String`|-
+|[[isDanmaku]]`isDanmaku`|`String`|-
+|[[isPay]]`isPay`|`String`|-
+|[[isPicCollections]]`isPicCollections`|`String`|-
+|[[isRecommend]]`isRecommend`|`String`|-
+|[[numericKeys]]`numericKeys`|`String`|-
+|[[orderNo]]`orderNo`|`String`|-
+|[[partId]]`partId`|`String`|-
+|[[pcWatermarkUrl]]`pcWatermarkUrl`|`String`|-
+|[[postH3]]`postH3`|`String`|-
+|[[postOrigin]]`postOrigin`|`String`|-
+|[[postS1]]`postS1`|`String`|-
+|[[postS2]]`postS2`|`String`|-
+|[[postS3]]`postS3`|`String`|-
+|[[postS4]]`postS4`|`String`|-
+|[[postS5]]`postS5`|`String`|-
+|[[programSource]]`programSource`|`String`|-
+|[[relaId]]`relaId`|`String`|-
+|[[satelliteTvType]]`satelliteTvType`|`String`|-
+|[[signal]]`signal`|`String`|-
+|[[sourceId]]`sourceId`|`String`|-
+|[[splatid]]`splatid`|`String`|-
+|[[src_id]]`src_id`|`String`|-
+|[[streamUrl]]`streamUrl`|`String`|-
+|[[subLiveType]]`subLiveType`|`String`|-
+|[[subLiveTypeName]]`subLiveTypeName`|`String`|-
+|[[watermarkUrl]]`watermarkUrl`|`String`|-
+|===
+
+[[CmsCategoryDto]]
+== CmsCategoryDto
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[categoryId]]`categoryId`|`String`|-
+|[[categoryName]]`categoryName`|`String`|-
+|[[channelList]]`channelList`|`Array of link:dataobjects.html#CmsChannelDto[CmsChannelDto]`|-
+|[[dataSource]]`dataSource`|`Number (Integer)`|-
+|[[dataType]]`dataType`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[isPersonalizedSort]]`isPersonalizedSort`|`Number (Integer)`|-
+|===
+
+[[CmsChannelDto]]
+== CmsChannelDto
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[avator]]`avator`|`String`|-
+|[[branchType]]`branchType`|`String`|-
+|[[channelBigPic]]`channelBigPic`|`String`|-
+|[[channelClass]]`channelClass`|`String`|-
+|[[channelDesc]]`channelDesc`|`String`|-
+|[[channelEname]]`channelEname`|`String`|-
+|[[channelId]]`channelId`|`String`|-
+|[[channelName]]`channelName`|`String`|-
+|[[channelPic]]`channelPic`|`String`|-
+|[[columnId]]`columnId`|`String`|-
+|[[corner]]`corner`|`String`|-
+|[[cpName]]`cpName`|`String`|-
+|[[fav]]`fav`|`String`|-
+|[[is3D]]`is3D`|`String`|-
+|[[is4K]]`is4K`|`String`|-
+|[[isAnchor]]`isAnchor`|`Number (Integer)`|-
+|[[isArtificialRecommend]]`isArtificialRecommend`|`String`|-
+|[[isDolby]]`isDolby`|`String`|-
+|[[isDrm]]`isDrm`|`String`|-
+|[[isLiveFromTV]]`isLiveFromTV`|`String`|-
+|[[isPanoramicView]]`isPanoramicView`|`String`|-
+|[[isPay]]`isPay`|`String`|-
+|[[liveType]]`liveType`|`String`|-
+|[[nickName]]`nickName`|`String`|-
+|[[numericKeys]]`numericKeys`|`String`|-
+|[[orderNo]]`orderNo`|`String`|-
+|[[selfCopyRight]]`selfCopyRight`|`String`|-
+|[[signal]]`signal`|`String`|-
+|[[src]]`src`|`String`|-
+|[[streamTips]]`streamTips`|`String`|-
+|[[thirdLiveId]]`thirdLiveId`|`String`|-
+|[[type]]`type`|`String`|-
+|[[waterLogo]]`waterLogo`|`String`|-
+|[[webViewType]]`webViewType`|`String`|-
+|[[weight]]`weight`|`Number (Integer)`|-
+|===
+
+[[CmsColumnContentResponse]]
+== CmsColumnContentResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[columnId]]`columnId`|`Number (Integer)`|-
+|[[corner1]]`corner1`|`String`|-
+|[[dataId]]`dataId`|`String`|-
+|[[dataName]]`dataName`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[isRecommend]]`isRecommend`|`Number (Integer)`|-
+|[[liveType]]`liveType`|`Number (Integer)`|-
+|[[orderr]]`orderr`|`Number (Integer)`|-
+|[[outputType]]`outputType`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[skipType]]`skipType`|`Number (Integer)`|-
+|[[skipValue]]`skipValue`|`String`|-
+|===
+
+[[CmsColumnListResponse]]
+== CmsColumnListResponse
+
+++++
+ get column response
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`Array of link:dataobjects.html#CmsColumnResponse[CmsColumnResponse]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[msg]]`msg`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[statusCode]]`statusCode`|`Number (Integer)`|-
+|===
+
+[[CmsColumnResponse]]
+== CmsColumnResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[columnColor]]`columnColor`|`String`|-
+|[[columnContent]]`columnContent`|`Array of link:dataobjects.html#CmsColumnContentResponse[CmsColumnContentResponse]`|-
+|[[columnName]]`columnName`|`String`|-
+|[[columnType]]`columnType`|`Number (Integer)`|-
+|[[fontColor]]`fontColor`|`String`|-
+|[[fontSize]]`fontSize`|`String`|-
+|[[hasDataSearchAPI]]`hasDataSearchAPI`|`Number (Integer)`|-
+|[[icon]]`icon`|`String`|-
+|[[icon2]]`icon2`|`String`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[orderr]]`orderr`|`String`|-
+|[[pid]]`pid`|`Number (Integer)`|-
+|[[product]]`product`|`Number (Integer)`|-
+|[[searchUrl]]`searchUrl`|`String`|-
+|[[site]]`site`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[CmsFragListResponse]]
+== CmsFragListResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[cacheTime]]`cacheTime`|`Number (long)`|-
+|[[frags]]`frags`|`Array of link:dataobjects.html#CmsFragResponse[CmsFragResponse]`|-
+|[[pageId]]`pageId`|`Number (Integer)`|-
+|===
+
+[[CmsFragResponse]]
+== CmsFragResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[columnEntity]]`columnEntity`|`link:dataobjects.html#CmsColumnResponse[CmsColumnResponse]`|-
+|[[contentCid]]`contentCid`|`Number (Integer)`|-
+|[[contentId]]`contentId`|`String`|-
+|[[contentManulNum]]`contentManulNum`|`Number (Integer)`|-
+|[[contentName]]`contentName`|`String`|-
+|[[contentPicSize]]`contentPicSize`|`String`|-
+|[[contentRate]]`contentRate`|`Number (Integer)`|-
+|[[contentRid]]`contentRid`|`String`|-
+|[[contentSort]]`contentSort`|`Number (Integer)`|-
+|[[contentStyle]]`contentStyle`|`String`|-
+|[[contentSubName]]`contentSubName`|`String`|-
+|[[contentTotal]]`contentTotal`|`Number (Integer)`|-
+|[[contentType]]`contentType`|`Number (Integer)`|-
+|[[contentVideoType]]`contentVideoType`|`Number (Integer)`|-
+|[[fragId]]`fragId`|`Number (Integer)`|-
+|[[fragType]]`fragType`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[isLock]]`isLock`|`Number (Integer)`|-
+|[[isOrder]]`isOrder`|`Number (Integer)`|-
+|[[isPage]]`isPage`|`Number (Integer)`|-
+|[[moduleSort]]`moduleSort`|`String`|-
+|[[nameLanguageJson]]`nameLanguageJson`|`String`|-
+|[[pid]]`pid`|`Number (Integer)`|-
+|[[pushPlatform]]`pushPlatform`|`String`|-
+|[[redirectCid]]`redirectCid`|`Number (Integer)`|-
+|[[redirectPageId]]`redirectPageId`|`String`|-
+|[[redirectSubCid]]`redirectSubCid`|`Number (Integer)`|-
+|[[redirectSubPageId]]`redirectSubPageId`|`String`|-
+|[[redirectSubType]]`redirectSubType`|`Number (Integer)`|-
+|[[redirectSubUrl]]`redirectSubUrl`|`String`|-
+|[[redirectSubVideoType]]`redirectSubVideoType`|`Number (Integer)`|-
+|[[redirectType]]`redirectType`|`Number (Integer)`|-
+|[[redirectUrl]]`redirectUrl`|`String`|-
+|[[redirectVideoType]]`redirectVideoType`|`Number (Integer)`|-
+|[[site]]`site`|`Number (Integer)`|-
+|[[subFrags]]`subFrags`|`Array of link:dataobjects.html#CmsFragResponse[CmsFragResponse]`|-
+|[[subNameLanguageJson]]`subNameLanguageJson`|`String`|-
+|===
+
+[[CmsMutilangDataResponse]]
+== CmsMutilangDataResponse
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/4/25
+ Time: 18:59
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`String`|-
+|[[data]]`data`|`link:dataobjects.html#CmsBlockTpResponse[CmsBlockTpResponse]`|-
+|[[innerCode]]`innerCode`|`String`|-
+|===
+
+[[CmsPageDto]]
+== CmsPageDto
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[categoryList]]`categoryList`|`Array of link:dataobjects.html#CmsCategoryDto[CmsCategoryDto]`|-
+|[[pageId]]`pageId`|`String`|-
+|===
+
+[[CmsPageRequest]]
+== CmsPageRequest
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[lang]]`lang`|`String`|-
+|[[pageId]]`pageId`|`String`|-
+|[[platform]]`platform`|`String`|-
+|===
+
+[[CmsPageResponse]]
+== CmsPageResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`Number (int)`|-
+|[[data]]`data`|`link:dataobjects.html#CmsFragListResponse[CmsFragListResponse]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[msg]]`msg`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[CmsPageWrapper]]
+== CmsPageWrapper
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#CmsPageDto[CmsPageDto]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[ColumnListRequest]]
+== ColumnListRequest
+
+++++
+ 子栏目类别request
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[lang]]`lang`|`String`|-
+|[[pid]]`pid`|`Number (Integer)`|-
+|[[platform]]`platform`|`String`|-
+|===
+
+[[CommonParam]]
+== CommonParam
+
+++++
+ request params of interface:GET_SHORT_CUT
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[areaCode]]`areaCode`|`String`|-
+|[[bizCode]]`bizCode`|`String`|-
+|[[countryArea]]`countryArea`|`String`|-
+|[[devId]]`devId`|`String`|-
+|[[history]]`history`|`String`|-
+|[[imeiArea]]`imeiArea`|`String`|-
+|[[ip]]`ip`|`String`|-
+|[[langcode]]`langcode`|`String`|-
+|[[support]]`support`|`Number (Integer)`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[wcode]]`wcode`|`String`|-
+|===
+
+[[ContentItem]]
+== ContentItem
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/31
+ Time: 11:37
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[actor]]`actor`|`String`|-
+|[[actorPlay]]`actorPlay`|`String`|-
+|[[actorPlayPic]]`actorPlayPic`|`String`|-
+|[[albumType]]`albumType`|`String`|-
+|[[alias]]`alias`|`String`|-
+|[[allowForgienPlatform]]`allowForgienPlatform`|`String`|-
+|[[area]]`area`|`String`|-
+|[[category]]`category`|`String`|-
+|[[description]]`description`|`String`|-
+|[[directory]]`directory`|`String`|-
+|[[downloadPlatform]]`downloadPlatform`|`String`|-
+|[[duration]]`duration`|`Number (Long)`|-
+|[[episode]]`episode`|`String`|-
+|[[id]]`id`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[isHomemade]]`isHomemade`|`String`|-
+|[[issue]]`issue`|`String`|-
+|[[mid]]`mid`|`String`|-
+|[[nameCn]]`nameCn`|`String`|-
+|[[nameEn]]`nameEn`|`String`|-
+|[[nowEpisodes]]`nowEpisodes`|`String`|-
+|[[nowIssue]]`nowIssue`|`String`|-
+|[[officialUrl]]`officialUrl`|`String`|-
+|[[pic43]]`pic43`|`String`|-
+|[[picAll]]`picAll`|`String`|-
+|[[picCollections]]`picCollections`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[platformVideoInfo]]`platformVideoInfo`|`String`|-
+|[[platformVideoNum]]`platformVideoNum`|`String`|-
+|[[porder]]`porder`|`String`|-
+|[[relationId]]`relationId`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[rid]]`rid`|`String`|-
+|[[rname]]`rname`|`String`|-
+|[[singer]]`singer`|`String`|-
+|[[subCategory]]`subCategory`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[transCodePrefix]]`transCodePrefix`|`String`|-
+|[[videoType]]`videoType`|`String`|-
+|===
+
+[[ContentPackage]]
+== ContentPackage
+
+++++
+ CMS内容包元素类
+ CMS接口中在同一集合中返回不同产品包
+ 这边解析只能把不同元素合为一个大元素解析
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[dataList]]`dataList`|`Array of link:dataobjects.html#ContentItem[ContentItem]`|-
+|[[id]]`id`|`String`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[name]]`name`|`String`|-
+|[[porder]]`porder`|`String`|-
+|[[ptype]]`ptype`|`String`|-
+|===
+
+[[Doc]]
+== Doc
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[document]]`document`|`String`|-
+|===
+
+[[FilterResultDto]]
+== FilterResultDto
+
+++++
+ Created by zhushenghao1 on 17/1/13.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[curPage]]`curPage`|`Number (Integer)`|-
+|[[nextPage]]`nextPage`|`Number (Integer)`|-
+|[[result]]`result`|`Array of link:dataobjects.html#AlbumInfoDto[AlbumInfoDto]`|-
+|[[total]]`total`|`Number (Integer)`|-
+|===
+
+[[Fpic]]
+== Fpic
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[pic1_746_419]]`pic1_746_419`|`String`|-
+|[[pic2_960_540]]`pic2_960_540`|`String`|-
+|[[pic5_1920_1080]]`pic5_1920_1080`|`String`|-
+|===
+
+[[JumpData]]
+== JumpData
+
+++++
+ 数据基类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[type]]`type`|`Number (Integer)`|-
+|[[value]]`value`|`link:dataobjects.html#Channel[Channel]`|-
+|===
+
+[[LeTVRecRequest]]
+== LeTVRecRequest
+
+++++
+ Created by zhushenghao1 on 17/2/7.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`String`|-
+|[[area]]`area`|`String`|-
+|[[bc]]`bc`|`Number (Integer)`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[city]]`city`|`String`|-
+|[[citylevel]]`citylevel`|`String`|-
+|[[disable_record_exposure]]`disable_record_exposure`|`Number (Integer)`|-
+|[[feedback]]`feedback`|`Number (Integer)`|-
+|[[history]]`history`|`String`|-
+|[[is_rec]]`is_rec`|`Boolean`|-
+|[[jsonp]]`jsonp`|`String`|-
+|[[lang]]`lang`|`String`|-
+|[[lc]]`lc`|`String`|-
+|[[mpt]]`mpt`|`String`|-
+|[[num]]`num`|`Number (Integer)`|-
+|[[page_num]]`page_num`|`Number (Integer)`|-
+|[[pageid]]`pageid`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[playtime]]`playtime`|`Number (Long)`|-
+|[[pt]]`pt`|`String`|-
+|[[random]]`random`|`Number (Double)`|-
+|[[region]]`region`|`String`|-
+|[[rom_country]]`rom_country`|`String`|-
+|[[serverTerminal]]`serverTerminal`|`String`|-
+|[[totaltime]]`totaltime`|`Number (Long)`|-
+|[[type]]`type`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[user_country]]`user_country`|`String`|-
+|[[version]]`version`|`String`|-
+|[[versiontype]]`versiontype`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|===
+
+[[LecomRecRequest]]
+== LecomRecRequest
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/7/22
+ Time: 15:33
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`String`|-
+|[[area]]`area`|`String`|-
+|[[bc]]`bc`|`Number (Integer)`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[city]]`city`|`String`|-
+|[[citylevel]]`citylevel`|`String`|-
+|[[disable_record_exposure]]`disable_record_exposure`|`Number (Integer)`|-
+|[[feedback]]`feedback`|`Number (Integer)`|-
+|[[history]]`history`|`String`|-
+|[[is_rec]]`is_rec`|`Boolean`|-
+|[[jsonp]]`jsonp`|`String`|-
+|[[lang]]`lang`|`String`|-
+|[[lc]]`lc`|`String`|-
+|[[mpt]]`mpt`|`String`|-
+|[[num]]`num`|`Number (Integer)`|-
+|[[page_num]]`page_num`|`Number (Integer)`|-
+|[[pageid]]`pageid`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[playtime]]`playtime`|`Number (Long)`|-
+|[[pt]]`pt`|`String`|-
+|[[random]]`random`|`Number (Double)`|-
+|[[region]]`region`|`String`|-
+|[[rom_country]]`rom_country`|`String`|-
+|[[serverTerminal]]`serverTerminal`|`String`|-
+|[[totaltime]]`totaltime`|`Number (Long)`|-
+|[[type]]`type`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[user_country]]`user_country`|`String`|-
+|[[version]]`version`|`String`|-
+|[[versiontype]]`versiontype`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|===
+
+[[LiveCommonParam]]
+== LiveCommonParam
+
+++++
+ 接口通用参数
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appVersion]]`appVersion`|`String`|-
+|[[broadcastId]]`broadcastId`|`String`|-
+|[[bsChannel]]`bsChannel`|`String`|-
+|[[cityInfo]]`cityInfo`|`String`|-
+|[[countryArea]]`countryArea`|`String`|-
+|[[devId]]`devId`|`String`|-
+|[[from]]`from`|`String`|-
+|[[langcode]]`langcode`|`String`|-
+|[[mac]]`mac`|`String`|-
+|[[pcode]]`pcode`|`String`|-
+|[[salesArea]]`salesArea`|`String`|-
+|[[splatClient]]`splatClient`|`String`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[terminalBrand]]`terminalBrand`|`String`|-
+|[[terminalSeries]]`terminalSeries`|`String`|-
+|[[token]]`token`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[versionCode]]`versionCode`|`String`|-
+|[[wcode]]`wcode`|`String`|-
+|===
+
+[[LmsDataListResponse]]
+== LmsDataListResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`String`|-
+|[[data]]`data`|`Array of link:dataobjects.html#LmsDataResponse[LmsDataResponse]`|-
+|[[message]]`message`|`String`|-
+|===
+
+[[LmsDataRequest]]
+== LmsDataRequest
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[fetchSize]]`fetchSize`|`Number (int)`|-
+|[[offSet]]`offSet`|`Number (int)`|-
+|[[sourceId]]`sourceId`|`String`|-
+|[[splatid]]`splatid`|`String`|-
+|[[url]]`url`|`String`|-
+|===
+
+[[LmsDataResponse]]
+== LmsDataResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[anchorId]]`anchorId`|`String`|-
+|[[anchorName]]`anchorName`|`String`|-
+|[[anchorSex]]`anchorSex`|`String`|-
+|[[chatRoomId]]`chatRoomId`|`String`|-
+|[[ctime]]`ctime`|`String`|-
+|[[headPic]]`headPic`|`String`|-
+|[[id]]`id`|`String`|-
+|[[imageScala]]`imageScala`|`String`|-
+|[[interactionId]]`interactionId`|`String`|-
+|[[isBarrage]]`isBarrage`|`String`|-
+|[[isChatRoom]]`isChatRoom`|`String`|-
+|[[isLike]]`isLike`|`String`|-
+|[[isProp]]`isProp`|`String`|-
+|[[isRward]]`isRward`|`String`|-
+|[[isShare]]`isShare`|`String`|-
+|[[liveRoomDesc]]`liveRoomDesc`|`String`|-
+|[[liveRoomName]]`liveRoomName`|`String`|-
+|[[liveRoomPic]]`liveRoomPic`|`String`|-
+|[[liveRoomStatus]]`liveRoomStatus`|`String`|-
+|[[liveRoomStreamId]]`liveRoomStreamId`|`String`|-
+|[[liveRoomType]]`liveRoomType`|`String`|-
+|[[liveRoomWeight]]`liveRoomWeight`|`String`|-
+|[[mtime]]`mtime`|`String`|-
+|[[partnerRoomId]]`partnerRoomId`|`String`|-
+|[[roomId]]`roomId`|`String`|-
+|[[shareDoc]]`shareDoc`|`String`|-
+|[[sid]]`sid`|`String`|-
+|[[sourceName]]`sourceName`|`String`|-
+|[[status]]`status`|`String`|-
+|[[streamInfo]]`streamInfo`|`String`|-
+|[[version]]`version`|`String`|-
+|===
+
+[[MaterialInfo]]
+== MaterialInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[height]]`height`|`Number (Integer)`|-
+|[[pic]]`pic`|`String`|-
+|[[textList]]`textList`|`Array of String`|-
+|[[width]]`width`|`Number (Integer)`|-
+|===
+
+[[Page]]
+== Page
+
+++++
+ 定制页面
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[albumId]]`albumId`|`Number (Integer)`|-
+|[[categoryId]]`categoryId`|`Number (Integer)`|-
+|[[channelCode]]`channelCode`|`String`|-
+|[[channelId]]`channelId`|`Number (Integer)`|-
+|[[channelName]]`channelName`|`String`|-
+|[[configInfo]]`configInfo`|`String`|-
+|[[cpCategoryId]]`cpCategoryId`|`String`|-
+|[[cpId]]`cpId`|`String`|-
+|[[dataType]]`dataType`|`Number (int)`|-
+|[[dataUrl]]`dataUrl`|`String`|-
+|[[defaultStream]]`defaultStream`|`String`|-
+|[[defaultStreamName]]`defaultStreamName`|`String`|-
+|[[globalId]]`globalId`|`String`|-
+|[[iconType]]`iconType`|`String`|-
+|[[img]]`img`|`String`|-
+|[[isSelected]]`isSelected`|`Number (Integer)`|-
+|[[jump]]`jump`|`link:dataobjects.html#JumpData[JumpData]`|-
+|[[name]]`name`|`String`|-
+|[[pageId]]`pageId`|`Number (Integer)`|-
+|[[parentChannelId]]`parentChannelId`|`Number (Integer)`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[pid]]`pid`|`Number (Integer)`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|[[productName]]`productName`|`String`|-
+|[[subName]]`subName`|`String`|-
+|[[subType]]`subType`|`Number (Integer)`|-
+|[[titleBgColor]]`titleBgColor`|`String`|-
+|[[titleDataType]]`titleDataType`|`Number (Integer)`|-
+|[[titleFocus1]]`titleFocus1`|`String`|-
+|[[titleFocus2]]`titleFocus2`|`String`|-
+|[[titleIcon]]`titleIcon`|`String`|-
+|===
+
+[[PageCategoryResponse]]
+== PageCategoryResponse
+
+++++
+ 分页响应类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[currentIndex]]`currentIndex`|`Number (Integer)`|-
+|[[data]]`data`|`Array of link:dataobjects.html#ChannelData[ChannelData]`|-
+|[[nextIndex]]`nextIndex`|`Number (Integer)`|-
+|[[totalCount]]`totalCount`|`Number (Integer)`|-
+|===
+
+[[PageResponse]]
+== PageResponse
+
+++++
+ Created by zhushenghao1 on 16/12/1.
+ 基于index的分页Response
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[currentIndex]]`currentIndex`|`Number (Integer)`|-
+|[[data]]`data`|`Array of link:dataobjects.html#ChannelList[ChannelList]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[nextIndex]]`nextIndex`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[totalCount]]`totalCount`|`Number (Integer)`|-
+|===
+
+[[PlayBillCurrentRequest]]
+== PlayBillCurrentRequest
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[channelIds]]`channelIds`|`Number (Integer)`|-
+|[[clientId]]`clientId`|`Number (int)`|-
+|===
+
+[[PlayBillCurrentTpResponse]]
+== PlayBillCurrentTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[rows]]`rows`|`Array of link:dataobjects.html#PlayBillCurrentTpRows[PlayBillCurrentTpRows]`|-
+|===
+
+[[PlayBillCurrentTpRows]]
+== PlayBillCurrentTpRows
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[channelId]]`channelId`|`String`|-
+|[[cur]]`cur`|`link:dataobjects.html#ProgramTp[ProgramTp]`|-
+|[[errMsg]]`errMsg`|`String`|-
+|[[next]]`next`|`link:dataobjects.html#ProgramTp[ProgramTp]`|-
+|[[pre]]`pre`|`link:dataobjects.html#ProgramTp[ProgramTp]`|-
+|===
+
+[[ProgramTp]]
+== ProgramTp
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[aid]]`aid`|`String`|-
+|[[duration]]`duration`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[isRecorder]]`isRecorder`|`Number (Integer)`|-
+|[[playTime]]`playTime`|`String`|-
+|[[programType]]`programType`|`Number (Integer)`|-
+|[[theaterIco]]`theaterIco`|`link:dataobjects.html#TheaterIcoTp[TheaterIcoTp]`|-
+|[[title]]`title`|`String`|-
+|[[vid]]`vid`|`String`|-
+|[[viewPic]]`viewPic`|`String`|-
+|===
+
+[[ProgramWaterMarkData]]
+== ProgramWaterMarkData
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[items]]`items`|`Array of link:dataobjects.html#WaterMarkDeliveryTpResponse[WaterMarkDeliveryTpResponse]`|-
+|[[page]]`page`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|[[total]]`total`|`Number (Integer)`|-
+|===
+
+[[ProgramWaterMarkRequest]]
+== ProgramWaterMarkRequest
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[channelId]]`channelId`|`Number (Integer)`|-
+|[[curPage]]`curPage`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|[[platform]]`platform`|`String`|-
+|[[playDate]]`playDate`|`String`|-
+|===
+
+[[ProgramWaterMarkTpResponse]]
+== ProgramWaterMarkTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`String`|-
+|[[data]]`data`|`link:dataobjects.html#ProgramWaterMarkData[ProgramWaterMarkData]`|-
+|[[result]]`result`|`Number (Integer)`|-
+|[[statusCode]]`statusCode`|`String`|-
+|===
+
+[[RatingAndPlayRankTp]]
+== RatingAndPlayRankTp
+
+++++
+ 排行榜返回实体
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[name]]`name`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[playcount]]`playcount`|`String`|-
+|[[rating]]`rating`|`String`|-
+|[[subname]]`subname`|`String`|-
+|[[webUrl]]`webUrl`|`String`|-
+|===
+
+[[RatingRankResponse]]
+== RatingRankResponse
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/11/1
+ Time: 11:42
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[ratingAndPlayRankTps]]`ratingAndPlayRankTps`|`Array of link:dataobjects.html#RatingAndPlayRankTp[RatingAndPlayRankTp]`|-
+|===
+
+[[RecBaseRequest]]
+== RecBaseRequest
+
+++++
+ 调用推荐接口的基本参数列表
+ 参数详细说说明参见http://wiki.letv.cn/pages/viewpage.action?pageId=32708712
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`String`|-
+|[[area]]`area`|`String`|-
+|[[bc]]`bc`|`Number (Integer)`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[city]]`city`|`String`|-
+|[[citylevel]]`citylevel`|`String`|-
+|[[disable_record_exposure]]`disable_record_exposure`|`Number (Integer)`|-
+|[[feedback]]`feedback`|`Number (Integer)`|-
+|[[history]]`history`|`String`|-
+|[[is_rec]]`is_rec`|`Boolean`|-
+|[[jsonp]]`jsonp`|`String`|-
+|[[lang]]`lang`|`String`|-
+|[[lc]]`lc`|`String`|-
+|[[mpt]]`mpt`|`String`|-
+|[[num]]`num`|`Number (Integer)`|-
+|[[page_num]]`page_num`|`Number (Integer)`|-
+|[[pageid]]`pageid`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[playtime]]`playtime`|`Number (Long)`|-
+|[[pt]]`pt`|`String`|-
+|[[random]]`random`|`Number (Double)`|-
+|[[region]]`region`|`String`|-
+|[[rom_country]]`rom_country`|`String`|-
+|[[serverTerminal]]`serverTerminal`|`String`|-
+|[[totaltime]]`totaltime`|`Number (Long)`|-
+|[[type]]`type`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[user_country]]`user_country`|`String`|-
+|[[version]]`version`|`String`|-
+|[[versiontype]]`versiontype`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|===
+
+[[RecBaseResponse]]
+== RecBaseResponse
+
+++++
+ 推荐接口通用返回参数
+ 参数详情参照：http://wiki.letv.cn/pages/viewpage.action?pageId=32708712
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[bucket]]`bucket`|`String`|-
+|[[rec]]`rec`|`Array of link:dataobjects.html#RecommendDetail[RecommendDetail]`|-
+|[[reid]]`reid`|`String`|-
+|===
+
+[[RecData]]
+== RecData
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/19 Time: 11:18
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[album_area]]`album_area`|`String`|-
+|[[album_release_date]]`album_release_date`|`String`|-
+|[[album_sub_category]]`album_sub_category`|`String`|-
+|[[album_type]]`album_type`|`String`|-
+|[[androidUrl]]`androidUrl`|`String`|-
+|[[area]]`area`|`String`|-
+|[[bid]]`bid`|`String`|-
+|[[cgidefault]]`cgidefault`|`String`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[cityLevel]]`cityLevel`|`String`|-
+|[[cityWhiteList]]`cityWhiteList`|`String`|-
+|[[content]]`content`|`String`|-
+|[[createtime]]`createtime`|`String`|-
+|[[ctime]]`ctime`|`String`|-
+|[[defaultPic]]`defaultPic`|`String`|-
+|[[director]]`director`|`String`|-
+|[[duration]]`duration`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[episodes]]`episodes`|`String`|-
+|[[extendJson]]`extendJson`|`link:dataobjects.html#ExtendJson[ExtendJson]`|-
+|[[float_flag]]`float_flag`|`String`|-
+|[[id]]`id`|`String`|-
+|[[iosUrl]]`iosUrl`|`String`|-
+|[[is_pay]]`is_pay`|`String`|-
+|[[is_rec]]`is_rec`|`String`|-
+|[[isalbum]]`isalbum`|`String`|-
+|[[isend]]`isend`|`String`|-
+|[[jump]]`jump`|`String`|-
+|[[latest_auto_video_pic]]`latest_auto_video_pic`|`String`|-
+|[[mobilePic]]`mobilePic`|`String`|-
+|[[mtime]]`mtime`|`String`|-
+|[[padPic]]`padPic`|`String`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[pic320_200]]`pic320_200`|`String`|-
+|[[pic400_225]]`pic400_225`|`String`|-
+|[[pic400_300]]`pic400_300`|`String`|-
+|[[picHT]]`picHT`|`String`|-
+|[[picList]]`picList`|`String`|-
+|[[picST]]`picST`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[pidname]]`pidname`|`String`|-
+|[[pidsubtitle]]`pidsubtitle`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[playcount]]`playcount`|`String`|-
+|[[playurl]]`playurl`|`String`|-
+|[[position]]`position`|`String`|-
+|[[priority]]`priority`|`String`|-
+|[[pushflag]]`pushflag`|`String`|-
+|[[rec_content_type]]`rec_content_type`|`String`|-
+|[[remark]]`remark`|`String`|-
+|[[score]]`score`|`Number (Float)`|-
+|[[shorDesc]]`shorDesc`|`String`|-
+|[[showTag]]`showTag`|`String`|-
+|[[showTagList]]`showTagList`|`Array of link:dataobjects.html#ShowTagList[ShowTagList]`|-
+|[[skipPage]]`skipPage`|`String`|-
+|[[skipType]]`skipType`|`String`|-
+|[[skipUrl]]`skipUrl`|`String`|-
+|[[source]]`source`|`Number (Integer)`|-
+|[[starring]]`starring`|`String`|-
+|[[startTime]]`startTime`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[subtitle]]`subtitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[tagUrl]]`tagUrl`|`String`|-
+|[[title]]`title`|`String`|-
+|[[tvPic]]`tvPic`|`String`|-
+|[[tvUrl]]`tvUrl`|`String`|-
+|[[type]]`type`|`String`|-
+|[[updatetime]]`updatetime`|`String`|-
+|[[url]]`url`|`String`|-
+|[[vcount]]`vcount`|`String`|-
+|[[versionPlatform]]`versionPlatform`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|[[vid_episode]]`vid_episode`|`String`|-
+|[[videoFollowTime]]`videoFollowTime`|`String`|-
+|[[video_pic]]`video_pic`|`String`|-
+|[[video_type]]`video_type`|`String`|-
+|[[vidsubtitle]]`vidsubtitle`|`String`|-
+|[[vtypeFlag]]`vtypeFlag`|`String`|-
+|[[zid]]`zid`|`Number (Long)`|-
+|===
+
+[[RecommendDetail]]
+== RecommendDetail
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/19
+ Time: 11:20
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[actors]]`actors`|`String`|-
+|[[album_area]]`album_area`|`String`|-
+|[[album_play_platform]]`album_play_platform`|`String`|-
+|[[album_play_tv]]`album_play_tv`|`String`|-
+|[[album_release_date]]`album_release_date`|`String`|-
+|[[album_sub_category]]`album_sub_category`|`String`|-
+|[[album_sub_category_code]]`album_sub_category_code`|`String`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[createtime]]`createtime`|`String`|-
+|[[description]]`description`|`String`|-
+|[[director]]`director`|`String`|-
+|[[duration]]`duration`|`Number (Long)`|-
+|[[episodes]]`episodes`|`Number (Integer)`|-
+|[[float_flag]]`float_flag`|`String`|-
+|[[guest]]`guest`|`String`|-
+|[[is_pay]]`is_pay`|`String`|-
+|[[isalbum]]`isalbum`|`Number (Integer)`|-
+|[[isend]]`isend`|`Number (Integer)`|-
+|[[jump]]`jump`|`Number (Integer)`|-
+|[[pic400_250]]`pic400_250`|`String`|-
+|[[pic400_300]]`pic400_300`|`String`|-
+|[[picHT]]`picHT`|`String`|-
+|[[picST]]`picST`|`String`|-
+|[[picsize]]`picsize`|`String`|-
+|[[picurl]]`picurl`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[pidname]]`pidname`|`String`|-
+|[[playurl]]`playurl`|`String`|-
+|[[score]]`score`|`String`|-
+|[[singer]]`singer`|`String`|-
+|[[starring]]`starring`|`String`|-
+|[[subtitle]]`subtitle`|`String`|-
+|[[title]]`title`|`String`|-
+|[[vcount]]`vcount`|`Number (Integer)`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|[[video_area]]`video_area`|`String`|-
+|[[video_play_platform]]`video_play_platform`|`String`|-
+|[[video_release_date]]`video_release_date`|`String`|-
+|[[video_sub_category]]`video_sub_category`|`String`|-
+|[[video_type]]`video_type`|`String`|-
+|[[video_type_name]]`video_type_name`|`String`|-
+|===
+
+[[RecommendTpResponse]]
+== RecommendTpResponse
+
+++++
+ 频道页推荐类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[blockname]]`blockname`|`String`|-
+|[[bucket]]`bucket`|`String`|-
+|[[cid]]`cid`|`Number (Integer)`|-
+|[[cityLevel]]`cityLevel`|`String`|-
+|[[cityWhiteList]]`cityWhiteList`|`String`|-
+|[[cms_num]]`cms_num`|`Number (Integer)`|-
+|[[conFieldDetailList]]`conFieldDetailList`|`String`|-
+|[[conFieldTypeList]]`conFieldTypeList`|`String`|-
+|[[contentCid]]`contentCid`|`Number (Integer)`|-
+|[[contentId]]`contentId`|`String`|-
+|[[contentManulNum]]`contentManulNum`|`Number (Integer)`|-
+|[[contentName]]`contentName`|`String`|-
+|[[contentRate]]`contentRate`|`String`|-
+|[[contentRid]]`contentRid`|`String`|-
+|[[contentSort]]`contentSort`|`String`|-
+|[[contentStyle]]`contentStyle`|`String`|-
+|[[contentSubName]]`contentSubName`|`String`|-
+|[[contentTotal]]`contentTotal`|`Number (Integer)`|-
+|[[contentType]]`contentType`|`String`|-
+|[[contentVideoType]]`contentVideoType`|`String`|-
+|[[fragEndTime]]`fragEndTime`|`String`|-
+|[[fragId]]`fragId`|`String`|-
+|[[fragStartTime]]`fragStartTime`|`String`|-
+|[[id]]`id`|`String`|-
+|[[moduleSort]]`moduleSort`|`String`|-
+|[[num]]`num`|`Number (Integer)`|-
+|[[rec]]`rec`|`Array of link:dataobjects.html#RecData[RecData]`|-
+|[[redFieldDetailList]]`redFieldDetailList`|`String`|-
+|[[redFieldTypeList]]`redFieldTypeList`|`String`|-
+|[[redSubFieldDetailList]]`redSubFieldDetailList`|`String`|-
+|[[redSubFieldTypeList]]`redSubFieldTypeList`|`String`|-
+|[[redirectCid]]`redirectCid`|`String`|-
+|[[redirectPageId]]`redirectPageId`|`String`|-
+|[[redirectSubCid]]`redirectSubCid`|`String`|-
+|[[redirectSubPageId]]`redirectSubPageId`|`String`|-
+|[[redirectSubType]]`redirectSubType`|`String`|-
+|[[redirectSubUrl]]`redirectSubUrl`|`String`|-
+|[[redirectSubVideoType]]`redirectSubVideoType`|`String`|-
+|[[redirectType]]`redirectType`|`String`|-
+|[[redirectUrl]]`redirectUrl`|`String`|-
+|[[redirectVideoType]]`redirectVideoType`|`String`|-
+|[[reid]]`reid`|`String`|-
+|[[subFrags]]`subFrags`|`Array of link:dataobjects.html#SubFrag[SubFrag]`|-
+|[[type]]`type`|`String`|-
+|[[typeid]]`typeid`|`String`|-
+|===
+
+[[ResourceItem]]
+== ResourceItem
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[docItemList]]`docItemList`|`Array of link:dataobjects.html#Doc[Doc]`|-
+|[[document]]`document`|`String`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[pxHeight]]`pxHeight`|`Number (Integer)`|-
+|[[pxWidth]]`pxWidth`|`Number (Integer)`|-
+|[[url]]`url`|`String`|-
+|===
+
+[[SearchResponse]]
+== SearchResponse
+
+++++
+ Created by zhushenghao1 on 17/1/13.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#FilterResultDto[FilterResultDto]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[SubFrag]]
+== SubFrag
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/19
+ Time: 11:17
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockContents]]`blockContents`|`Array of link:dataobjects.html#RecData[RecData]`|-
+|[[contentStyle]]`contentStyle`|`String`|-
+|===
+
+[[SubjectContent]]
+== SubjectContent
+
+++++
+ 定义第三方接口返回专题实体类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[ctime]]`ctime`|`String`|-
+|[[description]]`description`|`String`|-
+|[[focusMPic]]`focusMPic`|`String`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[name]]`name`|`String`|-
+|[[packageIds]]`packageIds`|`Array of String`|-
+|[[pic169]]`pic169`|`String`|-
+|[[pubName]]`pubName`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[tjPackages]]`tjPackages`|`Array of link:dataobjects.html#ContentPackage[ContentPackage]`|-
+|[[tvPic]]`tvPic`|`String`|-
+|===
+
+[[SubjectContentTpResponse]]
+== SubjectContentTpResponse
+
+++++
+ 专题包response
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`Number (Integer)`|-
+|[[data]]`data`|`link:dataobjects.html#SubjectContent[SubjectContent]`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[msg]]`msg`|`String`|-
+|===
+
+[[SuperLiveTagTpResponse]]
+== SuperLiveTagTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[lename]]`lename`|`String`|-
+|[[name]]`name`|`String`|-
+|[[tagIcon]]`tagIcon`|`String`|-
+|===
+
+[[TheaterIcoTp]]
+== TheaterIcoTp
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`Number (Integer)`|-
+|[[imgurl]]`imgurl`|`String`|-
+|[[name]]`name`|`String`|-
+|===
+
+[[TheaterPackedWapper]]
+== TheaterPackedWapper
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#WaterMarksDto[WaterMarksDto]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[TheaterWaterMarkRequest]]
+== TheaterWaterMarkRequest
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[channelId]]`channelId`|`Number (Integer)`|-
+|[[platform]]`platform`|`String`|-
+|[[playDate]]`playDate`|`String`|-
+|===
+
+[[TheaterWaterMarkTpResponse]]
+== TheaterWaterMarkTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`Array of link:dataobjects.html#WaterMarkDeliveryTpResponse[WaterMarkDeliveryTpResponse]`|-
+|[[result]]`result`|`Number (int)`|-
+|[[statusCode]]`statusCode`|`String`|-
+|===
+
+[[UserAddOnsInfo]]
+== UserAddOnsInfo
+
+++++
+ Created by zhushenghao1 on 17/2/28.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[listNotEnd]]`listNotEnd`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
+|[[listSub]]`listSub`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
+|[[other]]`other`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
+|===
+
+[[WarterMarkTpResponse]]
+== WarterMarkTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[cycleNum]]`cycleNum`|`Number (Integer)`|-
+|[[displayFrequency]]`displayFrequency`|`Number (Integer)`|-
+|[[displayType]]`displayType`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[name]]`name`|`String`|-
+|[[pos]]`pos`|`Number (Integer)`|-
+|[[preDuration]]`preDuration`|`Number (Integer)`|-
+|[[resourceItemList]]`resourceItemList`|`Array of link:dataobjects.html#ResourceItem[ResourceItem]`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[style]]`style`|`Number (Integer)`|-
+|[[type]]`type`|`Number (Integer)`|-
+|===
+
+[[WaterMarkDeliveryInfo]]
+== WaterMarkDeliveryInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[beginTime]]`beginTime`|`Number (Long)`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[playbillId]]`playbillId`|`Number (Integer)`|-
+|[[programId]]`programId`|`String`|-
+|[[programType]]`programType`|`Number (Integer)`|-
+|[[splatld]]`splatld`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[waterMarkId]]`waterMarkId`|`Number (Integer)`|-
+|[[waterMarkInfo]]`waterMarkInfo`|`link:dataobjects.html#WaterMarkInfo[WaterMarkInfo]`|-
+|===
+
+[[WaterMarkDeliveryTpResponse]]
+== WaterMarkDeliveryTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[beginTime]]`beginTime`|`Number (Long)`|-
+|[[dataId]]`dataId`|`String`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[playbillItemId]]`playbillItemId`|`Number (Integer)`|-
+|[[posx]]`posx`|`Number (Integer)`|-
+|[[posy]]`posy`|`Number (Integer)`|-
+|[[programType]]`programType`|`Number (Integer)`|-
+|[[splatId]]`splatId`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[wartermark]]`wartermark`|`link:dataobjects.html#WarterMarkTpResponse[WarterMarkTpResponse]`|-
+|[[watermarkId]]`watermarkId`|`Number (Integer)`|-
+|===
+
+[[WaterMarkInfo]]
+== WaterMarkInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[circleCount]]`circleCount`|`Number (Integer)`|-
+|[[displayFrequency]]`displayFrequency`|`Number (Integer)`|-
+|[[displayType]]`displayType`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[materialList]]`materialList`|`Array of link:dataobjects.html#MaterialInfo[MaterialInfo]`|-
+|[[name]]`name`|`String`|-
+|[[position]]`position`|`Number (Integer)`|-
+|[[preDuration]]`preDuration`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[style]]`style`|`Number (Integer)`|-
+|[[type]]`type`|`Number (Integer)`|-
+|===
+
+[[WaterMarksDto]]
+== WaterMarksDto
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[programWaterMarkList]]`programWaterMarkList`|`Array of link:dataobjects.html#WaterMarkDeliveryInfo[WaterMarkDeliveryInfo]`|-
+|[[theaterWaterMarkList]]`theaterWaterMarkList`|`Array of link:dataobjects.html#WaterMarkDeliveryInfo[WaterMarkDeliveryInfo]`|-
+|===
+
+[[ZhiBoDataResponse]]
+== ZhiBoDataResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[beginTime]]`beginTime`|`String`|-
+|[[belongArea]]`belongArea`|`String`|-
+|[[branchType]]`branchType`|`String`|-
+|[[buyFlag]]`buyFlag`|`String`|-
+|[[ch]]`ch`|`String`|-
+|[[chatRoomNum]]`chatRoomNum`|`String`|-
+|[[cibnSelectId]]`cibnSelectId`|`String`|-
+|[[cids]]`cids`|`String`|-
+|[[commentaryLanguage]]`commentaryLanguage`|`String`|-
+|[[connectionLiveIds]]`connectionLiveIds`|`String`|-
+|[[description]]`description`|`String`|-
+|[[drmFlag]]`drmFlag`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[eventId]]`eventId`|`String`|-
+|[[focusPic]]`focusPic`|`link:dataobjects.html#Fpic[Fpic]`|-
+|[[guest]]`guest`|`String`|-
+|[[guestImgUrl]]`guestImgUrl`|`String`|-
+|[[guestscore]]`guestscore`|`String`|-
+|[[home]]`home`|`String`|-
+|[[homeImgUrl]]`homeImgUrl`|`String`|-
+|[[homescore]]`homescore`|`String`|-
+|[[id]]`id`|`String`|-
+|[[isChat]]`isChat`|`String`|-
+|[[isDanmaku]]`isDanmaku`|`String`|-
+|[[isDolby]]`isDolby`|`String`|-
+|[[isPanoramicView]]`isPanoramicView`|`String`|-
+|[[isPay]]`isPay`|`String`|-
+|[[isVS]]`isVS`|`Number (Integer)`|-
+|[[leWord]]`leWord`|`Array of link:dataobjects.html#SuperLiveTagTpResponse[SuperLiveTagTpResponse]`|-
+|[[level1]]`level1`|`String`|-
+|[[level1Id]]`level1Id`|`String`|-
+|[[level2]]`level2`|`String`|-
+|[[level2Id]]`level2Id`|`String`|-
+|[[liveType]]`liveType`|`String`|-
+|[[match]]`match`|`String`|-
+|[[musicV2Screenings]]`musicV2Screenings`|`String`|-
+|[[originPrice]]`originPrice`|`String`|-
+|[[partId]]`partId`|`String`|-
+|[[payPlatForm]]`payPlatForm`|`String`|-
+|[[payType]]`payType`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[preVID]]`preVID`|`String`|-
+|[[price]]`price`|`String`|-
+|[[recordingId]]`recordingId`|`String`|-
+|[[screenings]]`screenings`|`String`|-
+|[[season]]`season`|`String`|-
+|[[selectId]]`selectId`|`String`|-
+|[[splatid]]`splatid`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[title]]`title`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[typeName]]`typeName`|`String`|-
+|[[vid]]`vid`|`String`|-
+|[[viewPic]]`viewPic`|`String`|-
+|[[vipPrice]]`vipPrice`|`String`|-
+|[[weight]]`weight`|`Number (Integer)`|-
+|===
+
+[[ZhiBoDataSetTpResponse]]
+== ZhiBoDataSetTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[rows]]`rows`|`Array of link:dataobjects.html#ZhiBoDataResponse[ZhiBoDataResponse]`|-
+|===
+

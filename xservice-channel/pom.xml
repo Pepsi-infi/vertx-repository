@@ -1,0 +1,62 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>xgroup</groupId>
+		<artifactId>xservice</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>xservice-channel</artifactId>
+
+    <!-- 配置变量 -->
+    <properties>
+        <main.verticle>api.StartVerticle</main.verticle>
+        <thrift-version>0.9.2</thrift-version>
+        <search-recommendation-thrift>v1.3.3</search-recommendation-thrift>
+        <commons-pool>1.6</commons-pool>
+        <vertx-version>3.4.1</vertx-version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>search-maven-repository</id>
+            <name>search-maven-repository</name>
+            <url>http://maven.letv.cn/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>xgroup</groupId>
+            <artifactId>xservice-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.letv.search</groupId>
+            <artifactId>search-recommendation-thrift</artifactId>
+            <version>${search-recommendation-thrift}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+            <version>${thrift-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>${commons-pool}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-redis-client</artifactId>
+            <version>${vertx-version}</version>
+        </dependency>
+    </dependencies>
+</project>

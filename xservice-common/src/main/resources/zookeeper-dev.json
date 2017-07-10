@@ -1,0 +1,11 @@
+{
+  "zookeeperHosts":"10.181.117.77:2181,10.100.54.205:2181,10.100.54.206:2181",
+  "sessionTimeout":20000,
+  "connectTimeout":3000,
+  "rootPath":"lead",
+  "retry": {
+    "initialSleepTime":100,
+    "intervalTimes":10000,
+    "maxTimes":5
+  }
+}

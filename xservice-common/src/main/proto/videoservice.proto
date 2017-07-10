@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "grpc.videoservice";
+option java_outer_classname = "VideoServiceProto";
+
+
+service VideoService {
+    rpc getVideo(VideoRequest) returns (Video) {}
+
+    rpc mgetVideos(VideoIdsRequest) returns (Videos) {}
+
+    rpc mgetVideosByStream(VideoIdsRequest) returns (stream Video) {}
+
+    rpc getVideosByStream(stream VideoRequest) returns (stream Video) {}
+
+}
+
+message VideoRequest {
+    int64 id = 1;
+}
+
+message Video {
+    int64 albumId=1;
+    int64 id=2;
+    int32 type=3;
+    int32 porder=4;
+    string mid=5;
+    string nameCn=6;
+    string alias=7;
+    string subTitle=8;
+    string shortDesc=9;
+    string description=10;
+    string tag=11;
+    int32 categoryId=12;
+    string categoryName=13;
+    string subCategory=14;
+    string subCategoryName=15;
+    string area=16;
+    string areaName=17;
+    string episode=18;
+    int32 btime=19;
+    int32 etime=20;
+    repeated WatchingFocusCache watchingFocus=21;
+    string downloadPlatform=22;
+    string playPlatform=23;
+    string payPlatform=24;
+    int32 duration=25;
+    int32 status=26;
+    int32 deleted=27;
+    string remark=28;
+    float score=29;
+    repeated PicAll picAll=30;
+    string picOriginal=31;
+    string relativeContent=32;
+    string releaseDate=33;
+    string firstPlayTime=34;
+    int32 issue=35;
+    string school=36;
+    string starring=37;
+    string directory=38;
+    string actor=39;
+    string actorPlay=40;
+    int32 language=41;
+    string languageName=42;
+    string singleName=43;
+    int32 style=44;
+    string styleName=45;
+    int32 sportsType=46;
+    string sportsTypeName=47;
+    int32 letvMakeStyle=48;
+    string letvMakeStyleName=49;
+    int32 popStyle=50;
+    string popStyleName=51;
+    int32 letvProduceStyle=52;
+    string letvProduceStyleName=53;
+    string cartoonStyle=54;
+    string cartoonStyleName=55;
+    int32 fieldType=56;
+    string fieldTypeName=57;
+    int32 pre=58;
+    string preName=59;
+    string instructor=60;
+    string compere=61;
+    string guest=62;
+    string singer=63;
+    string singerType=64;
+    string singerTypeName=65;
+    string musicAuthors=66;
+    string musicStyle=67;
+    string musicStyleName=68;
+    int32 travelTheme=69;
+    string travelThemeName=70;
+    int32 travelType=71;
+    string travelTypeName=72;
+    string maker=73;
+    string recordCompany=74;
+    string copyrightCompany=75;
+    string copyrightStart=76;
+    string copyrightEnd=77;
+    string copyrightType=78;
+    string copyrightTypeName=79;
+    string disableType=80;
+    string disableTypeName=81;
+    string issueCompany=82;
+    string musicCompose=83;
+    string team=84;
+    string transCodePrefix=85;
+    string recreationType=86;
+    string recreationTypeName=87;
+    string playStreams=88;
+    string carfilmType=89;
+    string carfilmTypeName=90;
+    int64 createTime=91;
+    int64 updateTime=92;
+    string midStreams=93;
+    int32 attr=94;
+    int32 logonum=95;
+    string drmFlagId=96;
+    string pic=97;
+    int32 isPlayLock=98;
+    int32 ismobile=99;
+    int64 vv=100;
+    int64 commentCnt=101;
+    repeated string videoStreams=102;
+    int64 midL=103;
+    repeated Stream streams=104;
+    repeated Stream normalStreams=105;
+    repeated Stream theatreStreams=106;
+    repeated Stream threeDStreams=107;
+    repeated Stream dolbyStreams=108;
+    repeated Stream dtsStreams=109;
+    int32 page=110;
+    repeated ActorCache guestList=111;
+    repeated int64 segmentIds=112;
+    int32 isDanmaku=113;
+    repeated int64 guestIds=114;
+    repeated Stream VRstreams=115;
+    string vtypeFlag=116;
+    string allStreams=117;
+    string contentRatingId=118;
+    string contentRatingValue=119;
+    string coopPlatform=120;
+    string statusCode=121;
+}
+
+message WatchingFocusCache {
+    string desc=1;
+    int32 id=2;
+    int64 time=3;
+}
+message PicAll {
+    string picKey=1;
+    string picValue=2;
+}
+message Stream {
+    string name=1;
+    string code=2;
+    string canPlay=3;
+    string canDown=4;
+    string kbps=5;
+    string bandWidth=6;
+    bool isDefault=7;
+    int64 fileSize=8;
+    int32 ifCharge=9;
+    repeated Stream liveStreams=10;
+    repeated Stream playStreams=11;
+}
+message ActorCache {
+    int32 id=1;
+    string name=2;
+    int32 role=3;
+    string img=4;
+    int32 type=5;
+}
+
+message VideoIdsRequest{
+    repeated string id = 1;
+}
+
+message Videos{
+    repeated Video videos = 1;
+}

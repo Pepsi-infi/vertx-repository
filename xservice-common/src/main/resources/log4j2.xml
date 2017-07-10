@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" monitorInterval="30">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="trace" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}#%t#%-5level#%msg%xEx%n" />
+			<!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} 
+				%L %M - %msg%xEx%n"/> -->
+		</Console>
+
+		<RollingFile name="ServerFile" fileName="${sys:log.path}/server.log"
+			filePattern="${sys:log.path}/server.%d{yyyy-MM-dd}.log" append="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}#%t#%p#%c#%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+			<DefaultRolloverStrategy max="30" />
+		</RollingFile>
+
+
+		<RollingFile name="HttpClientFile" fileName="${sys:log.path}/httpClient.log"
+			filePattern="${sys:log.path}/httpClient.%d{YYYY-MM-dd}.log" append="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}#%t#%p#%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+			<DefaultRolloverStrategy max="30" />
+		</RollingFile>
+
+		<RollingFile name="proxyFile" fileName="${sys:log.path}/proxy.log"
+			filePattern="${sys:log.path}/proxy.%d{YYYY-MM-dd}.log" append="true">
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS}#%t#%p#%msg%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+			<DefaultRolloverStrategy max="30" />
+		</RollingFile>
+
+	</Appenders>
+
+	<Loggers>
+		<logger name="httpClient" level="info" includeLocation="true"
+			additivity="false">
+			<appender-ref ref="HttpClientFile" />
+		</logger>
+
+		<logger name="proxy" level="info" includeLocation="true"
+			additivity="false">
+			<appender-ref ref="proxyFile" />
+		</logger>
+
+		<Root level="info">
+			<!--<AppenderRef ref="Console" />-->
+			<AppenderRef ref="ServerFile" />
+		</Root>
+	</Loggers>
+</Configuration>

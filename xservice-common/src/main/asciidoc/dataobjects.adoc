@@ -1,0 +1,1330 @@
+= Cheatsheets
+
+[[ActorCache]]
+== ActorCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`Number (Integer)`|-
+|[[img]]`img`|`String`|-
+|[[name]]`name`|`String`|-
+|[[role]]`role`|`Number (Integer)`|-
+|[[type]]`type`|`Number (Integer)`|-
+|===
+
+[[Album]]
+== Album
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[actor]]`actor`|`String`|-
+|[[alias]]`alias`|`String`|-
+|[[area]]`area`|`String`|-
+|[[areaName]]`areaName`|`String`|-
+|[[attr]]`attr`|`Number (Integer)`|-
+|[[audioInfoObj]]`audioInfoObj`|`Array of link:dataobjects.html#MusicCache[MusicCache]`|-
+|[[baseType]]`baseType`|`Number (Integer)`|-
+|[[carfilmType]]`carfilmType`|`String`|-
+|[[carfilmTypeName]]`carfilmTypeName`|`String`|-
+|[[cast]]`cast`|`String`|-
+|[[categoryId]]`categoryId`|`Number (Integer)`|-
+|[[categoryName]]`categoryName`|`String`|-
+|[[cibn]]`cibn`|`Number (Integer)`|-
+|[[cntv]]`cntv`|`Number (Integer)`|-
+|[[commentCnt]]`commentCnt`|`Number (Long)`|-
+|[[compere]]`compere`|`String`|-
+|[[compereIds]]`compereIds`|`Array of Number (Long)`|-
+|[[compereObj]]`compereObj`|`Array of link:dataobjects.html#ActorCache[ActorCache]`|-
+|[[contentRatingDesc]]`contentRatingDesc`|`String`|-
+|[[contentRatingId]]`contentRatingId`|`String`|-
+|[[contentRatingValue]]`contentRatingValue`|`String`|-
+|[[coopPlatform]]`coopPlatform`|`String`|-
+|[[copyrightCompany]]`copyrightCompany`|`String`|-
+|[[copyrightEnd]]`copyrightEnd`|`String`|-
+|[[copyrightStart]]`copyrightStart`|`String`|-
+|[[copyrightType]]`copyrightType`|`Number (Integer)`|-
+|[[copyrightTypeName]]`copyrightTypeName`|`String`|-
+|[[createTime]]`createTime`|`Number (Long)`|-
+|[[deleted]]`deleted`|`Number (Integer)`|-
+|[[description]]`description`|`String`|-
+|[[directory]]`directory`|`String`|-
+|[[directoryId]]`directoryId`|`Number (Integer)`|-
+|[[directoryIds]]`directoryIds`|`Array of Number (Long)`|-
+|[[downloadPlatform]]`downloadPlatform`|`String`|-
+|[[dub]]`dub`|`String`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[episode]]`episode`|`Number (Integer)`|-
+|[[fid]]`fid`|`Number (Long)`|-
+|[[fieldType]]`fieldType`|`Number (Integer)`|-
+|[[fieldTypeName]]`fieldTypeName`|`String`|-
+|[[filmBaseType]]`filmBaseType`|`Number (Integer)`|-
+|[[filmBaseTypeName]]`filmBaseTypeName`|`String`|-
+|[[firstPlayTime]]`firstPlayTime`|`String`|-
+|[[fitAge]]`fitAge`|`String`|-
+|[[follownum]]`follownum`|`Number (Integer)`|-
+|[[forder]]`forder`|`Number (Integer)`|-
+|[[hotWordIds]]`hotWordIds`|`Array of Number (Long)`|-
+|[[hotWords]]`hotWords`|`Array of link:dataobjects.html#HotWordsCache[HotWordsCache]`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[instructor]]`instructor`|`String`|-
+|[[isDanmaku]]`isDanmaku`|`Number (Integer)`|-
+|[[isEnd]]`isEnd`|`Number (Integer)`|-
+|[[isFollow]]`isFollow`|`Number (Integer)`|-
+|[[isHeight]]`isHeight`|`Number (Integer)`|-
+|[[isHomemade]]`isHomemade`|`Number (Integer)`|-
+|[[isPay]]`isPay`|`Number (Integer)`|-
+|[[isPlayMark]]`isPlayMark`|`Number (Integer)`|-
+|[[ismobile]]`ismobile`|`Number (Integer)`|-
+|[[issueCompany]]`issueCompany`|`String`|-
+|[[isyuanxian]]`isyuanxian`|`Number (Integer)`|-
+|[[key]]`key`|`String`|-
+|[[language]]`language`|`Number (Integer)`|-
+|[[languageName]]`languageName`|`String`|-
+|[[letvMakeStyle]]`letvMakeStyle`|`Number (Integer)`|-
+|[[letvMakeStyleName]]`letvMakeStyleName`|`String`|-
+|[[letvProduceStyle]]`letvProduceStyle`|`Number (Integer)`|-
+|[[letvProduceStyleName]]`letvProduceStyleName`|`String`|-
+|[[letvReleaseDate]]`letvReleaseDate`|`String`|-
+|[[maker]]`maker`|`String`|-
+|[[makerCompany]]`makerCompany`|`String`|-
+|[[musicCompose]]`musicCompose`|`String`|-
+|[[musicStyle]]`musicStyle`|`String`|-
+|[[musicStyleName]]`musicStyleName`|`String`|-
+|[[music_authors]]`music_authors`|`String`|-
+|[[nameCn]]`nameCn`|`String`|-
+|[[nonPositiveStreams]]`nonPositiveStreams`|`String`|-
+|[[nowEpisodes]]`nowEpisodes`|`String`|-
+|[[nowIssue]]`nowIssue`|`String`|-
+|[[originator]]`originator`|`String`|-
+|[[ost]]`ost`|`Array of link:dataobjects.html#OstCache[OstCache]`|-
+|[[payPlatform]]`payPlatform`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[picCollections]]`picCollections`|`Array of link:dataobjects.html#PicAll[PicAll]`|-
+|[[picOriginal]]`picOriginal`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[playStatus]]`playStatus`|`String`|-
+|[[playStreams]]`playStreams`|`String`|-
+|[[playTv]]`playTv`|`String`|-
+|[[playTvName]]`playTvName`|`String`|-
+|[[popStyle]]`popStyle`|`Number (Integer)`|-
+|[[popStyleName]]`popStyleName`|`String`|-
+|[[positiveStreams]]`positiveStreams`|`String`|-
+|[[producer]]`producer`|`String`|-
+|[[programStyle]]`programStyle`|`Number (Integer)`|-
+|[[programStyleName]]`programStyleName`|`String`|-
+|[[pushflag]]`pushflag`|`Number (Integer)`|-
+|[[recommLevel]]`recommLevel`|`Number (Integer)`|-
+|[[recordCompany]]`recordCompany`|`String`|-
+|[[recreationType]]`recreationType`|`String`|-
+|[[recreationTypeName]]`recreationTypeName`|`String`|-
+|[[relationAlbumId]]`relationAlbumId`|`String`|-
+|[[relationId]]`relationId`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[school]]`school`|`String`|-
+|[[score]]`score`|`Number (Float)`|-
+|[[screenWriter]]`screenWriter`|`String`|-
+|[[secondCate]]`secondCate`|`String`|-
+|[[shortDesc]]`shortDesc`|`String`|-
+|[[sportsType]]`sportsType`|`Number (Integer)`|-
+|[[sportsTypeName]]`sportsTypeName`|`String`|-
+|[[starIds]]`starIds`|`Array of Number (Long)`|-
+|[[starList]]`starList`|`Array of link:dataobjects.html#ActorCache[ActorCache]`|-
+|[[starring]]`starring`|`String`|-
+|[[starringIds]]`starringIds`|`Array of Number (Long)`|-
+|[[starringObj]]`starringObj`|`Array of link:dataobjects.html#ActorCache[ActorCache]`|-
+|[[starringPlay]]`starringPlay`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[streams]]`streams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[style]]`style`|`String`|-
+|[[styleName]]`styleName`|`String`|-
+|[[subCategory]]`subCategory`|`String`|-
+|[[subCategoryName]]`subCategoryName`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[supervise]]`supervise`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[thirdCate]]`thirdCate`|`String`|-
+|[[travelTheme]]`travelTheme`|`Number (Integer)`|-
+|[[travelThemeName]]`travelThemeName`|`String`|-
+|[[travelType]]`travelType`|`Number (Integer)`|-
+|[[travelTypeName]]`travelTypeName`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[typeName]]`typeName`|`String`|-
+|[[updateTime]]`updateTime`|`Number (Long)`|-
+|[[varietyShow]]`varietyShow`|`String`|-
+|[[videoFollowTime]]`videoFollowTime`|`Number (Long)`|-
+|[[videoId]]`videoId`|`Number (Long)`|-
+|[[videoStreams]]`videoStreams`|`Array of String`|-
+|[[vv]]`vv`|`Number (Long)`|-
+|[[wasu]]`wasu`|`Number (Integer)`|-
+|===
+
+[[AudioCodes]]
+== AudioCodes
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[status]]`status`|`String`|-
+|[[stream]]`stream`|`String`|-
+|===
+
+[[BaseCache]]
+== BaseCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|===
+
+[[BaseResponse]]
+== BaseResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[innerCode]]`innerCode`|`String`|-
+|===
+
+[[BaseResponse]]
+== BaseResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[innerCode]]`innerCode`|`String`|-
+|===
+
+[[BaseResponse]]
+== BaseResponse
+
+++++
+ Response基类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[ChildLockRequest]]
+== ChildLockRequest
+
+++++
+ SetChildLock
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[actionType]]`actionType`|`Number (Integer)`|-
+|[[langcode]]`langcode`|`String`|-
+|[[lockToken]]`lockToken`|`String`|-
+|[[mac]]`mac`|`String`|-
+|[[pin]]`pin`|`String`|-
+|[[salesArea]]`salesArea`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[terminalBrand]]`terminalBrand`|`String`|-
+|[[ticket]]`ticket`|`String`|-
+|[[token]]`token`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[wcode]]`wcode`|`String`|-
+|===
+
+[[ChildLockResponse]]
+== ChildLockResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[canPlayCRIds]]`canPlayCRIds`|`Array of String`|-
+|[[lockToken]]`lockToken`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[tokenEffectiveDuration]]`tokenEffectiveDuration`|`Number (Long)`|-
+|[[userId]]`userId`|`String`|-
+|===
+
+[[ChildLockTpResponse]]
+== ChildLockTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#ChildLockResponse[ChildLockResponse]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[CmsBlockContent]]
+== CmsBlockContent
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[androidUrl]]`androidUrl`|`String`|-
+|[[area]]`area`|`String`|-
+|[[bid]]`bid`|`String`|-
+|[[cityLevel]]`cityLevel`|`String`|-
+|[[cityWhiteList]]`cityWhiteList`|`String`|-
+|[[content]]`content`|`String`|-
+|[[ctime]]`ctime`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[extendJson]]`extendJson`|`link:dataobjects.html#ExtendJson[ExtendJson]`|-
+|[[id]]`id`|`String`|-
+|[[iosUrl]]`iosUrl`|`String`|-
+|[[mobilePic]]`mobilePic`|`String`|-
+|[[mtime]]`mtime`|`String`|-
+|[[padPic]]`padPic`|`String`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[picList]]`picList`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[playcount]]`playcount`|`String`|-
+|[[position]]`position`|`String`|-
+|[[priority]]`priority`|`String`|-
+|[[pushflag]]`pushflag`|`String`|-
+|[[remark]]`remark`|`String`|-
+|[[shorDesc]]`shorDesc`|`String`|-
+|[[showTag]]`showTag`|`String`|-
+|[[showTagList]]`showTagList`|`Array of link:dataobjects.html#ShowTagList[ShowTagList]`|-
+|[[skipPage]]`skipPage`|`String`|-
+|[[skipType]]`skipType`|`String`|-
+|[[skipUrl]]`skipUrl`|`String`|-
+|[[source]]`source`|`Number (Integer)`|-
+|[[startTime]]`startTime`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[tagUrl]]`tagUrl`|`String`|-
+|[[title]]`title`|`String`|-
+|[[tvPic]]`tvPic`|`String`|-
+|[[tvUrl]]`tvUrl`|`String`|-
+|[[type]]`type`|`String`|-
+|[[url]]`url`|`String`|-
+|[[versionPlatform]]`versionPlatform`|`String`|-
+|===
+
+[[CmsBlockContentTpResponse]]
+== CmsBlockContentTpResponse
+
+++++
+ 版块内容
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[androidUrl]]`androidUrl`|`String`|-
+|[[bid]]`bid`|`String`|
++++
+自定义扩展
++++
+|[[content]]`content`|`String`|-
+|[[endTime]]`endTime`|`String`|-
+|[[extends_QRcodescript]]`extends_QRcodescript`|`String`|-
+|[[extends_buttonscript]]`extends_buttonscript`|`String`|-
+|[[extends_cardscript1]]`extends_cardscript1`|`String`|-
+|[[extends_cardscript2]]`extends_cardscript2`|`String`|-
+|[[extends_extendPicAll]]`extends_extendPicAll`|`String`|-
+|[[iosUrl]]`iosUrl`|`String`|-
+|[[mobilePic]]`mobilePic`|`String`|-
+|[[nameCn]]`nameCn`|`String`|-
+|[[padPic]]`padPic`|`String`|-
+|[[pic1]]`pic1`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[position]]`position`|`String`|-
+|[[priority]]`priority`|`String`|-
+|[[pushflag]]`pushflag`|`String`|-
+|[[remark]]`remark`|`String`|-
+|[[shorDesc]]`shorDesc`|`String`|-
+|[[shortDesc]]`shortDesc`|`String`|-
+|[[skipPage]]`skipPage`|`String`|-
+|[[skipType]]`skipType`|`String`|-
+|[[skipUrl]]`skipUrl`|`String`|-
+|[[startTime]]`startTime`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[tagUrl]]`tagUrl`|`String`|-
+|[[title]]`title`|`String`|-
+|[[tvPic]]`tvPic`|`String`|-
+|[[tvUrl]]`tvUrl`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[url]]`url`|`String`|
++++
+边看边买 ---------------------end------------------------
++++
+|===
+
+[[CmsBlockTpResponse]]
+== CmsBlockTpResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockContent]]`blockContent`|`Array of link:dataobjects.html#CmsBlockContent[CmsBlockContent]`|-
+|[[id]]`id`|`String`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[name]]`name`|`String`|-
+|[[pid]]`pid`|`String`|-
+|[[subBlockList]]`subBlockList`|`Array of Number (Integer)`|-
+|[[subBlocks]]`subBlocks`|`Array of link:dataobjects.html#CmsBlockTpResponse[CmsBlockTpResponse]`|-
+|===
+
+[[CmsPageTpResponse]]
+== CmsPageTpResponse
+
+++++
+ CMS页面
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#CmsPageTpResponseData[CmsPageTpResponseData]`|-
+|===
+
+[[CmsPageTpResponseData]]
+== CmsPageTpResponseData
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[frags]]`frags`|`Array of link:dataobjects.html#CmsPageTpResponseFrag[CmsPageTpResponseFrag]`|-
+|===
+
+[[CmsPageTpResponseFrag]]
+== CmsPageTpResponseFrag
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[blockContents]]`blockContents`|`Array of link:dataobjects.html#CmsBlockContentTpResponse[CmsBlockContentTpResponse]`|-
+|[[contentManulNum]]`contentManulNum`|`Number (Integer)`|-
+|[[contentName]]`contentName`|`String`|-
+|[[contentRid]]`contentRid`|`String`|-
+|[[contentStyle]]`contentStyle`|`String`|-
+|[[contentType]]`contentType`|`Number (Integer)`|-
+|[[redirectPageId]]`redirectPageId`|`String`|-
+|[[redirectSubPageId]]`redirectSubPageId`|`String`|-
+|[[redirectSubUrl]]`redirectSubUrl`|`String`|-
+|[[redirectUrl]]`redirectUrl`|`String`|-
+|===
+
+[[CommonParam]]
+== CommonParam
+
+++++
+ 接口通用参数
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appVersion]]`appVersion`|`String`|-
+|[[areaCode]]`areaCode`|`String`|-
+|[[bsChannel]]`bsChannel`|`String`|-
+|[[countryArea]]`countryArea`|`String`|-
+|[[devId]]`devId`|`String`|-
+|[[imeiArea]]`imeiArea`|`String`|-
+|[[ip]]`ip`|`String`|-
+|[[langcode]]`langcode`|`String`|-
+|[[mac]]`mac`|`String`|-
+|[[pcode]]`pcode`|`String`|-
+|[[salesArea]]`salesArea`|`String`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[terminalBrand]]`terminalBrand`|`String`|-
+|[[terminalSeries]]`terminalSeries`|`String`|-
+|[[token]]`token`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[wcode]]`wcode`|`String`|-
+|===
+
+[[CommonParam]]
+== CommonParam
+
+++++
+ 接口通用参数
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appVersion]]`appVersion`|`String`|-
+|[[areaCode]]`areaCode`|`String`|-
+|[[bsChannel]]`bsChannel`|`String`|-
+|[[countryArea]]`countryArea`|`String`|-
+|[[devId]]`devId`|`String`|-
+|[[imeiArea]]`imeiArea`|`String`|-
+|[[ip]]`ip`|`String`|-
+|[[langcode]]`langcode`|`String`|-
+|[[pcode]]`pcode`|`String`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[terminalBrand]]`terminalBrand`|`String`|-
+|[[terminalSeries]]`terminalSeries`|`String`|-
+|[[token]]`token`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[wcode]]`wcode`|`String`|-
+|===
+
+[[Discount]]
+== Discount
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[price]]`price`|`Number (Double)`|-
+|[[vipType]]`vipType`|`Number (Integer)`|-
+|===
+
+[[DiscountInfo]]
+== DiscountInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[price]]`price`|`Number (Double)`|-
+|[[vipId]]`vipId`|`Number (Integer)`|-
+|===
+
+[[ExtendJson]]
+== ExtendJson
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/31
+ Time: 11:42
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[extendCid]]`extendCid`|`String`|-
+|[[extendPage]]`extendPage`|`String`|-
+|[[extendPicAll]]`extendPicAll`|`String`|-
+|[[extendPid]]`extendPid`|`String`|-
+|[[extendRange]]`extendRange`|`String`|-
+|===
+
+[[GetVipInfoResponse]]
+== GetVipInfoResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`Number (Integer)`|-
+|[[data]]`data`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
+|===
+
+[[HotWordsCache]]
+== HotWordsCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[attention]]`attention`|`String`|-
+|[[categoryType]]`categoryType`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[img]]`img`|`String`|-
+|[[name]]`name`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|===
+
+[[LecomGetPackageByProductIdResponse]]
+== LecomGetPackageByProductIdResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[code]]`code`|`Number (Integer)`|-
+|[[data]]`data`|`Array of link:dataobjects.html#PackageInfo[PackageInfo]`|-
+|===
+
+[[LecomSearchRequest]]
+== LecomSearchRequest
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/9/6
+ Time: 11:09
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[cg]]`cg`|`Number (Integer)`|-
+|[[city_info]]`city_info`|`String`|-
+|[[client_ip]]`client_ip`|`String`|-
+|[[coopPlatform]]`coopPlatform`|`String`|-
+|[[displayAppId]]`displayAppId`|`Number (Integer)`|-
+|[[displayPlatformId]]`displayPlatformId`|`Number (Integer)`|-
+|[[dt]]`dt`|`String`|-
+|[[dur]]`dur`|`String`|-
+|[[extraParam]]`extraParam`|`String`|-
+|[[fitAge]]`fitAge`|`String`|-
+|[[from]]`from`|`String`|-
+|[[hl]]`hl`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[isHomemade]]`isHomemade`|`String`|-
+|[[jf]]`jf`|`String`|-
+|[[lang]]`lang`|`String`|-
+|[[language]]`language`|`String`|-
+|[[lc]]`lc`|`String`|-
+|[[mix]]`mix`|`String`|-
+|[[or]]`or`|`String`|-
+|[[paramsMap]]`paramsMap`|`String`|-
+|[[ph]]`ph`|`String`|-
+|[[playStreamFeatures]]`playStreamFeatures`|`String`|-
+|[[pn]]`pn`|`Number (Integer)`|-
+|[[popStyle]]`popStyle`|`String`|-
+|[[ps]]`ps`|`Number (Integer)`|-
+|[[region]]`region`|`String`|-
+|[[releaseYearDecade]]`releaseYearDecade`|`String`|-
+|[[repo_type]]`repo_type`|`Number (Integer)`|-
+|[[sales_area]]`sales_area`|`String`|-
+|[[sc]]`sc`|`String`|-
+|[[sf]]`sf`|`String`|-
+|[[singerType]]`singerType`|`String`|-
+|[[splatid]]`splatid`|`String`|-
+|[[src]]`src`|`String`|-
+|[[stt]]`stt`|`String`|-
+|[[style]]`style`|`String`|-
+|[[stype]]`stype`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[token]]`token`|`String`|-
+|[[tvid]]`tvid`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[user_setting_country]]`user_setting_country`|`String`|-
+|[[version]]`version`|`String`|-
+|[[vipIds]]`vipIds`|`String`|-
+|[[vtp]]`vtp`|`String`|-
+|[[wd]]`wd`|`String`|-
+|===
+
+[[LinesCache]]
+== LinesCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[ctime]]`ctime`|`String`|-
+|[[episode]]`episode`|`String`|-
+|[[headImg]]`headImg`|`String`|-
+|[[id]]`id`|`String`|-
+|[[leids]]`leids`|`Array of Number (Long)`|-
+|[[lines]]`lines`|`String`|-
+|[[mid]]`mid`|`Number (Long)`|-
+|[[mtime]]`mtime`|`String`|-
+|[[pid]]`pid`|`Number (Long)`|-
+|[[ringCount]]`ringCount`|`Number (Integer)`|-
+|[[ringName]]`ringName`|`String`|-
+|[[roleLeId]]`roleLeId`|`Number (Long)`|-
+|[[roleName]]`roleName`|`String`|-
+|[[starLeId]]`starLeId`|`Number (Long)`|-
+|[[startPlayTime]]`startPlayTime`|`Number (Long)`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[videovid]]`videovid`|`Number (Long)`|-
+|===
+
+[[MusicCache]]
+== MusicCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[areaCode]]`areaCode`|`String`|-
+|[[areaName]]`areaName`|`String`|-
+|[[arranger]]`arranger`|`String`|-
+|[[audioFile]]`audioFile`|`String`|-
+|[[authors]]`authors`|`String`|-
+|[[category]]`category`|`String`|-
+|[[compose]]`compose`|`String`|-
+|[[compressMode]]`compressMode`|`Number (Integer)`|-
+|[[copyrightTypeCode]]`copyrightTypeCode`|`String`|-
+|[[copyrightTypeName]]`copyrightTypeName`|`String`|-
+|[[desc]]`desc`|`String`|-
+|[[downloadPlatform]]`downloadPlatform`|`String`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[key]]`key`|`String`|-
+|[[languageCode]]`languageCode`|`String`|-
+|[[languageName]]`languageName`|`String`|-
+|[[lyricFile]]`lyricFile`|`String`|-
+|[[lyricText]]`lyricText`|`String`|-
+|[[makerCompany]]`makerCompany`|`String`|-
+|[[mid]]`mid`|`Number (Long)`|-
+|[[mmsAudioCodes]]`mmsAudioCodes`|`Array of link:dataobjects.html#AudioCodes[AudioCodes]`|-
+|[[ostId]]`ostId`|`Number (Long)`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[porder]]`porder`|`Number (Integer)`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[singerName]]`singerName`|`String`|-
+|[[songId]]`songId`|`String`|-
+|[[songName]]`songName`|`String`|-
+|[[songTypeId]]`songTypeId`|`Number (Integer)`|-
+|[[songTypeName]]`songTypeName`|`String`|-
+|[[sourceCode]]`sourceCode`|`String`|-
+|[[sourceName]]`sourceName`|`String`|-
+|[[style]]`style`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[xiamiId]]`xiamiId`|`String`|-
+|===
+
+[[OstCache]]
+== OstCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[albumTypeCode]]`albumTypeCode`|`String`|-
+|[[albumTypeName]]`albumTypeName`|`String`|-
+|[[areaCode]]`areaCode`|`String`|-
+|[[areaName]]`areaName`|`String`|-
+|[[artist]]`artist`|`String`|-
+|[[categoryId]]`categoryId`|`Number (Integer)`|-
+|[[categoryName]]`categoryName`|`String`|-
+|[[copyrightTypeCode]]`copyrightTypeCode`|`String`|-
+|[[copyrightTypeName]]`copyrightTypeName`|`String`|-
+|[[description]]`description`|`String`|-
+|[[downloadPlatform]]`downloadPlatform`|`String`|-
+|[[episode]]`episode`|`Number (Integer)`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[img]]`img`|`String`|-
+|[[issueCompany]]`issueCompany`|`String`|-
+|[[key]]`key`|`String`|-
+|[[languageCode]]`languageCode`|`String`|-
+|[[languageName]]`languageName`|`String`|-
+|[[name]]`name`|`String`|-
+|[[picCollections]]`picCollections`|`Array of link:dataobjects.html#PicAll[PicAll]`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[sourceCode]]`sourceCode`|`String`|-
+|[[sourceName]]`sourceName`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[type]]`type`|`String`|-
+|[[xiamiId]]`xiamiId`|`Number (Integer)`|-
+|===
+
+[[PackageInfo]]
+== PackageInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[autoRenew]]`autoRenew`|`Number (Integer)`|-
+|[[autoRenewPeriod]]`autoRenewPeriod`|`Number (Integer)`|-
+|[[country]]`country`|`Number (Integer)`|-
+|[[desc]]`desc`|`String`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[durationName]]`durationName`|`String`|-
+|[[durationType]]`durationType`|`Number (Integer)`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[field]]`field`|`String`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[name]]`name`|`String`|-
+|[[originalPrice]]`originalPrice`|`Number (Double)`|-
+|[[pic]]`pic`|`String`|-
+|[[pic2]]`pic2`|`String`|-
+|[[pic3]]`pic3`|`String`|-
+|[[price]]`price`|`Number (Double)`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[subscribeStatus]]`subscribeStatus`|`Number (Integer)`|-
+|[[terminal]]`terminal`|`String`|-
+|[[typeGroup]]`typeGroup`|`Number (Integer)`|-
+|[[vipDiscountPriceInfo]]`vipDiscountPriceInfo`|`Array of link:dataobjects.html#DiscountInfo[DiscountInfo]`|-
+|[[weight]]`weight`|`Number (Integer)`|-
+|===
+
+[[PackageInfoResponse]]
+== PackageInfoResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[desc]]`desc`|`String`|-
+|[[discountInfos]]`discountInfos`|`Array of link:dataobjects.html#Discount[Discount]`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[durationName]]`durationName`|`String`|-
+|[[durationType]]`durationType`|`Number (Integer)`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[field]]`field`|`String`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[name]]`name`|`String`|-
+|[[originalPrice]]`originalPrice`|`Number (Double)`|-
+|[[pic]]`pic`|`String`|-
+|[[price]]`price`|`Number (Double)`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|[[subscribeStatus]]`subscribeStatus`|`Number (Integer)`|-
+|[[terminal]]`terminal`|`String`|-
+|[[typeGroup]]`typeGroup`|`Number (Integer)`|-
+|===
+
+[[Page]]
+== Page
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[page]]`page`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|===
+
+[[PageCache]]
+== PageCache
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/2/25
+ Time: 15:25
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[index]]`index`|`Array of link:dataobjects.html#Page[Page]`|-
+|[[key]]`key`|`String`|-
+|===
+
+[[ParamForSearch]]
+== ParamForSearch
+
+++++
+ Created by zhushenghao1 on 17/1/16.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[areaCode]]`areaCode`|`String`|-
+|[[countryArea]]`countryArea`|`String`|-
+|[[imeiArea]]`imeiArea`|`String`|-
+|[[ip]]`ip`|`String`|-
+|[[langcode]]`langcode`|`String`|-
+|[[terminalApplication]]`terminalApplication`|`String`|-
+|[[uid]]`uid`|`String`|-
+|===
+
+[[PicAll]]
+== PicAll
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[picKey]]`picKey`|`String`|-
+|[[picValue]]`picValue`|`String`|-
+|===
+
+[[SearchCategory]]
+== SearchCategory
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[category]]`category`|`Number (Integer)`|-
+|[[category_name]]`category_name`|`String`|-
+|[[count]]`count`|`Number (Integer)`|-
+|[[dataType]]`dataType`|`Number (Integer)`|-
+|[[innerCode]]`innerCode`|`String`|-
+|===
+
+[[SearchMixResult]]
+== SearchMixResult
+
+++++
+ 搜检索返回结果mix混排
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[aid]]`aid`|`Number (Long)`|-
+|[[albumSrc]]`albumSrc`|`String`|-
+|[[area]]`area`|`String`|-
+|[[areaName]]`areaName`|`String`|-
+|[[birthday]]`birthday`|`String`|-
+|[[category]]`category`|`Number (Integer)`|-
+|[[categoryName]]`categoryName`|`String`|-
+|[[ctime]]`ctime`|`String`|-
+|[[dataType]]`dataType`|`Number (Integer)`|-
+|[[description]]`description`|`String`|-
+|[[director]]`director`|`String`|-
+|[[directory]]`directory`|`String`|-
+|[[display]]`display`|`String`|-
+|[[display_tag]]`display_tag`|`String`|-
+|[[duration]]`duration`|`String`|-
+|[[englishName]]`englishName`|`String`|-
+|[[episodes]]`episodes`|`String`|-
+|[[firstWord]]`firstWord`|`String`|-
+|[[gender]]`gender`|`String`|-
+|[[images]]`images`|`String`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[isActor]]`isActor`|`String`|-
+|[[isAvail]]`isAvail`|`String`|-
+|[[isDirector]]`isDirector`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[ispay]]`ispay`|`String`|-
+|[[list_order]]`list_order`|`String`|-
+|[[mtime]]`mtime`|`String`|-
+|[[name]]`name`|`String`|-
+|[[nameJianpin]]`nameJianpin`|`String`|-
+|[[nameQuanpin]]`nameQuanpin`|`String`|-
+|[[nowEpisodes]]`nowEpisodes`|`String`|-
+|[[otherName]]`otherName`|`String`|-
+|[[playCount]]`playCount`|`Number (Long)`|-
+|[[postH1]]`postH1`|`String`|-
+|[[postH2]]`postH2`|`String`|-
+|[[postOrgin]]`postOrgin`|`String`|-
+|[[postS1]]`postS1`|`String`|-
+|[[postS2]]`postS2`|`String`|-
+|[[postS3]]`postS3`|`String`|-
+|[[pushFlag]]`pushFlag`|`String`|-
+|[[rating]]`rating`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[sid]]`sid`|`Number (Long)`|-
+|[[stars]]`stars`|`String`|-
+|[[subCategoryName]]`subCategoryName`|`String`|-
+|[[subname]]`subname`|`String`|-
+|[[title]]`title`|`String`|-
+|[[trueName]]`trueName`|`String`|-
+|[[url]]`url`|`String`|-
+|[[vid]]`vid`|`Number (Long)`|-
+|[[videoType]]`videoType`|`String`|-
+|===
+
+[[SearchMixResultTp]]
+== SearchMixResultTp
+
+++++
+ 搜检索返回结果，结果进行mix;video,album混合排序
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[album_count]]`album_count`|`Number (Integer)`|-
+|[[category_count_list]]`category_count_list`|`Array of link:dataobjects.html#SearchCategory[SearchCategory]`|-
+|[[data_count]]`data_count`|`Number (Integer)`|-
+|[[data_list]]`data_list`|`Array of link:dataobjects.html#SearchMixResult[SearchMixResult]`|-
+|[[innerCode]]`innerCode`|`String`|-
+|[[response_time]]`response_time`|`Number (Long)`|-
+|[[star_count]]`star_count`|`Number (Integer)`|-
+|[[video_count]]`video_count`|`Number (Integer)`|-
+|===
+
+[[SearchRequest]]
+== SearchRequest
+
+++++
+ 搜索通用参数
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[area]]`area`|`String`|-
+|[[cg]]`cg`|`Number (Integer)`|-
+|[[city_info]]`city_info`|`String`|-
+|[[client_ip]]`client_ip`|`String`|-
+|[[coopPlatform]]`coopPlatform`|`String`|-
+|[[displayAppId]]`displayAppId`|`Number (Integer)`|-
+|[[displayPlatformId]]`displayPlatformId`|`Number (Integer)`|-
+|[[dt]]`dt`|`String`|-
+|[[dur]]`dur`|`String`|-
+|[[extraParam]]`extraParam`|`String`|-
+|[[fitAge]]`fitAge`|`String`|-
+|[[from]]`from`|`String`|-
+|[[hl]]`hl`|`String`|-
+|[[isEnd]]`isEnd`|`String`|-
+|[[isHomemade]]`isHomemade`|`String`|-
+|[[jf]]`jf`|`String`|-
+|[[lang]]`lang`|`String`|-
+|[[language]]`language`|`String`|-
+|[[lc]]`lc`|`String`|-
+|[[mix]]`mix`|`String`|-
+|[[or]]`or`|`String`|-
+|[[paramsMap]]`paramsMap`|`String`|-
+|[[ph]]`ph`|`String`|-
+|[[playStreamFeatures]]`playStreamFeatures`|`String`|-
+|[[pn]]`pn`|`Number (Integer)`|-
+|[[popStyle]]`popStyle`|`String`|-
+|[[ps]]`ps`|`Number (Integer)`|-
+|[[region]]`region`|`String`|-
+|[[releaseYearDecade]]`releaseYearDecade`|`String`|-
+|[[repo_type]]`repo_type`|`Number (Integer)`|-
+|[[sales_area]]`sales_area`|`String`|-
+|[[sc]]`sc`|`String`|-
+|[[sf]]`sf`|`String`|-
+|[[singerType]]`singerType`|`String`|-
+|[[splatid]]`splatid`|`String`|-
+|[[src]]`src`|`String`|-
+|[[stt]]`stt`|`String`|-
+|[[style]]`style`|`String`|-
+|[[stype]]`stype`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[token]]`token`|`String`|-
+|[[tvid]]`tvid`|`String`|-
+|[[uid]]`uid`|`String`|-
+|[[user_setting_country]]`user_setting_country`|`String`|-
+|[[version]]`version`|`String`|-
+|[[vipIds]]`vipIds`|`String`|-
+|[[vtp]]`vtp`|`String`|-
+|[[wd]]`wd`|`String`|-
+|===
+
+[[SeriesCache]]
+== SeriesCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[key]]`key`|`String`|-
+|[[vidList]]`vidList`|`Array of Number (Long)`|-
+|===
+
+[[SeriesPage]]
+== SeriesPage
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[page]]`page`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|[[positiveSeries]]`positiveSeries`|`Array of link:dataobjects.html#Video[Video]`|-
+|===
+
+[[ShowTagList]]
+== ShowTagList
+
+++++
+ Created by IntelliJ IDEA.
+ User: xuli
+ Date：16/10/31
+ Time: 11:43
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[id]]`id`|`String`|-
+|[[typeId]]`typeId`|`String`|-
+|[[value]]`value`|`String`|-
+|===
+
+[[Stream]]
+== Stream
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[bandWidth]]`bandWidth`|`String`|-
+|[[canDown]]`canDown`|`String`|-
+|[[canPlay]]`canPlay`|`String`|-
+|[[code]]`code`|`String`|-
+|[[fileSize]]`fileSize`|`Number (Long)`|-
+|[[ifCharge]]`ifCharge`|`Number (Integer)`|-
+|[[isDefault]]`isDefault`|`Boolean`|-
+|[[kbps]]`kbps`|`String`|-
+|[[liveStreams]]`liveStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[name]]`name`|`String`|-
+|[[playStreams]]`playStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|===
+
+[[TrialData]]
+== TrialData
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[trialDuration]]`trialDuration`|`Number (Integer)`|-
+|[[trialDurationName]]`trialDurationName`|`String`|-
+|[[trialField]]`trialField`|`String`|-
+|===
+
+[[Video]]
+== Video
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[actor]]`actor`|`String`|-
+|[[actorPlay]]`actorPlay`|`String`|-
+|[[albumId]]`albumId`|`Number (Long)`|-
+|[[alias]]`alias`|`String`|-
+|[[area]]`area`|`String`|-
+|[[areaName]]`areaName`|`String`|-
+|[[attr]]`attr`|`Number (Integer)`|-
+|[[btime]]`btime`|`Number (Integer)`|-
+|[[carfilmType]]`carfilmType`|`String`|-
+|[[carfilmTypeName]]`carfilmTypeName`|`String`|-
+|[[cartoonStyle]]`cartoonStyle`|`String`|-
+|[[cartoonStyleName]]`cartoonStyleName`|`String`|-
+|[[categoryId]]`categoryId`|`Number (Integer)`|-
+|[[categoryName]]`categoryName`|`String`|-
+|[[commentCnt]]`commentCnt`|`Number (Long)`|-
+|[[compere]]`compere`|`String`|-
+|[[contentRatingId]]`contentRatingId`|`String`|-
+|[[contentRatingValue]]`contentRatingValue`|`String`|-
+|[[coopPlatform]]`coopPlatform`|`String`|-
+|[[copyrightCompany]]`copyrightCompany`|`String`|-
+|[[copyrightEnd]]`copyrightEnd`|`String`|-
+|[[copyrightStart]]`copyrightStart`|`String`|-
+|[[copyrightType]]`copyrightType`|`String`|-
+|[[copyrightTypeName]]`copyrightTypeName`|`String`|-
+|[[createTime]]`createTime`|`Number (Long)`|-
+|[[deleted]]`deleted`|`Number (Integer)`|-
+|[[description]]`description`|`String`|-
+|[[directory]]`directory`|`String`|-
+|[[disableType]]`disableType`|`String`|-
+|[[disableTypeName]]`disableTypeName`|`String`|-
+|[[dolbyStreams]]`dolbyStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[downloadPlatform]]`downloadPlatform`|`String`|-
+|[[drmFlagId]]`drmFlagId`|`String`|-
+|[[dtsStreams]]`dtsStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[duration]]`duration`|`Number (Integer)`|-
+|[[episode]]`episode`|`String`|-
+|[[etime]]`etime`|`Number (Integer)`|-
+|[[fieldType]]`fieldType`|`Number (Integer)`|-
+|[[fieldTypeName]]`fieldTypeName`|`String`|-
+|[[firstPlayTime]]`firstPlayTime`|`String`|-
+|[[guest]]`guest`|`String`|-
+|[[guestIds]]`guestIds`|`Array of Number (Long)`|-
+|[[guestList]]`guestList`|`Array of link:dataobjects.html#ActorCache[ActorCache]`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[instructor]]`instructor`|`String`|-
+|[[isDanmaku]]`isDanmaku`|`Number (Integer)`|-
+|[[isPlayLock]]`isPlayLock`|`Number (Integer)`|-
+|[[ismobile]]`ismobile`|`Number (Integer)`|-
+|[[issue]]`issue`|`Number (Integer)`|-
+|[[issueCompany]]`issueCompany`|`String`|-
+|[[key]]`key`|`String`|-
+|[[language]]`language`|`Number (Integer)`|-
+|[[languageName]]`languageName`|`String`|-
+|[[letvMakeStyle]]`letvMakeStyle`|`Number (Integer)`|-
+|[[letvMakeStyleName]]`letvMakeStyleName`|`String`|-
+|[[letvProduceStyle]]`letvProduceStyle`|`Number (Integer)`|-
+|[[letvProduceStyleName]]`letvProduceStyleName`|`String`|-
+|[[logonum]]`logonum`|`Number (Integer)`|-
+|[[maker]]`maker`|`String`|-
+|[[mid]]`mid`|`String`|-
+|[[midL]]`midL`|`Number (Long)`|-
+|[[midStreams]]`midStreams`|`String`|-
+|[[musicAuthors]]`musicAuthors`|`String`|-
+|[[musicCompose]]`musicCompose`|`String`|-
+|[[musicStyle]]`musicStyle`|`String`|-
+|[[musicStyleName]]`musicStyleName`|`String`|-
+|[[nameCn]]`nameCn`|`String`|-
+|[[normalStreams]]`normalStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[page]]`page`|`Number (Integer)`|-
+|[[payPlatform]]`payPlatform`|`String`|-
+|[[pic]]`pic`|`String`|-
+|[[picAll]]`picAll`|`Array of link:dataobjects.html#PicAll[PicAll]`|-
+|[[picOriginal]]`picOriginal`|`String`|-
+|[[playPlatform]]`playPlatform`|`String`|-
+|[[playStreams]]`playStreams`|`String`|-
+|[[popStyle]]`popStyle`|`Number (Integer)`|-
+|[[popStyleName]]`popStyleName`|`String`|-
+|[[porder]]`porder`|`Number (Integer)`|-
+|[[pre]]`pre`|`Number (Integer)`|-
+|[[preName]]`preName`|`String`|-
+|[[recordCompany]]`recordCompany`|`String`|-
+|[[recreationType]]`recreationType`|`String`|-
+|[[recreationTypeName]]`recreationTypeName`|`String`|-
+|[[relativeContent]]`relativeContent`|`String`|-
+|[[releaseDate]]`releaseDate`|`String`|-
+|[[remark]]`remark`|`String`|-
+|[[school]]`school`|`String`|-
+|[[score]]`score`|`Number (Float)`|-
+|[[segmentIds]]`segmentIds`|`Array of Number (Long)`|-
+|[[shortDesc]]`shortDesc`|`String`|-
+|[[singer]]`singer`|`String`|-
+|[[singerType]]`singerType`|`String`|-
+|[[singerTypeName]]`singerTypeName`|`String`|-
+|[[singleName]]`singleName`|`String`|-
+|[[sportsType]]`sportsType`|`Number (Integer)`|-
+|[[sportsTypeName]]`sportsTypeName`|`String`|-
+|[[starring]]`starring`|`String`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[statusCode]]`statusCode`|`String`|-
+|[[streams]]`streams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[style]]`style`|`Number (Integer)`|-
+|[[styleName]]`styleName`|`String`|-
+|[[subCategory]]`subCategory`|`String`|-
+|[[subCategoryName]]`subCategoryName`|`String`|-
+|[[subTitle]]`subTitle`|`String`|-
+|[[tag]]`tag`|`String`|-
+|[[team]]`team`|`String`|-
+|[[theatreStreams]]`theatreStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[threeDStreams]]`threeDStreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[transCodePrefix]]`transCodePrefix`|`String`|-
+|[[travelTheme]]`travelTheme`|`Number (Integer)`|-
+|[[travelThemeName]]`travelThemeName`|`String`|-
+|[[travelType]]`travelType`|`Number (Integer)`|-
+|[[travelTypeName]]`travelTypeName`|`String`|-
+|[[type]]`type`|`Number (Integer)`|-
+|[[updateTime]]`updateTime`|`Number (Long)`|-
+|[[vRstreams]]`vRstreams`|`Array of link:dataobjects.html#Stream[Stream]`|-
+|[[videoStreams]]`videoStreams`|`Array of String`|-
+|[[vtypeFlag]]`vtypeFlag`|`String`|-
+|[[vv]]`vv`|`Number (Long)`|-
+|[[watchingFocus]]`watchingFocus`|`Array of link:dataobjects.html#WatchingFocusCache[WatchingFocusCache]`|-
+|===
+
+[[VipInfo]]
+== VipInfo
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[createTime]]`createTime`|`Number (Long)`|-
+|[[endTime]]`endTime`|`Number (Long)`|-
+|[[isSubscribe]]`isSubscribe`|`Number (Integer)`|-
+|[[name]]`name`|`String`|-
+|[[productId]]`productId`|`Number (Integer)`|-
+|[[tryEndTime]]`tryEndTime`|`Number (Long)`|-
+|[[typeGroup]]`typeGroup`|`Number (Integer)`|-
+|[[uid]]`uid`|`Number (Integer)`|-
+|===
+
+[[WatchingFocusCache]]
+== WatchingFocusCache
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[desc]]`desc`|`String`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[time]]`time`|`Number (Long)`|-
+|===
+
+[[WhiteListRequest]]
+== WhiteListRequest
+
+++++
+ Created by wangbingbing on 2016/11/15.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[devId]]`devId`|`String`|-
+|[[moduleId]]`moduleId`|`String`|-
+|[[operator]]`operator`|`String`|-
+|[[status]]`status`|`Number (int)`|-
+|[[time]]`time`|`String`|-
+|===
+
+[[WhiteListResponse]]
+== WhiteListResponse
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[affected]]`affected`|`Number (Integer)`|-
+|===
+
