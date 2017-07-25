@@ -24,10 +24,27 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.xiaomi.miliao</groupId>
+            <artifactId>xmpush-server-api</artifactId>
+            <version>2.2.18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xiaomi.miliao</groupId>
+            <artifactId>xmpush-server-api</artifactId>
+            <version>2.2.18</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>thirdparty</id>
+            <url>http://192.168.0.7:8081/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
 </project>
