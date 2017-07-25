@@ -1,6 +1,6 @@
 package com.message.channel.sokit;
 
-import com.message.constant.EnumPassengerMessageType;
+import com.message.enums.EnumPassengerMessageType;
 import com.message.constant.MsgConstant;
 import com.message.serializer.ByteUtils;
 import com.message.util.ApplicationProperties;

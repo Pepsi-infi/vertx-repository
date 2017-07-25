@@ -1,4 +1,4 @@
-package com.message.constant;
+package com.message.enums;
 
 /**
  *  消息类型

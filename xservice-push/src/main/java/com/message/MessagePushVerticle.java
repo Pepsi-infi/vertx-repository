@@ -2,7 +2,7 @@ package com.message;
 
 import com.message.constant.ConnectionConsts;
 import com.message.constant.PushConsts;
-import com.message.constant.PushTypeEnum;
+import com.message.enums.PushTypeEnum;
 
 import io.netty.util.internal.StringUtil;
 import io.vertx.amqpbridge.AmqpBridge;
