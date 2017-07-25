@@ -95,7 +95,7 @@ public class CmsTpDao {
   }
 
 
-  public static CmsTpDao newInstance(tp.cms.CmsTpDao arg) {
+  public static  CmsTpDao newInstance(tp.cms.CmsTpDao arg) {
     return arg != null ? new CmsTpDao(arg) : null;
   }
 }

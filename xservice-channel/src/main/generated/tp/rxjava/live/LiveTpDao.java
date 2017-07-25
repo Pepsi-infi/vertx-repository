@@ -170,7 +170,7 @@ public class LiveTpDao {
   }
 
 
-  public static LiveTpDao newInstance(tp.live.LiveTpDao arg) {
+  public static  LiveTpDao newInstance(tp.live.LiveTpDao arg) {
     return arg != null ? new LiveTpDao(arg) : null;
   }
 }

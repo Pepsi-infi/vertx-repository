@@ -30,9 +30,6 @@ public class CmsMutilangDataResponseConverter {
     if (json.getValue("code") instanceof String) {
       obj.setCode((String)json.getValue("code"));
     }
-    if (json.getValue("data") instanceof JsonObject) {
-      obj.setData(new cms.response.CmsBlockTpResponse((JsonObject)json.getValue("data")));
-    }
     if (json.getValue("innerCode") instanceof String) {
       obj.setInnerCode((String)json.getValue("innerCode"));
     }
@@ -41,9 +38,6 @@ public class CmsMutilangDataResponseConverter {
   public static void toJson(CmsMutilangDataResponse obj, JsonObject json) {
     if (obj.getCode() != null) {
       json.put("code", obj.getCode());
-    }
-    if (obj.getData() != null) {
-      json.put("data", obj.getData().toJson());
     }
     if (obj.getInnerCode() != null) {
       json.put("innerCode", obj.getInnerCode());

@@ -36,6 +36,9 @@ public class SearchResponseConverter {
     if (json.getValue("errorMessage") instanceof String) {
       obj.setErrorMessage((String)json.getValue("errorMessage"));
     }
+    if (json.getValue("resultStatus") instanceof Number) {
+      obj.setResultStatus(((Number)json.getValue("resultStatus")).intValue());
+    }
     if (json.getValue("status") instanceof Number) {
       obj.setStatus(((Number)json.getValue("status")).intValue());
     }
@@ -50,6 +53,9 @@ public class SearchResponseConverter {
     }
     if (obj.getErrorMessage() != null) {
       json.put("errorMessage", obj.getErrorMessage());
+    }
+    if (obj.getResultStatus() != null) {
+      json.put("resultStatus", obj.getResultStatus());
     }
     if (obj.getStatus() != null) {
       json.put("status", obj.getStatus());

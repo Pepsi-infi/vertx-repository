@@ -81,7 +81,7 @@ public class LiveService {
   }
 
 
-  public static LiveService newInstance(service.LiveService arg) {
+  public static  LiveService newInstance(service.LiveService arg) {
     return arg != null ? new LiveService(arg) : null;
   }
 }

@@ -1,6 +1,5 @@
 package xservice;
 
-import grpc.ZkServiceRegistration;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AbstractVerticle;

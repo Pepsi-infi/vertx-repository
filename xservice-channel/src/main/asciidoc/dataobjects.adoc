@@ -24,121 +24,6 @@
 |[[productId]]`productId`|`Number (Integer)`|-
 |===
 
-[[AlbumInfoDto]]
-== AlbumInfoDto
-
-++++
- Created by zhushenghao1 on 17/1/13.
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[area]]`area`|`String`|-
-|[[cid]]`cid`|`Number (Integer)`|-
-|[[cornerLabel]]`cornerLabel`|`String`|-
-|[[dataType]]`dataType`|`Number (Integer)`|-
-|[[desc]]`desc`|`String`|-
-|[[director]]`director`|`String`|-
-|[[duration]]`duration`|`String`|-
-|[[episodes]]`episodes`|`String`|-
-|[[images]]`images`|`String`|-
-|[[isEnd]]`isEnd`|`String`|-
-|[[name]]`name`|`String`|-
-|[[nowEpisodes]]`nowEpisodes`|`String`|-
-|[[pay]]`pay`|`String`|-
-|[[pic]]`pic`|`String`|-
-|[[picAll]]`picAll`|`String`|-
-|[[pid]]`pid`|`Number (Long)`|-
-|[[playCount]]`playCount`|`Number (Long)`|-
-|[[releaseDate]]`releaseDate`|`String`|-
-|[[score]]`score`|`Number (Float)`|-
-|[[star]]`star`|`String`|-
-|[[subCategory]]`subCategory`|`String`|-
-|[[subTitle]]`subTitle`|`String`|-
-|[[updateTime]]`updateTime`|`Number (Long)`|-
-|[[url]]`url`|`String`|-
-|[[vid]]`vid`|`Number (Long)`|-
-|[[zid]]`zid`|`Number (Long)`|-
-|===
-
-[[AnchorDto]]
-== AnchorDto
-
-++++
- Created by wanglonghu on 17/6/9.
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[city]]`city`|`String`|-
-|[[id]]`id`|`String`|-
-|[[liveId]]`liveId`|`String`|-
-|[[nick]]`nick`|`String`|-
-|[[onlineNum]]`onlineNum`|`Number (Long)`|-
-|[[portrait]]`portrait`|`String`|-
-|[[source]]`source`|`Number (Integer)`|-
-|===
-
-[[AnchorListWapperDto]]
-== AnchorListWapperDto
-
-++++
- Created by wanglonghu on 17/6/9.
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[data]]`data`|`Array of link:dataobjects.html#AnchorPageDto[AnchorPageDto]`|-
-|[[status]]`status`|`Number (Integer)`|-
-|===
-
-[[AnchorPageDto]]
-== AnchorPageDto
-
-++++
- Created by wanglonghu on 17/6/9.
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[banner]]`banner`|`Array of link:dataobjects.html#BannerDto[BannerDto]`|-
-|[[content]]`content`|`Array of link:dataobjects.html#AnchorDto[AnchorDto]`|-
-|[[id]]`id`|`Number (Integer)`|-
-|[[name]]`name`|`String`|-
-|[[page]]`page`|`Number (Integer)`|-
-|[[pageSize]]`pageSize`|`Number (Integer)`|-
-|===
-
-[[BannerDto]]
-== BannerDto
-
-++++
- Created by wanglonghu on 17/6/12.
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[img]]`img`|`String`|-
-|[[jump]]`jump`|`Number (Integer)`|-
-|[[roomId]]`roomId`|`String`|-
-|[[url]]`url`|`String`|-
-|===
-
 [[BaseChannel]]
 == BaseChannel
 
@@ -464,6 +349,7 @@
 |[[data]]`data`|`link:dataobjects.html#ChannelPage[ChannelPage]`|-
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
@@ -631,6 +517,7 @@
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
 |[[msg]]`msg`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |[[statusCode]]`statusCode`|`Number (Integer)`|-
 |===
@@ -738,7 +625,6 @@
 |===
 ^|Name | Type ^| Description
 |[[code]]`code`|`String`|-
-|[[data]]`data`|`link:dataobjects.html#CmsBlockTpResponse[CmsBlockTpResponse]`|-
 |[[innerCode]]`innerCode`|`String`|-
 |===
 
@@ -780,6 +666,7 @@
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
 |[[msg]]`msg`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
@@ -794,6 +681,7 @@
 |[[data]]`data`|`link:dataobjects.html#CmsPageDto[CmsPageDto]`|-
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
@@ -1269,6 +1157,7 @@
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
 |[[nextIndex]]`nextIndex`|`Number (Integer)`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |[[totalCount]]`totalCount`|`Number (Integer)`|-
 |===
@@ -1375,29 +1264,6 @@
 |[[statusCode]]`statusCode`|`String`|-
 |===
 
-[[RatingAndPlayRankTp]]
-== RatingAndPlayRankTp
-
-++++
- 排行榜返回实体
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[cid]]`cid`|`Number (Integer)`|-
-|[[id]]`id`|`Number (Long)`|-
-|[[innerCode]]`innerCode`|`String`|-
-|[[name]]`name`|`String`|-
-|[[playPlatform]]`playPlatform`|`String`|-
-|[[playcount]]`playcount`|`String`|-
-|[[rating]]`rating`|`String`|-
-|[[subname]]`subname`|`String`|-
-|[[webUrl]]`webUrl`|`String`|-
-|===
-
 [[RatingRankResponse]]
 == RatingRankResponse
 
@@ -1479,161 +1345,6 @@
 |[[bucket]]`bucket`|`String`|-
 |[[rec]]`rec`|`Array of link:dataobjects.html#RecommendDetail[RecommendDetail]`|-
 |[[reid]]`reid`|`String`|-
-|===
-
-[[RecData]]
-== RecData
-
-++++
- Created by IntelliJ IDEA.
- User: xuli
- Date：16/10/19 Time: 11:18
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[album_area]]`album_area`|`String`|-
-|[[album_release_date]]`album_release_date`|`String`|-
-|[[album_sub_category]]`album_sub_category`|`String`|-
-|[[album_type]]`album_type`|`String`|-
-|[[androidUrl]]`androidUrl`|`String`|-
-|[[area]]`area`|`String`|-
-|[[bid]]`bid`|`String`|-
-|[[cgidefault]]`cgidefault`|`String`|-
-|[[cid]]`cid`|`Number (Integer)`|-
-|[[cityLevel]]`cityLevel`|`String`|-
-|[[cityWhiteList]]`cityWhiteList`|`String`|-
-|[[content]]`content`|`String`|-
-|[[createtime]]`createtime`|`String`|-
-|[[ctime]]`ctime`|`String`|-
-|[[defaultPic]]`defaultPic`|`String`|-
-|[[director]]`director`|`String`|-
-|[[duration]]`duration`|`String`|-
-|[[endTime]]`endTime`|`String`|-
-|[[episodes]]`episodes`|`String`|-
-|[[extendJson]]`extendJson`|`link:dataobjects.html#ExtendJson[ExtendJson]`|-
-|[[float_flag]]`float_flag`|`String`|-
-|[[id]]`id`|`String`|-
-|[[iosUrl]]`iosUrl`|`String`|-
-|[[is_pay]]`is_pay`|`String`|-
-|[[is_rec]]`is_rec`|`String`|-
-|[[isalbum]]`isalbum`|`String`|-
-|[[isend]]`isend`|`String`|-
-|[[jump]]`jump`|`String`|-
-|[[latest_auto_video_pic]]`latest_auto_video_pic`|`String`|-
-|[[mobilePic]]`mobilePic`|`String`|-
-|[[mtime]]`mtime`|`String`|-
-|[[padPic]]`padPic`|`String`|-
-|[[pic1]]`pic1`|`String`|-
-|[[pic2]]`pic2`|`String`|-
-|[[pic320_200]]`pic320_200`|`String`|-
-|[[pic400_225]]`pic400_225`|`String`|-
-|[[pic400_300]]`pic400_300`|`String`|-
-|[[picHT]]`picHT`|`String`|-
-|[[picList]]`picList`|`String`|-
-|[[picST]]`picST`|`String`|-
-|[[pid]]`pid`|`Number (Long)`|-
-|[[pidname]]`pidname`|`String`|-
-|[[pidsubtitle]]`pidsubtitle`|`String`|-
-|[[playPlatform]]`playPlatform`|`String`|-
-|[[playcount]]`playcount`|`String`|-
-|[[playurl]]`playurl`|`String`|-
-|[[position]]`position`|`String`|-
-|[[priority]]`priority`|`String`|-
-|[[pushflag]]`pushflag`|`String`|-
-|[[rec_content_type]]`rec_content_type`|`String`|-
-|[[remark]]`remark`|`String`|-
-|[[score]]`score`|`Number (Float)`|-
-|[[shorDesc]]`shorDesc`|`String`|-
-|[[showTag]]`showTag`|`String`|-
-|[[showTagList]]`showTagList`|`Array of link:dataobjects.html#ShowTagList[ShowTagList]`|-
-|[[skipPage]]`skipPage`|`String`|-
-|[[skipType]]`skipType`|`String`|-
-|[[skipUrl]]`skipUrl`|`String`|-
-|[[source]]`source`|`Number (Integer)`|-
-|[[starring]]`starring`|`String`|-
-|[[startTime]]`startTime`|`String`|-
-|[[subTitle]]`subTitle`|`String`|-
-|[[subtitle]]`subtitle`|`String`|-
-|[[tag]]`tag`|`String`|-
-|[[tagUrl]]`tagUrl`|`String`|-
-|[[title]]`title`|`String`|-
-|[[tvPic]]`tvPic`|`String`|-
-|[[tvUrl]]`tvUrl`|`String`|-
-|[[type]]`type`|`String`|-
-|[[updatetime]]`updatetime`|`String`|-
-|[[url]]`url`|`String`|-
-|[[vcount]]`vcount`|`String`|-
-|[[versionPlatform]]`versionPlatform`|`String`|-
-|[[vid]]`vid`|`Number (Long)`|-
-|[[vid_episode]]`vid_episode`|`String`|-
-|[[videoFollowTime]]`videoFollowTime`|`String`|-
-|[[video_pic]]`video_pic`|`String`|-
-|[[video_type]]`video_type`|`String`|-
-|[[vidsubtitle]]`vidsubtitle`|`String`|-
-|[[vtypeFlag]]`vtypeFlag`|`String`|-
-|[[zid]]`zid`|`Number (Long)`|-
-|===
-
-[[RecommendDetail]]
-== RecommendDetail
-
-++++
- Created by IntelliJ IDEA.
- User: xuli
- Date：16/10/19
- Time: 11:20
-++++
-'''
-
-[cols=">25%,^25%,50%"]
-[frame="topbot"]
-|===
-^|Name | Type ^| Description
-|[[actors]]`actors`|`String`|-
-|[[album_area]]`album_area`|`String`|-
-|[[album_play_platform]]`album_play_platform`|`String`|-
-|[[album_play_tv]]`album_play_tv`|`String`|-
-|[[album_release_date]]`album_release_date`|`String`|-
-|[[album_sub_category]]`album_sub_category`|`String`|-
-|[[album_sub_category_code]]`album_sub_category_code`|`String`|-
-|[[cid]]`cid`|`Number (Integer)`|-
-|[[createtime]]`createtime`|`String`|-
-|[[description]]`description`|`String`|-
-|[[director]]`director`|`String`|-
-|[[duration]]`duration`|`Number (Long)`|-
-|[[episodes]]`episodes`|`Number (Integer)`|-
-|[[float_flag]]`float_flag`|`String`|-
-|[[guest]]`guest`|`String`|-
-|[[is_pay]]`is_pay`|`String`|-
-|[[isalbum]]`isalbum`|`Number (Integer)`|-
-|[[isend]]`isend`|`Number (Integer)`|-
-|[[jump]]`jump`|`Number (Integer)`|-
-|[[pic400_250]]`pic400_250`|`String`|-
-|[[pic400_300]]`pic400_300`|`String`|-
-|[[picHT]]`picHT`|`String`|-
-|[[picST]]`picST`|`String`|-
-|[[picsize]]`picsize`|`String`|-
-|[[picurl]]`picurl`|`String`|-
-|[[pid]]`pid`|`Number (Long)`|-
-|[[pidname]]`pidname`|`String`|-
-|[[playurl]]`playurl`|`String`|-
-|[[score]]`score`|`String`|-
-|[[singer]]`singer`|`String`|-
-|[[starring]]`starring`|`String`|-
-|[[subtitle]]`subtitle`|`String`|-
-|[[title]]`title`|`String`|-
-|[[vcount]]`vcount`|`Number (Integer)`|-
-|[[vid]]`vid`|`Number (Long)`|-
-|[[video_area]]`video_area`|`String`|-
-|[[video_play_platform]]`video_play_platform`|`String`|-
-|[[video_release_date]]`video_release_date`|`String`|-
-|[[video_sub_category]]`video_sub_category`|`String`|-
-|[[video_type]]`video_type`|`String`|-
-|[[video_type_name]]`video_type_name`|`String`|-
 |===
 
 [[RecommendTpResponse]]
@@ -1727,6 +1438,7 @@
 |[[data]]`data`|`link:dataobjects.html#FilterResultDto[FilterResultDto]`|-
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
@@ -1830,6 +1542,7 @@
 |[[data]]`data`|`link:dataobjects.html#WaterMarksDto[WaterMarksDto]`|-
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
@@ -1871,9 +1584,6 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[listNotEnd]]`listNotEnd`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
-|[[listSub]]`listSub`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
-|[[other]]`other`|`Array of link:dataobjects.html#VipInfo[VipInfo]`|-
 |===
 
 [[WarterMarkTpResponse]]

@@ -47,6 +47,9 @@ public class PageResponseConverter {
     if (json.getValue("nextIndex") instanceof Number) {
       obj.setNextIndex(((Number)json.getValue("nextIndex")).intValue());
     }
+    if (json.getValue("resultStatus") instanceof Number) {
+      obj.setResultStatus(((Number)json.getValue("resultStatus")).intValue());
+    }
     if (json.getValue("status") instanceof Number) {
       obj.setStatus(((Number)json.getValue("status")).intValue());
     }
@@ -72,6 +75,9 @@ public class PageResponseConverter {
     }
     if (obj.getNextIndex() != null) {
       json.put("nextIndex", obj.getNextIndex());
+    }
+    if (obj.getResultStatus() != null) {
+      json.put("resultStatus", obj.getResultStatus());
     }
     if (obj.getStatus() != null) {
       json.put("status", obj.getStatus());
