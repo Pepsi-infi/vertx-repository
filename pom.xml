@@ -10,6 +10,7 @@
     <module>xservice-common</module>
     <module>xservice-demo</module>
     <module>xservice-statistic</module>
+    <module>xservice-push</module>
   </modules>
 
   <!-- 配置变量 -->
