@@ -1,4 +1,4 @@
-package com.message.channel.sokit;
+package com.message.channel.socket;
 
 import com.message.enums.EnumPassengerMessageType;
 import com.message.constant.MsgConstant;
@@ -17,12 +17,12 @@ import java.net.InetAddress;
 import java.util.*;
 
 /**
- * 使用 sokit 处理消息
+ * 使用 socket 处理消息
  * Created by weim on 2017/7/25.
  */
-public class SokitVerticle extends AbstractVerticle {
+public class SocketVerticle extends AbstractVerticle {
 
-    private Logger logger = LoggerFactory.getLogger(SokitVerticle.class);
+    private Logger logger = LoggerFactory.getLogger(SocketVerticle.class);
 
     public void start(Future<Void> startFuture) {
 
