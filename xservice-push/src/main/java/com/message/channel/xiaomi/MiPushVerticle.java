@@ -1,11 +1,9 @@
-package com.message.push.xiaomi;
+package com.message.channel.xiaomi;
 
-import com.message.common.ConnectionConsts;
-import com.message.common.PushConsts;
-import com.message.enums.PushTypeEnum;
+import com.message.constant.PushConsts;
+import com.message.constant.PushTypeEnum;
 
 import io.netty.util.internal.StringUtil;
-import io.vertx.amqpbridge.AmqpBridge;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.MessageConsumer;

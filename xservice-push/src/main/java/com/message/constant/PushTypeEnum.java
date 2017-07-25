@@ -1,4 +1,4 @@
-package com.message.enums;
+package com.message.constant;
 
 public enum PushTypeEnum {
 	
