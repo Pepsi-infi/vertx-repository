@@ -11,6 +11,7 @@ import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 import utils.JsonUtil;
 import utils.SystemCache;
+import xgroup.statistic.constants.PushActionEnum;
 import xgroup.statistic.service.MsgStatService;
 
 import java.util.Arrays;
@@ -34,7 +35,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
         Router router = Router.router(vertx);
         router.route(MsgRestConstants.Msg.MSG_SEND).handler(this::statMsgSend);
-//        router.route(MsgRestConstants.Msg.MSG_ARRIVE).handler(this::getWaterMark);
+        router.route(MsgRestConstants.Msg.MSG_ARRIVE).handler(this::statMsgArrive);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -60,10 +61,18 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
         logger.info("the request params : msgId : {},osType :{}", msgId, osType);
 
-//        liveService.getProgramListByPageId(uuid, pageId, columnld, langCode,
-//                resultHandler(context, JsonUtil::encodePrettily));
+        msgStatService.statPushMsg(PushActionEnum.SEND.getType(), msgId, Integer.valueOf(osType
+        ), resultHandler(context, JsonUtil::encodePrettily));
+    }
 
-//        msgStatService.statPushMsg();
+    private void statMsgArrive(RoutingContext context) {
+        String msgId = context.request().params().get("msgId");
+        String osType = context.request().params().get("osType");
+
+        logger.info("the request params : msgId : {},osType :{}", msgId, osType);
+
+        msgStatService.statPushMsg(PushActionEnum.ARRIVE.getType(), msgId, Integer.valueOf(osType
+        ), resultHandler(context, JsonUtil::encodePrettily));
     }
 
 
