@@ -25,6 +25,20 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<!-- core -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-core</artifactId>
+			<version>${vertx.version}</version>
+		</dependency>
+		
+		<!-- web -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web</artifactId>
+			<version>${vertx.version}</version>
+		</dependency>
+
 		<!-- xiaomi sdk -->
 		<dependency>
 			<groupId>com.xiaomi.miliao</groupId>
