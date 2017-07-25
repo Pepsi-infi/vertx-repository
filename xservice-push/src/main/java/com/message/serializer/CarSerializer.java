@@ -253,8 +253,8 @@ public class CarSerializer {
 			byte[] className = getBytes(getClassName(cls), charset);
 			byte[] classNameLen = getBytes(new Integer(className.length));
 
-			if (obj instanceof com.ichinait.car.utils.serializer.Serializable) {
-				byte[] cs = ((com.ichinait.car.utils.serializer.Serializable) obj).serialize();
+			if (obj instanceof com.message.serializer.Serializable) {
+				byte[] cs = ((com.message.serializer.Serializable) obj).serialize();
 				byte[] cslen = getBytes(new Integer(cs.length));
 
 				stream.write(__C);
@@ -962,11 +962,11 @@ public class CarSerializer {
 		ht.put(new Integer(hv++), o);
 		if (o == null) {
 			stream.skip(n);
-		} else if (o instanceof com.ichinait.car.utils.serializer.Serializable) {
+		} else if (o instanceof com.message.serializer.Serializable) {
 			byte[] b = new byte[n];
 
 			stream.read(b, 0, n);
-			((com.ichinait.car.utils.serializer.Serializable) o).unserialize(b);
+			((com.message.serializer.Serializable) o).unserialize(b);
 		} else {
 			stream.skip(n);
 		}
