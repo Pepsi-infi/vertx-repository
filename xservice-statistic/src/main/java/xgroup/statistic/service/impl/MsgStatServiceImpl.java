@@ -59,5 +59,4 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         });
     }
 
-
 }

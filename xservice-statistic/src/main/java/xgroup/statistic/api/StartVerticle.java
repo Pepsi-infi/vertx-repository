@@ -5,6 +5,8 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import xgroup.statistic.service.MsgStatService;
+import xgroup.statistic.service.impl.MsgStatServiceImpl;
+import xgroup.statistic.tp.msg.impl.MsgStatDaoImpl;
 import xservice.BaseServiceVerticle;
 
 /**
@@ -24,9 +26,9 @@ public class StartVerticle extends BaseServiceVerticle {
     }
 
 
-
     private void deployRestService() {
-//        this.deployVerticle(MsgStatService.class.getName());
+        this.deployVerticle(MsgStatDaoImpl.class.getName());
+        this.deployVerticle(MsgStatServiceImpl.class.getName());
         this.deployVerticle(RestMsgStatVerticle.class.getName());
     }
 
