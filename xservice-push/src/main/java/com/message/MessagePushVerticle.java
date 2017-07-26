@@ -16,6 +16,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 
+/**
+ * 
+ * @author yanglf
+ * 
+ *  消息推送消费入口类
+ *
+ */
 public class MessagePushVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessagePushVerticle.class);
@@ -115,7 +122,7 @@ public class MessagePushVerticle extends AbstractVerticle {
 				
 			} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 				
-				//TODO 小米推送
+				//TODO 只用作对安卓手机进行推送
 				mp=eventBus.sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX+PushTypeEnum.XIAOMI.getCode());
 				
 			} else{
@@ -123,6 +130,7 @@ public class MessagePushVerticle extends AbstractVerticle {
 				return;
 			}
 			
+			recieveMsg.put("regId", token);
 			mp.send(recieveMsg.toString());
 		}
 		
