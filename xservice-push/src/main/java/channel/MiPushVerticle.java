@@ -1,18 +1,12 @@
 package channel;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaomi.xmpush.server.Message;
+import com.xiaomi.xmpush.server.Sender;
 import constant.PushConsts;
 import enums.EnumPassengerMessageType;
 import enums.PushTypeEnum;
-import util.ApplicationProperties;
-import com.xiaomi.xmpush.server.Message;
-import com.xiaomi.xmpush.server.Sender;
-
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
@@ -21,6 +15,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.XiaoMiPushService;
+import util.PropertiesLoaderUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -77,7 +76,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	public void sendMessage(String title, String content, String description, String msgBody, String regId)
 			throws Exception {
-		Sender sender = new Sender(ApplicationProperties.getPropertyValue("xiaomi.appsecret"));
+		Sender sender = new Sender(PropertiesLoaderUtils.get("xiaomi.appsecret"));
 		Message message = buildMessage(title, content, description, msgBody);
 		sender.send(message, regId, 0); // 根据regID，发送消息到指定设备上，不重试。
 
@@ -85,7 +84,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	private Message buildMessage(String title, String content, String description, String msgBody) throws Exception {
 		// app包名
-		String packageName = ApplicationProperties.getPropertyValue("xiaomi.packagename");
+		String packageName = PropertiesLoaderUtils.get("xiaomi.packagename");
 
 		Message message = new Message.Builder().title(title).description(description).payload(content)
 				.restrictedPackageName(packageName).passThrough(PushConsts.XIAOMI_PASS_THROUGH_TONGZHILAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
@@ -96,14 +95,14 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	public void sendMessageRegIds(String title, String content, String description, String msgBody, List<String> regIds)
 			throws Exception {
-		Sender sender = new Sender(ApplicationProperties.getPropertyValue("xiaomi.appsecret"));
+		Sender sender = new Sender(PropertiesLoaderUtils.get("xiaomi.appsecret"));
 		Message message = this.buildMessage(title, content, description, msgBody);
 		sender.send(message, regIds, 0);
 	}
 
 	public void sendMessageAlias(String title, String content, String description, String msgBody,
 			List<String> aliasList) throws Exception {
-		Sender sender = new Sender(ApplicationProperties.getPropertyValue("xiaomi.appsecret"));
+		Sender sender = new Sender(PropertiesLoaderUtils.get("xiaomi.appsecret"));
 		Message message = this.buildMessage(title, content, description, msgBody);
 		sender.sendToAlias(message, aliasList, 0); // 根据aliasList，发送消息到指定设备上，不重试。
 	}

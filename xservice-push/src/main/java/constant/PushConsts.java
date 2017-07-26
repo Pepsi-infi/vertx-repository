@@ -13,5 +13,7 @@ public class PushConsts {
 	public static final int XIAOMI_PASS_THROUGH_TOUCHUAN = 1;
 
 	public static final int XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND = 1;
-	
+
+	// 用户消息队列key（乘客）
+	public static String _MSG_LIST_PASSENGER = "MSGLIST_PASSENGER";
 }
