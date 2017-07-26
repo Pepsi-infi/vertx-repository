@@ -31,6 +31,7 @@
     <orderEntry type="library" name="Maven: io.vertx:vertx-web:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: com.xiaomi.miliao:xmpush-server-api:2.2.18" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-amqp-bridge:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-proton:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.qpid:proton-j:0.19.0" level="project" />

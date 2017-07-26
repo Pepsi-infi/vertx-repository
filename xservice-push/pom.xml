@@ -1,84 +1,91 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<artifactId>xservice</artifactId>
-		<groupId>xgroup</groupId>
-		<version>1.0.0-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>xservice</artifactId>
+        <groupId>xgroup</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>xservice-push</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>xservice-push</artifactId>
+    <packaging>jar</packaging>
 
-	<name>xservice-push</name>
-	<url>http://maven.apache.org</url>
+    <name>xservice-push</name>
+    <url>http://maven.apache.org</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vertx.version>3.4.2</vertx.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <vertx.version>3.4.2</vertx.version>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>xgroup</groupId>
-			<artifactId>xservice-common</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>xgroup</groupId>
+            <artifactId>xservice-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- core -->
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-core</artifactId>
-			<version>${vertx.version}</version>
-		</dependency>
-		
-		<!-- web -->
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-web</artifactId>
-			<version>${vertx.version}</version>
-		</dependency>
+        <!-- core -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
 
-		<!-- xiaomi sdk -->
-		<dependency>
-			<groupId>com.xiaomi.miliao</groupId>
-			<artifactId>xmpush-server-api</artifactId>
-			<version>2.2.18</version>
-		</dependency>
+        <!-- web -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
 
-		<!-- mq -->
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-amqp-bridge</artifactId>
-			<version>${vertx.version}</version>
-		</dependency>
+        <!-- 小米推送 start -->
+        <dependency>
+            <groupId>com.xiaomi.miliao</groupId>
+            <artifactId>xmpush-server-api</artifactId>
+            <version>2.2.18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!-- 小米推送 end -->
 
-		<!-- mysql -->
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-mysql-postgresql-client</artifactId>
-			<version>${vertx.version}</version>
-		</dependency>
+        <!-- mq -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-amqp-bridge</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
 
-		<!-- redis -->
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-redis-client</artifactId>
-			<version>3.4.2</version>
-		</dependency>
+        <!-- mysql -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mysql-postgresql-client</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- redis -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-redis-client</artifactId>
+            <version>3.4.2</version>
+        </dependency>
 
-	<repositories>
-		<repository>
-			<id>thirdparty</id>
-			<url>http://192.168.0.7:8081/nexus/content/repositories/thirdparty/</url>
-		</repository>
-	</repositories>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>thirdparty</id>
+            <url>http://192.168.0.7:8081/nexus/content/repositories/thirdparty/</url>
+        </repository>
+    </repositories>
+
 </project>
