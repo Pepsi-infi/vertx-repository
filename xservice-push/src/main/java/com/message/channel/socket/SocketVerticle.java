@@ -1,12 +1,15 @@
 package com.message.channel.socket;
 
-import com.message.enums.EnumPassengerMessageType;
 import com.message.constant.MsgConstant;
+import com.message.constant.PushConsts;
+import com.message.enums.EnumPassengerMessageType;
+import com.message.enums.PushTypeEnum;
 import com.message.serializer.ByteUtils;
 import com.message.util.ApplicationProperties;
-import com.message.util.JsonUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
@@ -24,9 +27,20 @@ public class SocketVerticle extends AbstractVerticle {
 
     private Logger logger = LoggerFactory.getLogger(SocketVerticle.class);
 
+    private JsonObject recieveMsg;
+
     public void start(Future<Void> startFuture) {
 
-        Map<String, Object> msg = new HashMap<>();
+        MessageConsumer<String> message = vertx.eventBus().consumer(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX + PushTypeEnum.SOCKET.getCode());
+        message.handler(handler ->{
+            String msg = handler.body();
+            if(StringUtils.isBlank(msg)){
+               logger.info("socket接收到的数据为空");
+                return;
+            }
+            recieveMsg = JsonObject.mapFrom(msg);
+            sendMsg(recieveMsg);
+        });
 
     }
 
@@ -36,22 +50,23 @@ public class SocketVerticle extends AbstractVerticle {
 
     /**
      *
-     * @param messageType
      * @param msg
      */
-    public void sendMsg(EnumPassengerMessageType messageType, Map<String, Object> msg) {
+    public void sendMsg(JsonObject msg) {
 
-        Integer customerId = Integer.parseInt(msg.get("customerId") + "");
-        Long expireTime = Long.parseLong(msg.get("expireTime") + "");
+        EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
+
+        Object customerId = recieveMsg.getValue("customerId");
+        Object expireTime = recieveMsg.getValue("expireTime");
         String token = null;
         String msgId = createMsgId();
-        Integer seconds = (expireTime != null) ? (int) (expireTime - System.currentTimeMillis()) / 1000 : 600;
+        Integer seconds = (expireTime != null) ? (int) ((Long)expireTime - System.currentTimeMillis()) / 1000 : 600;
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
         msgInfo.put("msgId", msgId);
         msgInfo.put("title", messageType.getName());
-        msgInfo.put("body", JsonUtil.toJsonString(msg));
+        msgInfo.put("body", msg.toString());
         if (StringUtils.isNotBlank(token) && token.length() > 10) {
             msgInfo.put("token", token);
         }
@@ -65,7 +80,7 @@ public class SocketVerticle extends AbstractVerticle {
         Map<String, Object> sendMap = new HashMap<String, Object>();
         DatagramSocket client = null;
         try {
-            String[] Host = ApplicationProperties.tcpHostPassenger();
+            String[] Host = ApplicationProperties.udpHostPassenger();
             sendMap.put("method", MsgConstant.SendMethod.SEND_MSG.getMsg());
             sendMap.put("params", params);
             byte[] sendBuf = ByteUtils.objectToByte(sendMap);
