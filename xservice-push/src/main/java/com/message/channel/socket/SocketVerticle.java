@@ -7,8 +7,9 @@ import com.message.enums.PushTypeEnum;
 import com.message.serializer.ByteUtils;
 import com.message.util.ApplicationProperties;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.eventbus.MessageProducer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -29,7 +30,7 @@ public class SocketVerticle extends AbstractVerticle {
 
     private JsonObject recieveMsg;
 
-    public void start(Future<Void> startFuture) {
+    public void start() {
 
         MessageConsumer<String> message = vertx.eventBus().consumer(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX + PushTypeEnum.SOCKET.getCode());
         message.handler(handler ->{
@@ -44,8 +45,8 @@ public class SocketVerticle extends AbstractVerticle {
 
     }
 
-    public void stop(Future stopFuture) throws Exception {
-        System.out.println("MyVerticle stopped!");
+    public void stop() throws Exception {
+//        logger.info("socket verticle stop!");
     }
 
     /**
@@ -92,7 +93,7 @@ public class SocketVerticle extends AbstractVerticle {
             logger.info("{} udp host:{} {} msg: {}",MsgConstant.SendMethod.SEND_MSG.getMsg(),
                     Host[0], Host[1], new String(sendBuf, "UTF-8"));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("socket推送消息出错" + e.getMessage(),e);
         } finally {
             if (client != null) {
                 client.close();
@@ -106,4 +107,18 @@ public class SocketVerticle extends AbstractVerticle {
         return uuid.toString().replaceAll("-", "");
     }
 
+    public static void main(String[] args) {
+        Vertx vertx1 = Vertx.vertx();
+        vertx1.deployVerticle("com.message.channel.socket.SocketVerticle");
+
+        MessageProducer<String> mp = vertx1.eventBus().sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX+PushTypeEnum.SOCKET.getCode());
+
+        String json = "{\n" +
+                "  \"customerId\": 111111,\n" +
+                "  \"expireTime\": 1501032894,\n" +
+                "  \"msg\": \"\\\"我是消息内容，阿斯蒂芬工阿斯蒂芬 阿斯蒂芬 模压模压硒鼓 \\\"\",\n" +
+                "  \"token\": \"\"\n" +
+                "}";
+        mp.send(json);
+    }
 }
