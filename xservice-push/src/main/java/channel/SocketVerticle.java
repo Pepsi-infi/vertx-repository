@@ -1,6 +1,6 @@
 package channel;
 
-import com.message.channel.socket.bean.ChatMsgVO;
+import domain.ChatMsgVO;
 import constant.ConnectionConsts;
 import constant.MsgConstant;
 import constant.PushConsts;
