@@ -1,11 +1,11 @@
-package com.message.channel.socket;
+package channel;
 
-import com.message.constant.MsgConstant;
-import com.message.constant.PushConsts;
-import com.message.enums.EnumPassengerMessageType;
-import com.message.enums.PushTypeEnum;
-import com.message.serializer.ByteUtils;
-import com.message.util.ApplicationProperties;
+import constant.MsgConstant;
+import constant.PushConsts;
+import enums.EnumPassengerMessageType;
+import enums.PushTypeEnum;
+import serializer.ByteUtils;
+import util.ApplicationProperties;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -109,7 +109,7 @@ public class SocketVerticle extends AbstractVerticle {
 
     public static void main(String[] args) {
         Vertx vertx1 = Vertx.vertx();
-        vertx1.deployVerticle("com.message.channel.socket.SocketVerticle");
+        vertx1.deployVerticle("channel.SocketVerticle");
 
         MessageProducer<String> mp = vertx1.eventBus().sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX+PushTypeEnum.SOCKET.getCode());
 

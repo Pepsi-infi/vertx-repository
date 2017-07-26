@@ -1,4 +1,4 @@
-package com.message.util;
+package util;
 
 
 import io.vertx.core.logging.Logger;

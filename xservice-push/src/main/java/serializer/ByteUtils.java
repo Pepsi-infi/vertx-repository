@@ -1,4 +1,4 @@
-package com.message.serializer;
+package serializer;
 
 
 /**

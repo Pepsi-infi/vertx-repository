@@ -1,8 +1,8 @@
 package com.message;
 
-import com.message.constant.ConnectionConsts;
-import com.message.constant.PushConsts;
-import com.message.enums.PushTypeEnum;
+import constant.ConnectionConsts;
+import constant.PushConsts;
+import enums.PushTypeEnum;
 
 import io.netty.util.internal.StringUtil;
 import io.vertx.amqpbridge.AmqpBridge;
@@ -23,22 +23,27 @@ import io.vertx.redis.RedisOptions;
  *  消息推送消费入口类
  *
  */
-public class MessagePushVerticle extends AbstractVerticle {
+public class AmqpConsumerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(MessagePushVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(AmqpConsumerVerticle.class);
 
 	private JsonObject recieveMsg = null;
 
 	private Object activity = null;
 	
 	private EventBus eventBus;
+
+	private MessageConsumer<JsonObject> consumer;
 	
 	private MessageProducer<String> mp;
 
+	private RedisClient redisClient;
+
 	@Override
 	public void start() throws Exception {
+		RedisOptions config = new RedisOptions().setAddress(ConnectionConsts.redis_server_address);
+		redisClient = RedisClient.create(vertx, config);
 
-		RedisClient redisClient = getRedisClient();
 
 		if (redisClient == null) {
 			logger.error("redis服务器连接失败");
@@ -174,10 +179,4 @@ public class MessagePushVerticle extends AbstractVerticle {
 		return true;
 	}
 
-	private RedisClient getRedisClient() {
-
-		RedisOptions config = new RedisOptions().setAddress(ConnectionConsts.redis_server_address);
-
-		return RedisClient.create(vertx, config);
-	}
 }

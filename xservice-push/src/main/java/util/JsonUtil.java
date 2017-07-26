@@ -1,4 +1,4 @@
-package com.message.util;
+package util;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;

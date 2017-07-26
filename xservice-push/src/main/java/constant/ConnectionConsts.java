@@ -1,4 +1,4 @@
-package com.message.constant;
+package constant;
 
 public class ConnectionConsts {
 	

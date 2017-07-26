@@ -1,4 +1,4 @@
-package com.message.channel.xiaomi;
+package channel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.message.constant.PushConsts;
-import com.message.enums.EnumPassengerMessageType;
-import com.message.enums.PushTypeEnum;
-import com.message.util.ApplicationProperties;
+import constant.PushConsts;
+import enums.EnumPassengerMessageType;
+import enums.PushTypeEnum;
+import util.ApplicationProperties;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Sender;
 

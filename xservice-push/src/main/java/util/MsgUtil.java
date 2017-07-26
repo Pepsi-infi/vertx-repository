@@ -1,4 +1,4 @@
-package com.message.util;
+package util;
 
 import java.util.UUID;
 

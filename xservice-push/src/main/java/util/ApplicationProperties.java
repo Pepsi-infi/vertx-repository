@@ -1,4 +1,4 @@
-package com.message.util;
+package util;
 
 import org.apache.commons.lang.StringUtils;
 

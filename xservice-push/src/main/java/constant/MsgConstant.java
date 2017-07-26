@@ -1,4 +1,4 @@
-package com.message.constant;
+package constant;
 
 /**
  * Created by weim on 2017/7/25.
