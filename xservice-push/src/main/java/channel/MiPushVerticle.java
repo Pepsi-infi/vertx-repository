@@ -20,6 +20,7 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import service.XiaoMiPushService;
 
 /**
  * 
@@ -28,7 +29,7 @@ import io.vertx.core.logging.LoggerFactory;
  *         小米推送
  * 
  */
-public class MiPushVerticle extends AbstractVerticle {
+public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushService{
 
 	private static final Logger logger = LoggerFactory.getLogger(MiPushVerticle.class);
 
@@ -59,7 +60,7 @@ public class MiPushVerticle extends AbstractVerticle {
 
 	}
 
-	private void sendMsg(JsonObject recieveMsg) {
+	public void sendMsg(JsonObject recieveMsg) {
 
 		String title = EnumPassengerMessageType.ADVERTISEMENT.getName();
 		String content = recieveMsg.toString();
