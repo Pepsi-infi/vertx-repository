@@ -23,11 +23,18 @@
             <artifactId>xservice-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 小米推送 start -->
         <dependency>
             <groupId>com.xiaomi.miliao</groupId>
             <artifactId>xmpush-server-api</artifactId>
             <version>2.2.18</version>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!-- 小米推送 end -->
         <dependency>
             <groupId>com.xiaomi.miliao</groupId>
             <artifactId>xmpush-server-api</artifactId>
