@@ -1,6 +1,7 @@
 package api;
 
-import channel.SocketVerticle;
+import channel.AmqpConsumerVerticle;
+import channel.MiPushVerticle;
 import dao.impl.DeviceDaoImpl;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -17,16 +18,18 @@ public class Launcher extends AbstractVerticle{
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
 
+		vertx.deployVerticle(DeviceDaoImpl.class.getName());
+		vertx.deployVerticle(RedisServiceImpl.class.getName());
+		
+		vertx.deployVerticle(MiPushVerticle.class.getName());
+//		vertx.deployVerticle(SocketVerticle.class.getName());
 
-		vertx.deployVerticle(SocketVerticle.class.getName());
+		vertx.deployVerticle(AmqpConsumerVerticle.class.getName());
 	}
 
-	private void deployRestService() {
+	private static void deployRestService() {
 
-		this.deployVerticle(DeviceDaoImpl.class.getName());
-		this.deployVerticle(RedisServiceImpl.class.getName());
 
-		this.deployVerticle(DeviceDaoImpl.class.getName());
 
 	}
 
