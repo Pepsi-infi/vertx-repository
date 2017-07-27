@@ -25,7 +25,6 @@ import service.SocketPushService;
 import service.XiaoMiPushService;
 import util.JsonUtil;
 import util.MsgUtil;
-import util.PropertiesLoaderUtils;
 
 /**
  * 
@@ -62,37 +61,33 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
+		vertx.executeBlocking(future ->{
+			//连接redis
+			initRedis();
+			//初始化化服务
+			this.initService();
+			//建立MQ连接，获取消息体
+			recieveMsg =  getAmqpMsg();
+			future.complete(recieveMsg);
+		}, res ->{
+			logger.info("接收MQ消息： "+ res.result());
+			// 消费消息
+			consumMsg();
+		});
 
+	}
+
+	private RedisClient initRedis(){
 		// 获取redis连接
 		RedisOptions config = new RedisOptions().setAddress(ConnectionConsts.redis_server_address);
 		redisClient = RedisClient.create(vertx, config);
 
 		if (redisClient == null) {
 			logger.error("redis服务器连接失败");
-			return;
+			return null;
 		}
-		
-		//连接数据库
-		JsonObject jsonConfig = new JsonObject().put("url", PropertiesLoaderUtils.multiProp.getProperty("url"))
-				.put("user", PropertiesLoaderUtils.multiProp.getProperty("user"))
-				.put("password", PropertiesLoaderUtils.loadMultiProperties().getProperty("password"));
-
-		jdbcClient = JDBCClient.createNonShared(vertx, jsonConfig);
-
-		if (jdbcClient == null) {
-			logger.error("mysql服务器连接失败");
-			return;
-		}
-		
-		//建立MQ连接，获取消息体
-		recieveMsg = getMsg();
-		
-		//初始化化服务
-		this.initService();
-
-		// 消费消息
-		consumMsg();
-
+		logger.error("redis服务器连接成功");
+		return redisClient;
 	}
 
 	private void initService() {
@@ -275,7 +270,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	}
 
-	private JsonObject getMsg() {
+	private JsonObject getAmqpMsg() {
 		AmqpBridge bridge = AmqpBridge.create(vertx);
 		
 		
