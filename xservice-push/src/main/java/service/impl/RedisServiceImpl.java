@@ -27,12 +27,12 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     }
 
     private void initRedisClient(){
-        String config = System.getProperty("redis.config", ConnectionConsts.JDBC_CONFIG_PATH);
+        String config = System.getProperty("redis.config", ConnectionConsts.REDIS_CONFIG_PATH);
         JsonObject jsonObject = PropertiesLoaderUtils.getJsonConf(config);
 
         RedisOptions redisOptions = new RedisOptions();
         if (jsonObject != null && !jsonObject.isEmpty()) {
-            redisOptions.setAuth(jsonObject.getString("password"));
+//            redisOptions.setAuth(jsonObject.getString("password"));
             redisOptions.setAddress(jsonObject.getString("host"));
             redisOptions.setPort(jsonObject.getInteger("port"));
             redisOptions.setTcpKeepAlive(Boolean.getBoolean(jsonObject.getString("tcpKeepAlive")));

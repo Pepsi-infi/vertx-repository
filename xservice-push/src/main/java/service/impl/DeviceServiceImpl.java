@@ -4,6 +4,7 @@ import dao.DeviceDao;
 import domain.AmqpConsumeMessage;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -40,7 +41,15 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
     @Override
     public void addMessage(AmqpConsumeMessage msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
-        deviceDao.addMessage(msg, resultHandler);
+        Future<BaseResponse> resultFuture = Future.future();
+        deviceDao.addMessage(msg, resultFuture.completer());
+        resultFuture.setHandler(handler -> {
+            if (handler.succeeded()) {
+                resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+            } else {
+                resultHandler.handle(Future.failedFuture(handler.cause()));
+            }
+        });
     }
 
 }

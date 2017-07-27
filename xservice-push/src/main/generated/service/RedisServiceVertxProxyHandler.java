@@ -123,6 +123,8 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
+
+
         case "set": {
           service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), res -> {
             if (res.failed()) {
@@ -149,6 +151,10 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
               msg.reply(res.result() == null ? null : res.result().toJson());
             }
          });
+          break;
+        }
+        case "get": {
+          service.get((java.lang.String)json.getValue("key"), createHandler(msg));
           break;
         }
         default: {

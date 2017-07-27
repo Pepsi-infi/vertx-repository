@@ -48,6 +48,16 @@ public class RedisService {
     return ret;
   }
 
+  public static RedisService createLocalProxy(Vertx vertx) { 
+    RedisService ret = RedisService.newInstance(service.RedisService.createLocalProxy(vertx.getDelegate()));
+    return ret;
+  }
+
+  public static String getLocalAddress(String ip) { 
+    String ret = service.RedisService.getLocalAddress(ip);
+    return ret;
+  }
+
   public void set(String key, String value, Handler<AsyncResult<BaseResponse>> result) { 
     delegate.set(key, value, result);
   }
@@ -65,6 +75,16 @@ public class RedisService {
   public Single<BaseResponse> rxExpire(String key, long expire) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       expire(key, expire, fut);
+    }));
+  }
+
+  public void get(String key, Handler<AsyncResult<String>> result) { 
+    delegate.get(key, result);
+  }
+
+  public Single<String> rxGet(String key) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      get(key, fut);
     }));
   }
 
