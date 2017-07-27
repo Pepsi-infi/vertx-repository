@@ -21,7 +21,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
 
     private static final Logger logger = LoggerFactory.getLogger(RestDeviceVerticle.class);
 
-    private DeviceService userDeviceService;
+    private DeviceService deviceService;
 
     @Override
     public void start() throws Exception {
@@ -43,7 +43,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
     }
 
     private void initUserDeviceService() {
-        userDeviceService = DeviceService.createLocalProxy(vertx.getDelegate());
+        deviceService = DeviceService.createLocalProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
@@ -51,19 +51,18 @@ public class RestDeviceVerticle extends RestAPIVerticle {
     }
 
     private void reportUserDevice(RoutingContext context) {
-        DeviceDto userDeviceDto = buildUserDeviceDto(context);
+        DeviceDto userDeviceDto = buildDeviceDto(context);
         logger.info("the request params : userDeviceDto : {}", userDeviceDto);
-        userDeviceService.reportUserDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
+        deviceService.reportUserDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
     }
 
     /**
      * @param context
      * @return
      */
-    private DeviceDto buildUserDeviceDto(RoutingContext context) {
+    private DeviceDto buildDeviceDto(RoutingContext context) {
         DeviceDto userDeviceDto = new DeviceDto();
         String uid = context.request().params().get("uid");
-        String userType = context.request().params().get("userType");
         String phone = context.request().params().get("phone");
         String deviceType = context.request().params().get("deviceType");
         String deviceToken = context.request().params().get("deviceToken");
@@ -72,6 +71,8 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         String osVersion = context.request().params().get("osVersion");
         String appCode = context.request().params().get("appCode");
         String appVersion = context.request().params().get("appVersion");
+        String antFingerprint = context.request().params().get("antFingerprint");
+
 
         userDeviceDto.setDeviceToken(deviceToken);
         userDeviceDto.setOsVersion(osVersion);
@@ -79,14 +80,12 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         userDeviceDto.setDeviceType(deviceType);
         userDeviceDto.setImei(imei);
         userDeviceDto.setAppVersion(appVersion);
+        userDeviceDto.setAntFingerprint(antFingerprint);
         if (StringUtils.isNotBlank(osType)) {
             userDeviceDto.setOsType(Integer.valueOf(osType));
         }
         if (StringUtils.isNotBlank(uid)) {
             userDeviceDto.setUid(Long.valueOf(uid));
-        }
-        if (StringUtils.isNotBlank(userType)) {
-            userDeviceDto.setUserType(Integer.valueOf(userType));
         }
         if (StringUtils.isNotBlank(appCode)) {
             userDeviceDto.setAppCode(Integer.valueOf(appCode));

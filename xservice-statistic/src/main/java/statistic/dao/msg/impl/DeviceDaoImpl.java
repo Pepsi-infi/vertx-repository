@@ -34,7 +34,7 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
     private SQLClient sqlClient;
 
     public interface Sql {
-        public static final String ADD_USER_DEVICE = "insert into device (uid,userType,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion) values (?,?,?,?,?,?,?,?,?,?)";
+        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint) values (?,?,?,?,?,?,?,?,?,?)";
 
     }
 
@@ -90,9 +90,15 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
             return;
         }
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(userDeviceDto.getUid()).add(userDeviceDto.getUserType()).add(userDeviceDto.getPhone()).add(userDeviceDto.getDeviceType())
-                .add(userDeviceDto.getDeviceToken()).add(userDeviceDto.getImei()).add(userDeviceDto.getOsType()).add(userDeviceDto.getOsVersion())
-                .add(userDeviceDto.getAppCode()).add(userDeviceDto.getAppVersion());
+        //(uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint)
+        jsonArray.add(userDeviceDto.getUid() != null ? userDeviceDto.getUid() : "")
+                .add(userDeviceDto.getPhone() != null ? userDeviceDto.getPhone() : "")
+                .add(userDeviceDto.getDeviceType() != null ? userDeviceDto.getDeviceType() : "")
+                .add(userDeviceDto.getDeviceToken()).add(userDeviceDto.getImei()).add(userDeviceDto.getOsType())
+                .add(userDeviceDto.getOsVersion() != null ? userDeviceDto.getOsVersion() : "")
+                .add(userDeviceDto.getAppCode() != null ? userDeviceDto.getAppCode() : 0)
+                .add(userDeviceDto.getAppVersion() != null ? userDeviceDto.getAppVersion() : "")
+                .add(userDeviceDto.getAntFingerprint() != null ? userDeviceDto.getAntFingerprint() : "");
         execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
     }
 

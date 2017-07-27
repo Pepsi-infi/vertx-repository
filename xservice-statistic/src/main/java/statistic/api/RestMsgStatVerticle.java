@@ -66,6 +66,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     }
 
     private MsgStatDto buildMsgStatDto(RoutingContext context) {
+        String appCode = context.request().params().get("appCode");
         String msgId = context.request().params().get("msgId");
         String osType = context.request().params().get("osType");
         String channel = context.request().params().get("channel");
@@ -81,6 +82,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         }
         if (StringUtils.isNotBlank(isAcceptPush)) {
             statDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
+        }
+        if (StringUtils.isNotBlank(appCode)) {
+            statDto.setAppCode(Integer.valueOf(appCode));
         }
         statDto.setMsgId(msgId);
         statDto.setSendTime(sendTime);
