@@ -3,5 +3,5 @@
  * @author yanglf
  *
  */
-@io.vertx.codegen.annotations.ModuleGen(groupPackage="pushservice",name="service")
+@io.vertx.codegen.annotations.ModuleGen(name="service",groupPackage="pushservice")
 package service;

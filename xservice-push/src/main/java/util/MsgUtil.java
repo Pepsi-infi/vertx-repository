@@ -10,7 +10,7 @@ import java.util.UUID;
  */
 public class MsgUtil {
 
-    public String createMsgId(){
+    public static String createMsgId(){
         UUID uuid = UUID.randomUUID();
         return uuid.toString().replaceAll("-", "");
     }

@@ -1,19 +1,31 @@
+package channel;
 
 import constant.ConnectionConsts;
 import constant.PushConsts;
+import domain.AmqpConsumeMessage;
+import domain.MsgBody;
+import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
 import io.vertx.amqpbridge.AmqpBridge;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import service.GcmPushService;
 import service.SocketPushService;
 import service.XiaoMiPushService;
+import util.JsonUtil;
+import util.MsgUtil;
+import util.PropertiesLoaderUtils;
 
 /**
  * 
@@ -44,6 +56,10 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	private GcmPushService gcmPushService;
 
+	private SQLClient mysqlClient;
+
+	private JDBCClient jdbcClient;
+
 	@Override
 	public void start() throws Exception {
 
@@ -55,7 +71,23 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 			logger.error("redis服务器连接失败");
 			return;
 		}
+		
+		//连接数据库
+		JsonObject jsonConfig = new JsonObject().put("url", PropertiesLoaderUtils.multiProp.getProperty("url"))
+				.put("user", PropertiesLoaderUtils.multiProp.getProperty("user"))
+				.put("password", PropertiesLoaderUtils.loadMultiProperties().getProperty("password"));
 
+		jdbcClient = JDBCClient.createNonShared(vertx, jsonConfig);
+
+		if (jdbcClient == null) {
+			logger.error("mysql服务器连接失败");
+			return;
+		}
+		
+		//建立MQ连接，获取消息体
+		recieveMsg = getMsg();
+		
+		//初始化化服务
 		this.initService();
 
 		// 消费消息
@@ -80,9 +112,8 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void consumMsg() {
-
-		recieveMsg = getMsg();
-
+				
+		//校验
 		if (!validateRecieveMsg(recieveMsg)) {
 			return;
 		}
@@ -104,22 +135,25 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 		if (StringUtil.isNullOrEmpty(apnsToken) || "null".equals(apnsToken)) {
 
-			redisClient.set(PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId, 1 + "", handler -> {
-				if (!handler.succeeded()) {
-					logger.error("redis赋值失败");
-					return;
-				}
-			});
-
-			long now = System.currentTimeMillis();
-			Integer seconds = (int) ((Long) recieveMsg.getValue("expireTime") - now) / 1000;
-
-			redisClient.expire(PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId, seconds, handler -> {
-				if (!handler.succeeded()) {
-					logger.error("redis赋值失败");
-					return;
-				}
-			});
+			// redisClient.set(PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_"
+			// + customerId, 1 + "", handler -> {
+			// if (!handler.succeeded()) {
+			// logger.error("redis赋值失败");
+			// return;
+			// }
+			// });
+			//
+			// long now = System.currentTimeMillis();
+			// Integer seconds = (int) ((Long) recieveMsg.getValue("expireTime")
+			// - now) / 1000;
+			//
+			// redisClient.expire(PushConsts.AD_PASSENGER_MSG_PREFIX + msgId +
+			// "_" + customerId, seconds, handler -> {
+			// if (!handler.succeeded()) {
+			// logger.error("redis赋值失败");
+			// return;
+			// }
+			// });
 
 			String token = (String) recieveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 			String devicePushType = (String) recieveMsg.getValue("devicePushType"); // 消息推送类型
@@ -132,14 +166,61 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 			String sendType = getSendType(token, devicePushType);
 
+			// 推送消息
+			pushMsg(sendType, token);
+
+			// 消息入库
+			saveMsg(sendType);
+
 			// 安装消息推送：在sokit有连接时，优先sokit推送，其次是 GCM推送，最后是小米推送，如果都不支持，重连sokit进行推送
 
 			// eventBus = vertx.eventBus();
 
-			pushMsg(sendType, token);
-
 		}
 
+	}
+
+	private void saveMsg(String sendType) {
+		AmqpConsumeMessage msg=new AmqpConsumeMessage();
+		
+		msg.setAmqpMsgId(MsgUtil.createMsgId());
+		msg.setChannel(sendType);
+		msg.setMsgBody(JsonUtil.toJavaObject(recieveMsg.toString(), MsgBody.class));
+		msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
+		
+		jdbcClient.getConnection(res->{
+			
+			if(res.succeeded()){
+				
+				logger.info("数据库连接建立");
+				
+				String insertSql="insert into amqp_consume_message "
+								+ "(amqp_msg_id,channel,msg_body,status,"
+								+ "created_time,updated_time) "
+								+ "values "
+								+ "(?,?,?,?,now(),now())";
+						
+				SQLConnection connection= res.result();
+				
+				JsonArray array=new JsonArray().add(msg.getAmqpMsgId()).add(msg.getChannel()).add(msg.getMsgBody()).add(msg.getStatus());
+				
+				connection.updateWithParams(insertSql, array,sqlRes->{
+					
+					if(sqlRes.succeeded()){
+						UpdateResult result=sqlRes.result();
+						logger.info("updateResult="+result);
+					}
+					
+				});
+				
+				
+			}else{
+				logger.error("数据库连接失败");
+			}
+		});
+		
+		
+		
 	}
 
 	private String getSendType(String token, String devicePushType) {
@@ -167,13 +248,15 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 			token = null; // TODO socket推送
 			socketPushService.sendMsg(recieveMsg);
-			//mp = eventBus.sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX + PushTypeEnum.SOCKET.getCode());
+			// mp = eventBus.sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX +
+			// PushTypeEnum.SOCKET.getCode());
 
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 
 			token = null; // TODO gcm推送
 			gcmPushService.sendMsg(recieveMsg);
-			//mp = eventBus.sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX + PushTypeEnum.GCM.getCode());
+			// mp = eventBus.sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX +
+			// PushTypeEnum.GCM.getCode());
 
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 
@@ -194,16 +277,27 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	private JsonObject getMsg() {
 		AmqpBridge bridge = AmqpBridge.create(vertx);
-
+		
+		
+		//bridge.start
+		
 		bridge.start(ConnectionConsts.activemq_server_url, ConnectionConsts.activemq_server_port, res -> {
-
-			MessageConsumer<JsonObject> consumer = bridge.createConsumer("");
-
-			consumer.handler(msg -> {
-
-				recieveMsg = msg.body();
-
-			});
+			
+			
+			if(res.succeeded()){
+				logger.info("连接结果"+res.succeeded());
+	
+				MessageConsumer<JsonObject> consumer = bridge.createConsumer("ylf");
+									
+				consumer.handler(msg -> {
+					
+					recieveMsg = msg.body();
+	
+				});
+			}else{
+				logger.info("mq服务器连接失败");
+				return;
+			}
 
 		});
 		return recieveMsg;

@@ -60,7 +60,12 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 	}
 
 	public void sendMsg(JsonObject recieveMsg) {
-
+		
+		if(recieveMsg==null){
+			logger.error("尚无消息");
+			return;
+		}
+		
 		String title = EnumPassengerMessageType.ADVERTISEMENT.getName();
 		String content = recieveMsg.toString();
 
