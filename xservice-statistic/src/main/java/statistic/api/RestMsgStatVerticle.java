@@ -7,11 +7,11 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
-import statistic.service.dto.MsgStatDto;
+import iservice.dto.MsgStatDto;
 import utils.IPUtil;
 import utils.JsonUtil;
 import statistic.constants.PushActionEnum;
-import statistic.service.MsgStatService;
+import iservice.MsgStatService;
 
 /**
  * Created by lufei
