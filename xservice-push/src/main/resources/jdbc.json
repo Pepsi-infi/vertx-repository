@@ -4,7 +4,7 @@
   "maxPoolSize": 100,
   "username": "root",
   "password": "123456",
-  "database": "test",
+  "database": "kuaidian",
   "charset": "UTF-8",
   "queryTimeout": 3000
 }
