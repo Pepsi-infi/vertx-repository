@@ -1,5 +1,8 @@
 package domain;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+
 import java.io.Serializable;
 
 /**
@@ -7,9 +10,9 @@ import java.io.Serializable;
  * @author yanglf
  *
  */
+@DataObject(generateConverter = true)
 public class AmqpConsumeMessage extends BaseModel implements Serializable{
 	
-
 	/**
 	 * 
 	 */
@@ -45,6 +48,18 @@ public class AmqpConsumeMessage extends BaseModel implements Serializable{
 	public void setChannel(String channel) {
 		this.channel = channel;
 	}
-	
+
+	public AmqpConsumeMessage() {
+	}
+	public AmqpConsumeMessage(JsonObject json) {
+		// A converter is generated to easy the conversion from and to JSON.
+		AmqpConsumeMessageConverter.fromJson(json,this);
+	}
+
+	public JsonObject toJson() {
+		JsonObject json = new JsonObject();
+		AmqpConsumeMessageConverter.toJson(this, json);
+		return json;
+	}
 	
 }

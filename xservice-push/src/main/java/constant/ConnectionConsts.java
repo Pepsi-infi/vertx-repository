@@ -2,11 +2,19 @@ package constant;
 
 public class ConnectionConsts {
 	
-	public static String activemq_server_url="DESKTOP-7SFPCQ9";
+	public static String ACTIVEMQ_SERVER_URL = "active.server.url";
 	
-	public static int activemq_server_port=61616;
+	public static String ACTIVE_SERVER_PORT = "active.server.port";
 
-	public static String redis_server_address="127.0.0.1:6379";
+	public static String ACTIVE_QUEUE_TOPIC = "ylf";
+
 
 	public static String SOCKET_SENDTO_ADDRESS = "UDP_HOSTS_PASSENGER";
+
+
+	public static String JDBC_CONFIG_PATH = "jdbc.json";
+
+	public static String REDIS_CONFIG_PATH = "redis.json";
+
+	public static String MQ_CONFIG_PATH = "activemq.properties";
 }

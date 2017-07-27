@@ -1,6 +1,7 @@
 package util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.UUID;
@@ -15,6 +16,9 @@ public class MsgUtil {
         return uuid.toString().replaceAll("-", "");
     }
 
+    public static String getSystemPath(String filePath){
+        return filePath = filePath.replace("/", File.separator);
+    }
 
     public static byte[] objectToByte(Object obj) {
         byte[] bs=null;
@@ -31,4 +35,7 @@ public class MsgUtil {
         }
         return bs;
     }
+
+
+
 }

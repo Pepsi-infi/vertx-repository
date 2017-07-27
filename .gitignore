@@ -5,3 +5,8 @@
 .project
 target/
 *.iml
+xservice-push/src/main/generated/service/SocketPushServiceVertxProxyHandler.java
+xservice-push/src/main/generated/service/XiaoMiPushServiceVertxProxyHandler.java
+xservice-push/src/main/generated/service/rxjava/GcmPushService.java
+xservice-push/src/main/generated/service/rxjava/SocketPushService.java
+xservice-push/src/main/generated/service/rxjava/XiaoMiPushService.java

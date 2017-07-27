@@ -1,9 +1,9 @@
 package channel;
 
-import domain.ChatMsgVO;
 import constant.ConnectionConsts;
 import constant.MsgConstant;
 import constant.PushConsts;
+import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
 import enums.PushTypeEnum;
 import io.vertx.core.AbstractVerticle;
@@ -13,12 +13,9 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.eventbus.MessageProducer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisOptions;
 import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import util.JsonUtil;
-import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 
 import java.net.DatagramPacket;
@@ -81,28 +78,27 @@ public class SocketVerticle extends AbstractVerticle {
         chatMsgVO.setMsgTitle(messageType.getName());
         chatMsgVO.setMsgBody(msgBody);
         chatMsgVO.setType(messageType.getType());
-        RedisClient redisClient = getRedisClient();
-        if (redisClient == null) {
-            logger.error("redis服务器连接失败");
-        }else{
-            redisClient.rpush(PushConsts._MSG_LIST_PASSENGER + to, msgId, r ->{
-                if(!r.succeeded()){
-                    logger.error("redis设置失败， msgId :" + msgId);
-                }
-            });
-            byte[] objByte = MsgUtil.objectToByte(chatMsgVO);
-            String msgStr = new String(objByte);
-            redisClient.set(msgId, msgStr, r ->{
-                if(!r.succeeded()){
-                    logger.error("redis设置失败， msgId :" + msgId);
-                }
-            });
-            redisClient.expire(msgId, seconds, r ->{
-                if(!r.succeeded()){
-                    logger.error("redis设置失败， msgId :" + msgId);
-                }
-            });
-        }
+//        if (redisClient == null) {
+//            logger.error("redis服务器连接失败");
+//        }else{
+//            redisClient.rpush(PushConsts._MSG_LIST_PASSENGER + to, msgId, r ->{
+//                if(!r.succeeded()){
+//                    logger.error("redis设置失败， msgId :" + msgId);
+//                }
+//            });
+//            byte[] objByte = MsgUtil.objectToByte(chatMsgVO);
+//            String msgStr = new String(objByte);
+//            redisClient.set(msgId, msgStr, r ->{
+//                if(!r.succeeded()){
+//                    logger.error("redis设置失败， msgId :" + msgId);
+//                }
+//            });
+//            redisClient.expire(msgId, seconds, r ->{
+//                if(!r.succeeded()){
+//                    logger.error("redis设置失败， msgId :" + msgId);
+//                }
+//            });
+//        }
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
@@ -148,10 +144,6 @@ public class SocketVerticle extends AbstractVerticle {
         return uuid.toString().replaceAll("-", "");
     }
 
-    private RedisClient getRedisClient() {
-        RedisOptions config = new RedisOptions().setAddress(ConnectionConsts.redis_server_address);
-        return RedisClient.create(vertx, config);
-    }
 
     /**
      * 测试示例

@@ -16,7 +16,7 @@
 
 package service;
 
-import service.GcmPushService;
+import service.RedisService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,27 +32,29 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.GcmPushService;
+import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import service.RedisService;
+import io.vertx.core.Handler;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class GcmPushServiceVertxEBProxy implements GcmPushService {
+public class RedisServiceVertxEBProxy implements RedisService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public GcmPushServiceVertxEBProxy(Vertx vertx, String address) {
+  public RedisServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public GcmPushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public RedisServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -62,15 +64,42 @@ public class GcmPushServiceVertxEBProxy implements GcmPushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject recieveMsg) {
+  public void set(String key, String value, Handler<AsyncResult<BaseResponse>> result) {
     if (closed) {
-      throw new IllegalStateException("Proxy is closed");
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("recieveMsg", recieveMsg);
+    _json.put("key", key);
+    _json.put("value", value);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "sendMsg");
-    _vertx.eventBus().send(_address, _json, _deliveryOptions);
+    _deliveryOptions.addHeader("action", "set");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+                      }
+    });
+  }
+
+  public void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("key", key);
+    _json.put("expire", expire);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "expire");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+                      }
+    });
   }
 
 

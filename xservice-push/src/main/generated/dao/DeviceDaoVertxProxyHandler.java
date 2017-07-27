@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package dao;
 
-import service.GcmPushService;
+import dao.DeviceDao;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,34 +39,37 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.GcmPushService;
+import domain.AmqpConsumeMessage;
+import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import dao.DeviceDao;
+import io.vertx.core.Handler;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class GcmPushServiceVertxProxyHandler extends ProxyHandler {
+public class DeviceDaoVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final GcmPushService service;
+  private final DeviceDao service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public GcmPushServiceVertxProxyHandler(Vertx vertx, GcmPushService service) {
+  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public GcmPushServiceVertxProxyHandler(Vertx vertx, GcmPushService service, long timeoutInSecond) {
+  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public GcmPushServiceVertxProxyHandler(Vertx vertx, GcmPushService service, boolean topLevel, long timeoutSeconds) {
+  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -123,8 +126,18 @@ public class GcmPushServiceVertxProxyHandler extends ProxyHandler {
 
 
 
-        case "sendMsg": {
-          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"));
+        case "addMessage": {
+          service.addMessage(json.getJsonObject("dto") == null ? null : new domain.AmqpConsumeMessage(json.getJsonObject("dto")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
           break;
         }
         default: {
