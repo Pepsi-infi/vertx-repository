@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
 import statistic.constants.CacheConstants;
 import statistic.constants.PushActionEnum;
+import statistic.service.dto.MsgStatDto;
 import utils.BaseResponse;
 import statistic.service.MsgStatService;
 
@@ -83,13 +84,12 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
     }
 
 
-
     @Override
-    public void statPushMsg(int action, String msgId, int osType, Handler<AsyncResult<BaseResponse>> result) {
-        String msgSendKey = CacheConstants.getPushMsgKey(msgId);
-        String field = getFiledForRedisStat(action, osType);
+    public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
+        String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto.getMsgId());
+        String field = getFiledForRedisStat(msgStatDto.getAction(), msgStatDto.getOsType());
         if (StringUtils.isBlank(field)) {
-            logger.warn("the msgId : {} statistical indicators is null,action :{},osType : {} ", msgId, action, osType);
+            logger.warn("[statPushMsg] the msgStat:{} ", msgStatDto);
             return;
         }
         redisClient.hincrby(msgSendKey, CacheConstants.PUSH_MSG_SEND, 1, handler -> {
@@ -110,5 +110,6 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         }
         return redisFiled;
     }
+
 
 }

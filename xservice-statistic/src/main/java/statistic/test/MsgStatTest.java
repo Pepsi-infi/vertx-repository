@@ -5,7 +5,9 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
 import statistic.api.RestMsgStatVerticle;
+import statistic.dao.msg.impl.DeviceDaoImpl;
 import statistic.service.impl.MsgStatServiceImpl;
+import statistic.service.impl.DeviceServiceImpl;
 
 /**
  * Created by lufei
@@ -30,6 +32,8 @@ public class MsgStatTest {
             deploymentOptions.setConfig(config());
 
             vertx.deployVerticle(MsgStatServiceImpl.class.getName(), deploymentOptions);
+            vertx.deployVerticle(DeviceDaoImpl.class.getName(), deploymentOptions);
+            vertx.deployVerticle(DeviceServiceImpl.class.getName(), deploymentOptions);
 
             Thread.sleep(3000);
         } catch (Exception e) {
@@ -50,6 +54,7 @@ public class MsgStatTest {
         DeploymentOptions deploymentOptions = new DeploymentOptions();
         deploymentOptions.setConfig(config());
         vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
         return future.map(r -> null);
     }
 
