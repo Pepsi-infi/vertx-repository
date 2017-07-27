@@ -27,6 +27,9 @@ import io.vertx.core.json.JsonArray;
 public class DeviceDtoConverter {
 
   public static void fromJson(JsonObject json, DeviceDto obj) {
+    if (json.getValue("antFingerprint") instanceof String) {
+      obj.setAntFingerprint((String)json.getValue("antFingerprint"));
+    }
     if (json.getValue("appCode") instanceof Number) {
       obj.setAppCode(((Number)json.getValue("appCode")).intValue());
     }
@@ -60,6 +63,9 @@ public class DeviceDtoConverter {
   }
 
   public static void toJson(DeviceDto obj, JsonObject json) {
+    if (obj.getAntFingerprint() != null) {
+      json.put("antFingerprint", obj.getAntFingerprint());
+    }
     if (obj.getAppCode() != null) {
       json.put("appCode", obj.getAppCode());
     }

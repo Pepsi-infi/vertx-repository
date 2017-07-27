@@ -1,17 +1,23 @@
 package statistic.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import rxjava.BaseServiceVerticle;
 import statistic.constants.CacheConstants;
+import statistic.constants.ChannelEnum;
 import statistic.constants.PushActionEnum;
 import statistic.service.dto.MsgStatDto;
 import utils.BaseResponse;
@@ -21,6 +27,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Created by lufei
@@ -52,8 +59,10 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         JsonObject jsonObject = this.getJsonConf(root + "/" + redis + "/redis.json");
         RedisOptions redisOptions = new RedisOptions();
         if (jsonObject != null && !jsonObject.isEmpty()) {
-            redisOptions.setAuth(jsonObject.getString("password"));
-            redisOptions.setAddress(jsonObject.getString("host"));
+            if (StringUtils.isNotBlank(jsonObject.getString("password"))) {
+                redisOptions.setAuth(jsonObject.getString("password"));
+            }
+            redisOptions.setHost(jsonObject.getString("host"));
             redisOptions.setPort(jsonObject.getInteger("port"));
             redisOptions.setTcpKeepAlive(Boolean.getBoolean(jsonObject.getString("tcpKeepAlive")));
             redisOptions.setEncoding(jsonObject.getString("encoding"));
@@ -86,29 +95,47 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 
     @Override
     public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
-        String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto.getMsgId());
-        String field = getFiledForRedisStat(msgStatDto.getAction(), msgStatDto.getOsType());
-        if (StringUtils.isBlank(field)) {
-            logger.warn("[statPushMsg] the msgStat:{} ", msgStatDto);
+        String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto);
+        List<String> fields = getFiledsForMsgStat(msgStatDto);
+        if (CollectionUtils.isEmpty(fields)) {
+            logger.warn("the msgStat:{} need stat is null ", msgStatDto);
             return;
         }
-        redisClient.hincrby(msgSendKey, CacheConstants.PUSH_MSG_SEND, 1, handler -> {
-            if (handler.succeeded()) {
-                result.handle(Future.succeededFuture(null));
-            } else {
-                result.handle(Future.failedFuture(handler.cause()));
+        try {
+            for (String field : fields) {
+                redisClient.hincrby(msgSendKey, field, 1, handler -> {
+                    if (handler.succeeded()) {
+                        logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
+                    } else {
+                        logger.error("stat msgStatDto : {} by filed :{} error.", msgStatDto, field, handler.cause());
+                    }
+                });
             }
-        });
+            result.handle(Future.succeededFuture(new BaseResponse()));
+        } catch (Exception e) {
+            logger.error("stat msgStatDto : {} error.", msgStatDto);
+            result.handle(Future.failedFuture(e.getCause()));
+        }
+
     }
 
-    private String getFiledForRedisStat(int action, int osType) {
-        String redisFiled = null;
-        if (PushActionEnum.SEND.getType() == action) {
-            redisFiled = CacheConstants.PUSH_MSG_SEND;
-        } else if (PushActionEnum.ARRIVE.getType() == action) {
-            redisFiled = CacheConstants.PUSH_MSG_ARRIVE;
+    private List<String> getFiledsForMsgStat(MsgStatDto msgStatDto) {
+        List<String> fieldsList = Lists.newArrayList();
+        if (PushActionEnum.SEND.getType() == msgStatDto.getAction()) {
+            fieldsList.add(CacheConstants.PUSH_SEND_SUM);
+            if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_SEND_CHANNEL).append(msgStatDto.getChannel()).toString();
+                fieldsList.add(filed);
+            }
+        } else if (PushActionEnum.ARRIVE.getType() == msgStatDto.getAction()) {
+            fieldsList.add(CacheConstants.PUSH_ARRIVE_SUM);
+            if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_ARRIVE_CHANNEL).append(msgStatDto.getChannel()).toString();
+                fieldsList.add(filed);
+            }
         }
-        return redisFiled;
+        logger.info("the msgstatDto : {} need stat fileds : {}", JSON.toJSONString(fieldsList));
+        return fieldsList;
     }
 
 

@@ -33,6 +33,9 @@ public class MsgStatDtoConverter {
     if (json.getValue("channel") instanceof Number) {
       obj.setChannel(((Number)json.getValue("channel")).intValue());
     }
+    if (json.getValue("isAcceptPush") instanceof Number) {
+      obj.setIsAcceptPush(((Number)json.getValue("isAcceptPush")).intValue());
+    }
     if (json.getValue("msgId") instanceof String) {
       obj.setMsgId((String)json.getValue("msgId"));
     }
@@ -50,6 +53,9 @@ public class MsgStatDtoConverter {
     }
     if (obj.getChannel() != null) {
       json.put("channel", obj.getChannel());
+    }
+    if (obj.getIsAcceptPush() != null) {
+      json.put("isAcceptPush", obj.getIsAcceptPush());
     }
     if (obj.getMsgId() != null) {
       json.put("msgId", obj.getMsgId());
