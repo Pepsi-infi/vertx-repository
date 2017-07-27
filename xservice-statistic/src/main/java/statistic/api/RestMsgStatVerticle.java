@@ -70,6 +70,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String osType = context.request().params().get("osType");
         String channel = context.request().params().get("channel");
         String sendTime = context.request().params().get("sendTime");
+        String isAcceptPush = context.request().params().get("isAcceptPush");
 
         MsgStatDto statDto = new MsgStatDto();
         if (StringUtils.isNotBlank(osType)) {
@@ -77,6 +78,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         }
         if (StringUtils.isNotBlank(channel)) {
             statDto.setChannel(Integer.valueOf(channel));
+        }
+        if (StringUtils.isNotBlank(isAcceptPush)) {
+            statDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
         }
         statDto.setMsgId(msgId);
         statDto.setSendTime(sendTime);

@@ -34,7 +34,7 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
     private SQLClient sqlClient;
 
     public interface Sql {
-        public static final String ADD_USER_DEVICE = "insert into user_device (uid,userType,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion) values (?,?,?,?,?,?,?,?,?,?)";
+        public static final String ADD_USER_DEVICE = "insert into device (uid,userType,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion) values (?,?,?,?,?,?,?,?,?,?)";
 
     }
 
