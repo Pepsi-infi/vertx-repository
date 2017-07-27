@@ -1,0 +1,7 @@
+{
+     "host": "10.10.10.125",
+     "port": 6381,
+     "encoding": "UTF-8",
+     "tcpKeepAlive": "true",
+     "tcpNoDelay": "true"
+}
