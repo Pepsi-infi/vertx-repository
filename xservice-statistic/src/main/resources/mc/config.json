@@ -1,18 +1,6 @@
 {
-      "service.name": "le.tv.channel",
-      "service.host": "127.0.0.1",
-      "service.port": 1203,
-      "service.root": "/tv-channel",
-      "thrift.properties":
-      {
-            "search.stream.server": "10.112.32.127:10010;10.112.32.254:10010",
-            "search.search.server": "107.155.42.171:1070;107.155.42.181:1070",
-            "search.search.server.zookeeper": "",
-            "search.search.server.zookeeper.path": "",
-            "search.panoSearch.server": "",
-            "search.panoSearch.server.zookeeper.path": "",
-            "cn.recommendation.server=10.180.92.85:8406": "",
-            "video.stream.server": "202.47.215.115:10010;202.47.215.116:10010",
-            "sarr.albumdetail.server": "107.155.52.72:9090;107.155.52.73:9080"
-      }
+  "service.name": "sy.mc.statistic",
+  "service.host": "127.0.0.1",
+  "service.port": 1203,
+  "service.root": "/mc-statistic"
 }

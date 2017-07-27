@@ -1,0 +1,12 @@
+{
+  "url": "127.0.0.1",
+  "driver_class": "org.hsqldb.jdbcDriver",
+  "user": "UTF-8",
+  "password": "true",
+  "max_pool_size": 100,
+  "initial_pool_size":10,
+  "min_pool_size":10,
+  "max_statements":0,
+  "max_statements_per_connection":0,
+  "max_idle_time":0
+}

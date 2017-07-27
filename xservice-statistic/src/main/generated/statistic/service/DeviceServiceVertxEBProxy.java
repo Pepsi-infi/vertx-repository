@@ -16,7 +16,7 @@
 
 package statistic.service;
 
-import statistic.service.MsgStatService;
+import statistic.service.DeviceService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,10 +32,10 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import statistic.service.dto.MsgStatDto;
+import statistic.service.dto.DeviceDto;
+import statistic.service.DeviceService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import statistic.service.MsgStatService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -44,18 +44,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class MsgStatServiceVertxEBProxy implements MsgStatService {
+public class DeviceServiceVertxEBProxy implements DeviceService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public MsgStatServiceVertxEBProxy(Vertx vertx, String address) {
+  public DeviceServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public MsgStatServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public DeviceServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -65,15 +65,15 @@ public class MsgStatServiceVertxEBProxy implements MsgStatService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
+  public void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("msgStatDto", msgStatDto == null ? null : msgStatDto.toJson());
+    _json.put("userDeviceDto", userDeviceDto == null ? null : userDeviceDto.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "statPushMsg");
+    _deliveryOptions.addHeader("action", "reportUserDevice");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));

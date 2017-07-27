@@ -1,0 +1,60 @@
+= Cheatsheets
+
+[[DeviceDto]]
+== DeviceDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 17:21
+ Description :
+ uid
+ userType
+ phone
+ deviceName
+ deviceToken
+ imei
+ osType
+ osVersion
+ appName
+ appPackage
+ appVersion
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appCode]]`appCode`|`Number (Integer)`|-
+|[[appVersion]]`appVersion`|`String`|-
+|[[deviceToken]]`deviceToken`|`String`|-
+|[[deviceType]]`deviceType`|`String`|-
+|[[imei]]`imei`|`String`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[osVersion]]`osVersion`|`String`|-
+|[[phone]]`phone`|`String`|-
+|[[uid]]`uid`|`Number (Long)`|-
+|[[userType]]`userType`|`Number (Integer)`|-
+|===
+
+[[MsgStatDto]]
+== MsgStatDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 15:56
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`Number (Integer)`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[msgId]]`msgId`|`String`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[sendTime]]`sendTime`|`String`|-
+|===
+

@@ -7,6 +7,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.serviceproxy.ProxyHelper;
+import statistic.service.dto.MsgStatDto;
 import utils.BaseResponse;
 import utils.IPUtil;
 
@@ -37,12 +38,14 @@ public interface MsgStatService {
         return new StringBuffer().append(IPUtil.getInnerIP()).append("-").append(SERVICE_ADDRESS).toString();
     }
 
+
     /**
-     * @param action
-     * @param msgId
-     * @param osType
+     * 统计push消息
+     *
+     * @param msgStatDto
      * @param result
      */
-    void statPushMsg(int action, String msgId, int osType, Handler<AsyncResult<BaseResponse>> result);
+    void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result);
+
 
 }

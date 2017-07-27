@@ -19,6 +19,7 @@ package statistic.service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import statistic.service.dto.MsgStatDto;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
@@ -67,24 +68,22 @@ public class MsgStatService {
   }
 
   /**
-   * @param action 
-   * @param msgId 
-   * @param osType 
+   * 统计push消息
+   * @param msgStatDto 
    * @param result 
    */
-  public void statPushMsg(int action, String msgId, int osType, Handler<AsyncResult<BaseResponse>> result) { 
-    delegate.statPushMsg(action, msgId, osType, result);
+  public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) { 
+    delegate.statPushMsg(msgStatDto, result);
   }
 
   /**
-   * @param action 
-   * @param msgId 
-   * @param osType 
+   * 统计push消息
+   * @param msgStatDto 
    * @return 
    */
-  public Single<BaseResponse> rxStatPushMsg(int action, String msgId, int osType) { 
+  public Single<BaseResponse> rxStatPushMsg(MsgStatDto msgStatDto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      statPushMsg(action, msgId, osType, fut);
+      statPushMsg(msgStatDto, fut);
     }));
   }
 
