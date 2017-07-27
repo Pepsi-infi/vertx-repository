@@ -1,0 +1,29 @@
+= Cheatsheets
+
+[[DeviceDto]]
+== DeviceDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 17:21
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[antFingerprint]]`antFingerprint`|`String`|-
+|[[appCode]]`appCode`|`Number (Integer)`|-
+|[[appVersion]]`appVersion`|`String`|-
+|[[deviceToken]]`deviceToken`|`String`|-
+|[[deviceType]]`deviceType`|`String`|-
+|[[imei]]`imei`|`String`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[osVersion]]`osVersion`|`String`|-
+|[[phone]]`phone`|`String`|-
+|[[uid]]`uid`|`Number (Long)`|-
+|[[userType]]`userType`|`Number (Integer)`|-
+|===
+
