@@ -122,7 +122,7 @@ public class SocketVerticle extends AbstractVerticle {
         Map<String, Object> sendMap = new HashMap<String, Object>();
         DatagramSocket client = null;
         try {
-            String socketAddress = PropertiesLoaderUtils.get(ConnectionConsts.SOCKET_SENDTO_ADDRESS);
+            String socketAddress = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_SENDTO_ADDRESS);
             String[] Host = socketAddress.split(":");
             sendMap.put("method", MsgConstant.SendMethod.SEND_MSG.getMsg());
             sendMap.put("params", params);

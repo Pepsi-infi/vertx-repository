@@ -3,12 +3,9 @@ package util;
 
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.apache.commons.lang.StringUtils;
-import org.mvel2.util.ThisLiteral;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 //import org.apache.log4j.Logger;
@@ -28,32 +25,27 @@ public final class PropertiesLoaderUtils {
 	
 	static{
 		multiProp=loadMultiProperties();
-		singleProp=loadStreamProperties(PUSH_CONFIG);
+		singleProp=loadStreamProperties();
 	}
-	
 
-	public static String get(String key){
-		if(StringUtils.isBlank(key)){
-			return null;
-		}
-		return (String)loadStreamProperties(PUSH_CONFIG).get(key);
-	}
 
 	/**
-	 * read properties
-	 * @param resourceName "/"
-	 * @return Properties
+	 *
+	 * @return
 	 */
-	public static Properties loadStreamProperties(String resourceName) {
+	public static Properties loadStreamProperties() {
 
 		if(singleProp!=null){
 			return singleProp;
 		}
+
+		String config = System.getProperty("push.config", PUSH_CONFIG) ;
+
 		singleProp=new Properties();
 		InputStream is = null;
 
 		try {
-			is = PropertiesLoaderUtils.class.getResourceAsStream(resourceName);
+			is = PropertiesLoaderUtils.class.getResourceAsStream(config);
 			singleProp.load(is);
 		} catch (IOException e) {
 			e.printStackTrace();
