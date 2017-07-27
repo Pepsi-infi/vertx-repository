@@ -1,5 +1,7 @@
 package channel;
 
+import java.util.Properties;
+
 import constant.ConnectionConsts;
 import constant.PushConsts;
 import domain.AmqpConsumeMessage;
@@ -12,12 +14,13 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import service.*;
+import service.DeviceService;
+import service.GcmPushService;
+import service.RedisService;
+import service.SocketPushService;
+import service.XiaoMiPushService;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
-
-import java.io.File;
-import java.util.Properties;
 
 /**
  * 
@@ -153,14 +156,20 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		recieveMsg.put("regId", token);
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			token = null; //socket推送
-			socketPushService.sendMsg(recieveMsg);
+			socketPushService.sendMsg(recieveMsg, res->{
+				
+			});
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			token = null; //gcm推送
-			gcmPushService.sendMsg(recieveMsg);
+			gcmPushService.sendMsg(recieveMsg,res->{
+				
+			});
 
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 			// 只用作对安卓手机进行推送
-			xiaomiPushService.sendMsg(recieveMsg);
+			xiaomiPushService.sendMsg(recieveMsg,res->{
+				
+			});
 		} else {
 			logger.error("无效推送渠道");
 			return;
@@ -174,7 +183,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	private void recivedMessage(){
 		AmqpBridge bridge = AmqpBridge.create(vertx);
 		//读取配置
-		Properties prop = PropertiesLoaderUtils.loadProperties(File.separator + ConnectionConsts.MQ_CONFIG_PATH);
+		Properties prop = PropertiesLoaderUtils.loadProperties( ConnectionConsts.MQ_CONFIG_PATH);
 		//bridge.start
 		String addr = prop.getProperty(ConnectionConsts.ACTIVEMQ_SERVER_URL);
 		int port = Integer.parseInt(prop.getProperty(ConnectionConsts.ACTIVE_SERVER_PORT));
