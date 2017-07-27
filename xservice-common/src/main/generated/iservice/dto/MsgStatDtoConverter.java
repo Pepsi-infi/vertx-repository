@@ -30,6 +30,9 @@ public class MsgStatDtoConverter {
     if (json.getValue("action") instanceof Number) {
       obj.setAction(((Number)json.getValue("action")).intValue());
     }
+    if (json.getValue("appCode") instanceof Number) {
+      obj.setAppCode(((Number)json.getValue("appCode")).intValue());
+    }
     if (json.getValue("channel") instanceof Number) {
       obj.setChannel(((Number)json.getValue("channel")).intValue());
     }
@@ -50,6 +53,9 @@ public class MsgStatDtoConverter {
   public static void toJson(MsgStatDto obj, JsonObject json) {
     if (obj.getAction() != null) {
       json.put("action", obj.getAction());
+    }
+    if (obj.getAppCode() != null) {
+      json.put("appCode", obj.getAppCode());
     }
     if (obj.getChannel() != null) {
       json.put("channel", obj.getChannel());

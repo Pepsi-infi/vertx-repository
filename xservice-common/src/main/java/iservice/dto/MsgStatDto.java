@@ -10,6 +10,8 @@ import io.vertx.core.json.JsonObject;
  */
 @DataObject(generateConverter = true)
 public class MsgStatDto {
+    //应用code
+    private Integer appCode;
     //消息id
     private String msgId;
     //消息发送动作,参照：PushActionEnum
@@ -39,6 +41,13 @@ public class MsgStatDto {
         return json;
     }
 
+    public Integer getAppCode() {
+        return appCode;
+    }
+
+    public void setAppCode(Integer appCode) {
+        this.appCode = appCode;
+    }
 
     public String getMsgId() {
         return msgId;
@@ -93,7 +102,8 @@ public class MsgStatDto {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MsgStatDto{");
-        sb.append("msgId='").append(msgId).append('\'');
+        sb.append("appCode=").append(appCode);
+        sb.append(", msgId='").append(msgId).append('\'');
         sb.append(", action=").append(action);
         sb.append(", channel=").append(channel);
         sb.append(", sendTime='").append(sendTime).append('\'');

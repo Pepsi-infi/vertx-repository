@@ -4,6 +4,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
+import statistic.api.RestDeviceVerticle;
 import statistic.api.RestMsgStatVerticle;
 import statistic.dao.msg.impl.DeviceDaoImpl;
 import statistic.service.impl.MsgStatServiceImpl;
@@ -53,8 +54,8 @@ public class MsgStatTest {
         Future<String> future = Future.future();
         DeploymentOptions deploymentOptions = new DeploymentOptions();
         deploymentOptions.setConfig(config());
-        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
         return future.map(r -> null);
     }
 
