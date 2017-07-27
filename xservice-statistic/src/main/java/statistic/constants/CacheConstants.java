@@ -1,6 +1,6 @@
 package statistic.constants;
 
-import statistic.service.dto.MsgStatDto;
+import iservice.dto.MsgStatDto;
 
 /**
  * Created by lufei
