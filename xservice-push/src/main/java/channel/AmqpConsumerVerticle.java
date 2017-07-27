@@ -284,7 +284,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		bridge.start(ConnectionConsts.activemq_server_url, ConnectionConsts.activemq_server_port, res -> {
 			
 			
-			if(res.succeeded()){
+//			if(res.succeeded()){
 				logger.info("连接结果"+res.succeeded());
 	
 				MessageConsumer<JsonObject> consumer = bridge.createConsumer("ylf");
@@ -294,10 +294,10 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 					recieveMsg = msg.body();
 	
 				});
-			}else{
-				logger.info("mq服务器连接失败");
-				return;
-			}
+//			}else{
+//				logger.info("mq服务器连接失败");
+//				return;
+//			}
 
 		});
 		return recieveMsg;
