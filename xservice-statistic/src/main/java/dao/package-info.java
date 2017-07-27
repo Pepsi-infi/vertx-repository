@@ -1,9 +1,9 @@
-@ModuleGen(name = "xservice-statistic", groupPackage = "statistic.dao.msg")
+@ModuleGen(name = "xservice-statistic", groupPackage = "dao")
 /**
  * Created by lufei
  * Date : 2017/7/25 15:13
  * Description :
  */
-package statistic.dao.msg;
+package dao;
 
 import io.vertx.codegen.annotations.ModuleGen;
