@@ -7,7 +7,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.serviceproxy.ProxyHelper;
-import utils.BaseResponse;
 import utils.IPUtil;
 
 @ProxyGen
@@ -41,7 +40,7 @@ public interface RedisService {
 
 	void set(String key, String value, Handler<AsyncResult<Void>> result);
 
-	void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result);
+	void expire(String key, long expire, Handler<AsyncResult<Long>> result);
 
 	void get(String key, Handler<AsyncResult<String>> result);
 }

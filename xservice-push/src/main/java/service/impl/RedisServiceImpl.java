@@ -13,7 +13,6 @@ import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import service.RedisService;
 import util.PropertiesLoaderUtils;
-import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
 
@@ -69,10 +68,10 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     }
 
     @Override
-    public void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result) {
+    public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
         redisClient.expire(key, expire, handler ->{
             if(handler.succeeded()){
-                result.handle(Future.succeededFuture(null));
+                result.handle(handler);
             } else {
                 result.handle(Future.failedFuture(handler.cause()));
             }

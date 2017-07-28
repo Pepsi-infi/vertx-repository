@@ -77,47 +77,34 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		router.route("/sqyc/push/sokcet.htm").handler(context -> {
 			
 			HttpServerResponse resp= context.response();
-			
-			HttpServerRequest request = context.request();		
+			HttpServerRequest request = context.request();
 			String httpMsg = request.getParam("body");
+			logger.info(" 接收到的消息内容：" + httpMsg);
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
-				
 				resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.FAIL.getCode());
-				
 				return;
 			}
-			
 			resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.SUCCESS.getCode());
-			
-			logger.info("开始消费数据");
-
 			consumMsg(res -> {
 				if(res.succeeded()){
-					logger.info(" consumMsg success! ");
+					logger.info("消费消息成功！" );
 				}else{
-					logger.error(" consumMsg fail! ");
+					logger.error("消费消息失败,失败原因：" + res.cause());
 				}
 			});
 		});
 
 		httpServer.requestHandler(router::accept).listen(8989);
-
 	}
 
 	private void initService() {
-	
 			socketPushService = SocketPushService.createProxy(vertx);
-
 			xiaomiPushService = XiaoMiPushService.createProxy(vertx);
-		
 			gcmPushService = GcmPushService.createProxy(vertx);
-		
 			msgRecordService = MsgRecordService.createProxy(vertx);
-	
 			redisService = RedisService.createProxy(vertx);
-	
 	}
 
 	private void consumMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {

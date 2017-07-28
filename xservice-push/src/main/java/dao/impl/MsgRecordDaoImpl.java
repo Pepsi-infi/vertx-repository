@@ -109,7 +109,7 @@ public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDa
                 if (r.succeeded()) {
                     resultHandler.handle(Future.succeededFuture(ret));
                 } else {
-                    logger.error( " insert error : " + r.cause());
+                    logger.error( " insert msgRecord error : " + r.cause());
                     resultHandler.handle(Future.failedFuture(r.cause()));
                 }
                 connection.close();
