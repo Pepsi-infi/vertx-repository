@@ -34,7 +34,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private RedisService redisService;
 
-	private MsgRecordService deviceService;
+	private MsgRecordService msgRecordService;
 
 	private HttpServer httpServer;
 
@@ -110,13 +110,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	
 			socketPushService = SocketPushService.createProxy(vertx);
 
-			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
+			xiaomiPushService = XiaoMiPushService.createProxy(vertx);
 		
-			gcmPushService = GcmPushService.createLocalProxy(vertx);
+			gcmPushService = GcmPushService.createProxy(vertx);
 		
-			deviceService = MsgRecordService.createLocalProxy(vertx);
+			msgRecordService = MsgRecordService.createProxy(vertx);
 	
-			redisService = RedisService.createLocalProxy(vertx);
+			redisService = RedisService.createProxy(vertx);
 	
 	}
 
@@ -161,7 +161,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		msg.setChannel(sendType);
 		msg.setMsgBody(receiveMsg.toString());
 		msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
-		deviceService.addMessage(msg, res ->{
+		msgRecordService.addMessage(msg, res ->{
 			if(res.succeeded()){
 				logger.info("保存消息成功：" + res);
 			}else{

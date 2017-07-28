@@ -17,14 +17,14 @@ public interface RedisService {
 	/**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-redis-service";
+	String SERVICE_NAME = "push-redis-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
 	String SERVICE_ADDRESS = "push.redis.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-redis-service";
+	String LOCAL_SERVICE_NAME = "local-push-redis-service";
 
 	static RedisService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(RedisService.class, vertx, RedisService.SERVICE_ADDRESS);
@@ -39,7 +39,7 @@ public interface RedisService {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
 
-	void set(String key, String value, Handler<AsyncResult<BaseResponse>> result);
+	void set(String key, String value, Handler<AsyncResult<Void>> result);
 
 	void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result);
 
