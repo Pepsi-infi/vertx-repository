@@ -43,7 +43,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
     }
 
     private void initUserDeviceService() {
-        deviceService = DeviceService.createLocalProxy(vertx.getDelegate());
+        deviceService = DeviceService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {

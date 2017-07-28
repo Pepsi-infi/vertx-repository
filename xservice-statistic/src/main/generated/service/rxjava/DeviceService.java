@@ -57,16 +57,6 @@ public class DeviceService {
     return ret;
   }
 
-  public static DeviceService createLocalProxy(Vertx vertx) { 
-    DeviceService ret = DeviceService.newInstance(service.DeviceService.createLocalProxy(vertx.getDelegate()));
-    return ret;
-  }
-
-  public static String getLocalAddress() { 
-    String ret = service.DeviceService.getLocalAddress();
-    return ret;
-  }
-
   /**
    * @param userDeviceDto 
    * @param result 
