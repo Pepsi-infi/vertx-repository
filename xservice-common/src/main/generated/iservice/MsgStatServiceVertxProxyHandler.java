@@ -124,8 +124,6 @@ public class MsgStatServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-
-
         case "statPushMsg": {
           service.statPushMsg(json.getJsonObject("msgStatDto") == null ? null : new iservice.dto.MsgStatDto(json.getJsonObject("msgStatDto")), res -> {
             if (res.failed()) {

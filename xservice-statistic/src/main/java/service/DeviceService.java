@@ -23,19 +23,8 @@ public interface DeviceService {
 
     public static final String SERVICE_ADDRESS = "http-userDevice-eb-service";
 
-    public static final String LOCAL_SERVICE_NAME = "local.http.userDevice.eb.service";
-
     static DeviceService createProxy(Vertx vertx) {
         return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
-    }
-
-    static DeviceService createLocalProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(DeviceService.class, vertx, getLocalAddress(),
-                new DeliveryOptions().setSendTimeout(3000));
-    }
-
-    static String getLocalAddress() {
-        return new StringBuffer().append(IPUtil.getInnerIP()).append("-").append(SERVICE_ADDRESS).toString();
     }
 
 

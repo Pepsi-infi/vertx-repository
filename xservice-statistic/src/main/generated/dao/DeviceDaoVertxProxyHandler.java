@@ -124,8 +124,6 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-
-
         case "addUserDevice": {
           service.addUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new service.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {

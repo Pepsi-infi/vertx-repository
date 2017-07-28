@@ -48,14 +48,9 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
         XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
         publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
-        String ip = IPUtil.getInnerIP();
-        XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.getLocalAddress(ip));
-        publishEventBusService(DeviceDao.LOCAL_SERVICE_NAME, DeviceDao.getLocalAddress(ip), DeviceDao.class);
 
-
-        String root = System.getProperty("config", "mc");
-        String jdbc = System.getProperty("jdbc", "dev");
-        JsonObject jsonObject = this.getJsonConf(root + "/" + jdbc + "/jdbc.json");
+        String env = System.getProperty("env", "dev");
+        JsonObject jsonObject = this.getJsonConf(env + "/jdbc-" + env + ".json");
 
         sqlClient = MySQLClient.createShared(vertx, jsonObject);
 
@@ -74,7 +69,7 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
                 sb.append(line);
             }
             conf = new JsonObject(sb.toString());
-            logger.info("Loaded jdbc.json file from [" + configPath + "/jdbc.json] and config.json="
+            logger.info("Loaded jdbc-dev.json file from [" + configPath + "/jdbc-dev.json] and config.json="
                     + conf.toString());
         } catch (Exception e) {
             logger.error("Failed to load configuration file" + e);

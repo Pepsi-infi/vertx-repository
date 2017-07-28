@@ -44,7 +44,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     }
 
     private void initMsgStatService() {
-        msgStatService = MsgStatService.createLocalProxy(vertx.getDelegate());
+        msgStatService = MsgStatService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
