@@ -23,6 +23,11 @@
             <artifactId>xservice-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-redis-client</artifactId>
+            <version>${vertx-version}</version>
+        </dependency>
         <!-- 小米推送 start -->
         <dependency>
             <groupId>com.xiaomi.miliao</groupId>
