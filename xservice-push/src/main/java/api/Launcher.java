@@ -25,7 +25,7 @@ public class Launcher extends AbstractVerticle{
 		vertx.deployVerticle(MiPushVerticle.class.getName());
 //		vertx.deployVerticle(SocketVerticle.class.getName());
 
-		vertx.deployVerticle(AmqpConsumerVerticle.class.getName());
+		//vertx.deployVerticle(AmqpConsumerVerticle.class.getName());
 		vertx.deployVerticle(HttpConsumerVerticle.class.getName());
 	}
 

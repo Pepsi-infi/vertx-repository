@@ -91,8 +91,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private void initService() {
 	
 			socketPushService = SocketPushService.createProxy(vertx);
-	
-		
+			
 			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
 		
 			gcmPushService = GcmPushService.createLocalProxy(vertx);
