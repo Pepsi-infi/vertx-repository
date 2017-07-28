@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
@@ -14,6 +15,7 @@ import constant.PushConsts;
 import enums.EnumPassengerMessageType;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -47,7 +49,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 	public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
 
 		logger.info("进入小米推送Verticle");
-
+		
 		if (recieveMsg == null) {
 			logger.error("尚无消息");
 			return;
@@ -60,20 +62,30 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		String regId = null;
 		try {
 			regId = (String) recieveMsg.getValue("regId");
-			sendMessage(title, content, description, regId);
+			
+			Result result= sendMessage(title, content, description, regId);
+			
+			if(ErrorCode.Success==result.getErrorCode()){
+				resultHandler.handle(Future.succeededFuture(new BaseResponse()));		
+			}else{
+				resultHandler.handle(Future.failedFuture(result.getReason()));
+			}
+			
 		} catch (Exception e) {
 			logger.error("sendMsg error:regId=" + regId + ",mapName=" + title + ",map=" + recieveMsg, e);
 		}
 	}
 
-	public void sendMessage(String title, String content, String description, String regId) throws Exception {
+	public Result sendMessage(String title, String content, String description, String regId) throws Exception {
 		Sender sender = new Sender(PropertiesLoaderUtils.singleProp.getProperty("xiaomi.appsecret"));
 		Message message = buildMessage(title, content, description);
 		Result sendResult = sender.send(message, regId, 0); // 根据regID，发送消息到指定设备上，不重试。
-
+		//handler.handle(Future.succeededFuture(sendResult));
+		
 		logger.info("小米推送返回结果,messageId:" + sendResult.getMessageId() + "~errorCodeName:"
 				+ sendResult.getErrorCode().getName()+"~errorCodeDescription="+ sendResult.getErrorCode().getDescription() + "~reason:" + sendResult.getReason());
-
+		
+		return sendResult;
 	}
 
 	private Message buildMessage(String title, String content, String description) throws Exception {
