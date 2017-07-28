@@ -2,12 +2,14 @@ package channel;
 
 import constant.PushConsts;
 import domain.AmqpConsumeMessage;
+import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -70,14 +72,22 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 
 		router.route("/sqyc/push/sokcet.htm").handler(context -> {
-			HttpServerRequest request = context.request();
+			
+			HttpServerResponse resp= context.response();
+			
+			HttpServerRequest request = context.request();		
 			String httpMsg = request.getParam("body");
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
+				
+				resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.FAIL.getCode());
+				
 				return;
 			}
-
+			
+			resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.SUCCESS.getCode());
+			
 			logger.info("开始消费数据");
 
 			consumMsg();
@@ -178,9 +188,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			logger.info("开始走小米推送");
 			xiaomiPushService.sendMsg(receiveMsg, res->{
 				if(res.succeeded()){
-					logger.info("小米推送成功");
+					logger.info("小米推送成功:"+res.result());
 				}else{
-					logger.error("小米推送失败");
+					logger.error("小米推送失败"+res.cause());
 				}
 			});
 		} else {
