@@ -57,16 +57,6 @@ public class MsgStatService {
     return ret;
   }
 
-  public static MsgStatService createLocalProxy(Vertx vertx) { 
-    MsgStatService ret = MsgStatService.newInstance(iservice.MsgStatService.createLocalProxy(vertx.getDelegate()));
-    return ret;
-  }
-
-  public static String getLocalAddress() { 
-    String ret = iservice.MsgStatService.getLocalAddress();
-    return ret;
-  }
-
   /**
    * 统计push消息
    * @param msgStatDto 

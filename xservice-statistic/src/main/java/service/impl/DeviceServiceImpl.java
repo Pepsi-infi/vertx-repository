@@ -21,7 +21,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
 
-    private DeviceDao userDeviceDao;
+    private DeviceDao deviceDao;
 
 
     @Override
@@ -31,17 +31,14 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
         XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
         publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
 
-        XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.getLocalAddress());
-        publishEventBusService(DeviceService.LOCAL_SERVICE_NAME, DeviceService.getLocalAddress(), DeviceService.class);
-
-        userDeviceDao = DeviceDao.createLocalProxy(vertx.getDelegate());
+        deviceDao = DeviceDao.createProxy(vertx.getDelegate());
     }
 
 
     @Override
     public void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
         Future<BaseResponse> resultFuture = Future.future();
-        userDeviceDao.addUserDevice(userDeviceDto, resultFuture.completer());
+        deviceDao.addUserDevice(userDeviceDto, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             if (handler.succeeded()) {
                 result.handle(Future.succeededFuture(new BaseResponse()));

@@ -57,16 +57,6 @@ public class DeviceDao {
     return ret;
   }
 
-  public static DeviceDao createLocalProxy(Vertx vertx) { 
-    DeviceDao ret = DeviceDao.newInstance(dao.DeviceDao.createLocalProxy(vertx.getDelegate()));
-    return ret;
-  }
-
-  public static String getLocalAddress(String ip) { 
-    String ret = dao.DeviceDao.getLocalAddress(ip);
-    return ret;
-  }
-
   public void addUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
     delegate.addUserDevice(userDeviceDto, resultHandler);
   }

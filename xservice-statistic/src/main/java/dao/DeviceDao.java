@@ -29,20 +29,11 @@ public interface DeviceDao {
      */
     String SERVICE_ADDRESS = "dao.userDevice.service";
 
-    String LOCAL_SERVICE_NAME = "local-dao-userDevice-service";
 
     static DeviceDao createProxy(Vertx vertx) {
         return ProxyHelper.createProxy(DeviceDao.class, vertx, DeviceDao.SERVICE_ADDRESS);
     }
 
-    static DeviceDao createLocalProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(DeviceDao.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
-                new DeliveryOptions().setSendTimeout(3000));
-    }
-
-    static String getLocalAddress(String ip) {
-        return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
-    }
 
     void addUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
 

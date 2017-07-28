@@ -48,12 +48,9 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.SERVICE_ADDRESS);
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
-        XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.getLocalAddress());
-        publishEventBusService(MsgStatService.LOCAL_SERVICE_NAME, MsgStatService.getLocalAddress(), MsgStatService.class);
 
-        String root = System.getProperty("config", "mc");
-        String redis = System.getProperty("redis", "dev");
-        JsonObject jsonObject = this.getJsonConf(root + "/" + redis + "/redis.json");
+        String env = System.getProperty("env", "dev");
+        JsonObject jsonObject = this.getJsonConf(env + "/redis-" + env + ".json");
         RedisOptions redisOptions = new RedisOptions();
         if (jsonObject != null && !jsonObject.isEmpty()) {
             if (StringUtils.isNotBlank(jsonObject.getString("password"))) {
@@ -81,7 +78,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
                 sb.append(line);
             }
             conf = new JsonObject(sb.toString());
-            logger.info("Loaded redis.json file from [" + configPath + "/redis.json] and config.json="
+            logger.info("Loaded redis-dev.json file from [" + configPath + "/redis-dev.json] and config.json="
                     + conf.toString());
         } catch (Exception e) {
             logger.error("Failed to load configuration file" + e);
