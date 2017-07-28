@@ -22,7 +22,7 @@ public class StatRestConstants {
         static final String MSG_ARRIVE = "/mc-statistic/msg/statArrive.json";
 
         //用户设备关系上报接口
-        static final String USER_DEVICE_REPORT = "/mc-statistic/userDevice/report.json";
+        static final String USER_DEVICE_REPORT = "/mc-statistic/device/report.json";
     }
 
 
