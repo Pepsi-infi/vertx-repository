@@ -89,21 +89,18 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void initService() {
-		if (socketPushService == null) {
+	
 			socketPushService = SocketPushService.createProxy(vertx);
-		}
-		if (xiaomiPushService == null) {
+	
+		
 			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
-		}
-		if (gcmPushService == null) {
+		
 			gcmPushService = GcmPushService.createLocalProxy(vertx);
-		}
-		if (deviceService == null) {
+		
 			deviceService = DeviceService.createLocalProxy(vertx);
-		}
-		if (redisService == null) {
+	
 			redisService = RedisService.createLocalProxy(vertx);
-		}
+	
 	}
 
 	private void consumMsg() {

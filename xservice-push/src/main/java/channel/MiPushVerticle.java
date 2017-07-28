@@ -1,28 +1,27 @@
 package channel;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Sender;
+
 import constant.PushConsts;
 import enums.EnumPassengerMessageType;
-import enums.PushTypeEnum;
-import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.serviceproxy.ProxyHelper;
 import service.XiaoMiPushService;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import utils.IPUtil;
 
 /**
  * 
@@ -35,8 +34,18 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	private static final Logger logger = LoggerFactory.getLogger(MiPushVerticle.class);
 
-
+	@Override
+	public void start() throws Exception {
+		super.start();
+		ProxyHelper.registerService(XiaoMiPushService.class, vertx, this,
+				XiaoMiPushService.getLocalAddress(IPUtil.getInnerIP()));
+		
+	}
+	
+	@Override
 	public void sendMsg(JsonObject recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler) {
+		
+		logger.info("进入小米推送Verticle");
 				
 		if(recieveMsg==null){
 			logger.error("尚无消息");
