@@ -1,6 +1,7 @@
 package dao.impl;
 
 import constant.ConnectionConsts;
+import dao.MsgRecordDao;
 import domain.AmqpConsumeMessage;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -14,7 +15,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
-import dao.DeviceDao;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -27,8 +27,8 @@ import java.io.InputStreamReader;
 /**
  *  保存消息记录
  */
-public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
-    private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
+public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDao {
+    private static final Logger logger = LoggerFactory.getLogger(MsgRecordDaoImpl.class);
 
     private SQLClient sqlClient;
 
@@ -43,19 +43,19 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
 
     }
 
-    public DeviceDaoImpl() {
+    public MsgRecordDaoImpl() {
     }
 
     @Override
     public void start() throws Exception {
         super.start();
 
-        XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
-        publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
+        XProxyHelper.registerService(MsgRecordDao.class, vertx, this, MsgRecordDao.SERVICE_ADDRESS);
+        publishEventBusService(MsgRecordDao.SERVICE_NAME, MsgRecordDao.SERVICE_ADDRESS, MsgRecordDao.class);
 
         String ip = IPUtil.getInnerIP();
-        XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.getLocalAddress(ip));
-        publishEventBusService(DeviceDao.LOCAL_SERVICE_NAME, DeviceDao.getLocalAddress(ip), DeviceDao.class);
+        XProxyHelper.registerService(MsgRecordDao.class, vertx, this, MsgRecordDao.getLocalAddress(ip));
+        publishEventBusService(MsgRecordDao.LOCAL_SERVICE_NAME, MsgRecordDao.getLocalAddress(ip), MsgRecordDao.class);
 
 
         String jdbcConfig = System.getProperty("jdbcConfig", ConnectionConsts.JDBC_CONFIG_PATH);
@@ -109,6 +109,7 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
                 if (r.succeeded()) {
                     resultHandler.handle(Future.succeededFuture(ret));
                 } else {
+                    logger.error( " insert error : " + r.cause());
                     resultHandler.handle(Future.failedFuture(r.cause()));
                 }
                 connection.close();
@@ -136,7 +137,7 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
     public static void main(String[] args) {
 
         Vertx vertx = Vertx.vertx();
-        vertx.deployVerticle("dao.impl.DeviceDaoImpl");
+        vertx.deployVerticle("dao.impl.MsgRecordDaoImpl");
 
     }
 }

@@ -1,10 +1,10 @@
 {
-  "host": "127.0.0.1",
+  "host": "10.10.10.178",
   "port": 3306,
   "maxPoolSize": 100,
-  "username": "root",
-  "password": "123456",
-  "database": "kuaidian",
+  "username": "sqyc_message",
+  "password": "sqyc_message@01zhuanche.com",
+  "database": "message_center",
   "charset": "UTF-8",
   "queryTimeout": 3000
 }

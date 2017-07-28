@@ -13,26 +13,26 @@ import utils.IPUtil;
 
 @ProxyGen
 @VertxGen
-public interface DeviceService {
+public interface MsgRecordService {
 
 	/**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-device-service";
+	String SERVICE_NAME = "push-msgrecord-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
-	String SERVICE_ADDRESS = "push.device.service";
+	String SERVICE_ADDRESS = "push.msgrecord.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-device-service";
+	String LOCAL_SERVICE_NAME = "local-push-msgrecord-service";
 
-	static DeviceService createProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
+	static MsgRecordService createProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(MsgRecordService.class, vertx, MsgRecordService.SERVICE_ADDRESS);
 	}
 
-	static DeviceService createLocalProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(DeviceService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
+	static MsgRecordService createLocalProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(MsgRecordService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
 				new DeliveryOptions().setSendTimeout(3000));
 	}
 

@@ -12,7 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
-import service.DeviceService;
+import service.MsgRecordService;
 import service.GcmPushService;
 import service.RedisService;
 import service.SocketPushService;
@@ -35,7 +35,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private RedisService redisService;
 
-	private DeviceService deviceService;
+	private MsgRecordService deviceService;
 
 	private HttpServer httpServer;
 
@@ -89,21 +89,18 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void initService() {
-		if (socketPushService == null) {
+	
 			socketPushService = SocketPushService.createProxy(vertx);
-		}
-		if (xiaomiPushService == null) {
+	
+		
 			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
-		}
-		if (gcmPushService == null) {
+		
 			gcmPushService = GcmPushService.createLocalProxy(vertx);
-		}
-		if (deviceService == null) {
-			deviceService = DeviceService.createLocalProxy(vertx);
-		}
-		if (redisService == null) {
+		
+			deviceService = MsgRecordService.createLocalProxy(vertx);
+	
 			redisService = RedisService.createLocalProxy(vertx);
-		}
+	
 	}
 
 	private void consumMsg() {
@@ -190,7 +187,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 			token = null; // TODO socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(recieveMsg,res->{
+			socketPushService.sendMsg(recieveMsg.toString(),res->{
 				
 				if(res.succeeded()){
 					logger.info("socket推送成功");

@@ -16,7 +16,7 @@
 
 package dao;
 
-import dao.DeviceDao;
+import dao.MsgRecordDao;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -35,8 +35,8 @@ import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
+import dao.MsgRecordDao;
 import io.vertx.core.AsyncResult;
-import dao.DeviceDao;
 import io.vertx.core.Handler;
 
 /*
@@ -44,18 +44,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceDaoVertxEBProxy implements DeviceDao {
+public class MsgRecordDaoVertxEBProxy implements MsgRecordDao {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public DeviceDaoVertxEBProxy(Vertx vertx, String address) {
+  public MsgRecordDaoVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public DeviceDaoVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public MsgRecordDaoVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;

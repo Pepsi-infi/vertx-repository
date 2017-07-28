@@ -6,44 +6,45 @@ import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
 import enums.PushTypeEnum;
-import io.vertx.core.AbstractVerticle;
+import helper.XProxyHelper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.eventbus.MessageProducer;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
+import service.SocketPushService;
 import util.JsonUtil;
+import util.MsgUtil;
 import util.PropertiesLoaderUtils;
+import utils.BaseResponse;
+import xservice.BaseServiceVerticle;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 使用 socket 处理消息
  * Created by weim on 2017/7/25.
  */
-public class SocketVerticle extends AbstractVerticle {
+public class SocketVerticle extends BaseServiceVerticle implements SocketPushService {
 
     private Logger logger = LoggerFactory.getLogger(SocketVerticle.class);
 
-    public void start() {
+    public void start() throws Exception {
+        super.start();
 
-        EventBus eb = vertx.eventBus();
-        MessageConsumer<String> message = eb.consumer(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX + PushTypeEnum.SOCKET.getCode());
-        message.handler(handler ->{
-            String msg = handler.body();
-            logger.info(" recived msg : " + msg);
-            if(StringUtils.isBlank(msg)){
-               logger.info("socket接收到的数据为空");
-                return;
-            }
-            sendMsg(msg);
-        });
+        XProxyHelper.registerService(SocketPushService.class, vertx, this, SocketPushService.SERVICE_ADDRESS);
+        publishEventBusService(SocketPushService.SERVICE_NAME, SocketPushService.SERVICE_ADDRESS, SocketPushService.class);
+
 
     }
 
@@ -55,7 +56,7 @@ public class SocketVerticle extends AbstractVerticle {
      *
      * @param msg
      */
-    public void sendMsg(String msg) {
+    public void sendMsg(String msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
 
         Map revicedMap = JsonUtil.toJavaObject(msg, Map.class);
         EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
@@ -65,7 +66,7 @@ public class SocketVerticle extends AbstractVerticle {
         Long expireTime = new Long(srcExpireTime);
         String token = null;
         //新生成一个消息id
-        String msgId = createMsgId();
+        String msgId = MsgUtil.createMsgId();
 
         //超时时间： 秒
         Long seconds = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
@@ -78,27 +79,6 @@ public class SocketVerticle extends AbstractVerticle {
         chatMsgVO.setMsgTitle(messageType.getName());
         chatMsgVO.setMsgBody(msgBody);
         chatMsgVO.setType(messageType.getType());
-//        if (redisClient == null) {
-//            logger.error("redis服务器连接失败");
-//        }else{
-//            redisClient.rpush(PushConsts._MSG_LIST_PASSENGER + to, msgId, r ->{
-//                if(!r.succeeded()){
-//                    logger.error("redis设置失败， msgId :" + msgId);
-//                }
-//            });
-//            byte[] objByte = MsgUtil.objectToByte(chatMsgVO);
-//            String msgStr = new String(objByte);
-//            redisClient.set(msgId, msgStr, r ->{
-//                if(!r.succeeded()){
-//                    logger.error("redis设置失败， msgId :" + msgId);
-//                }
-//            });
-//            redisClient.expire(msgId, seconds, r ->{
-//                if(!r.succeeded()){
-//                    logger.error("redis设置失败， msgId :" + msgId);
-//                }
-//            });
-//        }
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
@@ -130,20 +110,16 @@ public class SocketVerticle extends AbstractVerticle {
             client.send(sendPacket);
             logger.info(MsgConstant.SendMethod.SEND_MSG.getMsg() + " udp host:" +  Host[0] + ":" + Host[1]+ " msg: " +
                     new String(sendBuf, "UTF-8"));
+            resultHandler.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
             logger.error("socket推送消息出错 " + e.getMessage(),e);
+            resultHandler.handle(Future.failedFuture(e.getMessage()));
         } finally {
             if (client != null) {
                 client.close();
             }
         }
     }
-
-    private String createMsgId() {
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString().replaceAll("-", "");
-    }
-
 
     /**
      * 测试示例

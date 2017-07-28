@@ -31,39 +31,39 @@ import io.vertx.core.Handler;
  * Description :
  *
  * <p/>
- * NOTE: This class has been automatically generated from the {@link dao.DeviceDao original} non RX-ified interface using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link dao.MsgRecordDao original} non RX-ified interface using Vert.x codegen.
  */
 
-@io.vertx.lang.rxjava.RxGen(dao.DeviceDao.class)
-public class DeviceDao {
+@io.vertx.lang.rxjava.RxGen(dao.MsgRecordDao.class)
+public class MsgRecordDao {
 
-  public static final io.vertx.lang.rxjava.TypeArg<DeviceDao> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new DeviceDao((dao.DeviceDao) obj),
-    DeviceDao::getDelegate
+  public static final io.vertx.lang.rxjava.TypeArg<MsgRecordDao> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new MsgRecordDao((dao.MsgRecordDao) obj),
+    MsgRecordDao::getDelegate
   );
 
-  private final dao.DeviceDao delegate;
+  private final dao.MsgRecordDao delegate;
   
-  public DeviceDao(dao.DeviceDao delegate) {
+  public MsgRecordDao(dao.MsgRecordDao delegate) {
     this.delegate = delegate;
   }
 
-  public dao.DeviceDao getDelegate() {
+  public dao.MsgRecordDao getDelegate() {
     return delegate;
   }
 
-  public static DeviceDao createProxy(Vertx vertx) { 
-    DeviceDao ret = DeviceDao.newInstance(dao.DeviceDao.createProxy(vertx.getDelegate()));
+  public static MsgRecordDao createProxy(Vertx vertx) { 
+    MsgRecordDao ret = MsgRecordDao.newInstance(dao.MsgRecordDao.createProxy(vertx.getDelegate()));
     return ret;
   }
 
-  public static DeviceDao createLocalProxy(Vertx vertx) { 
-    DeviceDao ret = DeviceDao.newInstance(dao.DeviceDao.createLocalProxy(vertx.getDelegate()));
+  public static MsgRecordDao createLocalProxy(Vertx vertx) { 
+    MsgRecordDao ret = MsgRecordDao.newInstance(dao.MsgRecordDao.createLocalProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static String getLocalAddress(String ip) { 
-    String ret = dao.DeviceDao.getLocalAddress(ip);
+    String ret = dao.MsgRecordDao.getLocalAddress(ip);
     return ret;
   }
 
@@ -78,7 +78,7 @@ public class DeviceDao {
   }
 
 
-  public static  DeviceDao newInstance(dao.DeviceDao arg) {
-    return arg != null ? new DeviceDao(arg) : null;
+  public static  MsgRecordDao newInstance(dao.MsgRecordDao arg) {
+    return arg != null ? new MsgRecordDao(arg) : null;
   }
 }

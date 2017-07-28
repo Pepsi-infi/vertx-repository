@@ -1,7 +1,5 @@
 package channel;
 
-import java.util.Properties;
-
 import constant.ConnectionConsts;
 import constant.PushConsts;
 import domain.AmqpConsumeMessage;
@@ -14,13 +12,11 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import service.DeviceService;
-import service.GcmPushService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
+
+import java.util.Properties;
 
 /**
  * 
@@ -44,7 +40,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	private RedisService redisService;
 
-	private DeviceService deviceService;
+	private MsgRecordService deviceService;
 
 	@Override
 	public void start() throws Exception {
@@ -66,7 +62,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 			gcmPushService = GcmPushService.createLocalProxy(vertx);
 		}
 		if(deviceService == null) {
-			deviceService = DeviceService.createLocalProxy(vertx);
+			deviceService = MsgRecordService.createLocalProxy(vertx);
 		}
 		if(redisService == null){
 			redisService = RedisService.createLocalProxy(vertx);
@@ -128,9 +124,9 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 		deviceService.addMessage(msg, res ->{
 			if(res.succeeded()){
-				logger.info("保存消息成功：" + msg);
+				logger.info("保存消息成功：" + res.result());
 			}else{
-				logger.info("保存消息失败：" + msg);
+				logger.info("保存消息失败：" + res.result());
 			}
 		});
 	}
@@ -156,19 +152,19 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		recieveMsg.put("regId", token);
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			token = null; //socket推送
-			socketPushService.sendMsg(recieveMsg, res->{
-				
+			socketPushService.sendMsg(recieveMsg.toString(), res->{
+				logger.info(" socket exe result : " + res.result());
 			});
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			token = null; //gcm推送
 			gcmPushService.sendMsg(recieveMsg,res->{
-				
+				logger.info(" gcm exe result : " + res.result());
 			});
 
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 			// 只用作对安卓手机进行推送
 			xiaomiPushService.sendMsg(recieveMsg,res->{
-				
+				logger.info(" xiaomi exe result : " + res.result());
 			});
 		} else {
 			logger.error("无效推送渠道");

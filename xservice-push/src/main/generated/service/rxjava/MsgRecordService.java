@@ -26,36 +26,36 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 
-@io.vertx.lang.rxjava.RxGen(service.DeviceService.class)
-public class DeviceService {
+@io.vertx.lang.rxjava.RxGen(service.MsgRecordService.class)
+public class MsgRecordService {
 
-  public static final io.vertx.lang.rxjava.TypeArg<DeviceService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new DeviceService((service.DeviceService) obj),
-    DeviceService::getDelegate
+  public static final io.vertx.lang.rxjava.TypeArg<MsgRecordService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new MsgRecordService((service.MsgRecordService) obj),
+    MsgRecordService::getDelegate
   );
 
-  private final service.DeviceService delegate;
+  private final service.MsgRecordService delegate;
   
-  public DeviceService(service.DeviceService delegate) {
+  public MsgRecordService(service.MsgRecordService delegate) {
     this.delegate = delegate;
   }
 
-  public service.DeviceService getDelegate() {
+  public service.MsgRecordService getDelegate() {
     return delegate;
   }
 
-  public static DeviceService createProxy(Vertx vertx) { 
-    DeviceService ret = DeviceService.newInstance(service.DeviceService.createProxy(vertx.getDelegate()));
+  public static MsgRecordService createProxy(Vertx vertx) { 
+    MsgRecordService ret = MsgRecordService.newInstance(service.MsgRecordService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
-  public static DeviceService createLocalProxy(Vertx vertx) { 
-    DeviceService ret = DeviceService.newInstance(service.DeviceService.createLocalProxy(vertx.getDelegate()));
+  public static MsgRecordService createLocalProxy(Vertx vertx) { 
+    MsgRecordService ret = MsgRecordService.newInstance(service.MsgRecordService.createLocalProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static String getLocalAddress(String ip) { 
-    String ret = service.DeviceService.getLocalAddress(ip);
+    String ret = service.MsgRecordService.getLocalAddress(ip);
     return ret;
   }
 
@@ -70,7 +70,7 @@ public class DeviceService {
   }
 
 
-  public static  DeviceService newInstance(service.DeviceService arg) {
-    return arg != null ? new DeviceService(arg) : null;
+  public static  MsgRecordService newInstance(service.MsgRecordService arg) {
+    return arg != null ? new MsgRecordService(arg) : null;
   }
 }

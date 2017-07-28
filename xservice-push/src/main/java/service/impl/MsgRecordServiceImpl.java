@@ -1,6 +1,6 @@
 package service.impl;
 
-import dao.DeviceDao;
+import dao.MsgRecordDao;
 import domain.AmqpConsumeMessage;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -8,7 +8,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import service.DeviceService;
+import service.MsgRecordService;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -16,33 +16,33 @@ import xservice.BaseServiceVerticle;
 /**
  *  保存消息记录
  */
-public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceService {
+public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgRecordService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MsgRecordServiceImpl.class);
 
-    private DeviceDao deviceDao;
+    private MsgRecordDao msgRecordDao;
 
-    public DeviceServiceImpl() {
+    public MsgRecordServiceImpl() {
     }
 
     @Override
     public void start() throws Exception {
         super.start();
 
-        XProxyHelper.registerService(DeviceService.class, vertx, this, DeviceService.SERVICE_ADDRESS);
-        publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
+        XProxyHelper.registerService(MsgRecordService.class, vertx, this, MsgRecordService.SERVICE_ADDRESS);
+        publishEventBusService(MsgRecordService.SERVICE_NAME, MsgRecordService.SERVICE_ADDRESS, MsgRecordService.class);
 
         String ip = IPUtil.getInnerIP();
-        XProxyHelper.registerService(DeviceService.class, vertx, this, DeviceService.getLocalAddress(ip));
-        publishEventBusService(DeviceService.LOCAL_SERVICE_NAME, DeviceService.getLocalAddress(ip), DeviceService.class);
+        XProxyHelper.registerService(MsgRecordService.class, vertx, this, MsgRecordService.getLocalAddress(ip));
+        publishEventBusService(MsgRecordService.LOCAL_SERVICE_NAME, MsgRecordService.getLocalAddress(ip), MsgRecordService.class);
 
-        deviceDao = DeviceDao.createLocalProxy(vertx);
+        msgRecordDao = MsgRecordDao.createLocalProxy(vertx);
     }
 
     @Override
     public void addMessage(AmqpConsumeMessage msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         Future<BaseResponse> resultFuture = Future.future();
-        deviceDao.addMessage(msg, resultFuture.completer());
+        msgRecordDao.addMessage(msg, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             if (handler.succeeded()) {
                 resultHandler.handle(Future.succeededFuture(new BaseResponse()));

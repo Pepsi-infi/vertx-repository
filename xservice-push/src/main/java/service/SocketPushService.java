@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 import utils.BaseResponse;
 import utils.IPUtil;
@@ -28,9 +27,7 @@ public interface SocketPushService {
 	String LOCAL_SERVICE_NAME = "local-x-push-socket-service";
 
 	static SocketPushService createProxy(Vertx vertx){
-		
 		return ProxyHelper.createProxy(SocketPushService.class, vertx, SocketPushService.class.getName());
-	
 	}
 
 	static SocketPushService createLocalProxy(Vertx vertx) {
@@ -43,6 +40,6 @@ public interface SocketPushService {
 	}
 
 
-	void sendMsg(JsonObject recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler);
+	void sendMsg(String recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler);
 
 }

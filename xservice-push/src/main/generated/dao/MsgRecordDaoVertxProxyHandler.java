@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package dao;
 
-import service.DeviceService;
+import dao.MsgRecordDao;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,10 +39,10 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
 import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
+import dao.MsgRecordDao;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -51,25 +51,25 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceServiceVertxProxyHandler extends ProxyHandler {
+public class MsgRecordDaoVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final DeviceService service;
+  private final MsgRecordDao service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service) {
+  public MsgRecordDaoVertxProxyHandler(Vertx vertx, MsgRecordDao service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, long timeoutInSecond) {
+  public MsgRecordDaoVertxProxyHandler(Vertx vertx, MsgRecordDao service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, boolean topLevel, long timeoutSeconds) {
+  public MsgRecordDaoVertxProxyHandler(Vertx vertx, MsgRecordDao service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
