@@ -3,7 +3,7 @@ package api;
 import channel.AmqpConsumerVerticle;
 import channel.HttpConsumerVerticle;
 import channel.MiPushVerticle;
-import dao.impl.DeviceDaoImpl;
+import dao.impl.MsgRecordDaoImpl;
 import io.vertx.rxjava.core.AbstractVerticle;
 import service.impl.RedisServiceImpl;
 
@@ -16,7 +16,7 @@ public class StartVerticle extends AbstractVerticle{
         // 提供EventBus服务
         
 
-		vertx.deployVerticle(DeviceDaoImpl.class.getName());
+		vertx.deployVerticle(MsgRecordDaoImpl.class.getName());
 		vertx.deployVerticle(RedisServiceImpl.class.getName());
 		
 		vertx.deployVerticle(MiPushVerticle.class.getName());

@@ -1,5 +1,6 @@
 package service;
 
+import domain.AmqpConsumeMessage;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -12,26 +13,26 @@ import utils.IPUtil;
 
 @ProxyGen
 @VertxGen
-public interface SocketPushService {
+public interface MsgRecordService {
 
 	/**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-socket-service";
+	String SERVICE_NAME = "x-push-device-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
-	String SERVICE_ADDRESS = "push.socket.service";
+	String SERVICE_ADDRESS = "push.device.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-socket-service";
+	String LOCAL_SERVICE_NAME = "local-x-push-device-service";
 
-	static SocketPushService createProxy(Vertx vertx){
-		return ProxyHelper.createProxy(SocketPushService.class, vertx, SocketPushService.class.getName());
+	static MsgRecordService createProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(MsgRecordService.class, vertx, MsgRecordService.SERVICE_ADDRESS);
 	}
 
-	static SocketPushService createLocalProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(SocketPushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
+	static MsgRecordService createLocalProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(MsgRecordService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
 				new DeliveryOptions().setSendTimeout(3000));
 	}
 
@@ -39,7 +40,5 @@ public interface SocketPushService {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
 
-
-	void sendMsg(String recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler);
-
+	void addMessage(AmqpConsumeMessage dto, Handler<AsyncResult<BaseResponse>> resultHandler);
 }

@@ -33,8 +33,11 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import service.GcmPushService;
+import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -62,15 +65,22 @@ public class GcmPushServiceVertxEBProxy implements GcmPushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject recieveMsg) {
+  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
     if (closed) {
-      throw new IllegalStateException("Proxy is closed");
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
     }
     JsonObject _json = new JsonObject();
     _json.put("recieveMsg", recieveMsg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "sendMsg");
-    _vertx.eventBus().send(_address, _json, _deliveryOptions);
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+                      }
+    });
   }
 
 
