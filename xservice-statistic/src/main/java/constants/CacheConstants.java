@@ -19,6 +19,10 @@ public class CacheConstants {
 
     public static final String PUSH_ARRIVE_CHANNEL = "ARRIVE_CHANNEL_";
 
+    public static final String PUSH_SEND_OSTYPE = "SEND_OSTYPE_";
+
+    public static final String PUSH_ARRIVE_OSTYPE = "ARRIVE_OSTYPE_";
+
 
     public static final String getPushMsgKey(MsgStatDto msgStatDto) {
         return new StringBuffer().append(PUSH_MSG).append(msgStatDto.getMsgId()).toString();

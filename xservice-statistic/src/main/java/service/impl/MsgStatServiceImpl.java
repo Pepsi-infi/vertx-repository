@@ -117,12 +117,20 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         List<String> fieldsList = Lists.newArrayList();
         if (PushActionEnum.SEND.getType() == msgStatDto.getAction()) {
             fieldsList.add(CacheConstants.PUSH_SEND_SUM);
+            if (msgStatDto.getOsType() != null && msgStatDto.getOsType() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_SEND_OSTYPE).append(msgStatDto.getOsType()).toString();
+                fieldsList.add(filed);
+            }
             if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
                 String filed = new StringBuilder(CacheConstants.PUSH_SEND_CHANNEL).append(msgStatDto.getChannel()).toString();
                 fieldsList.add(filed);
             }
         } else if (PushActionEnum.ARRIVE.getType() == msgStatDto.getAction()) {
             fieldsList.add(CacheConstants.PUSH_ARRIVE_SUM);
+            if (msgStatDto.getOsType() != null && msgStatDto.getOsType() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_ARRIVE_OSTYPE).append(msgStatDto.getOsType()).toString();
+                fieldsList.add(filed);
+            }
             if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
                 String filed = new StringBuilder(CacheConstants.PUSH_ARRIVE_CHANNEL).append(msgStatDto.getChannel()).toString();
                 fieldsList.add(filed);
