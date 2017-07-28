@@ -22,14 +22,14 @@ public interface MsgRecordDao {
     /**
      * The name of the event bus service.
      */
-    String SERVICE_NAME = "x-push-device-dao";
+    String SERVICE_NAME = "push-msgrecord-dao";
 
     /**
      * The address on which the service is published.
      */
-    String SERVICE_ADDRESS = "push.device.dao";
+    String SERVICE_ADDRESS = "push.msgrecord.dao";
 
-    String LOCAL_SERVICE_NAME = "local-x-push-device-dao";
+    String LOCAL_SERVICE_NAME = "local-push-msgrecord-dao";
 
     static MsgRecordDao createProxy(Vertx vertx) {
         return ProxyHelper.createProxy(MsgRecordDao.class, vertx, MsgRecordDao.SERVICE_ADDRESS);

@@ -16,7 +16,6 @@
 
 package service;
 
-import service.DeviceService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,7 +38,6 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
 import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;

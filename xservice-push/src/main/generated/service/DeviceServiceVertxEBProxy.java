@@ -16,7 +16,6 @@
 
 package service;
 
-import service.DeviceService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,7 +31,6 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
 import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;

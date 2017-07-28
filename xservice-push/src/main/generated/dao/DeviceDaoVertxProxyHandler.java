@@ -16,7 +16,6 @@
 
 package dao;
 
-import dao.DeviceDao;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -43,7 +42,6 @@ import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
-import dao.DeviceDao;
 import io.vertx.core.Handler;
 
 /*

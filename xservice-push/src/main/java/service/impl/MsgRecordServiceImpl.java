@@ -20,7 +20,7 @@ public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgReco
 
     private static final Logger logger = LoggerFactory.getLogger(MsgRecordServiceImpl.class);
 
-    private MsgRecordDao deviceDao;
+    private MsgRecordDao msgRecordDao;
 
     public MsgRecordServiceImpl() {
     }
@@ -36,13 +36,13 @@ public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgReco
         XProxyHelper.registerService(MsgRecordService.class, vertx, this, MsgRecordService.getLocalAddress(ip));
         publishEventBusService(MsgRecordService.LOCAL_SERVICE_NAME, MsgRecordService.getLocalAddress(ip), MsgRecordService.class);
 
-        deviceDao = MsgRecordDao.createLocalProxy(vertx);
+        msgRecordDao = MsgRecordDao.createLocalProxy(vertx);
     }
 
     @Override
     public void addMessage(AmqpConsumeMessage msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         Future<BaseResponse> resultFuture = Future.future();
-        deviceDao.addMessage(msg, resultFuture.completer());
+        msgRecordDao.addMessage(msg, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             if (handler.succeeded()) {
                 resultHandler.handle(Future.succeededFuture(new BaseResponse()));
