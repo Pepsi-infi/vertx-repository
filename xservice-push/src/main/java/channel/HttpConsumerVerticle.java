@@ -12,18 +12,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
-import service.MsgRecordService;
-import service.GcmPushService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.MsgUtil;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(AmqpConsumerVerticle.class);
-
-	private JsonObject recieveMsg = null;
 
 	private Object activity = null;
 
@@ -41,6 +35,17 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private Router router;
 
+	//接收到的消息
+	private JsonObject receiveMsg = null;
+
+
+	//上游消息id
+	private String msgId;
+	//小米，GCM   token
+	private String token;
+	//推送类型
+	private String sendType;
+
 	@Override
 	public void start() throws Exception {
 
@@ -48,39 +53,33 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		this.initService();
 
 		// 接收消息
-		recivedHttpMessage();
+		this.recivedHttpMessage();
 
 	}
 
 	private void recivedHttpMessage() {
 		httpServer = vertx.createHttpServer();
-
 		if (httpServer == null) {
 			logger.error("HttpServer is null");
 			return;
 		}
-
 		router = Router.router(vertx);
-
 		if (router == null) {
 			logger.error("Router is null");
 			return;
 		}
 
 		router.route("/sqyc/push/sokcet.htm").handler(context -> {
-
 			HttpServerRequest request = context.request();
-
 			String httpMsg = request.getParam("body");
-
-			recieveMsg = new JsonObject(httpMsg);
-
-			if (recieveMsg == null) {
+			receiveMsg = new JsonObject(httpMsg);
+			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
 				return;
 			}
 
 			logger.info("开始消费数据");
+
 			consumMsg();
 		});
 
@@ -91,8 +90,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private void initService() {
 	
 			socketPushService = SocketPushService.createProxy(vertx);
-	
-		
+
 			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
 		
 			gcmPushService = GcmPushService.createLocalProxy(vertx);
@@ -104,128 +102,87 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void consumMsg() {
-
 		// 校验
-		if (!validateRecieveMsg(recieveMsg)) {
+		if (!validateRecieveMsg(receiveMsg)) {
 			return;
 		}
-		String msgId =  (String) recieveMsg.getValue("msgId");
-		Object customerId = recieveMsg.getValue("customerId");
-		String apnsToken = (String) recieveMsg.getValue("apnsToken");
+		msgId =  (String) receiveMsg.getValue("msgId");
+		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
+		String devicePushType = (String) receiveMsg.getValue("devicePushType"); // 消息推送类型
+		sendType = MsgUtil.convertCode(devicePushType);
+
+		Object customerId = receiveMsg.getValue("customerId");
+		String apnsToken = (String) receiveMsg.getValue("apnsToken");
 
 		redisService.get(PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId, res -> {
 			if (res.succeeded()) {
 				activity = res.result();
+			}else{
+				logger.error("from redis get key fail : key = " + PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId);
 			}
 		});
-
 		if (activity != null) {
 			logger.error("消费PassengerMsg：这个消息发送过，禁止重复发送！，msgId==:" + msgId);
 			return;
 		}
-
 		if (StringUtil.isNullOrEmpty(apnsToken) || "null".equals(apnsToken)) {
-
-			String token = (String) recieveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
-			String devicePushType = (String) recieveMsg.getValue("devicePushType"); // 消息推送类型
-																					// 1:IOS；2：GCM(或FCM)；3:小米
-			if (StringUtil.isNullOrEmpty(devicePushType)) {
-				logger.error("消息推送类型为空");
-				return;
-			}
-
-			String sendType = getSendType(token, devicePushType);
-
-			// 推送消息
-			pushMsg(sendType, token);
-
+			// 推送消息到下游
+			pushMsgToDownStream();
 			// 消息入库
-			saveMsg(sendType);
-
+			saveMsgRecord();
 		}
-
 	}
 
-	private void saveMsg(String sendType) {
+	/**
+	 * 保存消息记录
+	 */
+	private void saveMsgRecord() {
 		AmqpConsumeMessage msg=new AmqpConsumeMessage();
-		msg.setAmqpMsgId(MsgUtil.createMsgId());
+		msg.setAmqpMsgId(msgId);
 		msg.setChannel(sendType);
-		msg.setMsgBody(recieveMsg.toString());
+		msg.setMsgBody(receiveMsg.toString());
 		msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
-
 		deviceService.addMessage(msg, res ->{
 			if(res.succeeded()){
-				logger.info("保存消息成功：" + msg);
+				logger.info("保存消息成功：" + res);
 			}else{
-				logger.info("保存消息失败：" + msg);
+				logger.info("保存消息失败：" + res.cause());
 			}
 		});
 	}
 
-	private String getSendType(String token, String devicePushType) {
-
-		String sendType = "sokit";
-
-		if (!StringUtil.isNullOrEmpty(token)) {
-
-			if ("3".equals(devicePushType)) {
-				sendType = "gcm";
-			}
-
-			if ("2".equals(devicePushType)) {
-				sendType = "xiaomi";
-			}
-		}
-		return sendType;
-	}
-
-	private void pushMsg(String sendType, String token) {
-
-		recieveMsg.put("regId", token);
-
+	private void pushMsgToDownStream() {
+		receiveMsg.put("regId", token);
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
-
-			token = null; // TODO socket推送
+			// socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(recieveMsg.toString(),res->{
-				
+			socketPushService.sendMsg(receiveMsg.toString(), res->{
 				if(res.succeeded()){
 					logger.info("socket推送成功");
 				}else{
 					logger.error("socket推送失败");
 				}
-				
 			});
-
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
-
-			token = null; // TODO gcm推送
+			// gcm推送
 			logger.info("开始走gcm推送");
-			gcmPushService.sendMsg(recieveMsg,res->{
-				
+			gcmPushService.sendMsg(receiveMsg, res->{
 				if(res.succeeded()){
 					logger.info("gcm推送成功");
 				}else{
 					logger.error("gcm推送失败");
 				}
-				
 			});
-
-
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
-
-			// TODO 只用作对安卓手机进行推送
+			// 只用作对安卓手机进行推送
 			logger.info("开始走小米推送");
-			xiaomiPushService.sendMsg(recieveMsg,res->{
-				
+			xiaomiPushService.sendMsg(receiveMsg, res->{
 				if(res.succeeded()){
 					logger.info("小米推送成功");
 				}else{
 					logger.error("小米推送失败");
 				}
-				
 			});
-
 		} else {
 			logger.error("无效推送渠道");
 			return;
@@ -234,22 +191,18 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private boolean validateRecieveMsg(JsonObject msg) {
-
 		if (msg == null) {
-			logger.error("校验未通过，recieveMsg==" + msg);
+			logger.error("校验未通过，receiveMsg==" + msg);
 			return false;
 		}
-
 		if (msg.getValue("msgId") == null) {
 			logger.error("校验未通过：msgId为空");
 			return false;
 		}
-
 		if (msg.getValue("customerId") == null) {
 			logger.error("校验未通过：customerId为空");
 			return false;
 		}
-
 		return true;
 	}
 

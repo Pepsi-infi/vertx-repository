@@ -11,11 +11,6 @@ import io.vertx.serviceproxy.ProxyHelper;
 import utils.BaseResponse;
 import utils.IPUtil;
 
-/**
- * Created by lufei
- * Date : 2017/7/26 10:17
- * Description :
- */
 @VertxGen
 @ProxyGen
 public interface MsgRecordDao {
