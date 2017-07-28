@@ -7,6 +7,8 @@ import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -16,6 +18,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import service.*;
 import util.MsgUtil;
+import utils.BaseResponse;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -90,7 +93,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			
 			logger.info("开始消费数据");
 
-			consumMsg();
+			consumMsg(res -> {
+				if(res.succeeded()){
+					logger.info(" consumMsg success! ");
+				}else{
+					logger.error(" consumMsg fail! ");
+				}
+			});
 		});
 
 		httpServer.requestHandler(router::accept).listen(8989);
@@ -111,7 +120,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	
 	}
 
-	private void consumMsg() {
+	private void consumMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验
 		if (!validateRecieveMsg(receiveMsg)) {
 			return;
@@ -137,7 +146,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 		if (StringUtil.isNullOrEmpty(apnsToken) || "null".equals(apnsToken)) {
 			// 推送消息到下游
-			pushMsgToDownStream();
+			pushMsgToDownStream(resultHandler);
 			// 消息入库
 			saveMsgRecord();
 		}
@@ -161,38 +170,20 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void pushMsgToDownStream() {
+	private void pushMsgToDownStream(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		receiveMsg.put("regId", token);
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			// socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(receiveMsg.toString(), res->{
-				if(res.succeeded()){
-					logger.info("socket推送成功");
-				}else{
-					logger.error("socket推送失败");
-				}
-			});
+			socketPushService.sendMsg(receiveMsg.toString(), resultHandler);
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			// gcm推送
 			logger.info("开始走gcm推送");
-			gcmPushService.sendMsg(receiveMsg, res->{
-				if(res.succeeded()){
-					logger.info("gcm推送成功");
-				}else{
-					logger.error("gcm推送失败");
-				}
-			});
+			gcmPushService.sendMsg(receiveMsg, resultHandler);
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 			// 只用作对安卓手机进行推送
 			logger.info("开始走小米推送");
-			xiaomiPushService.sendMsg(receiveMsg, res->{
-				if(res.succeeded()){
-					logger.info("小米推送成功:"+res.result());
-				}else{
-					logger.error("小米推送失败"+res.cause());
-				}
-			});
+			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 		} else {
 			logger.error("无效推送渠道");
 			return;
