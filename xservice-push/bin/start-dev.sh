@@ -6,8 +6,8 @@ pid=$(ps -ef | grep xservice-push | grep java | awk '{print $2}')
 
 kill -9 $pid
 
-BUILD_ID=
-dontKillMe nohup java \
+BUILD_ID=dontKillMe \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
