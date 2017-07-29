@@ -9,7 +9,7 @@ then
 fi
 
 BUILD_ID=
-dontKillMe java \
+java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -26,3 +26,5 @@ dontKillMe java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-push-fat.jar >/dev/null 2>&1
+
+exit 0
