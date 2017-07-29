@@ -12,8 +12,8 @@ nohup java \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
 -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
--Xloggc:~/push/gc.log \
--Dlog.path=~/push/ \
+-Xloggc:/u01/projectCAR/service/xservice-push/gc.log \
+-Dlog.path=/u01/projectCAR/service/xservice-push \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
