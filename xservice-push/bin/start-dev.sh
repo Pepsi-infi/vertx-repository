@@ -1,6 +1,11 @@
 #!/bin/sh
 set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
+
+pid=$(ps -ef | grep xservice-push | grep java | awk '{print $2}')
+
+kill -9 $pid
+
 BUILD_ID=
 dontKillMe nohup java \
 -server \
