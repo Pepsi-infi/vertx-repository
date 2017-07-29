@@ -3,8 +3,7 @@ set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-push | grep java | awk '{print $2}')
-
-kill -9 $pid
+if[ -n "$pid"]; then kill -9 $pid;fi
 
 BUILD_ID=dontKillMe \
 nohup java \
