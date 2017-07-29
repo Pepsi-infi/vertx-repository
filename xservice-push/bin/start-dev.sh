@@ -8,8 +8,8 @@ then
   kill -9 $pid
 fi
 
-BUILD_ID=dontKillMe
-nohup java \
+BUILD_ID=
+dontKillMe java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
