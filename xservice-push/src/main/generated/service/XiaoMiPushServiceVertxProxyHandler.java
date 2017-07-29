@@ -40,8 +40,11 @@ import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import service.XiaoMiPushService;
+import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -124,7 +127,17 @@ public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
 
 
         case "sendMsg": {
-          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"));
+          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
           break;
         }
         default: {

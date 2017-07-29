@@ -8,7 +8,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>xservice-common</module>
-    <module>xservice-demo</module>
     <module>xservice-statistic</module>
     <module>xservice-push</module>
     <module>xservice-demo</module>

@@ -25,14 +25,6 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
-/**
- * Created by lufei
- * Date : 2017/7/26 10:17
- * Description :
- *
- * <p/>
- * NOTE: This class has been automatically generated from the {@link dao.MsgRecordDao original} non RX-ified interface using Vert.x codegen.
- */
 
 @io.vertx.lang.rxjava.RxGen(dao.MsgRecordDao.class)
 public class MsgRecordDao {
