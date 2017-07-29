@@ -11,6 +11,7 @@
     <module>xservice-demo</module>
     <module>xservice-statistic</module>
     <module>xservice-push</module>
+    <module>xservice-demo</module>
   </modules>
 
   <!-- 配置变量 -->
