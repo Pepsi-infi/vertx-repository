@@ -55,6 +55,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	//小米，GCM   token
 	private String token;
 	//推送类型
+	private String devicePushType;
+	//推送类型，下游需要
 	private String sendType;
 
 	@Override
@@ -115,7 +117,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		MsgStatDto msgStatDto = new MsgStatDto();
 		//首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(1001);
-		msgStatDto.setChannel(Integer.parseInt(sendType));
+		msgStatDto.setChannel(Integer.parseInt(devicePushType));
 		msgStatDto.setMsgId(msgId);
 		msgStatDto.setOsType(1);
 		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
@@ -148,7 +150,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 		msgId =  (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
-		String devicePushType = (String) receiveMsg.getValue("devicePushType"); // 消息推送类型
+		//从上游接收到的 推送类型
+		devicePushType = (String) receiveMsg.getValue("devicePushType");
+		//转化成下游需要的推送类型
 		sendType = MsgUtil.convertCode(devicePushType);
 
 		Object customerId = receiveMsg.getValue("customerId");
