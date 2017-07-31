@@ -86,15 +86,26 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			
 			HttpServerResponse resp= context.response();
 			HttpServerRequest request = context.request();
+			
 			String httpMsg = request.getParam("body");
 			logger.info(" 接收到的消息内容：" + httpMsg);
+			if(StringUtil.isNullOrEmpty(httpMsg)){
+				
+				logger.error("请求数据为空，不做处理");
+				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),"body is null", null).toString());
+				return;
+				
+			}
+			
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
-				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL, null).toString());
+				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),"body is null", null).toString());
 				return;
 			}
+			
 			resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
+			
 			consumMsg(res -> {
 				if(res.succeeded()){
 					logger.info("消费消息成功！" );
