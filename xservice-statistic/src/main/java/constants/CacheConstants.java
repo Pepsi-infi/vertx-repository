@@ -43,17 +43,17 @@ public class CacheConstants {
 
     static {
         PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_SUM);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.ANDROID);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.IOS);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.SOCKET);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.GCM);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.XIAOMI);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.ANDROID.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.IOS.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.SOCKET.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.GCM.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.XIAOMI.getType());
         PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_SUM);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.ANDROID);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.IOS);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.SOCKET);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.GCM);
-        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.XIAOMI);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.ANDROID.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.IOS.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.SOCKET.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.GCM.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.XIAOMI.getType());
     }
 
 }

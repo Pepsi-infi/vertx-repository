@@ -1,11 +1,11 @@
 package service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -20,11 +20,6 @@ import iservice.dto.MsgStatDto;
 import util.FileUtils;
 import utils.BaseResponse;
 import iservice.MsgStatService;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -126,7 +121,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
                 fieldsList.add(filed);
             }
         }
-        logger.info("the msgstatDto : {} need stat fileds : {}", JSON.toJSONString(fieldsList));
+        logger.info("the msgStatDto : {} need stat fields : {}", msgStatDto, Json.encode(fieldsList));
         return fieldsList;
     }
 
