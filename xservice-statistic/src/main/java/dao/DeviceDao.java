@@ -22,12 +22,12 @@ public interface DeviceDao {
     /**
      * The name of the event bus service.
      */
-    String SERVICE_NAME = "dao-userDevice-service";
+    String SERVICE_NAME = "dao-device-service";
 
     /**
      * The address on which the service is published.
      */
-    String SERVICE_ADDRESS = "dao.userDevice.service";
+    String SERVICE_ADDRESS = "dao.device.service";
 
 
     static DeviceDao createProxy(Vertx vertx) {

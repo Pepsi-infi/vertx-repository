@@ -40,11 +40,21 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
         Future<BaseResponse> resultFuture = Future.future();
         deviceDao.addUserDevice(userDeviceDto, resultFuture.completer());
         resultFuture.setHandler(handler -> {
+            BaseResponse baseResponse = new BaseResponse();
             if (handler.succeeded()) {
-                result.handle(Future.succeededFuture(new BaseResponse()));
+                result.handle(Future.succeededFuture(baseResponse));
             } else {
-                result.handle(Future.failedFuture(handler.cause()));
+                buildErrorBaseResponse(baseResponse, null, handler.cause().toString());
+                result.handle(Future.succeededFuture(baseResponse));
             }
         });
+    }
+
+    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String errCode, String message) {
+        if (response != null) {
+            response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
+            response.setErrorCode(errCode);
+            response.setErrorMessage(message);
+        }
     }
 }

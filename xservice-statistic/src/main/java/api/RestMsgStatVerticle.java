@@ -71,6 +71,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String osType = context.request().params().get("osType");
         String channel = context.request().params().get("channel");
         String sendTime = context.request().params().get("sendTime");
+        String arriveTime = context.request().params().get("arriveTime");
+        String imei = context.request().params().get("imei");
+        String antFingerprint = context.request().params().get("antFingerprint");
         String isAcceptPush = context.request().params().get("isAcceptPush");
 
         MsgStatDto statDto = new MsgStatDto();
@@ -88,6 +91,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         }
         statDto.setMsgId(msgId);
         statDto.setSendTime(sendTime);
+        statDto.setArriveTime(arriveTime);
+        statDto.setImei(imei);
+        statDto.setAntFingerprint(antFingerprint);
         return statDto;
     }
 
