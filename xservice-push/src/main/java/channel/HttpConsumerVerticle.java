@@ -16,7 +16,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import iservice.MsgStatService;
+import iservice.dto.MsgStatDto;
+import result.ResultData;
 import service.*;
+import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
@@ -34,7 +38,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private RedisService redisService;
 
-	private MsgRecordService deviceService;
+	private MsgRecordService msgRecordService;
+
+	private MsgStatService msgStatService;
 
 	private HttpServer httpServer;
 
@@ -49,6 +55,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	//小米，GCM   token
 	private String token;
 	//推送类型
+	private String devicePushType;
+	//推送类型，下游需要
 	private String sendType;
 
 	@Override
@@ -74,50 +82,76 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			return;
 		}
 
-		router.route("/sqyc/push/sokcet.htm").handler(context -> {
+		router.route("/mc-push/message/push.json").handler(context -> {
 			
 			HttpServerResponse resp= context.response();
+			HttpServerRequest request = context.request();
 			
-			HttpServerRequest request = context.request();		
 			String httpMsg = request.getParam("body");
+			logger.info(" 接收到的消息内容：" + httpMsg);
+			if(StringUtil.isNullOrEmpty(httpMsg)){
+				
+				logger.error("请求数据为空，不做处理");
+				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),"body is null", null).toString());
+				return;
+				
+			}
+			
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
-				
-				resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.FAIL.getCode());
-				
+				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),"body is null", null).toString());
 				return;
 			}
 			
-			resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.SUCCESS.getCode());
+			resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
 			
-			logger.info("开始消费数据");
-
 			consumMsg(res -> {
 				if(res.succeeded()){
-					logger.info(" consumMsg success! ");
+					logger.info("消费消息成功！" );
+					callStatPushMsg();
 				}else{
-					logger.error(" consumMsg fail! ");
+					logger.error("消费消息失败,失败原因：" + res.cause());
 				}
 			});
 		});
 
 		httpServer.requestHandler(router::accept).listen(8989);
+	}
 
+	/**
+	 * 已推送消息上报
+	 * //接口参见wiki : http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=329268
+	 */
+	private void callStatPushMsg(){
+		//已推送消息上报接口
+		MsgStatDto msgStatDto = new MsgStatDto();
+		//首约app乘客端 1001；首约app司机端 1002
+		msgStatDto.setAppCode(1001);
+		msgStatDto.setChannel(Integer.parseInt(devicePushType));
+		msgStatDto.setMsgId(msgId);
+		msgStatDto.setOsType(1);
+		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
+		msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
+	}
+	/**
+	 * 已推送消息上报结果
+	 */
+	private void pushMsgHandler(AsyncResult<BaseResponse> resultHandler){
+		if(resultHandler.succeeded()){
+			logger.info("已推送消息上报成功");
+		}else{
+			logger.error("已推送消息上报失败,失败原因：" + resultHandler.cause());
+		}
 	}
 
 	private void initService() {
-	
 			socketPushService = SocketPushService.createProxy(vertx);
-
-			xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
-		
-			gcmPushService = GcmPushService.createLocalProxy(vertx);
-		
-			deviceService = MsgRecordService.createLocalProxy(vertx);
-	
-			redisService = RedisService.createLocalProxy(vertx);
-	
+			xiaomiPushService = XiaoMiPushService.createProxy(vertx);
+			gcmPushService = GcmPushService.createProxy(vertx);
+			msgRecordService = MsgRecordService.createProxy(vertx);
+			redisService = RedisService.createProxy(vertx);
+			msgStatService = MsgStatService.createProxy(vertx);
 	}
 
 	private void consumMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
@@ -127,7 +161,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 		msgId =  (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
-		String devicePushType = (String) receiveMsg.getValue("devicePushType"); // 消息推送类型
+		//从上游接收到的 推送类型
+		devicePushType = (String) receiveMsg.getValue("devicePushType");
+		//转化成下游需要的推送类型
 		sendType = MsgUtil.convertCode(devicePushType);
 
 		Object customerId = receiveMsg.getValue("customerId");
@@ -161,7 +197,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		msg.setChannel(sendType);
 		msg.setMsgBody(receiveMsg.toString());
 		msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
-		deviceService.addMessage(msg, res ->{
+		msgRecordService.addMessage(msg, res ->{
 			if(res.succeeded()){
 				logger.info("保存消息成功：" + res);
 			}else{

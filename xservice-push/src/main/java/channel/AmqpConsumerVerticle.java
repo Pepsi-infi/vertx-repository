@@ -8,13 +8,17 @@ import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
 import io.vertx.amqpbridge.AmqpBridge;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.*;
+import util.JsonUtil;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
+import utils.BaseResponse;
 
 import java.util.Properties;
 
@@ -40,7 +44,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 
 	private RedisService redisService;
 
-	private MsgRecordService deviceService;
+	private MsgRecordService msgRecordService;
 
 	//接收到的消息
 	private JsonObject receiveMsg = null;
@@ -61,20 +65,14 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void initService() {
-
 		socketPushService = SocketPushService.createProxy(vertx);
-
-		xiaomiPushService = XiaoMiPushService.createLocalProxy(vertx);
-
-		gcmPushService = GcmPushService.createLocalProxy(vertx);
-
-		deviceService = MsgRecordService.createLocalProxy(vertx);
-
-		redisService = RedisService.createLocalProxy(vertx);
-
+		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
+		gcmPushService = GcmPushService.createProxy(vertx);
+		msgRecordService = MsgRecordService.createProxy(vertx);
+		redisService = RedisService.createProxy(vertx);
 	}
 
-	private void consumMsg() {
+	private void consumMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验
 		if (!validateRecieveMsg(receiveMsg)) {
 			return;
@@ -100,7 +98,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		}
 		if (StringUtil.isNullOrEmpty(apnsToken) || "null".equals(apnsToken)) {
 			// 推送消息到下游
-			pushMsgToDownStream();
+			pushMsgToDownStream(resultHandler);
 			// 消息入库
 			saveMsgRecord();
 		}
@@ -115,7 +113,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		msg.setChannel(sendType);
 		msg.setMsgBody(receiveMsg.toString());
 		msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
-		deviceService.addMessage(msg, res ->{
+		msgRecordService.addMessage(msg, res ->{
 			if(res.succeeded()){
 				logger.info("保存消息成功：" + res);
 			}else{
@@ -124,38 +122,20 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void pushMsgToDownStream() {
+	private void pushMsgToDownStream(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		receiveMsg.put("regId", token);
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			// socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(receiveMsg.toString(), res->{
-				if(res.succeeded()){
-					logger.info("socket推送成功");
-				}else{
-					logger.error("socket推送失败");
-				}
-			});
+			socketPushService.sendMsg(receiveMsg.toString(), resultHandler);
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			// gcm推送
 			logger.info("开始走gcm推送");
-			gcmPushService.sendMsg(receiveMsg, res->{
-				if(res.succeeded()){
-					logger.info("gcm推送成功");
-				}else{
-					logger.error("gcm推送失败");
-				}
-			});
+			gcmPushService.sendMsg(receiveMsg, resultHandler);
 		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
 			// 只用作对安卓手机进行推送
 			logger.info("开始走小米推送");
-			xiaomiPushService.sendMsg(receiveMsg, res->{
-				if(res.succeeded()){
-					logger.info("小米推送成功");
-				}else{
-					logger.error("小米推送失败");
-				}
-			});
+			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 		} else {
 			logger.error("无效推送渠道");
 			return;
@@ -185,7 +165,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	private void recivedMessage(){
 		AmqpBridge bridge = AmqpBridge.create(vertx);
 		//读取配置
-		Properties prop = PropertiesLoaderUtils.loadProperties( ConnectionConsts.MQ_CONFIG_PATH);
+		Properties prop = PropertiesLoaderUtils.loadProperties("/" + ConnectionConsts.MQ_CONFIG_PATH);
 		//bridge.start
 		String addr = prop.getProperty(ConnectionConsts.ACTIVEMQ_SERVER_URL);
 		int port = Integer.parseInt(prop.getProperty(ConnectionConsts.ACTIVE_SERVER_PORT));
@@ -194,15 +174,31 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 				System.out.println("Bridge startup failed: " + res.cause());
 				return;
 			}
-			MessageConsumer<JsonObject> consumer = bridge.createConsumer(ConnectionConsts.ACTIVE_QUEUE_TOPIC);
+			MessageConsumer<AmqpConsumeMessage> consumer = bridge.createConsumer("topic1");
 			consumer.handler(vertxMsg -> {
-				receiveMsg = vertxMsg.body();
-				logger.info("Received a message with body : " + receiveMsg.toString());
+				AmqpConsumeMessage message = vertxMsg.body();
+				logger.info("Received a message with body : " + JsonUtil.toJsonString(message));
+				String body = message.getMsgBody();
+				logger.info("Received a message with body : " + body);
 
-				this.consumMsg();
+				this.consumMsg(result -> {
+					if(res.succeeded()){
+						logger.info("消费消息成功！" );
+					}else{
+						logger.error("消费消息失败,失败原因：" + result.cause());
+					}
+				});
 			});
 		});
 	}
 
+	public static void main(String[] args) {
+		AmqpConsumeMessage bean = new AmqpConsumeMessage();
+		bean.setAmqpMsgId("1231231241241");
+		bean.setMsgBody("aasdfsaddsafasdfaasdf");
+		bean.setStatus(2);
+		bean.setChannel("2");
 
+		System.out.println(JsonUtil.toJsonString(bean));
+	}
 }

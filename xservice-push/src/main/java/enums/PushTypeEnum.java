@@ -3,8 +3,9 @@ package enums;
 public enum PushTypeEnum {
 	
 	SOCKET("1","sokit","套接字推送"),
-	XIAOMI("2","xiaomi","小米推送"),
-	GCM("3","gcm","谷歌推送");
+	GCM("2","gcm","谷歌推送"),
+	XIAOMI("3","xiaomi","小米推送");
+
 
 	/**
 	 * 上游使用的标志

@@ -41,7 +41,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 	public void start() throws Exception {
 		super.start();
 		ProxyHelper.registerService(XiaoMiPushService.class, vertx, this,
-				XiaoMiPushService.getLocalAddress(IPUtil.getInnerIP()));
+				XiaoMiPushService.class.getName());
 
 	}
 

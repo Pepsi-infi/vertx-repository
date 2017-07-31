@@ -66,7 +66,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Long expireTime = new Long(srcExpireTime);
         String token = null;
         //新生成一个消息id
-        String msgId = MsgUtil.createMsgId();
+        String msgId = MsgUtil.getUUID();
 
         //超时时间： 秒
         Long seconds = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;

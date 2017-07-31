@@ -11,13 +11,16 @@ import java.io.ObjectOutputStream;
 import java.util.UUID;
 
 /**
+ *  消息工具类
  * Created by weim on 2017/7/25.
  */
 public class MsgUtil {
 
     private static Logger logger = LoggerFactory.getLogger(MsgUtil.class);
 
-    //返回对应code
+    /**
+     *  上游推送类型 转换成 下游推送类型
+     */
     public static String convertCode(String srcCode){
         for(PushTypeEnum e : PushTypeEnum.values()){
             if(e.getSrcCode().equals(srcCode)){
@@ -28,16 +31,27 @@ public class MsgUtil {
         return null;
     }
 
-
-    public static String createMsgId(){
+    /**
+     *  java生成UUID
+     * @return
+     */
+    public static String getUUID(){
         UUID uuid = UUID.randomUUID();
         return uuid.toString().replaceAll("-", "");
     }
 
+    /**
+     * 替换成系统路径
+     * @param filePath
+     * @return
+     */
     public static String getSystemPath(String filePath){
         return filePath = filePath.replace("/", File.separator);
     }
 
+    /**
+     * 对象序列化， 输出byte[]
+     */
     public static byte[] objectToByte(Object obj) {
         byte[] bs=null;
         try {
