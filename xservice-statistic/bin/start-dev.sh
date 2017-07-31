@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-statistic | grep java | awk '{print $2}')
