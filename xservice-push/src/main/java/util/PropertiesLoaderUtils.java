@@ -1,6 +1,5 @@
 package util;
 
-
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -10,37 +9,35 @@ import java.util.Properties;
 
 //import org.apache.log4j.Logger;
 
-
 /**
- * @author  
+ * @author
  *
  */
 public final class PropertiesLoaderUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(PropertiesLoaderUtils.class);
 	private static String PUSH_CONFIG = "/push-config.properties";
-	private static String[] resources={"/push-config.properties", "/activemq.properties","/mysql.properties","/redis.properties"};
+	private static String[] resources = { "/push-config.properties", "/activemq.properties" };
 	public static Properties multiProp;
 	public static Properties singleProp;
-	
-	static{
-		multiProp=loadMultiProperties();
-		singleProp=loadSingleProperties();
-	}
 
+	static {
+		multiProp = loadMultiProperties();
+		singleProp = loadSingleProperties();
+	}
 
 	/**
 	 *
 	 * @return
 	 */
 	private static Properties loadSingleProperties() {
-		if(singleProp!=null){
+		if (singleProp != null) {
 			return singleProp;
 		}
 
-		String config = System.getProperty("push.config", PUSH_CONFIG) ;
+		String config = System.getProperty("push.config", PUSH_CONFIG);
 
-		singleProp=new Properties();
+		singleProp = new Properties();
 		InputStream is = null;
 
 		try {
@@ -49,7 +46,7 @@ public final class PropertiesLoaderUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if(is != null) {
+			if (is != null) {
 				try {
 					is.close();
 					is = null;
@@ -60,23 +57,23 @@ public final class PropertiesLoaderUtils {
 		}
 		return singleProp;
 	}
-	
+
 	private static Properties loadMultiProperties() {
-		if(multiProp!=null){
+		if (multiProp != null) {
 			return multiProp;
-		}	
-		multiProp=new Properties();
+		}
+		multiProp = new Properties();
 		InputStream is = null;
 
 		try {
-			for(String location:resources){
+			for (String location : resources) {
 				is = PropertiesLoaderUtils.class.getResourceAsStream(location);
 				multiProp.load(is);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if(is != null) {
+			if (is != null) {
 				try {
 					is.close();
 					is = null;
@@ -102,7 +99,7 @@ public final class PropertiesLoaderUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if(is != null) {
+			if (is != null) {
 				try {
 					is.close();
 					is = null;
@@ -116,6 +113,7 @@ public final class PropertiesLoaderUtils {
 
 	/**
 	 * 加载json文件 ， 例 jdbc.json
+	 * 
 	 * @param configPath
 	 * @return
 	 */
