@@ -16,7 +16,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import iservice.MsgStatService;
+import iservice.dto.MsgStatDto;
 import service.*;
+import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
@@ -35,6 +38,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private RedisService redisService;
 
 	private MsgRecordService msgRecordService;
+
+	private MsgStatService msgStatService;
 
 	private HttpServer httpServer;
 
@@ -90,6 +95,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			consumMsg(res -> {
 				if(res.succeeded()){
 					logger.info("消费消息成功！" );
+					//已推送消息上报接口
+					MsgStatDto msgStatDto = new MsgStatDto();
+					msgStatDto.setAppCode(1001);
+					msgStatDto.setChannel(Integer.parseInt(sendType));
+					msgStatDto.setMsgId(msgId);
+					msgStatDto.setOsType(1);
+					msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
+					msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
 				}else{
 					logger.error("消费消息失败,失败原因：" + res.cause());
 				}
@@ -99,12 +112,24 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		httpServer.requestHandler(router::accept).listen(8989);
 	}
 
+	/**
+	 * 已推送消息上报结果
+	 */
+	private void pushMsgHandler(AsyncResult<BaseResponse> resultHandler){
+		if(resultHandler.succeeded()){
+			logger.info("已推送消息上报成功");
+		}else{
+			logger.error("已推送消息上报失败,失败原因：" + resultHandler.cause());
+		}
+	}
+
 	private void initService() {
 			socketPushService = SocketPushService.createProxy(vertx);
 			xiaomiPushService = XiaoMiPushService.createProxy(vertx);
 			gcmPushService = GcmPushService.createProxy(vertx);
 			msgRecordService = MsgRecordService.createProxy(vertx);
 			redisService = RedisService.createProxy(vertx);
+			msgStatService = MsgStatService.createProxy(vertx);
 	}
 
 	private void consumMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
