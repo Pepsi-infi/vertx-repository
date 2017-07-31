@@ -8,7 +8,7 @@ then
 fi
 
 BUILD_ID=
-nohup java \
+java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -24,6 +24,6 @@ nohup java \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-statistic-fat.jar >/dev/null 2>&1 &
+-jar ${root_path}/xservice-statistic-fat.jar >/dev/null 2>&1
 
 exit 0
