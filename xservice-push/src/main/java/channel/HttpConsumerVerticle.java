@@ -95,14 +95,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			consumMsg(res -> {
 				if(res.succeeded()){
 					logger.info("消费消息成功！" );
-					//已推送消息上报接口
-					MsgStatDto msgStatDto = new MsgStatDto();
-					msgStatDto.setAppCode(1001);
-					msgStatDto.setChannel(Integer.parseInt(sendType));
-					msgStatDto.setMsgId(msgId);
-					msgStatDto.setOsType(1);
-					msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
-					msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
+					callStatPushMsg();
 				}else{
 					logger.error("消费消息失败,失败原因：" + res.cause());
 				}
@@ -112,6 +105,21 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		httpServer.requestHandler(router::accept).listen(8989);
 	}
 
+	/**
+	 * 已推送消息上报
+	 * //接口参见wiki : http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=329268
+	 */
+	private void callStatPushMsg(){
+		//已推送消息上报接口
+		MsgStatDto msgStatDto = new MsgStatDto();
+		//首约app乘客端 1001；首约app司机端 1002
+		msgStatDto.setAppCode(1001);
+		msgStatDto.setChannel(Integer.parseInt(sendType));
+		msgStatDto.setMsgId(msgId);
+		msgStatDto.setOsType(1);
+		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
+		msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
+	}
 	/**
 	 * 已推送消息上报结果
 	 */
