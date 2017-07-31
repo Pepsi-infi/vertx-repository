@@ -16,7 +16,7 @@
 
 package service;
 
-import service.XiaoMiPushService;
+import service.DeviceService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,10 +39,10 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.XiaoMiPushService;
+import service.DeviceService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import service.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -51,25 +51,25 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
+public class DeviceServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final XiaoMiPushService service;
+  private final DeviceService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, long timeoutInSecond) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, boolean topLevel, long timeoutSeconds) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -124,10 +124,8 @@ public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-
-
-        case "sendMsg": {
-          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"), res -> {
+        case "reportUserDevice": {
+          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new service.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

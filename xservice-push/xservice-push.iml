@@ -7,13 +7,28 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/generated" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="xservice-common" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-redis-client:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-amqp-bridge:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-proton:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.qpid:proton-j:0.19.0" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-mysql-postgresql-client:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-sql-common:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.12.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.mauricio:postgresql-async_2.12:0.2.21" level="project" />
+    <orderEntry type="library" name="Maven: com.github.mauricio:db-async-common_2.12:0.2.21" level="project" />
+    <orderEntry type="library" name="Maven: joda-time:joda-time:2.9.7" level="project" />
+    <orderEntry type="library" name="Maven: org.joda:joda-convert:1.8.1" level="project" />
+    <orderEntry type="library" name="Maven: org.javassist:javassist:3.21.0-GA" level="project" />
+    <orderEntry type="library" name="Maven: com.github.mauricio:mysql-async_2.12:0.2.21" level="project" />
+    <orderEntry type="library" name="Maven: com.xiaomi.miliao:xmpush-server-api:2.2.18" level="project" />
     <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
-    <orderEntry type="module" module-name="xservice-common" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-core:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-common:4.1.8.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-buffer:4.1.8.Final" level="project" />
@@ -30,24 +45,6 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.7.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.7.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-web:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: com.xiaomi.miliao:xmpush-server-api:2.2.18" level="project" />
-    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-amqp-bridge:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-proton:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.qpid:proton-j:0.19.0" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-mysql-postgresql-client:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-sql-common:3.4.2" level="project" />
-    <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.12.1" level="project" />
-    <orderEntry type="library" name="Maven: com.github.mauricio:postgresql-async_2.12:0.2.21" level="project" />
-    <orderEntry type="library" name="Maven: com.github.mauricio:db-async-common_2.12:0.2.21" level="project" />
-    <orderEntry type="library" name="Maven: joda-time:joda-time:2.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.joda:joda-convert:1.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.javassist:javassist:3.21.0-GA" level="project" />
-    <orderEntry type="library" name="Maven: com.github.mauricio:mysql-async_2.12:0.2.21" level="project" />
-    <orderEntry type="library" name="Maven: io.vertx:vertx-redis-client:3.4.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-codegen:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.mvel:mvel2:2.2.8.Final" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-service-proxy:3.4.2" level="project" />
@@ -81,6 +78,8 @@
     <orderEntry type="library" name="Maven: io.vertx:vertx-config:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-circuit-breaker:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: org.hdrhistogram:HdrHistogram:2.1.9" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-web:3.4.2" level="project" />
+    <orderEntry type="library" name="Maven: io.vertx:vertx-auth-common:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-unit:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: io.vertx:vertx-jdbc-client:3.4.2" level="project" />
     <orderEntry type="library" name="Maven: com.mchange:c3p0:0.9.5.2" level="project" />

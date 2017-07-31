@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package iservice;
 
-import service.XiaoMiPushService;
+import iservice.MsgStatService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,10 +39,10 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.XiaoMiPushService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import iservice.MsgStatService;
+import iservice.dto.MsgStatDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -51,25 +51,25 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
+public class MsgStatServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final XiaoMiPushService service;
+  private final MsgStatService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service) {
+  public MsgStatServiceVertxProxyHandler(Vertx vertx, MsgStatService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, long timeoutInSecond) {
+  public MsgStatServiceVertxProxyHandler(Vertx vertx, MsgStatService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, boolean topLevel, long timeoutSeconds) {
+  public MsgStatServiceVertxProxyHandler(Vertx vertx, MsgStatService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -124,10 +124,8 @@ public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-
-
-        case "sendMsg": {
-          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"), res -> {
+        case "statPushMsg": {
+          service.statPushMsg(json.getJsonObject("msgStatDto") == null ? null : new iservice.dto.MsgStatDto(json.getJsonObject("msgStatDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

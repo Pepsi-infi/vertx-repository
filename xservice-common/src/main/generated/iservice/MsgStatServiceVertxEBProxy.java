@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package iservice;
 
-import service.XiaoMiPushService;
+import iservice.MsgStatService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,10 +32,10 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.XiaoMiPushService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
+import iservice.MsgStatService;
+import iservice.dto.MsgStatDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -44,18 +44,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class XiaoMiPushServiceVertxEBProxy implements XiaoMiPushService {
+public class MsgStatServiceVertxEBProxy implements MsgStatService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public XiaoMiPushServiceVertxEBProxy(Vertx vertx, String address) {
+  public MsgStatServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public XiaoMiPushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public MsgStatServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -65,20 +65,20 @@ public class XiaoMiPushServiceVertxEBProxy implements XiaoMiPushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
     if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("recieveMsg", recieveMsg);
+    _json.put("msgStatDto", msgStatDto == null ? null : msgStatDto.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "sendMsg");
+    _deliveryOptions.addHeader("action", "statPushMsg");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
+        result.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
                       }
     });
   }
