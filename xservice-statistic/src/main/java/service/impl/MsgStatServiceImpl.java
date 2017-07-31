@@ -20,6 +20,7 @@ import iservice.dto.MsgStatDto;
 import util.FileUtils;
 import utils.BaseResponse;
 import iservice.MsgStatService;
+
 import java.util.List;
 
 /**
@@ -65,12 +66,20 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
     @Override
     public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
         String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto);
-        List<String> fields = getFiledsForMsgStat(msgStatDto);
+        List<String> fields = getFieldsForMsgStat(msgStatDto);
         if (CollectionUtils.isEmpty(fields)) {
             logger.warn("the msgStat:{} need stat is null ", msgStatDto);
             return;
         }
         try {
+            //设置过期时间 12小时
+            redisClient.expire(msgSendKey, 43200, handler -> {
+                if (handler.succeeded()) {
+                    logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
+                } else {
+                    logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
+                }
+            });
             for (String field : fields) {
                 redisClient.hincrby(msgSendKey, field, 1, handler -> {
                     if (handler.succeeded()) {
@@ -80,14 +89,6 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
                     }
                 });
             }
-            //设置过期时间
-            redisClient.expire(msgSendKey, 86400, handler -> {
-                if (handler.succeeded()) {
-                    logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
-                } else {
-                    logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
-                }
-            });
             result.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
             logger.error("stat msgStatDto : {} error.", msgStatDto, e);
@@ -98,7 +99,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 
     }
 
-    private List<String> getFiledsForMsgStat(MsgStatDto msgStatDto) {
+    private List<String> getFieldsForMsgStat(MsgStatDto msgStatDto) {
         List<String> fieldsList = Lists.newArrayList();
         if (PushActionEnum.SEND.getType() == msgStatDto.getAction()) {
             fieldsList.add(CacheConstants.PUSH_SEND_SUM);
