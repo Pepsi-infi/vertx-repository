@@ -19,9 +19,9 @@ import utils.IPUtil;
 @ProxyGen
 @VertxGen
 public interface DeviceService {
-    public static final String SERVICE_NAME = "http.userDevice.eb.service";
+    public static final String SERVICE_NAME = "http.device.eb.service";
 
-    public static final String SERVICE_ADDRESS = "http-userDevice-eb-service";
+    public static final String SERVICE_ADDRESS = "http-device-eb-service";
 
     static DeviceService createProxy(Vertx vertx) {
         return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);

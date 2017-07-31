@@ -17,6 +17,7 @@ import rxjava.BaseServiceVerticle;
 import constants.CacheConstants;
 import constants.PushActionEnum;
 import iservice.dto.MsgStatDto;
+import util.FileUtils;
 import utils.BaseResponse;
 import iservice.MsgStatService;
 
@@ -48,9 +49,8 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.SERVICE_ADDRESS);
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
-
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = this.getJsonConf(env + "/redis-" + env + ".json");
+        JsonObject jsonObject = FileUtils.getJsonConf(env + "/redis-" + env + ".json");
         RedisOptions redisOptions = new RedisOptions();
         if (jsonObject != null && !jsonObject.isEmpty()) {
             if (StringUtils.isNotBlank(jsonObject.getString("password"))) {
@@ -63,27 +63,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             redisOptions.setTcpNoDelay(Boolean.getBoolean(jsonObject.getString("tcpNoDelay")));
         }
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
-    }
 
-    private JsonObject getJsonConf(String configPath) {
-        logger.info("redidPath: " + configPath);
-        JsonObject conf = new JsonObject();
-        ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
-        InputStream is = ctxClsLoader.getResourceAsStream(configPath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-        try {
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            conf = new JsonObject(sb.toString());
-            logger.info("Loaded redis-dev.json file from [" + configPath + "/redis-dev.json] and config.json="
-                    + conf.toString());
-        } catch (Exception e) {
-            logger.error("Failed to load configuration file" + e);
-        }
-        return conf;
     }
 
 
@@ -105,10 +85,20 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
                     }
                 });
             }
+            //设置过期时间
+            redisClient.expire(msgSendKey, 86400, handler -> {
+                if (handler.succeeded()) {
+                    logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
+                } else {
+                    logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
+                }
+            });
             result.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
-            logger.error("stat msgStatDto : {} error.", msgStatDto);
-            result.handle(Future.failedFuture(e.getCause()));
+            logger.error("stat msgStatDto : {} error.", msgStatDto, e);
+            BaseResponse baseResponse = new BaseResponse();
+            buildErrorBaseResponse(baseResponse, null, e.getMessage());
+            result.handle(Future.succeededFuture(baseResponse));
         }
 
     }
@@ -140,5 +130,12 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         return fieldsList;
     }
 
+    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String errCode, String message) {
+        if (response != null) {
+            response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
+            response.setErrorCode(errCode);
+            response.setErrorMessage(message);
+        }
+    }
 
 }
