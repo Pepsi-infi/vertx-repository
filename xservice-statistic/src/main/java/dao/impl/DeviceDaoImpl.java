@@ -14,6 +14,7 @@ import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang.StringUtils;
 import dao.DeviceDao;
 import service.dto.DeviceDto;
+import util.FileUtils;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -50,31 +51,10 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
 
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = this.getJsonConf(env + "/jdbc-" + env + ".json");
+        JsonObject jsonObject = FileUtils.getJsonConf(env + "/jdbc-device" + env + ".json");
 
-        sqlClient = MySQLClient.createShared(vertx, jsonObject);
+        sqlClient = MySQLClient.createNonShared(vertx, jsonObject);
 
-    }
-
-    private JsonObject getJsonConf(String configPath) {
-        logger.info("jdbc Path: " + configPath);
-        JsonObject conf = new JsonObject();
-        ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
-        InputStream is = ctxClsLoader.getResourceAsStream(configPath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-        try {
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            conf = new JsonObject(sb.toString());
-            logger.info("Loaded jdbc-dev.json file from [" + configPath + "/jdbc-dev.json] and config.json="
-                    + conf.toString());
-        } catch (Exception e) {
-            logger.error("Failed to load configuration file" + e);
-        }
-        return conf;
     }
 
 

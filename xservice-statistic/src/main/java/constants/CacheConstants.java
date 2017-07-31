@@ -1,6 +1,10 @@
 package constants;
 
+import com.google.common.collect.Lists;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
 
 /**
  * Created by lufei
@@ -23,9 +27,33 @@ public class CacheConstants {
 
     public static final String PUSH_ARRIVE_OSTYPE = "ARRIVE_OSTYPE_";
 
+    public static final List<String> PUSH_MSG_FIELDS = Lists.newArrayList();
+
 
     public static final String getPushMsgKey(MsgStatDto msgStatDto) {
         return new StringBuffer().append(PUSH_MSG).append(msgStatDto.getMsgId()).toString();
+    }
+
+    public static String getMsgId(String pushMsgKey) {
+        if (StringUtils.isBlank(pushMsgKey)) {
+            return null;
+        }
+        return pushMsgKey.substring(pushMsgKey.lastIndexOf("_") + 1, pushMsgKey.length());
+    }
+
+    static {
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_SUM);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.ANDROID);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_OSTYPE + OsTypeEnum.IOS);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.SOCKET);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.GCM);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_SEND_CHANNEL + ChannelEnum.XIAOMI);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_SUM);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.ANDROID);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_OSTYPE + OsTypeEnum.IOS);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.SOCKET);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.GCM);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.XIAOMI);
     }
 
 }
