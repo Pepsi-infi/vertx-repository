@@ -18,6 +18,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
+import result.ResultData;
 import service.*;
 import util.DateUtil;
 import util.MsgUtil;
@@ -79,7 +80,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			return;
 		}
 
-		router.route("/sqyc/push/sokcet.htm").handler(context -> {
+		router.route("/mc-push/message/push.json").handler(context -> {
 			
 			HttpServerResponse resp= context.response();
 			HttpServerRequest request = context.request();
@@ -88,10 +89,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
 				logger.error("请求数据为空，不做处理");
-				resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.FAIL.getCode());
+				resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.FAIL, null).toString());
 				return;
 			}
-			resp.putHeader("content-type", "text/plain").end(ErrorCodeEnum.SUCCESS.getCode());
+			resp.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
 			consumMsg(res -> {
 				if(res.succeeded()){
 					logger.info("消费消息成功！" );

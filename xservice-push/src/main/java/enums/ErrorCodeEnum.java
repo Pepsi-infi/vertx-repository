@@ -2,23 +2,23 @@ package enums;
 
 public enum ErrorCodeEnum {
 	
-	SUCCESS("success","成功"),
-	FAIL("fail","失败");
+	SUCCESS(1,"成功"),
+	FAIL(0,"失败");
 	
-	private String code;
+	private int code;
 	private String msg;
 	
-	private ErrorCodeEnum(String code,String msg) {
+	private ErrorCodeEnum(int code,String msg) {
 		
 		this.code=code;
 		this.msg=msg;
 	}
 
-	public String getCode() {
+	public int getCode() {
 		return code;
 	}
 
-	public void setCode(String code) {
+	public void setCode(int code) {
 		this.code = code;
 	}
 
