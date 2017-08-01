@@ -1,5 +1,6 @@
 package dao.impl;
 
+import dao.BaseDaoVerticle;
 import dao.MsgStatResultDao;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -10,13 +11,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
-import io.vertx.ext.sql.SQLClient;
-import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang.StringUtils;
 import service.dto.MsgStatResultDto;
-import util.FileUtils;
+import util.ConfigUtils;
 import utils.BaseResponse;
-import xservice.BaseServiceVerticle;
+
+import java.util.Optional;
 
 
 /**
@@ -24,21 +24,24 @@ import xservice.BaseServiceVerticle;
  * Date : 2017/7/30 22:31
  * Description :
  */
-public class MsgStatResultDaoImpl extends BaseServiceVerticle implements MsgStatResultDao {
+public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResultDao {
 
     private static final Logger logger = LoggerFactory.getLogger(MsgStatResultDaoImpl.class);
 
-    private SQLClient sqlClient;
-
-    public interface Sql {
-        static final String ADD_MSG_STAT_RESULT = "insert into msg_stat (channel,msgId,statTime,sendSum,sendAndroidSum," +
-                "sendIosSum,sendSockSum,sendMiSum,sendGcmSum,arriveSum,arriveAndroidSum,arriveIosSum,arriveSockSum,arriveMiSum,arriveGcmSum)" +
-                " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
-    }
 
     public MsgStatResultDaoImpl() {
     }
+
+
+    public interface Sql {
+        String ADD_MSG_STAT_RESULT = "insert into msg_stat (msgId,statTime,sendSum,sendAndroidSum," +
+                "sendIosSum,sendSockSum,sendMiSum,sendGcmSum,arriveSum,arriveAndroidSum,arriveIosSum,arriveSockSum,arriveMiSum,arriveGcmSum)" +
+                " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+        String GET_MSG_STAT_RESULT = "SELECT * FROM `msg_stat` WHERE msgId=? ORDER BY id DESC LIMIT 1;";
+
+    }
+
 
     @Override
     public void start() throws Exception {
@@ -48,10 +51,9 @@ public class MsgStatResultDaoImpl extends BaseServiceVerticle implements MsgStat
         publishEventBusService(MsgStatResultDao.SERVICE_NAME, MsgStatResultDao.SERVICE_ADDRESS, MsgStatResultDao.class);
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = FileUtils.getJsonConf(env + "/jdbc-statistic-" + env + ".json");
+        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-statistic-" + env + ".json");
 
-        sqlClient = MySQLClient.createNonShared(vertx, jsonObject);
-
+        client = MySQLClient.createNonShared(vertx, jsonObject);
     }
 
 
@@ -64,41 +66,29 @@ public class MsgStatResultDaoImpl extends BaseServiceVerticle implements MsgStat
 
         JsonArray jsonArray = new JsonArray();
         //(channel,msgId,statTime,sendSum,sendAndroidSum,sendIosSum,sendSockSum,sendMiSum,sendGcmSum,arriveSum,arriveAndroidSum,arriveIosSum,arriveSockSum,arriveMiSum,arriveGcmSum)
-        jsonArray.add(msgStatResultDto.getChannel() != null ? msgStatResultDto.getChannel() : 0)
-                .add(StringUtils.defaultIfEmpty(msgStatResultDto.getMsgId(), ""))
+        jsonArray.add(msgStatResultDto.getMsgId())
                 .add(msgStatResultDto.getStatTime())
                 .add(msgStatResultDto.getSendSum()).add(msgStatResultDto.getSendAndroidSum()).add(msgStatResultDto.getSendIosSum()).add(msgStatResultDto.getSendSockSum()).add(msgStatResultDto.getSendMiSum()).add(msgStatResultDto.getSendGcmSum())
                 .add(msgStatResultDto.getArriveSum()).add(msgStatResultDto.getArriveAndroidSum()).add(msgStatResultDto.getArriveIosSum()).add(msgStatResultDto.getArriveSockSum()).add(msgStatResultDto.getArriveMiSum()).add(msgStatResultDto.getArriveGcmSum());
         execute(jsonArray, MsgStatResultDaoImpl.Sql.ADD_MSG_STAT_RESULT, new BaseResponse(), resultHandler);
     }
 
-    protected <R> void execute(JsonArray params, String sql, R ret, Handler<AsyncResult<R>> resultHandler) {
-        sqlClient.getConnection(connHandler(resultHandler, connection -> {
-            connection.updateWithParams(sql, params, r -> {
-                if (r.succeeded()) {
-                    resultHandler.handle(Future.succeededFuture(ret));
-                } else {
-                    logger.error(r.cause());
-                    resultHandler.handle(Future.failedFuture(r.cause()));
-                }
-                connection.close();
-            });
-        }));
+    @Override
+    public void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler) {
+        Future<Optional<JsonObject>> future = retrieveOne(msgStatResultDto.getMsgId(), Sql.GET_MSG_STAT_RESULT);
+        future.setHandler(result -> {
+            if (result.succeeded()) {
+                Optional<JsonObject> jsonObject = result.result();
+                MsgStatResultDto msgStatResultDto1 = new MsgStatResultDto();
+                JsonObject jsonObject1 = jsonObject.orElse(new JsonObject());
+                msgStatResultDto1.setSendSum(jsonObject1.getLong("sendSum"));
+                msgStatResultDto1.setArriveSum(jsonObject1.getLong("arriveSum"));
+                resultHandler.handle(Future.succeededFuture(msgStatResultDto1));
+            } else {
+                resultHandler.handle(Future.failedFuture(result.cause()));
+            }
+        });
     }
 
-    /**
-     * A helper methods that generates async handler for SQLConnection
-     *
-     * @return generated handler
-     */
-    protected <R> Handler<AsyncResult<SQLConnection>> connHandler(Handler<AsyncResult<R>> h1, Handler<SQLConnection> h2) {
-        return conn -> {
-            if (conn.succeeded()) {
-                final SQLConnection connection = conn.result();
-                h2.handle(connection);
-            } else {
-                h1.handle(Future.failedFuture(conn.cause()));
-            }
-        };
-    }
+
 }

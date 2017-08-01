@@ -12,12 +12,11 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
 import constants.CacheConstants;
 import constants.PushActionEnum;
 import iservice.dto.MsgStatDto;
-import util.FileUtils;
+import util.ConfigUtils;
 import utils.BaseResponse;
 import iservice.MsgStatService;
 
@@ -46,18 +45,8 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = FileUtils.getJsonConf(env + "/redis-" + env + ".json");
-        RedisOptions redisOptions = new RedisOptions();
-        if (jsonObject != null && !jsonObject.isEmpty()) {
-            if (StringUtils.isNotBlank(jsonObject.getString("password"))) {
-                redisOptions.setAuth(jsonObject.getString("password"));
-            }
-            redisOptions.setHost(jsonObject.getString("host"));
-            redisOptions.setPort(jsonObject.getInteger("port"));
-            redisOptions.setTcpKeepAlive(Boolean.getBoolean(jsonObject.getString("tcpKeepAlive")));
-            redisOptions.setEncoding(jsonObject.getString("encoding"));
-            redisOptions.setTcpNoDelay(Boolean.getBoolean(jsonObject.getString("tcpNoDelay")));
-        }
+        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/redis-" + env + ".json");
+        RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
     }

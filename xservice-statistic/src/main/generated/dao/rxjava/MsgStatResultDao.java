@@ -67,6 +67,16 @@ public class MsgStatResultDao {
     }));
   }
 
+  public void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler) { 
+    delegate.getMsgStatResult(msgStatResultDto, resultHandler);
+  }
+
+  public Single<MsgStatResultDto> rxGetMsgStatResult(MsgStatResultDto msgStatResultDto) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getMsgStatResult(msgStatResultDto, fut);
+    }));
+  }
+
 
   public static  MsgStatResultDao newInstance(dao.MsgStatResultDao arg) {
     return arg != null ? new MsgStatResultDao(arg) : null;
