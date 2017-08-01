@@ -48,6 +48,24 @@ public class MsgStatResultDtoConverter {
     if (json.getValue("channel") instanceof Number) {
       obj.setChannel(((Number)json.getValue("channel")).intValue());
     }
+    if (json.getValue("clickAndroidSum") instanceof Number) {
+      obj.setClickAndroidSum(((Number)json.getValue("clickAndroidSum")).longValue());
+    }
+    if (json.getValue("clickGcmSum") instanceof Number) {
+      obj.setClickGcmSum(((Number)json.getValue("clickGcmSum")).longValue());
+    }
+    if (json.getValue("clickIosSum") instanceof Number) {
+      obj.setClickIosSum(((Number)json.getValue("clickIosSum")).longValue());
+    }
+    if (json.getValue("clickMiSum") instanceof Number) {
+      obj.setClickMiSum(((Number)json.getValue("clickMiSum")).longValue());
+    }
+    if (json.getValue("clickSockSum") instanceof Number) {
+      obj.setClickSockSum(((Number)json.getValue("clickSockSum")).longValue());
+    }
+    if (json.getValue("clickSum") instanceof Number) {
+      obj.setClickSum(((Number)json.getValue("clickSum")).longValue());
+    }
     if (json.getValue("msgId") instanceof String) {
       obj.setMsgId((String)json.getValue("msgId"));
     }
@@ -98,6 +116,24 @@ public class MsgStatResultDtoConverter {
     }
     if (obj.getChannel() != null) {
       json.put("channel", obj.getChannel());
+    }
+    if (obj.getClickAndroidSum() != null) {
+      json.put("clickAndroidSum", obj.getClickAndroidSum());
+    }
+    if (obj.getClickGcmSum() != null) {
+      json.put("clickGcmSum", obj.getClickGcmSum());
+    }
+    if (obj.getClickIosSum() != null) {
+      json.put("clickIosSum", obj.getClickIosSum());
+    }
+    if (obj.getClickMiSum() != null) {
+      json.put("clickMiSum", obj.getClickMiSum());
+    }
+    if (obj.getClickSockSum() != null) {
+      json.put("clickSockSum", obj.getClickSockSum());
+    }
+    if (obj.getClickSum() != null) {
+      json.put("clickSum", obj.getClickSum());
     }
     if (obj.getMsgId() != null) {
       json.put("msgId", obj.getMsgId());

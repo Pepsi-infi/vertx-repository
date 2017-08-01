@@ -41,13 +41,19 @@ public class StartVerticle extends BaseServiceVerticle {
 
     private void deployEventBusService() {
         this.deployVerticle(MsgStatResultDaoImpl.class.getName());
-        this.deployVerticle(MsgStatResultServiceImpl.class.getName());
+        this.deployCronVerticle(MsgStatResultServiceImpl.class.getName());
     }
 
     public void deployVerticle(String verticleName) {
         Future<String> future = Future.future();
         future.setHandler(ar -> logger.info(ar.succeeded() ? "success:" + ar.result() : "failed:" + ar.cause()));
         vertx.deployVerticle(verticleName, readBossOpts().setConfig(config()), future.completer());
+    }
+
+    public void deployCronVerticle(String verticleName) {
+        Future<String> future = Future.future();
+        future.setHandler(ar -> logger.info(ar.succeeded() ? "success:" + ar.result() : "failed:" + ar.cause()));
+        vertx.deployVerticle(verticleName, new DeploymentOptions().setConfig(config()), future.completer());
     }
 
     public static DeploymentOptions readBossOpts() {

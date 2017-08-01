@@ -15,11 +15,13 @@ public class StatRestConstants {
 
         static final String SERVICE_ROOT = "/mc-statistic";
 
-        //统计发送
-        static final String MSG_SEND = "/mc-statistic/msg/statSend.json";
+        //统计push msg
+        static final String PUSH_MSG_STAT = "/mc-statistic/msg/stat.json";
 
-        //统计到达
-        static final String MSG_ARRIVE = "/mc-statistic/msg/statArrive.json";
+    }
+
+    interface Device {
+        static final int HTTP_PORT = 28888;
 
         //用户设备关系上报接口
         static final String USER_DEVICE_REPORT = "/mc-statistic/device/report.json";

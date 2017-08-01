@@ -34,9 +34,10 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
 
 
     public interface Sql {
-        String ADD_MSG_STAT_RESULT = "insert into msg_stat (msgId,statTime,sendSum,sendAndroidSum," +
-                "sendIosSum,sendSockSum,sendMiSum,sendGcmSum,arriveSum,arriveAndroidSum,arriveIosSum,arriveSockSum,arriveMiSum,arriveGcmSum)" +
-                " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String ADD_MSG_STAT_RESULT = "insert into msg_stat (msgId,statTime,sendSum,sendAndroidSum,sendIosSum,sendSockSum,sendMiSum,sendGcmSum," +
+                "arriveSum,arriveAndroidSum,arriveIosSum,arriveSockSum,arriveMiSum,arriveGcmSum," +
+                "clickSum,clickAndroidSum,clickIosSum,clickSockSum,clickMiSum,clickGcmSum)" +
+                " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         String GET_MSG_STAT_RESULT = "SELECT * FROM `msg_stat` WHERE msgId=? ORDER BY id DESC LIMIT 1;";
 
@@ -69,7 +70,8 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
         jsonArray.add(msgStatResultDto.getMsgId())
                 .add(msgStatResultDto.getStatTime())
                 .add(msgStatResultDto.getSendSum()).add(msgStatResultDto.getSendAndroidSum()).add(msgStatResultDto.getSendIosSum()).add(msgStatResultDto.getSendSockSum()).add(msgStatResultDto.getSendMiSum()).add(msgStatResultDto.getSendGcmSum())
-                .add(msgStatResultDto.getArriveSum()).add(msgStatResultDto.getArriveAndroidSum()).add(msgStatResultDto.getArriveIosSum()).add(msgStatResultDto.getArriveSockSum()).add(msgStatResultDto.getArriveMiSum()).add(msgStatResultDto.getArriveGcmSum());
+                .add(msgStatResultDto.getArriveSum()).add(msgStatResultDto.getArriveAndroidSum()).add(msgStatResultDto.getArriveIosSum()).add(msgStatResultDto.getArriveSockSum()).add(msgStatResultDto.getArriveMiSum()).add(msgStatResultDto.getArriveGcmSum())
+                .add(msgStatResultDto.getClickSum()).add(msgStatResultDto.getClickAndroidSum()).add(msgStatResultDto.getClickIosSum()).add(msgStatResultDto.getClickSockSum()).add(msgStatResultDto.getClickMiSum()).add(msgStatResultDto.getClickGcmSum());
         execute(jsonArray, MsgStatResultDaoImpl.Sql.ADD_MSG_STAT_RESULT, new BaseResponse(), resultHandler);
     }
 
@@ -83,6 +85,7 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
                 JsonObject jsonObject1 = jsonObject.orElse(new JsonObject());
                 msgStatResultDto1.setSendSum(jsonObject1.getLong("sendSum"));
                 msgStatResultDto1.setArriveSum(jsonObject1.getLong("arriveSum"));
+                msgStatResultDto1.setClickSum(jsonObject1.getLong("clickSum"));
                 resultHandler.handle(Future.succeededFuture(msgStatResultDto1));
             } else {
                 resultHandler.handle(Future.failedFuture(result.cause()));

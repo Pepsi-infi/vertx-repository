@@ -14,18 +14,25 @@ import java.util.List;
 public class CacheConstants {
 
     public static final String PUSH_MSG = "PUSH_MSG_";
-
+    //发送总数
     public static final String PUSH_SEND_SUM = "SEND_SUM";
-
+    //达到总数
     public static final String PUSH_ARRIVE_SUM = "ARRIVE_SUM";
-
+    //点击总数
+    public static final String PUSH_CLICK_SUM = "CLICK_SUM";
+    //发送渠道_
     public static final String PUSH_SEND_CHANNEL = "SEND_CHANNEL_";
-
+    //到达渠道_
     public static final String PUSH_ARRIVE_CHANNEL = "ARRIVE_CHANNEL_";
-
+    //点击渠道_
+    public static final String PUSH_CLICK_CHANNEL = "CLICK_CHANNEL_";
+    //发送系统型号_
     public static final String PUSH_SEND_OSTYPE = "SEND_OSTYPE_";
-
+    //到达系统型号_
     public static final String PUSH_ARRIVE_OSTYPE = "ARRIVE_OSTYPE_";
+    //点击系统型号_
+    public static final String PUSH_CLICK_OSTYPE = "CLICK_OSTYPE_";
+
 
     public static final List<String> PUSH_MSG_FIELDS = Lists.newArrayList();
 
@@ -54,6 +61,12 @@ public class CacheConstants {
         PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.SOCKET.getType());
         PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.GCM.getType());
         PUSH_MSG_FIELDS.add(CacheConstants.PUSH_ARRIVE_CHANNEL + ChannelEnum.XIAOMI.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_SUM);
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_OSTYPE + OsTypeEnum.ANDROID.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_OSTYPE + OsTypeEnum.IOS.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_CHANNEL + ChannelEnum.SOCKET.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_CHANNEL + ChannelEnum.GCM.getType());
+        PUSH_MSG_FIELDS.add(CacheConstants.PUSH_CLICK_CHANNEL + ChannelEnum.XIAOMI.getType());
     }
 
 }
