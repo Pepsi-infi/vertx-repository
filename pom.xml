@@ -1,292 +1,275 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>xgroup</groupId>
-  <artifactId>xservice</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <modules>
-    <module>xservice-common</module>
-    <module>xservice-demo</module>
-    <module>xservice-statistic</module>
-    <module>xservice-push</module>
-  </modules>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>xgroup</groupId>
+	<artifactId>xservice</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>xservice-common</module>
+		<module>xservice-demo</module>
+		<module>xservice-statistic</module>
+		<module>xservice-push</module>
+		<module>xservice-im</module>
+	</modules>
 
-  <!-- 配置变量 -->
-  <properties>
-    <!-- 插件版本 -->
-    <maven-compiler-plugin>2.5.1</maven-compiler-plugin>
-    <vertx-version>3.4.2</vertx-version>
-    <!-- tmp -->
-    <main.verticle>api.StartVerticle</main.verticle>
-    <grpc.version>1.1.2</grpc.version>
-    <vertx.grpc.version>1.1.2</vertx.grpc.version>
-  </properties>
+	<!-- 配置变量 -->
+	<properties>
+		<!-- 插件版本 -->
+		<maven-compiler-plugin>2.5.1</maven-compiler-plugin>
+		<vertx-version>3.4.2</vertx-version>
+		<!-- tmp -->
+		<main.verticle>api.StartVerticle</main.verticle>
+		<grpc.version>1.1.2</grpc.version>
+		<vertx.grpc.version>1.1.2</vertx.grpc.version>
+	</properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-codegen</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-proxy</artifactId>
-      <version>${vertx-version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>io.vertx</groupId>
-          <artifactId>vertx-lang-js</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-factory</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-rx-java</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-core</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-codegen</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-service-proxy</artifactId>
+			<version>${vertx-version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.vertx</groupId>
+					<artifactId>vertx-lang-js</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-service-factory</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-rx-java</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
 
-    <!-- Microservice Toolbox -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-discovery</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-discovery-bridge-consul</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-service-discovery-bridge-kubernetes</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <!--<dependency> -->
-    <!--<groupId>io.vertx</groupId> -->
-    <!--<artifactId>vertx-service-discovery-backend-redis</artifactId> -->
-    <!--<version>${vertx-version}</version> -->
-    <!--</dependency> -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-zookeeper</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-config</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
+		<!-- Microservice Toolbox -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-service-discovery</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-service-discovery-bridge-consul</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-service-discovery-bridge-kubernetes</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<!--<dependency> -->
+		<!--<groupId>io.vertx</groupId> -->
+		<!--<artifactId>vertx-service-discovery-backend-redis</artifactId> -->
+		<!--<version>${vertx-version}</version> -->
+		<!--</dependency> -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-zookeeper</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-config</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
 
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-circuit-breaker</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-circuit-breaker</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
 
-    <!-- Vertx Web -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
+		<!-- Vertx Web -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
 
-    <!-- Unit Test Start -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-unit</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <!-- Unit Test End -->
+		<!-- Unit Test Start -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-unit</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<!-- Unit Test End -->
 
-    <!-- datasource start -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-jdbc-client</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-mongo-client</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <!-- datasource end -->
+		<!-- datasource start -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-jdbc-client</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mongo-client</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<!-- datasource end -->
 
-    <!-- metrices start -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-hawkular-metrics</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-dropwizard-metrics</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <!-- metrices end -->
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
+		<!-- metrices start -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-hawkular-metrics</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-dropwizard-metrics</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<!-- metrices end -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web-client</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
 
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>20.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.baidu</groupId>
-      <artifactId>jprotobuf</artifactId>
-      <version>1.8.5</version>
-    </dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.baidu</groupId>
+			<artifactId>jprotobuf</artifactId>
+			<version>1.8.5</version>
+		</dependency>
 
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>2.1</version>
-    </dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.1</version>
+		</dependency>
 
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-grpc</artifactId>
-      <version>${vertx-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>3.1.0</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.googlecode.protobuf-java-format</groupId>
-      <artifactId>protobuf-java-format</artifactId>
-      <version>1.4</version>
-    </dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-grpc</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.protobuf-java-format</groupId>
+			<artifactId>protobuf-java-format</artifactId>
+			<version>1.4</version>
+		</dependency>
 
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-  </dependencies>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+	</dependencies>
 
-  <!-- 构建 -->
-  <build>
-    <extensions>
-      <extension>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>1.4.1.Final</version>
-      </extension>
-    </extensions>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-        <executions>
-          <execution>
-            <id>default-compile</id>
-            <configuration>
-              <annotationProcessors>
-                <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
-              </annotationProcessors>
-              <generatedSourcesDirectory>src/main/generated</generatedSourcesDirectory>
-              <compilerArgs>
-                <arg>-AoutputDirectory=${project.basedir}/src/main</arg>
-              </compilerArgs>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <manifestEntries>
-                    <Main-Class>xservice.Launcher</Main-Class>
-                    <Main-Verticle>${main.verticle}</Main-Verticle>
-                  </manifestEntries>
-                </transformer>
-                <transformer
-                  implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
-                </transformer>
-              </transformers>
-              <artifactSet>
-              </artifactSet>
-              <outputFile>${project.build.directory}/${project.artifactId}-fat.jar</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!--
-      <plugin>
-        <groupId>org.xolstice.maven.plugins</groupId>
-        <artifactId>protobuf-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <protocArtifact>com.google.protobuf:protoc:3.1.0:exe:${os.detected.classifier}</protocArtifact>
-          <pluginId>grpc-java</pluginId>
-          <pluginArtifact>io.vertx:protoc-gen-grpc-java:${vertx.grpc.version}:exe:${os.detected.classifier}
-          </pluginArtifact>
-        </configuration>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <configuration>
-              <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
-              <clearOutputDirectory>false</clearOutputDirectory>
-            </configuration>
-            <goals>
-              <goal>compile</goal>
-              <goal>compile-custom</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-    </plugins>
-  </build>
+	<!-- 构建 -->
+	<build>
+		<extensions>
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.4.1.Final</version>
+			</extension>
+		</extensions>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<configuration>
+							<annotationProcessors>
+								<annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
+							</annotationProcessors>
+							<generatedSourcesDirectory>src/main/generated</generatedSourcesDirectory>
+							<compilerArgs>
+								<arg>-AoutputDirectory=${project.basedir}/src/main</arg>
+							</compilerArgs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>xservice.Launcher</Main-Class>
+										<Main-Verticle>${main.verticle}</Main-Verticle>
+									</manifestEntries>
+								</transformer>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/services/io.vertx.core.spi.VerticleFactory</resource>
+								</transformer>
+							</transformers>
+							<artifactSet>
+							</artifactSet>
+							<outputFile>${project.build.directory}/${project.artifactId}-fat.jar</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- <plugin> <groupId>org.xolstice.maven.plugins</groupId> <artifactId>protobuf-maven-plugin</artifactId> 
+				<version>0.5.0</version> <configuration> <protocArtifact>com.google.protobuf:protoc:3.1.0:exe:${os.detected.classifier}</protocArtifact> 
+				<pluginId>grpc-java</pluginId> <pluginArtifact>io.vertx:protoc-gen-grpc-java:${vertx.grpc.version}:exe:${os.detected.classifier} 
+				</pluginArtifact> </configuration> <executions> <execution> <id>compile</id> 
+				<configuration> <outputDirectory>${project.basedir}/src/main/java</outputDirectory> 
+				<clearOutputDirectory>false</clearOutputDirectory> </configuration> <goals> 
+				<goal>compile</goal> <goal>compile-custom</goal> </goals> </execution> </executions> 
+				</plugin> -->
+		</plugins>
+	</build>
 </project>
