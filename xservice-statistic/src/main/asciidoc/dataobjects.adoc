@@ -48,6 +48,12 @@
 |[[arriveSockSum]]`arriveSockSum`|`Number (Long)`|-
 |[[arriveSum]]`arriveSum`|`Number (Long)`|-
 |[[channel]]`channel`|`Number (Integer)`|-
+|[[clickAndroidSum]]`clickAndroidSum`|`Number (Long)`|-
+|[[clickGcmSum]]`clickGcmSum`|`Number (Long)`|-
+|[[clickIosSum]]`clickIosSum`|`Number (Long)`|-
+|[[clickMiSum]]`clickMiSum`|`Number (Long)`|-
+|[[clickSockSum]]`clickSockSum`|`Number (Long)`|-
+|[[clickSum]]`clickSum`|`Number (Long)`|-
 |[[msgId]]`msgId`|`String`|-
 |[[sendAndroidSum]]`sendAndroidSum`|`Number (Long)`|-
 |[[sendGcmSum]]`sendGcmSum`|`Number (Long)`|-

@@ -30,8 +30,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route(StatRestConstants.Stat.MSG_SEND).handler(this::statMsgSend);
-        router.route(StatRestConstants.Stat.MSG_ARRIVE).handler(this::statMsgArrive);
+        router.route(StatRestConstants.Stat.PUSH_MSG_STAT).handler(this::statPushMsg);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -51,21 +50,19 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         return StringUtils.isNotBlank(IPUtil.getInnerIP()) ? IPUtil.getInnerIP() : config().getString("service.host");
     }
 
-    private void statMsgSend(RoutingContext context) {
+    private void statPushMsg(RoutingContext context) {
         MsgStatDto statDto = buildMsgStatDto(context);
-        statDto.setAction(PushActionEnum.SEND.getType());
-        logger.info("the request params , msgStat: {}", statDto);
+        logger.info("stat pushMsg,the statDto: {}", statDto);
+        if (statDto.getAction() == null || statDto.getAction() < 0) {
+            logger.error("the action is null for {} ", statDto);
+            return;
+        }
         msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
     }
 
-    private void statMsgArrive(RoutingContext context) {
-        MsgStatDto statDto = buildMsgStatDto(context);
-        statDto.setAction(PushActionEnum.ARRIVE.getType());
-        logger.info("the request params , msgStat: {}", statDto);
-        msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
-    }
 
     private MsgStatDto buildMsgStatDto(RoutingContext context) {
+        String action = context.request().params().get("action");
         String appCode = context.request().params().get("appCode");
         String msgId = context.request().params().get("msgId");
         String osType = context.request().params().get("osType");
@@ -77,6 +74,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String isAcceptPush = context.request().params().get("isAcceptPush");
 
         MsgStatDto statDto = new MsgStatDto();
+        if (StringUtils.isNotBlank(action)) {
+            statDto.setAction(Integer.valueOf(action));
+        }
         if (StringUtils.isNotBlank(osType)) {
             statDto.setOsType(Integer.valueOf(osType));
         }

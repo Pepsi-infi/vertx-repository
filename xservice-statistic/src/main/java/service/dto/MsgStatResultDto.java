@@ -42,6 +42,18 @@ public class MsgStatResultDto {
     private Long arriveMiSum;
     //gcm渠道到达总数
     private Long arriveGcmSum;
+    //点击总数
+    private Long clickSum;
+    //Android点击总数
+    private Long clickAndroidSum;
+    //ios点击总数
+    private Long clickIosSum;
+    //socket点击总数
+    private Long clickSockSum;
+    //小米渠道点击总数
+    private Long clickMiSum;
+    //gcm渠道点击总数
+    private Long clickGcmSum;
 
     public Integer getChannel() {
         return channel;
@@ -171,6 +183,53 @@ public class MsgStatResultDto {
         this.arriveGcmSum = arriveGcmSum;
     }
 
+    public Long getClickSum() {
+        return clickSum;
+    }
+
+    public void setClickSum(Long clickSum) {
+        this.clickSum = clickSum;
+    }
+
+    public Long getClickAndroidSum() {
+        return clickAndroidSum;
+    }
+
+    public void setClickAndroidSum(Long clickAndroidSum) {
+        this.clickAndroidSum = clickAndroidSum;
+    }
+
+    public Long getClickIosSum() {
+        return clickIosSum;
+    }
+
+    public void setClickIosSum(Long clickIosSum) {
+        this.clickIosSum = clickIosSum;
+    }
+
+    public Long getClickSockSum() {
+        return clickSockSum;
+    }
+
+    public void setClickSockSum(Long clickSockSum) {
+        this.clickSockSum = clickSockSum;
+    }
+
+    public Long getClickMiSum() {
+        return clickMiSum;
+    }
+
+    public void setClickMiSum(Long clickMiSum) {
+        this.clickMiSum = clickMiSum;
+    }
+
+    public Long getClickGcmSum() {
+        return clickGcmSum;
+    }
+
+    public void setClickGcmSum(Long clickGcmSum) {
+        this.clickGcmSum = clickGcmSum;
+    }
 
     public MsgStatResultDto() {
         super();
@@ -206,6 +265,12 @@ public class MsgStatResultDto {
         sb.append(", arriveSockSum=").append(arriveSockSum);
         sb.append(", arriveMiSum=").append(arriveMiSum);
         sb.append(", arriveGcmSum=").append(arriveGcmSum);
+        sb.append(", clickSum=").append(clickSum);
+        sb.append(", clickAndroidSum=").append(clickAndroidSum);
+        sb.append(", clickIosSum=").append(clickIosSum);
+        sb.append(", clickSockSum=").append(clickSockSum);
+        sb.append(", clickMiSum=").append(clickMiSum);
+        sb.append(", clickGcmSum=").append(clickGcmSum);
         sb.append('}');
         return sb.toString();
     }
