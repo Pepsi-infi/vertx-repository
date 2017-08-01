@@ -1,6 +1,5 @@
 package api;
 
-import channel.AmqpConsumerVerticle;
 import channel.HttpConsumerVerticle;
 import channel.MiPushVerticle;
 import dao.impl.MsgRecordDaoImpl;
@@ -14,7 +13,7 @@ import service.impl.RedisServiceImpl;
 
 public class StartVerticle extends AbstractVerticle{
 
-    private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartVerticle.class);
     @Override
     public void start() throws Exception {
         super.start();
@@ -28,7 +27,7 @@ public class StartVerticle extends AbstractVerticle{
         this.deployVerticle(MiPushVerticle.class.getName());
 //		vertx.deployVerticle(SocketVerticle.class.getName());
 
-        this.deployVerticle(AmqpConsumerVerticle.class.getName());
+//        this.deployVerticle(AmqpConsumerVerticle.class.getName());
         this.deployVerticle(HttpConsumerVerticle.class.getName());
         
         // 提供其他非EventBus服务
