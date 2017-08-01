@@ -130,7 +130,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		msgStatDto.setAppCode(1001);
 		msgStatDto.setChannel(Integer.parseInt(devicePushType));
 		msgStatDto.setMsgId(msgId);
+        //1 安卓
 		msgStatDto.setOsType(1);
+        //1发送，2接收
+        msgStatDto.setAction(1);
 		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
 		msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
 	}
@@ -184,7 +187,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			// 推送消息到下游
 			pushMsgToDownStream(resultHandler);
 			// 消息入库
-			saveMsgRecord();
+//			saveMsgRecord();
 		}
 	}
 
