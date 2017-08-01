@@ -58,7 +58,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         List<String> fields = getFieldsForMsgStat(msgStatDto);
         if (CollectionUtils.isEmpty(fields)) {
             logger.warn("the msgStat:{} need stat is null ", msgStatDto);
-            return;
+            result.handle(Future.failedFuture("the msgStat :" + msgStatDto + "need stat is null"));
         }
         try {
             //设置过期时间 12小时
@@ -108,6 +108,16 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             }
             if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
                 String filed = new StringBuilder(CacheConstants.PUSH_ARRIVE_CHANNEL).append(msgStatDto.getChannel()).toString();
+                fieldsList.add(filed);
+            }
+        } else if (PushActionEnum.CLICK.getType() == msgStatDto.getAction()) {
+            fieldsList.add(CacheConstants.PUSH_CLICK_SUM);
+            if (msgStatDto.getOsType() != null && msgStatDto.getOsType() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_CLICK_OSTYPE).append(msgStatDto.getOsType()).toString();
+                fieldsList.add(filed);
+            }
+            if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
+                String filed = new StringBuilder(CacheConstants.PUSH_CLICK_CHANNEL).append(msgStatDto.getChannel()).toString();
                 fieldsList.add(filed);
             }
         }

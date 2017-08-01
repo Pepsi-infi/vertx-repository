@@ -87,7 +87,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         List<String> keys = jsonArray.getList();
         if (CollectionUtils.isEmpty(keys)) {
             logger.info("need stat msg is null");
-            return;
+            result.handle(Future.succeededFuture());
         }
         for (String key : keys) {
             redisClient.hmget(key, CacheConstants.PUSH_MSG_FIELDS, handler -> {
@@ -115,10 +115,10 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         msgStatResultDao.getMsgStatResult(msgStatResultDto, result1 -> {
             if (result1.succeeded()) {
                 MsgStatResultDto dbMsgStatResult = result1.result();
-                if ((dbMsgStatResult.getSendSum() != null && dbMsgStatResult.getSendSum() >= msgStatResultDto.getSendSum()) ||
+                if ((dbMsgStatResult.getSendSum() != null && dbMsgStatResult.getSendSum() >= msgStatResultDto.getSendSum()) &&
                         (dbMsgStatResult.getArriveSum() != null && dbMsgStatResult.getArriveSum() >= msgStatResultDto.getArriveSum())) {
                     logger.info("the data of  msgStatResult :{} in db gt in redis.", msgStatResultDto);
-                    return;
+                    result.handle(Future.succeededFuture());
                 }
                 Future<BaseResponse> future = Future.future();
                 //入库
@@ -155,6 +155,12 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         msgStatResultDto.setArriveSockSum(NumberUtils.toLong(values.get(9), 0));
         msgStatResultDto.setArriveGcmSum(NumberUtils.toLong(values.get(10), 0));
         msgStatResultDto.setArriveMiSum(NumberUtils.toLong(values.get(11), 0));
+        msgStatResultDto.setClickSum(NumberUtils.toLong(values.get(12), 0));
+        msgStatResultDto.setClickAndroidSum(NumberUtils.toLong(values.get(13), 0));
+        msgStatResultDto.setClickIosSum(NumberUtils.toLong(values.get(14), 0));
+        msgStatResultDto.setClickSockSum(NumberUtils.toLong(values.get(15), 0));
+        msgStatResultDto.setClickGcmSum(NumberUtils.toLong(values.get(16), 0));
+        msgStatResultDto.setClickMiSum(NumberUtils.toLong(values.get(17), 0));
         return msgStatResultDto;
     }
 

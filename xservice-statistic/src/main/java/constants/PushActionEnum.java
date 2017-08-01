@@ -6,11 +6,12 @@ package constants;
  * Description :
  */
 public enum PushActionEnum {
-    SEND(1), ARRIVE(2);
+    SEND(1), ARRIVE(2), CLICK(3);
 
     private int type;
 
-    PushActionEnum(int i) {
+    PushActionEnum(int type) {
+        this.type = type;
     }
 
     public int getType() {
