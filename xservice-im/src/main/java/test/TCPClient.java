@@ -1,5 +1,7 @@
 package test;
 
+import java.util.Random;
+
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetClient;
@@ -9,29 +11,27 @@ import io.vertx.core.net.NetSocket;
 public class TCPClient {
 
 	public static void main(String[] args) throws InterruptedException {
+		System.out.println(System.currentTimeMillis());
 		Vertx vertx = Vertx.vertx();
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
 		NetClient client = vertx.createNetClient(options);
-		for (int i = 0; i < 10000; i++) {
-			Thread.sleep(5);
-			client.connect(1234, "localhost", res -> {
-				if (res.succeeded()) {
-					NetSocket socket = res.result();
-					Buffer bf = Buffer.buffer();
-					byte[] headerLength = intToBytes(20);
-					byte[] clientVersion = floatToBytes(1.43f);
-					byte[] cmdId = intToBytes(1000);
-					byte[] seq = intToBytes(4320);
-					byte[] bodyLength = intToBytes(3000);
-					Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
-							.appendBytes(seq).appendBytes(bodyLength).appendString("body");
-					bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
-					socket.write(msg);
-				} else {
-					System.out.println("Failed to connect: " + res.cause().getMessage());
-				}
-			});
-		}
+		client.connect(1234, "localhost", res -> {
+			if (res.succeeded()) {
+				NetSocket socket = res.result();
+				Buffer bf = Buffer.buffer();
+				byte[] headerLength = intToBytes(20);
+				byte[] clientVersion = floatToBytes(1.43f);
+				byte[] cmdId = intToBytes(1000);
+				byte[] seq = intToBytes(4320);
+				byte[] bodyLength = intToBytes(3000);
+				Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
+						.appendBytes(seq).appendBytes(bodyLength).appendString("body");
+				bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
+				socket.write(msg);
+			} else {
+				System.out.println("Failed to connect: " + res.cause().getMessage());
+			}
+		});
 	}
 
 	/**
@@ -87,5 +87,25 @@ public class TCPClient {
 	 */
 	public static float bytesToFloat(byte[] b) {
 		return Float.intBitsToFloat(bytesToInt(b));
+	}
+
+	final static char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+			'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
+			'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+			'X', 'Y', 'Z' };
+
+	/**
+	 * 随机ID生成器，由数字、小写字母和大写字母组成
+	 * 
+	 * @param size
+	 * @return
+	 */
+	public static String id(int size) {
+		Random random = new Random();
+		char[] cs = new char[size];
+		for (int i = 0; i < cs.length; i++) {
+			cs[i] = digits[random.nextInt(digits.length)];
+		}
+		return new String(cs);
 	}
 }
