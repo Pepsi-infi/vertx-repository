@@ -1,38 +1,27 @@
 package dao.impl;
 
+import dao.BaseDaoVerticle;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
-import io.vertx.ext.sql.SQLClient;
-import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.lang.StringUtils;
 import dao.DeviceDao;
 import service.dto.DeviceDto;
-import util.FileUtils;
+import util.ConfigUtils;
 import utils.BaseResponse;
-import utils.IPUtil;
-import xservice.BaseServiceVerticle;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Created by lufei
  * Date : 2017/7/26 10:32
  * Description :
  */
-public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
+public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
-
-    private SQLClient sqlClient;
 
     public interface Sql {
         static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint) values (?,?,?,?,?,?,?,?,?,?)";
@@ -51,9 +40,9 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
 
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = FileUtils.getJsonConf(env + "/jdbc-device" + env + ".json");
+        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-device-" + env + ".json");
 
-        sqlClient = MySQLClient.createNonShared(vertx, jsonObject);
+        client = MySQLClient.createNonShared(vertx, jsonObject);
 
     }
 
@@ -77,33 +66,5 @@ public class DeviceDaoImpl extends BaseServiceVerticle implements DeviceDao {
         execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
     }
 
-    protected <R> void execute(JsonArray params, String sql, R ret, Handler<AsyncResult<R>> resultHandler) {
-        sqlClient.getConnection(connHandler(resultHandler, connection -> {
-            connection.updateWithParams(sql, params, r -> {
-                if (r.succeeded()) {
-                    resultHandler.handle(Future.succeededFuture(ret));
-                } else {
-                    resultHandler.handle(Future.failedFuture(r.cause()));
-                }
-                connection.close();
-            });
-        }));
-    }
-
-    /**
-     * A helper methods that generates async handler for SQLConnection
-     *
-     * @return generated handler
-     */
-    protected <R> Handler<AsyncResult<SQLConnection>> connHandler(Handler<AsyncResult<R>> h1, Handler<SQLConnection> h2) {
-        return conn -> {
-            if (conn.succeeded()) {
-                final SQLConnection connection = conn.result();
-                h2.handle(connection);
-            } else {
-                h1.handle(Future.failedFuture(conn.cause()));
-            }
-        };
-    }
 
 }

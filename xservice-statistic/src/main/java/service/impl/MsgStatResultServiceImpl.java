@@ -13,14 +13,14 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
-import util.FileUtils;
+import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
+
 import java.util.Date;
 import java.util.List;
 
@@ -51,18 +51,8 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = FileUtils.getJsonConf(env + "/redis-" + env + ".json");
-        RedisOptions redisOptions = new RedisOptions();
-        if (jsonObject != null && !jsonObject.isEmpty()) {
-            if (StringUtils.isNotBlank(jsonObject.getString("password"))) {
-                redisOptions.setAuth(jsonObject.getString("password"));
-            }
-            redisOptions.setHost(jsonObject.getString("host"));
-            redisOptions.setPort(jsonObject.getInteger("port"));
-            redisOptions.setTcpKeepAlive(Boolean.getBoolean(jsonObject.getString("tcpKeepAlive")));
-            redisOptions.setEncoding(jsonObject.getString("encoding"));
-            redisOptions.setTcpNoDelay(Boolean.getBoolean(jsonObject.getString("tcpNoDelay")));
-        }
+        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/redis-" + env + ".json");
+        RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
         vertx.setPeriodic(10000, handler -> {
@@ -121,17 +111,32 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
     private void addMsgStatResultToDb(String key, List<String> values, Handler<AsyncResult<BaseResponse>> result) {
         MsgStatResultDto msgStatResultDto = buildMsgStatResult(key, values);
         logger.info("the msgStatResultDto:{}", msgStatResultDto);
-        Future<BaseResponse> future = Future.future();
-        msgStatResultDao.addMsgStatResult(msgStatResultDto, future.completer());
-        future.setHandler(resultHandler -> {
-            BaseResponse baseResponse = new BaseResponse();
-            if (resultHandler.succeeded()) {
-                result.handle(Future.succeededFuture(baseResponse));
+        //获取db数据
+        msgStatResultDao.getMsgStatResult(msgStatResultDto, result1 -> {
+            if (result1.succeeded()) {
+                MsgStatResultDto dbMsgStatResult = result1.result();
+                if ((dbMsgStatResult.getSendSum() != null && dbMsgStatResult.getSendSum() >= msgStatResultDto.getSendSum()) ||
+                        (dbMsgStatResult.getArriveSum() != null && dbMsgStatResult.getArriveSum() >= msgStatResultDto.getArriveSum())) {
+                    logger.info("the data of  msgStatResult :{} in db gt in redis.", msgStatResultDto);
+                    return;
+                }
+                Future<BaseResponse> future = Future.future();
+                //入库
+                msgStatResultDao.addMsgStatResult(msgStatResultDto, future.completer());
+                future.setHandler(resultHandler -> {
+                    BaseResponse baseResponse = new BaseResponse();
+                    if (resultHandler.succeeded()) {
+                        result.handle(Future.succeededFuture(baseResponse));
+                    } else {
+                        logger.error("add msgStatResult:{} to db error.", msgStatResultDto, resultHandler.cause());
+                        result.handle(Future.failedFuture(resultHandler.cause()));
+                    }
+                });
             } else {
-                logger.error(resultHandler.cause());
-                result.handle(Future.failedFuture(resultHandler.cause()));
+                logger.error("get msgStatResult:{} from db error.", msgStatResultDto, result1.cause());
             }
         });
+
     }
 
     private MsgStatResultDto buildMsgStatResult(String key, List<String> values) {
