@@ -2,7 +2,7 @@
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-push | grep java | awk '{print $2}')
-if [ ! -z "$pid"]
+if [ ! -z "$pid" ]
 then 
   kill -9 $pid
 fi
