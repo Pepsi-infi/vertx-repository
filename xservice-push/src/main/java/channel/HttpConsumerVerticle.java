@@ -26,7 +26,7 @@ import utils.BaseResponse;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(AmqpConsumerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
 
 	private Object activity = null;
 
