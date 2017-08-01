@@ -4,7 +4,7 @@
   "maxPoolSize": 100,
   "username": "sqyc_message",
   "password": "sqyc_message@01zhuanche.com",
-  "database": "statistic",
+  "database": "device",
   "charset": "UTF-8",
   "queryTimeout": 3000
 }

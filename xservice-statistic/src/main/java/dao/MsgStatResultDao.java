@@ -34,4 +34,7 @@ public interface MsgStatResultDao {
 
 
     void addMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+
+
+    void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler);
 }

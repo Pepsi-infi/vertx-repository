@@ -27,3 +27,35 @@
 |[[userType]]`userType`|`Number (Integer)`|-
 |===
 
+[[MsgStatResultDto]]
+== MsgStatResultDto
+
+++++
+ Created by lufei
+ Date : 2017/7/30 22:02
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[arriveAndroidSum]]`arriveAndroidSum`|`Number (Long)`|-
+|[[arriveGcmSum]]`arriveGcmSum`|`Number (Long)`|-
+|[[arriveIosSum]]`arriveIosSum`|`Number (Long)`|-
+|[[arriveMiSum]]`arriveMiSum`|`Number (Long)`|-
+|[[arriveSockSum]]`arriveSockSum`|`Number (Long)`|-
+|[[arriveSum]]`arriveSum`|`Number (Long)`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[msgId]]`msgId`|`String`|-
+|[[sendAndroidSum]]`sendAndroidSum`|`Number (Long)`|-
+|[[sendGcmSum]]`sendGcmSum`|`Number (Long)`|-
+|[[sendIosSum]]`sendIosSum`|`Number (Long)`|-
+|[[sendMiSum]]`sendMiSum`|`Number (Long)`|-
+|[[sendSockSum]]`sendSockSum`|`Number (Long)`|-
+|[[sendSum]]`sendSum`|`Number (Long)`|-
+|[[sendTime]]`sendTime`|`String`|-
+|[[statTime]]`statTime`|`String`|-
+|===
+
