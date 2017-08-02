@@ -53,12 +53,12 @@ public class MsgRecord extends BaseModel implements Serializable{
 	}
 	public MsgRecord(JsonObject json) {
 		// A converter is generated to easy the conversion from and to JSON.
-		AmqpConsumeMessageConverter.fromJson(json,this);
+		MsgRecordConverter.fromJson(json,this);
 	}
 
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
-		AmqpConsumeMessageConverter.toJson(this, json);
+		MsgRecordConverter.toJson(this, json);
 		return json;
 	}
 	
