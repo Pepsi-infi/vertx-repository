@@ -1,7 +1,7 @@
 package channel;
 
 import constant.PushConsts;
-import domain.AmqpConsumeMessage;
+import domain.MsgRecord;
 import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
@@ -114,7 +114,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
             this.pushMsgToDownStream(pushFuture.completer(), checkFuture);
 
             //保存消息到数据库
-//			this.saveMsgRecord();
+//			this.saveMsgRecord(checkFuture);
 
             //消息推送成功后，调用上报消息接口
             this.callStatPushMsg(pushFuture);
@@ -219,19 +219,26 @@ public class HttpConsumerVerticle extends AbstractVerticle {
     /**
      * 保存消息记录
      */
-    private void saveMsgRecord() {
-        AmqpConsumeMessage msg = new AmqpConsumeMessage();
-        msg.setAmqpMsgId(msgId);
-        msg.setChannel(sendType);
-        msg.setMsgBody(receiveMsg.toString());
-        msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
-        msgRecordService.addMessage(msg, res -> {
-            if (res.succeeded()) {
-                logger.info("保存消息成功：" + res);
-            } else {
-                logger.info("保存消息失败：" + res.cause());
+    private void saveMsgRecord(Future<BaseResponse> checkFutrue) {
+        checkFutrue.setHandler(handler ->{
+            if(handler.succeeded()){
+                MsgRecord msg = new MsgRecord();
+                msg.setAmqpMsgId(msgId);
+                msg.setChannel(sendType);
+                msg.setMsgBody(receiveMsg.toString());
+                msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
+                msgRecordService.addMessage(msg, res -> {
+                    if (res.succeeded()) {
+                        logger.info("保存消息成功：" + res);
+                    } else {
+                        logger.info("保存消息失败：" + res.cause());
+                    }
+                });
+            }else{
+                logger.error("数据验证未通过，原因：" + checkFutrue.cause());
             }
         });
+
     }
 
     private void pushMsgToDownStream(Handler<AsyncResult<BaseResponse>> resultHandler, Future<BaseResponse> checkFutrue) {
