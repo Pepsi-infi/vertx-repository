@@ -1,16 +1,11 @@
 package channel;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
-
 import constant.PushConsts;
 import enums.EnumPassengerMessageType;
 import io.vertx.core.AbstractVerticle;
@@ -22,9 +17,13 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.XiaoMiPushService;
+import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
-import utils.IPUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -65,14 +64,14 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 			
 			Result result= sendMessage(title, content, description, regId);
 			
-			if(ErrorCode.Success==result.getErrorCode()){
+			if(ErrorCode.Success == result.getErrorCode()){
 				resultHandler.handle(Future.succeededFuture(new BaseResponse()));		
 			}else{
 				resultHandler.handle(Future.failedFuture(result.getReason()));
 			}
 			
 		} catch (Exception e) {
-			logger.error("sendMsg error:regId=" + regId + ",mapName=" + title + ",map=" + recieveMsg, e);
+			logger.error("sendMsg error:regId=" + regId + ", mapName=" + title + ", recieveMsg=" + recieveMsg, e);
 		}
 	}
 
@@ -80,11 +79,8 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		Sender sender = new Sender(PropertiesLoaderUtils.singleProp.getProperty("xiaomi.appsecret"));
 		Message message = buildMessage(title, content, description);
 		Result sendResult = sender.send(message, regId, 0); // 根据regID，发送消息到指定设备上，不重试。
-		//handler.handle(Future.succeededFuture(sendResult));
-		
-		logger.info("小米推送返回结果,messageId:" + sendResult.getMessageId() + "~errorCodeName:"
-				+ sendResult.getErrorCode().getName()+"~errorCodeDescription="+ sendResult.getErrorCode().getDescription() + "~reason:" + sendResult.getReason());
-		
+
+		logger.info("regId: " + regId + ", 小米推送返回结果：" + JsonUtil.toJsonString(sendResult));
 		return sendResult;
 	}
 
@@ -116,7 +112,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	public static void main(String[] args) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("name", "infi");
 		map.put("age", 28);
 		System.out.println(mapper.writeValueAsString(map));

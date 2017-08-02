@@ -2,7 +2,7 @@ package dao.impl;
 
 import constant.ConnectionConsts;
 import dao.MsgRecordDao;
-import domain.AmqpConsumeMessage;
+import domain.MsgRecord;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -62,7 +62,7 @@ public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDa
         JsonObject jsonObject = this.getJsonConf(jdbcConfig);
         sqlClient = MySQLClient.createShared(vertx, jsonObject);
 
-//        AmqpConsumeMessage dto = new AmqpConsumeMessage();
+//        MsgRecord dto = new MsgRecord();
 //        dto.setAmqpMsgId("qqqq");
 //        dto.setChannel("aaaa");
 //        dto.setMsgBody("qdaslfjasdf");
@@ -94,7 +94,7 @@ public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDa
 
 
     @Override
-    public void addMessage(AmqpConsumeMessage msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+    public void addMessage(MsgRecord msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         if (msg == null) {
             logger.warn("the msg is null");
             return;

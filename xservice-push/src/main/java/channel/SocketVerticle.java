@@ -89,13 +89,13 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             msgInfo.put("token", token);
         }
 
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
         params.add(to);
         params.add(messageType.getType());
         params.add(MsgConstant.ZERO);
         params.add(msgInfo);
 
-        Map<String, Object> sendMap = new HashMap<String, Object>();
+        Map<String, Object> sendMap = new HashMap<>();
         DatagramSocket client = null;
         try {
             String socketAddress = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_SENDTO_ADDRESS);

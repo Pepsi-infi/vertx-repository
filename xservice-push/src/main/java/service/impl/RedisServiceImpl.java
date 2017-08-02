@@ -60,7 +60,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     public void set(String key, String value, Handler<AsyncResult<Void>> result) {
         redisClient.set(key, value, handler ->{
            if(handler.succeeded()){
-               result.handle(handler);
+               result.handle(Future.succeededFuture(handler.result()));
            } else {
                result.handle(Future.failedFuture(handler.cause()));
            }
@@ -71,7 +71,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
         redisClient.expire(key, expire, handler ->{
             if(handler.succeeded()){
-                result.handle(handler);
+                result.handle(Future.succeededFuture(handler.result()));
             } else {
                 result.handle(Future.failedFuture(handler.cause()));
             }
@@ -82,7 +82,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     public void get(String key, Handler<AsyncResult<String>> result) {
         redisClient.get(key, handler ->{
             if(handler.succeeded()){
-                result.handle(handler);
+                result.handle(Future.succeededFuture(handler.result()));
             } else {
                 result.handle(Future.failedFuture(handler.cause()));
             }
