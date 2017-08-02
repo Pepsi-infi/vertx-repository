@@ -1,5 +1,6 @@
 package channel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
@@ -218,35 +220,36 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		msgId = (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 
+		Future<List<DeviceDto>> deviceFuture = Future.future();
+		;
 		if (StringUtil.isNullOrEmpty(token)) {
 			logger.info("设备token为空，从数据库获取设备token");
 
 			Map<String, String> param = new HashMap<>();
 			param.put("phone", phone);
 
-			Future<List<DeviceDto>> deviceHandler = Future.future();
-			deviceService.queryDevices(param, deviceHandler.completer());
-			deviceHandler.setHandler(handler -> {
-
-				if (handler.succeeded()) {
-
-					deviceList = handler.result();
-
-					if (CollectionUtils.isEmpty(deviceList)) {
-						logger.error("设备token不存在,推送操作不执行");
-						resultHandler.handle(Future.failedFuture("设备token不存在"));
-						return;
-					}
-
-					token = deviceList.get(0).getDeviceToken();
-
-				} else {
-					logger.error("设备token获取异常");
-					resultHandler.handle(Future.failedFuture(handler.cause()));
-					return;
-				}
-
-			});
+			deviceService.queryDevices(param, deviceFuture.completer());
+			// deviceHandler.setHandler(handler -> {
+			//
+			// if (handler.succeeded()) {
+			//
+			// deviceList = handler.result();
+			//
+			// if (CollectionUtils.isEmpty(deviceList)) {
+			// logger.error("设备token不存在,推送操作不执行");
+			// resultHandler.handle(Future.failedFuture("设备token不存在"));
+			// return;
+			// }
+			//
+			// token = deviceList.get(0).getDeviceToken();
+			//
+			// } else {
+			// logger.error("设备token获取异常");
+			// resultHandler.handle(Future.failedFuture(handler.cause()));
+			// return;
+			// }
+			//
+			// });
 
 		}
 
@@ -268,19 +271,48 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
 		Future<String> redisFuture = Future.future();
 		redisService.get(redisMsgKey, redisFuture.completer());
-		redisFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				if (null != res.result()) {
+//		redisFuture.setHandler(res -> {
+//			if (res.succeeded()) {
+//				if (null != res.result()) {
+//					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送，msgId =" + msgId;
+//					resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
+//				} else {
+//					// 验证通过
+//					resultHandler.handle(Future.succeededFuture());
+//				}
+//			} else {
+//				logger.info("from redis get key fail : key = " + redisMsgKey);
+//				// getkey失败也不能影响主流程
+//				resultHandler.handle(Future.succeededFuture());
+//			}
+//		});
+
+		Future<CompositeFuture> compositFuture = CompositeFuture.all(deviceFuture, redisFuture);
+		compositFuture.setHandler(handler -> {
+			if (handler.succeeded()) {
+				
+				//校验并获取设备token
+				deviceList = handler.result().resultAt(0);
+				if (CollectionUtils.isEmpty(deviceList)) {
+					logger.error("设备token不存在,推送操作不执行");
+					resultHandler.handle(Future.failedFuture("设备token不存在"));
+					return;
+				}				
+				token = deviceList.get(0).getDeviceToken();
+				
+				//验证redis
+				String redisResult=handler.result().resultAt(1);
+				if(StringUtils.isNotBlank(redisResult)){
 					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送，msgId =" + msgId;
 					resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
-				} else {
-					// 验证通过
-					resultHandler.handle(Future.succeededFuture());
+					return;
 				}
-			} else {
-				logger.info("from redis get key fail : key = " + redisMsgKey);
-				// getkey失败也不能影响主流程
+				
+				logger.info("from redis get key fail : key = " + redisMsgKey);			
 				resultHandler.handle(Future.succeededFuture());
+				
+			} else {
+				resultHandler.handle(Future.failedFuture(handler.cause()));
 			}
 		});
 
@@ -315,6 +347,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			Future<BaseResponse> checkFutrue) {
 		checkFutrue.setHandler(res -> {
 			if (res.succeeded()) {
+				logger.debug("token="+token);
 				receiveMsg.put("regId", token);
 				if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 					// socket推送
