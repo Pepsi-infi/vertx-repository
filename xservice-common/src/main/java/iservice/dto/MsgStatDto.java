@@ -28,8 +28,6 @@ public class MsgStatDto {
     private String imei;
     //蚂蚁金服指纹
     private String antFingerprint;
-    //是否接收推送消息 1：是 0 否
-    private Integer isAcceptPush;
 
 
     public MsgStatDto() {
@@ -95,13 +93,6 @@ public class MsgStatDto {
         this.osType = osType;
     }
 
-    public Integer getIsAcceptPush() {
-        return isAcceptPush;
-    }
-
-    public void setIsAcceptPush(Integer isAcceptPush) {
-        this.isAcceptPush = isAcceptPush;
-    }
 
     public String getArriveTime() {
         return arriveTime;
@@ -139,7 +130,6 @@ public class MsgStatDto {
         sb.append(", osType=").append(osType);
         sb.append(", imei='").append(imei).append('\'');
         sb.append(", antFingerprint='").append(antFingerprint).append('\'');
-        sb.append(", isAcceptPush=").append(isAcceptPush);
         sb.append('}');
         return sb.toString();
     }

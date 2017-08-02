@@ -53,7 +53,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
     private void reportUserDevice(RoutingContext context) {
         DeviceDto userDeviceDto = buildDeviceDto(context);
         logger.info("the request params : userDeviceDto : {}", userDeviceDto);
-        deviceService.reportUserDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
+        deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
     }
 
     /**
@@ -72,7 +72,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         String appCode = context.request().params().get("appCode");
         String appVersion = context.request().params().get("appVersion");
         String antFingerprint = context.request().params().get("antFingerprint");
-
+        String isAcceptPush = context.request().params().get("isAcceptPush");
 
         userDeviceDto.setDeviceToken(deviceToken);
         userDeviceDto.setOsVersion(osVersion);
@@ -89,6 +89,9 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         }
         if (StringUtils.isNotBlank(appCode)) {
             userDeviceDto.setAppCode(Integer.valueOf(appCode));
+        }
+        if (StringUtils.isNotBlank(isAcceptPush)) {
+            userDeviceDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
         }
         return userDeviceDto;
     }

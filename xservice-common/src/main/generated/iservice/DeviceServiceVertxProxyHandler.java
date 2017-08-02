@@ -126,8 +126,8 @@ public class DeviceServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "reportUserDevice": {
-          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+        case "reportDevice": {
+          service.reportDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

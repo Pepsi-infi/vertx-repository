@@ -67,7 +67,7 @@ public class DeviceServiceVertxEBProxy implements DeviceService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
+  public void reportDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -75,7 +75,7 @@ public class DeviceServiceVertxEBProxy implements DeviceService {
     JsonObject _json = new JsonObject();
     _json.put("userDeviceDto", userDeviceDto == null ? null : userDeviceDto.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "reportUserDevice");
+    _deliveryOptions.addHeader("action", "reportDevice");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));

@@ -1,5 +1,6 @@
 package dao;
 
+import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -32,7 +33,7 @@ public interface MsgStatResultDao {
 
 
     static MsgStatResultDao createProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(MsgStatResultDao.class, vertx, MsgStatResultDao.SERVICE_ADDRESS);
+        return XProxyHelper.createProxy(MsgStatResultDao.class, MsgStatResultDao.class, vertx, MsgStatResultDao.SERVICE_ADDRESS);
     }
 
 

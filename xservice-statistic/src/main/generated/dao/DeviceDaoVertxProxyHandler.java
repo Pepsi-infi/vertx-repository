@@ -127,7 +127,35 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
       switch (action) {
 
         case "addDevice": {
-          service.addDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+          service.addDevice(json.getJsonObject("deviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("deviceDto")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "updateDevice": {
+          service.updateDevice(json.getJsonObject("deviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("deviceDto")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "getDevice": {
+          service.getDevice(convertMap(json.getJsonObject("params").getMap()), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

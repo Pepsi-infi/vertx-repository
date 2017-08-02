@@ -1,5 +1,6 @@
 package iservice;
 
+import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -25,7 +26,7 @@ public interface DeviceService {
     public static final String SERVICE_ADDRESS = "http-device-eb-service";
 
     static DeviceService createProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
+        return XProxyHelper.createProxy(DeviceService.class, DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
     }
 
 
@@ -33,7 +34,8 @@ public interface DeviceService {
      * @param userDeviceDto
      * @param result
      */
-    void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result);
+    void reportDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result);
+
 
     /**
      * @param param

@@ -48,6 +48,9 @@ public class DeviceDtoConverter {
     if (json.getValue("imei") instanceof String) {
       obj.setImei((String)json.getValue("imei"));
     }
+    if (json.getValue("isAcceptPush") instanceof Number) {
+      obj.setIsAcceptPush(((Number)json.getValue("isAcceptPush")).intValue());
+    }
     if (json.getValue("osType") instanceof Number) {
       obj.setOsType(((Number)json.getValue("osType")).intValue());
     }
@@ -86,6 +89,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getImei() != null) {
       json.put("imei", obj.getImei());
+    }
+    if (obj.getIsAcceptPush() != null) {
+      json.put("isAcceptPush", obj.getIsAcceptPush());
     }
     if (obj.getOsType() != null) {
       json.put("osType", obj.getOsType());
