@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package iservice;
 
-import service.MsgStatResultService;
+import iservice.DeviceService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,38 +39,39 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.dto.MsgStatResultPage;
+import java.util.List;
+import iservice.DeviceService;
 import utils.BaseResponse;
 import java.util.Map;
 import io.vertx.core.Vertx;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import service.MsgStatResultService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
+public class DeviceServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final MsgStatResultService service;
+  private final DeviceService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, long timeoutInSecond) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, boolean topLevel, long timeoutSeconds) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -125,8 +126,8 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "storeMsgStatResult": {
-          service.storeMsgStatResult(res -> {
+        case "reportUserDevice": {
+          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -139,8 +140,8 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
-        case "queryMsgStatResult": {
-          service.queryMsgStatResult(convertMap(json.getJsonObject("param").getMap()), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("limit") == null ? null : (json.getLong("limit").intValue()), res -> {
+        case "queryDevices": {
+          service.queryDevices(convertMap(json.getJsonObject("param").getMap()), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -148,7 +149,7 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
+              msg.reply(new JsonArray(res.result().stream().map(DeviceDto::toJson).collect(Collectors.toList())));
             }
          });
           break;

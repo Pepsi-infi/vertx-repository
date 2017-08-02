@@ -1,17 +1,23 @@
 package api;
 
+import com.google.common.collect.Maps;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
 import iservice.dto.MsgStatDto;
+import service.MsgStatResultService;
+import service.dto.MsgStatResultDto;
 import utils.IPUtil;
 import utils.JsonUtil;
-import constants.PushActionEnum;
 import iservice.MsgStatService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -23,6 +29,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private MsgStatService msgStatService;
 
+    private MsgStatResultService msgStatResultService;
+
     @Override
     public void start() throws Exception {
         super.start();
@@ -30,7 +38,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route(StatRestConstants.Stat.PUSH_MSG_STAT).handler(this::statPushMsg);
+        router.route(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
+        router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -44,6 +53,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private void initMsgStatService() {
         msgStatService = MsgStatService.createProxy(vertx.getDelegate());
+        msgStatResultService = MsgStatResultService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
@@ -58,6 +68,20 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
             return;
         }
         msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
+    }
+
+    private void queryMsgStatResult(RoutingContext context) {
+        String msgId = context.request().params().get("msgId");
+        String page = context.request().params().get("page");
+        String size = context.request().params().get("size");
+        logger.info("query msgStatResult msgId: {}，page: {},size:{}", msgId, page, size);
+        Map<String, String> params = Maps.newHashMap();
+        if (StringUtils.isNotBlank(msgId)) {
+            params.put("msgId", msgId);
+        }
+        Future<List<MsgStatResultDto>> future = Future.future();
+        msgStatResultService.queryMsgStatResult(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
+
     }
 
 

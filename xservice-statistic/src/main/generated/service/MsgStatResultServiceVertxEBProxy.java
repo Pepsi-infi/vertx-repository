@@ -32,9 +32,8 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import java.util.List;
+import service.dto.MsgStatResultPage;
 import utils.BaseResponse;
-import service.dto.MsgStatResultDto;
 import java.util.Map;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
@@ -84,7 +83,7 @@ public class MsgStatResultServiceVertxEBProxy implements MsgStatResultService {
     });
   }
 
-  public void queryMsgStatResult(Map<String,String> param, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> result) {
+  public void queryMsgStatResult(Map<String,String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPage>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -95,12 +94,12 @@ public class MsgStatResultServiceVertxEBProxy implements MsgStatResultService {
     _json.put("limit", limit);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "queryMsgStatResult");
-    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new MsgStatResultDto(new JsonObject((Map) o)) : new MsgStatResultDto((JsonObject) o)).collect(Collectors.toList())));
-      }
+        result.handle(Future.succeededFuture(res.result().body() == null ? null : new MsgStatResultPage(res.result().body())));
+                      }
     });
   }
 

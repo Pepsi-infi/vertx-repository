@@ -19,9 +19,11 @@ package dao.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import java.util.List;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -57,13 +59,23 @@ public class DeviceDao {
     return ret;
   }
 
-  public void addUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
-    delegate.addUserDevice(userDeviceDto, resultHandler);
+  public void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.addDevice(userDeviceDto, resultHandler);
   }
 
-  public Single<BaseResponse> rxAddUserDevice(DeviceDto userDeviceDto) { 
+  public Single<BaseResponse> rxAddDevice(DeviceDto userDeviceDto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      addUserDevice(userDeviceDto, fut);
+      addDevice(userDeviceDto, fut);
+    }));
+  }
+
+  public void queryDevices(Map<String,String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler) { 
+    delegate.queryDevices(params, resultHandler);
+  }
+
+  public Single<List<DeviceDto>> rxQueryDevices(Map<String,String> params) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryDevices(params, fut);
     }));
   }
 

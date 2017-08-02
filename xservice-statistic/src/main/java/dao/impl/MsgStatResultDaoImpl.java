@@ -9,6 +9,7 @@ import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -119,7 +120,7 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
                 if (result.succeeded()) {
                     Optional<JsonObject> jsonObject = result.result();
                     JsonObject jsonObject1 = jsonObject.orElse(null);
-                    resultHandler.handle(Future.succeededFuture(convertMsgStatResultDto(jsonObject1)));
+                    resultHandler.handle(Future.succeededFuture(jsonObject1.mapTo(MsgStatResultDto.class)));
                 } else {
                     resultHandler.handle(Future.failedFuture(result.cause()));
                 }
@@ -143,44 +144,15 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
                     @Nullable
                     @Override
                     public MsgStatResultDto apply(@Nullable JsonObject jsonObject) {
-                        return convertMsgStatResultDto(jsonObject);
+                        return jsonObject.mapTo(MsgStatResultDto.class);
                     }
                 });
                 resultHandler.handle(Future.succeededFuture(msgStatResultDtos));
             } else {
+                logger.error(result.cause());
                 resultHandler.handle(Future.failedFuture(result.cause()));
             }
         });
 
     }
-
-    private MsgStatResultDto convertMsgStatResultDto(JsonObject jsonObject1) {
-        if (jsonObject1 == null) {
-            return null;
-        }
-        MsgStatResultDto msgStatResultDto = new MsgStatResultDto();
-        msgStatResultDto.setMsgId(jsonObject1.getString("msgId"));
-        msgStatResultDto.setStatTime(jsonObject1.getString("statTime"));
-        msgStatResultDto.setSendSum(jsonObject1.getLong("sendSum"));
-        msgStatResultDto.setSendAndroidSum(jsonObject1.getLong("sendAndroidSum"));
-        msgStatResultDto.setSendIosSum(jsonObject1.getLong("sendIosSum"));
-        msgStatResultDto.setSendSockSum(jsonObject1.getLong("sendSockSum"));
-        msgStatResultDto.setSendGcmSum(jsonObject1.getLong("sendGcmSum"));
-        msgStatResultDto.setSendMiSum(jsonObject1.getLong("sendMiSum"));
-        msgStatResultDto.setArriveSum(jsonObject1.getLong("arriveSum"));
-        msgStatResultDto.setArriveAndroidSum(jsonObject1.getLong("arriveAndroidSum"));
-        msgStatResultDto.setArriveIosSum(jsonObject1.getLong("arriveIosSum"));
-        msgStatResultDto.setArriveSockSum(jsonObject1.getLong("arriveSockSum"));
-        msgStatResultDto.setArriveGcmSum(jsonObject1.getLong("arriveGcmSum"));
-        msgStatResultDto.setArriveMiSum(jsonObject1.getLong("arriveMiSum"));
-        msgStatResultDto.setClickSum(jsonObject1.getLong("clickSum"));
-        msgStatResultDto.setClickAndroidSum(jsonObject1.getLong("clickAndroidSum"));
-        msgStatResultDto.setClickIosSum(jsonObject1.getLong("clickIosSum"));
-        msgStatResultDto.setClickSockSum(jsonObject1.getLong("clickSockSum"));
-        msgStatResultDto.setClickGcmSum(jsonObject1.getLong("clickGcmSum"));
-        msgStatResultDto.setClickMiSum(jsonObject1.getLong("clickMiSum"));
-        return msgStatResultDto;
-    }
-
-
 }
