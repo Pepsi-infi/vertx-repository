@@ -4,6 +4,7 @@ import java.util.Random;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
@@ -15,18 +16,19 @@ public class TCPClient {
 		Vertx vertx = Vertx.vertx();
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
 		NetClient client = vertx.createNetClient(options);
-		client.connect(1234, "localhost", res -> {
+		client.connect(4321, "localhost", res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
-				Buffer bf = Buffer.buffer();
-				byte[] headerLength = intToBytes(20);
-				byte[] clientVersion = floatToBytes(1.43f);
-				byte[] cmdId = intToBytes(1000);
-				byte[] seq = intToBytes(4320);
-				byte[] bodyLength = intToBytes(3000);
+				byte[] headerLength = intToBytes(24);
+				byte[] clientVersion = intToBytes(10001);
+				byte[] cmdId = intToBytes(1002);
+				byte[] seq = intToBytes(1);
+				JsonObject msgBody = new JsonObject().put("from", 11111);
+				byte[] bodyLength = intToBytes(msgBody.toString().length());
 				Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
-						.appendBytes(seq).appendBytes(bodyLength).appendString("body");
-				bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
+						.appendBytes(seq).appendBytes(bodyLength).appendString(msgBody.toString()).appendString("\n");
+				// Buffer bf = Buffer.buffer();
+				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
 				socket.write(msg);
 			} else {
 				System.out.println("Failed to connect: " + res.cause().getMessage());

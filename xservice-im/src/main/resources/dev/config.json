@@ -1,0 +1,7 @@
+{
+    "db_name": "lecom_copy",
+    "connection_string": "mongodb://admin:ODY3ZGYxNGFiOTd@10.212.23.161:9350,10.212.23.162:9350,10.212.23.163:9350",
+    "memcached.servers": "10.154.157.64:11211",
+    "memcached.timeout.ms": 1000,
+    "validate-on-connect": true
+}

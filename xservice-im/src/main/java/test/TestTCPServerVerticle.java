@@ -10,8 +10,8 @@ import io.vertx.core.parsetools.RecordParser;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
 
-public class TCPServerVerticle extends AbstractVerticle {
-	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
+public class TestTCPServerVerticle extends AbstractVerticle {
+	private static final Logger logger = LoggerFactory.getLogger(TestTCPServerVerticle.class);
 	private SharedData sharedData;
 	private LocalMap<String, String> sessionMap;
 	private LocalMap<String, String> sessionReverse;
