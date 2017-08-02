@@ -33,6 +33,8 @@ public class DeviceDto {
     private String appVersion;
     //蚂蚁金服指纹
     private String antFingerprint;
+    //是否接收推送消息 1：是 0 否
+    private Integer isAcceptPush;
 
     public Long getId() {
         return id;
@@ -130,6 +132,14 @@ public class DeviceDto {
         this.antFingerprint = antFingerprint;
     }
 
+    public Integer getIsAcceptPush() {
+        return isAcceptPush;
+    }
+
+    public void setIsAcceptPush(Integer isAcceptPush) {
+        this.isAcceptPush = isAcceptPush;
+    }
+
     public DeviceDto() {
         super();
     }
@@ -160,6 +170,7 @@ public class DeviceDto {
         sb.append(", appCode=").append(appCode);
         sb.append(", appVersion='").append(appVersion).append('\'');
         sb.append(", antFingerprint='").append(antFingerprint).append('\'');
+        sb.append(", isAcceptPush=").append(isAcceptPush);
         sb.append('}');
         return sb.toString();
     }

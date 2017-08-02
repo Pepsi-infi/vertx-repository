@@ -1,5 +1,6 @@
 package iservice;
 
+import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -25,7 +26,7 @@ public interface MsgStatService {
 
 
     static MsgStatService createProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(MsgStatService.class, vertx, MsgStatService.SERVICE_ADDRESS);
+        return XProxyHelper.createProxy(MsgStatService.class, MsgStatService.class, vertx, MsgStatService.SERVICE_ADDRESS);
     }
 
     /**

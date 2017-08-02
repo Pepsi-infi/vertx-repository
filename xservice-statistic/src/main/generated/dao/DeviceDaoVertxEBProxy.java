@@ -67,13 +67,13 @@ public class DeviceDaoVertxEBProxy implements DeviceDao {
     } catch (IllegalStateException ex) {}
   }
 
-  public void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("userDeviceDto", userDeviceDto == null ? null : userDeviceDto.toJson());
+    _json.put("deviceDto", deviceDto == null ? null : deviceDto.toJson());
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "addDevice");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
@@ -81,6 +81,42 @@ public class DeviceDaoVertxEBProxy implements DeviceDao {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
         resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+                      }
+    });
+  }
+
+  public void updateDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("deviceDto", deviceDto == null ? null : deviceDto.toJson());
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "updateDevice");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
+                      }
+    });
+  }
+
+  public void getDevice(Map<String,String> params, Handler<AsyncResult<DeviceDto>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("params", new JsonObject(convertMap(params)));
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "getDevice");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new DeviceDto(res.result().body())));
                       }
     });
   }

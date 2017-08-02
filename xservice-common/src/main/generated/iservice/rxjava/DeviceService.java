@@ -63,17 +63,17 @@ public class DeviceService {
    * @param userDeviceDto 
    * @param result 
    */
-  public void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) { 
-    delegate.reportUserDevice(userDeviceDto, result);
+  public void reportDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) { 
+    delegate.reportDevice(userDeviceDto, result);
   }
 
   /**
    * @param userDeviceDto 
    * @return 
    */
-  public Single<BaseResponse> rxReportUserDevice(DeviceDto userDeviceDto) { 
+  public Single<BaseResponse> rxReportDevice(DeviceDto userDeviceDto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      reportUserDevice(userDeviceDto, fut);
+      reportDevice(userDeviceDto, fut);
     }));
   }
 

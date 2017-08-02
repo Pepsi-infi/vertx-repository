@@ -4,13 +4,13 @@ Navicat MySQL Data Transfer
 Source Server         : 本机
 Source Server Version : 50717
 Source Host           : localhost:3306
-Source Database       : user
+Source Database       : device
 
 Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-07-28 11:10:00
+Date: 2017-08-02 20:33:26
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -31,7 +31,9 @@ CREATE TABLE `device` (
   `appCode` tinyint(4) DEFAULT NULL COMMENT '应用标识,首约app乘客端 1001；首约app司机端 1002',
   `appVersion` varchar(20) DEFAULT NULL COMMENT '应用版本',
   `antFingerprint` varchar(50) DEFAULT NULL COMMENT '蚂蚁金服指纹',
+  `isAcceptPush` tinyint(2) DEFAULT NULL COMMENT '是否接收推送消息 1：是 0 否',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uni_imei` (`imei`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+  UNIQUE KEY `uni_antFingerprint` (`antFingerprint`) USING BTREE,
+  KEY `ind_phone` (`phone`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 SET FOREIGN_KEY_CHECKS=1;

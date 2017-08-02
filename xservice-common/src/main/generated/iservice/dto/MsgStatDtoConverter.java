@@ -45,9 +45,6 @@ public class MsgStatDtoConverter {
     if (json.getValue("imei") instanceof String) {
       obj.setImei((String)json.getValue("imei"));
     }
-    if (json.getValue("isAcceptPush") instanceof Number) {
-      obj.setIsAcceptPush(((Number)json.getValue("isAcceptPush")).intValue());
-    }
     if (json.getValue("msgId") instanceof String) {
       obj.setMsgId((String)json.getValue("msgId"));
     }
@@ -77,9 +74,6 @@ public class MsgStatDtoConverter {
     }
     if (obj.getImei() != null) {
       json.put("imei", obj.getImei());
-    }
-    if (obj.getIsAcceptPush() != null) {
-      json.put("isAcceptPush", obj.getIsAcceptPush());
     }
     if (obj.getMsgId() != null) {
       json.put("msgId", obj.getMsgId());

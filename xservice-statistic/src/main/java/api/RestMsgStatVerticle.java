@@ -95,7 +95,6 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String arriveTime = context.request().params().get("arriveTime");
         String imei = context.request().params().get("imei");
         String antFingerprint = context.request().params().get("antFingerprint");
-        String isAcceptPush = context.request().params().get("isAcceptPush");
 
         MsgStatDto statDto = new MsgStatDto();
         if (StringUtils.isNotBlank(action)) {
@@ -106,9 +105,6 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         }
         if (StringUtils.isNotBlank(channel)) {
             statDto.setChannel(Integer.valueOf(channel));
-        }
-        if (StringUtils.isNotBlank(isAcceptPush)) {
-            statDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
         }
         if (StringUtils.isNotBlank(appCode)) {
             statDto.setAppCode(Integer.valueOf(appCode));
