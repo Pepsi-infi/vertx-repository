@@ -19,8 +19,10 @@ package dao.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import java.util.List;
 import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -67,6 +69,16 @@ public class MsgStatResultDao {
     }));
   }
 
+  public void updateMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.updateMsgStatResult(msgStatResultDto, resultHandler);
+  }
+
+  public Single<BaseResponse> rxUpdateMsgStatResult(MsgStatResultDto msgStatResultDto) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      updateMsgStatResult(msgStatResultDto, fut);
+    }));
+  }
+
   public void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler) { 
     delegate.getMsgStatResult(msgStatResultDto, resultHandler);
   }
@@ -74,6 +86,16 @@ public class MsgStatResultDao {
   public Single<MsgStatResultDto> rxGetMsgStatResult(MsgStatResultDto msgStatResultDto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       getMsgStatResult(msgStatResultDto, fut);
+    }));
+  }
+
+  public void queryMsgStatResultByPage(Map<String,String> params, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> resultHandler) { 
+    delegate.queryMsgStatResultByPage(params, page, limit, resultHandler);
+  }
+
+  public Single<List<MsgStatResultDto>> rxQueryMsgStatResultByPage(Map<String,String> params, int page, int limit) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryMsgStatResultByPage(params, page, limit, fut);
     }));
   }
 
