@@ -36,7 +36,7 @@ public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgReco
         XProxyHelper.registerService(MsgRecordService.class, vertx, this, MsgRecordService.getLocalAddress(ip));
         publishEventBusService(MsgRecordService.LOCAL_SERVICE_NAME, MsgRecordService.getLocalAddress(ip), MsgRecordService.class);
 
-        msgRecordDao = MsgRecordDao.createLocalProxy(vertx);
+        msgRecordDao = MsgRecordDao.createProxy(vertx);
     }
 
     @Override
