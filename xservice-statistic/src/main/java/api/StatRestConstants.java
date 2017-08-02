@@ -15,8 +15,11 @@ public class StatRestConstants {
 
         static final String SERVICE_ROOT = "/mc-statistic";
 
-        //统计push msg
-        static final String PUSH_MSG_STAT = "/mc-statistic/msg/stat.json";
+        //pushMsg上报接口
+        static final String PUSH_MSG_REPORT = "/mc-statistic/v1/msg/report.json";
+
+        //查询pushMsg统计
+        static final String QUERY_PUSH_MSG_STAT = "/mc-statistic/v1/msgStats.json";
 
     }
 
@@ -24,7 +27,7 @@ public class StatRestConstants {
         static final int HTTP_PORT = 9110;
 
         //用户设备关系上报接口
-        static final String USER_DEVICE_REPORT = "/mc-statistic/device/report.json";
+        static final String DEVICE_REPORT = "/mc-statistic/v1/devices/report.json";
     }
 
 
