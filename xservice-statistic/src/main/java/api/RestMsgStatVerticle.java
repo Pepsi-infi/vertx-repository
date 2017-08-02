@@ -1,17 +1,23 @@
 package api;
 
+import com.google.common.collect.Maps;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
 import iservice.dto.MsgStatDto;
+import service.MsgStatResultService;
+import service.dto.MsgStatResultDto;
 import utils.IPUtil;
 import utils.JsonUtil;
-import constants.PushActionEnum;
 import iservice.MsgStatService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -23,6 +29,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private MsgStatService msgStatService;
 
+    private MsgStatResultService msgStatResultService;
+
     @Override
     public void start() throws Exception {
         super.start();
@@ -30,8 +38,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route(StatRestConstants.Stat.MSG_SEND).handler(this::statMsgSend);
-        router.route(StatRestConstants.Stat.MSG_ARRIVE).handler(this::statMsgArrive);
+        router.route(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
+        router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -45,35 +53,54 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private void initMsgStatService() {
         msgStatService = MsgStatService.createProxy(vertx.getDelegate());
+        msgStatResultService = MsgStatResultService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
         return StringUtils.isNotBlank(IPUtil.getInnerIP()) ? IPUtil.getInnerIP() : config().getString("service.host");
     }
 
-    private void statMsgSend(RoutingContext context) {
+    private void statPushMsg(RoutingContext context) {
         MsgStatDto statDto = buildMsgStatDto(context);
-        statDto.setAction(PushActionEnum.SEND.getType());
-        logger.info("the request params , msgStat: {}", statDto);
+        logger.info("stat pushMsg,the statDto: {}", statDto);
+        if (statDto.getAction() == null || statDto.getAction() < 0) {
+            logger.error("the action is null for {} ", statDto);
+            return;
+        }
         msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
     }
 
-    private void statMsgArrive(RoutingContext context) {
-        MsgStatDto statDto = buildMsgStatDto(context);
-        statDto.setAction(PushActionEnum.ARRIVE.getType());
-        logger.info("the request params , msgStat: {}", statDto);
-        msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
+    private void queryMsgStatResult(RoutingContext context) {
+        String msgId = context.request().params().get("msgId");
+        String page = context.request().params().get("page");
+        String size = context.request().params().get("size");
+        logger.info("query msgStatResult msgId: {}，page: {},size:{}", msgId, page, size);
+        Map<String, String> params = Maps.newHashMap();
+        if (StringUtils.isNotBlank(msgId)) {
+            params.put("msgId", msgId);
+        }
+        Future<List<MsgStatResultDto>> future = Future.future();
+        msgStatResultService.queryMsgStatResult(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
+
     }
+
 
     private MsgStatDto buildMsgStatDto(RoutingContext context) {
+        String action = context.request().params().get("action");
         String appCode = context.request().params().get("appCode");
         String msgId = context.request().params().get("msgId");
         String osType = context.request().params().get("osType");
         String channel = context.request().params().get("channel");
         String sendTime = context.request().params().get("sendTime");
+        String arriveTime = context.request().params().get("arriveTime");
+        String imei = context.request().params().get("imei");
+        String antFingerprint = context.request().params().get("antFingerprint");
         String isAcceptPush = context.request().params().get("isAcceptPush");
 
         MsgStatDto statDto = new MsgStatDto();
+        if (StringUtils.isNotBlank(action)) {
+            statDto.setAction(Integer.valueOf(action));
+        }
         if (StringUtils.isNotBlank(osType)) {
             statDto.setOsType(Integer.valueOf(osType));
         }
@@ -88,6 +115,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         }
         statDto.setMsgId(msgId);
         statDto.setSendTime(sendTime);
+        statDto.setArriveTime(arriveTime);
+        statDto.setImei(imei);
+        statDto.setAntFingerprint(antFingerprint);
         return statDto;
     }
 

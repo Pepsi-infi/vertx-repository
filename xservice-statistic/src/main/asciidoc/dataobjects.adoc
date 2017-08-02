@@ -1,11 +1,11 @@
 = Cheatsheets
 
-[[DeviceDto]]
-== DeviceDto
+[[MsgStatResultDto]]
+== MsgStatResultDto
 
 ++++
  Created by lufei
- Date : 2017/7/26 17:21
+ Date : 2017/7/30 22:02
  Description :
 ++++
 '''
@@ -14,16 +14,51 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[antFingerprint]]`antFingerprint`|`String`|-
-|[[appCode]]`appCode`|`Number (Integer)`|-
-|[[appVersion]]`appVersion`|`String`|-
-|[[deviceToken]]`deviceToken`|`String`|-
-|[[deviceType]]`deviceType`|`String`|-
-|[[imei]]`imei`|`String`|-
-|[[osType]]`osType`|`Number (Integer)`|-
-|[[osVersion]]`osVersion`|`String`|-
-|[[phone]]`phone`|`String`|-
-|[[uid]]`uid`|`Number (Long)`|-
-|[[userType]]`userType`|`Number (Integer)`|-
+|[[arriveAndroidSum]]`arriveAndroidSum`|`Number (Long)`|-
+|[[arriveGcmSum]]`arriveGcmSum`|`Number (Long)`|-
+|[[arriveIosSum]]`arriveIosSum`|`Number (Long)`|-
+|[[arriveMiSum]]`arriveMiSum`|`Number (Long)`|-
+|[[arriveSockSum]]`arriveSockSum`|`Number (Long)`|-
+|[[arriveSum]]`arriveSum`|`Number (Long)`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[clickAndroidSum]]`clickAndroidSum`|`Number (Long)`|-
+|[[clickGcmSum]]`clickGcmSum`|`Number (Long)`|-
+|[[clickIosSum]]`clickIosSum`|`Number (Long)`|-
+|[[clickMiSum]]`clickMiSum`|`Number (Long)`|-
+|[[clickSockSum]]`clickSockSum`|`Number (Long)`|-
+|[[clickSum]]`clickSum`|`Number (Long)`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[msgId]]`msgId`|`String`|-
+|[[sendAndroidSum]]`sendAndroidSum`|`Number (Long)`|-
+|[[sendGcmSum]]`sendGcmSum`|`Number (Long)`|-
+|[[sendIosSum]]`sendIosSum`|`Number (Long)`|-
+|[[sendMiSum]]`sendMiSum`|`Number (Long)`|-
+|[[sendSockSum]]`sendSockSum`|`Number (Long)`|-
+|[[sendSum]]`sendSum`|`Number (Long)`|-
+|[[sendTime]]`sendTime`|`String`|-
+|[[statTime]]`statTime`|`String`|-
+|===
+
+[[MsgStatResultPage]]
+== MsgStatResultPage
+
+++++
+ Created by lufei
+ Date : 2017/8/2 14:25
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`Array of link:dataobjects.html#MsgStatResultDto[MsgStatResultDto]`|-
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[page]]`page`|`Number (int)`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
+|[[size]]`size`|`Number (int)`|-
+|[[status]]`status`|`Number (Integer)`|-
 |===
 

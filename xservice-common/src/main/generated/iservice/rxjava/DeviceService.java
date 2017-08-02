@@ -14,14 +14,16 @@
  * under the License.
  */
 
-package service.rxjava;
+package iservice.rxjava;
 
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import java.util.List;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -31,29 +33,29 @@ import io.vertx.core.Handler;
  * Description :
  *
  * <p/>
- * NOTE: This class has been automatically generated from the {@link service.DeviceService original} non RX-ified interface using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link iservice.DeviceService original} non RX-ified interface using Vert.x codegen.
  */
 
-@io.vertx.lang.rxjava.RxGen(service.DeviceService.class)
+@io.vertx.lang.rxjava.RxGen(iservice.DeviceService.class)
 public class DeviceService {
 
   public static final io.vertx.lang.rxjava.TypeArg<DeviceService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new DeviceService((service.DeviceService) obj),
+    obj -> new DeviceService((iservice.DeviceService) obj),
     DeviceService::getDelegate
   );
 
-  private final service.DeviceService delegate;
+  private final iservice.DeviceService delegate;
   
-  public DeviceService(service.DeviceService delegate) {
+  public DeviceService(iservice.DeviceService delegate) {
     this.delegate = delegate;
   }
 
-  public service.DeviceService getDelegate() {
+  public iservice.DeviceService getDelegate() {
     return delegate;
   }
 
   public static DeviceService createProxy(Vertx vertx) { 
-    DeviceService ret = DeviceService.newInstance(service.DeviceService.createProxy(vertx.getDelegate()));
+    DeviceService ret = DeviceService.newInstance(iservice.DeviceService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
@@ -75,8 +77,26 @@ public class DeviceService {
     }));
   }
 
+  /**
+   * @param param 
+   * @param result 
+   */
+  public void queryDevices(Map<String,String> param, Handler<AsyncResult<List<DeviceDto>>> result) { 
+    delegate.queryDevices(param, result);
+  }
 
-  public static  DeviceService newInstance(service.DeviceService arg) {
+  /**
+   * @param param 
+   * @return 
+   */
+  public Single<List<DeviceDto>> rxQueryDevices(Map<String,String> param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryDevices(param, fut);
+    }));
+  }
+
+
+  public static  DeviceService newInstance(iservice.DeviceService arg) {
     return arg != null ? new DeviceService(arg) : null;
   }
 }

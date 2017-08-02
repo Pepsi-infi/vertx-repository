@@ -1,15 +1,16 @@
-package service;
+package iservice;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.serviceproxy.ProxyHelper;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import utils.BaseResponse;
-import utils.IPUtil;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -19,9 +20,9 @@ import utils.IPUtil;
 @ProxyGen
 @VertxGen
 public interface DeviceService {
-    public static final String SERVICE_NAME = "http.userDevice.eb.service";
+    public static final String SERVICE_NAME = "http.device.eb.service";
 
-    public static final String SERVICE_ADDRESS = "http-userDevice-eb-service";
+    public static final String SERVICE_ADDRESS = "http-device-eb-service";
 
     static DeviceService createProxy(Vertx vertx) {
         return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
@@ -34,4 +35,9 @@ public interface DeviceService {
      */
     void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result);
 
+    /**
+     * @param param
+     * @param result
+     */
+    void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result);
 }

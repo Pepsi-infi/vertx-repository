@@ -20,8 +20,14 @@ public class MsgStatDto {
     private Integer channel;
     //消息发送时间
     private String sendTime;
+    //消息到达时间
+    private String arriveTime;
     //设备类型,参照：OsTypeEnum
     private Integer osType;
+    //imei
+    private String imei;
+    //蚂蚁金服指纹
+    private String antFingerprint;
     //是否接收推送消息 1：是 0 否
     private Integer isAcceptPush;
 
@@ -57,7 +63,6 @@ public class MsgStatDto {
         this.msgId = msgId;
     }
 
-
     public String getSendTime() {
         return sendTime;
     }
@@ -65,7 +70,6 @@ public class MsgStatDto {
     public void setSendTime(String sendTime) {
         this.sendTime = sendTime;
     }
-
 
     public Integer getAction() {
         return action;
@@ -99,6 +103,30 @@ public class MsgStatDto {
         this.isAcceptPush = isAcceptPush;
     }
 
+    public String getArriveTime() {
+        return arriveTime;
+    }
+
+    public void setArriveTime(String arriveTime) {
+        this.arriveTime = arriveTime;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
+    public String getAntFingerprint() {
+        return antFingerprint;
+    }
+
+    public void setAntFingerprint(String antFingerprint) {
+        this.antFingerprint = antFingerprint;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MsgStatDto{");
@@ -107,7 +135,10 @@ public class MsgStatDto {
         sb.append(", action=").append(action);
         sb.append(", channel=").append(channel);
         sb.append(", sendTime='").append(sendTime).append('\'');
+        sb.append(", arriveTime='").append(arriveTime).append('\'');
         sb.append(", osType=").append(osType);
+        sb.append(", imei='").append(imei).append('\'');
+        sb.append(", antFingerprint='").append(antFingerprint).append('\'');
         sb.append(", isAcceptPush=").append(isAcceptPush);
         sb.append('}');
         return sb.toString();

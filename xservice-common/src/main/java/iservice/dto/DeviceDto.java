@@ -1,4 +1,4 @@
-package service.dto;
+package iservice.dto;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
  */
 @DataObject(generateConverter = true)
 public class DeviceDto {
+    private Long id;
     //用户id
     private Long uid;
     //用户类型
@@ -33,6 +34,13 @@ public class DeviceDto {
     //蚂蚁金服指纹
     private String antFingerprint;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getUid() {
         return uid;
@@ -140,7 +148,8 @@ public class DeviceDto {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("DeviceDto{");
-        sb.append("uid=").append(uid);
+        sb.append("id=").append(id);
+        sb.append(", uid=").append(uid);
         sb.append(", userType=").append(userType);
         sb.append(", phone='").append(phone).append('\'');
         sb.append(", deviceType='").append(deviceType).append('\'');

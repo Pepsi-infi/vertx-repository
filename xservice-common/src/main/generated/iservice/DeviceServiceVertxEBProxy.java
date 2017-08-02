@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package iservice;
 
-import service.DeviceService;
+import iservice.DeviceService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,10 +32,12 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
+import java.util.List;
+import iservice.DeviceService;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.core.Vertx;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -80,6 +82,24 @@ public class DeviceServiceVertxEBProxy implements DeviceService {
       } else {
         result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
                       }
+    });
+  }
+
+  public void queryDevices(Map<String,String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", new JsonObject(convertMap(param)));
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "queryDevices");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new DeviceDto(new JsonObject((Map) o)) : new DeviceDto((JsonObject) o)).collect(Collectors.toList())));
+      }
     });
   }
 

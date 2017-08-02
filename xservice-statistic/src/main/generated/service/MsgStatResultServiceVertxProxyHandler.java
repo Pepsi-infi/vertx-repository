@@ -16,7 +16,7 @@
 
 package service;
 
-import service.DeviceService;
+import service.MsgStatResultService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,37 +39,38 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
+import service.dto.MsgStatResultPage;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.core.Vertx;
-import service.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import service.MsgStatResultService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceServiceVertxProxyHandler extends ProxyHandler {
+public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final DeviceService service;
+  private final MsgStatResultService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service) {
+  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, long timeoutInSecond) {
+  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, boolean topLevel, long timeoutSeconds) {
+  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -124,8 +125,22 @@ public class DeviceServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "reportUserDevice": {
-          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new service.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+        case "storeMsgStatResult": {
+          service.storeMsgStatResult(res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "queryMsgStatResult": {
+          service.queryMsgStatResult(convertMap(json.getJsonObject("param").getMap()), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("limit") == null ? null : (json.getLong("limit").intValue()), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

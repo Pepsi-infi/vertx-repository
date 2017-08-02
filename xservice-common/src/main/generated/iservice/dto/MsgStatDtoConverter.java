@@ -30,11 +30,20 @@ public class MsgStatDtoConverter {
     if (json.getValue("action") instanceof Number) {
       obj.setAction(((Number)json.getValue("action")).intValue());
     }
+    if (json.getValue("antFingerprint") instanceof String) {
+      obj.setAntFingerprint((String)json.getValue("antFingerprint"));
+    }
     if (json.getValue("appCode") instanceof Number) {
       obj.setAppCode(((Number)json.getValue("appCode")).intValue());
     }
+    if (json.getValue("arriveTime") instanceof String) {
+      obj.setArriveTime((String)json.getValue("arriveTime"));
+    }
     if (json.getValue("channel") instanceof Number) {
       obj.setChannel(((Number)json.getValue("channel")).intValue());
+    }
+    if (json.getValue("imei") instanceof String) {
+      obj.setImei((String)json.getValue("imei"));
     }
     if (json.getValue("isAcceptPush") instanceof Number) {
       obj.setIsAcceptPush(((Number)json.getValue("isAcceptPush")).intValue());
@@ -54,11 +63,20 @@ public class MsgStatDtoConverter {
     if (obj.getAction() != null) {
       json.put("action", obj.getAction());
     }
+    if (obj.getAntFingerprint() != null) {
+      json.put("antFingerprint", obj.getAntFingerprint());
+    }
     if (obj.getAppCode() != null) {
       json.put("appCode", obj.getAppCode());
     }
+    if (obj.getArriveTime() != null) {
+      json.put("arriveTime", obj.getArriveTime());
+    }
     if (obj.getChannel() != null) {
       json.put("channel", obj.getChannel());
+    }
+    if (obj.getImei() != null) {
+      json.put("imei", obj.getImei());
     }
     if (obj.getIsAcceptPush() != null) {
       json.put("isAcceptPush", obj.getIsAcceptPush());

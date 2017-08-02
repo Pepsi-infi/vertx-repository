@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package dao;
+package iservice;
 
-import dao.DeviceDao;
+import iservice.DeviceService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -40,12 +40,12 @@ import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import java.util.List;
+import iservice.DeviceService;
 import utils.BaseResponse;
 import java.util.Map;
 import io.vertx.core.Vertx;
 import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
-import dao.DeviceDao;
 import io.vertx.core.Handler;
 
 /*
@@ -53,25 +53,25 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceDaoVertxProxyHandler extends ProxyHandler {
+public class DeviceServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final DeviceDao service;
+  private final DeviceService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, long timeoutInSecond) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, boolean topLevel, long timeoutSeconds) {
+  public DeviceServiceVertxProxyHandler(Vertx vertx, DeviceService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -126,8 +126,8 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "addDevice": {
-          service.addDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+        case "reportUserDevice": {
+          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -141,7 +141,7 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "queryDevices": {
-          service.queryDevices(convertMap(json.getJsonObject("params").getMap()), res -> {
+          service.queryDevices(convertMap(json.getJsonObject("param").getMap()), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

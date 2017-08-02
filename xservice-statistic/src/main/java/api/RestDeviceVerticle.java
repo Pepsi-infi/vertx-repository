@@ -7,8 +7,8 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
-import service.DeviceService;
-import service.dto.DeviceDto;
+import iservice.DeviceService;
+import iservice.dto.DeviceDto;
 import utils.IPUtil;
 import utils.JsonUtil;
 
@@ -30,13 +30,13 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         logger.info("Rest device verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route(StatRestConstants.Stat.USER_DEVICE_REPORT).handler(this::reportUserDevice);
+        router.route(StatRestConstants.Device.DEVICE_REPORT).handler(this::reportUserDevice);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
-        createHttpServer(router, serverHost, StatRestConstants.Stat.HTTP_PORT).compose(
+        createHttpServer(router, serverHost, StatRestConstants.Device.HTTP_PORT).compose(
                 serverCreated -> publishHttpEndpoint(StatRestConstants.Stat.SERVICE_NAME, serverHost,
-                        StatRestConstants.Stat.HTTP_PORT, StatRestConstants.Stat.SERVICE_ROOT)).setHandler(
+                        StatRestConstants.Device.HTTP_PORT, StatRestConstants.Stat.SERVICE_ROOT)).setHandler(
                 voidFuture.completer());
 
         this.initUserDeviceService();

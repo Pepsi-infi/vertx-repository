@@ -10,7 +10,8 @@ public enum OsTypeEnum {
 
     private int type;
 
-    OsTypeEnum(int i) {
+    OsTypeEnum(int type) {
+        this.type = type;
     }
 
     public int getType() {
