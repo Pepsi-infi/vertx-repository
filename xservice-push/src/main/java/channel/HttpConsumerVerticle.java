@@ -1,6 +1,7 @@
 package channel;
 
 import constant.PushConsts;
+import constant.ServiceUrlConstant;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
@@ -86,7 +87,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
             return;
         }
 
-        router.route("/mc-push/message/push.json").handler(context -> {
+        router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
             HttpServerResponse resp = context.response();
             HttpServerRequest request = context.request();
             String httpMsg = request.getParam("body");
