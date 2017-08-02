@@ -17,6 +17,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
+import service.dto.MsgStatResultPage;
 import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
@@ -85,12 +86,13 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
     }
 
     @Override
-    public void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> result) {
+    public void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPage>> result) {
         Future<List<MsgStatResultDto>> future = Future.future();
         msgStatResultDao.queryMsgStatResultByPage(param, page, limit, future.completer());
         future.setHandler(ar1 -> {
             if (ar1.succeeded()) {
-                result.handle(Future.succeededFuture(ar1.result()));
+                MsgStatResultPage msgStatResultPage = new MsgStatResultPage(ar1.result(), page, limit);
+                result.handle(Future.succeededFuture(msgStatResultPage));
             } else {
                 result.handle(Future.failedFuture(ar1.cause()));
             }

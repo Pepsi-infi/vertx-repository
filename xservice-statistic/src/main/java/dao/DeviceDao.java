@@ -5,11 +5,12 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.serviceproxy.ProxyHelper;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import utils.BaseResponse;
-import utils.IPUtil;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -35,6 +36,8 @@ public interface DeviceDao {
     }
 
 
-    void addUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+    void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+
+    void queryDevices(Map<String, String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler);
 
 }

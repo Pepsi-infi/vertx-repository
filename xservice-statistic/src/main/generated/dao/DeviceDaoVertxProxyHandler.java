@@ -39,9 +39,11 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import java.util.List;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.core.Vertx;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import dao.DeviceDao;
 import io.vertx.core.Handler;
@@ -124,8 +126,8 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "addUserDevice": {
-          service.addUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new service.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+        case "addDevice": {
+          service.addDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -134,6 +136,20 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
               }
             } else {
               msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "queryDevices": {
+          service.queryDevices(convertMap(json.getJsonObject("params").getMap()), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(DeviceDto::toJson).collect(Collectors.toList())));
             }
          });
           break;

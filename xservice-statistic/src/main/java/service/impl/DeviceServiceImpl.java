@@ -8,9 +8,12 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import rxjava.BaseServiceVerticle;
 import dao.DeviceDao;
-import service.DeviceService;
-import service.dto.DeviceDto;
+import iservice.DeviceService;
+import iservice.dto.DeviceDto;
 import utils.BaseResponse;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -38,7 +41,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
     @Override
     public void reportUserDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
         Future<BaseResponse> resultFuture = Future.future();
-        deviceDao.addUserDevice(userDeviceDto, resultFuture.completer());
+        deviceDao.addDevice(userDeviceDto, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             BaseResponse baseResponse = new BaseResponse();
             if (handler.succeeded()) {
@@ -46,6 +49,20 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
             } else {
                 buildErrorBaseResponse(baseResponse, null, handler.cause().toString());
                 result.handle(Future.succeededFuture(baseResponse));
+            }
+        });
+    }
+
+    @Override
+    public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
+        Future<List<DeviceDto>> resultFuture = Future.future();
+        deviceDao.queryDevices(param, resultFuture.completer());
+        resultFuture.setHandler(handler -> {
+            if (handler.succeeded()) {
+                result.handle(Future.succeededFuture(handler.result()));
+            } else {
+                logger.error("query devices error.", handler.cause());
+                result.handle(Future.failedFuture(handler.cause()));
             }
         });
     }
