@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package iservice;
 
-import service.DeviceService;
+import iservice.DeviceService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,10 +39,12 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DeviceService;
+import java.util.List;
+import iservice.DeviceService;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.core.Vertx;
-import service.dto.DeviceDto;
+import iservice.dto.DeviceDto;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -125,7 +127,7 @@ public class DeviceServiceVertxProxyHandler extends ProxyHandler {
       switch (action) {
 
         case "reportUserDevice": {
-          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new service.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+          service.reportUserDevice(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -134,6 +136,20 @@ public class DeviceServiceVertxProxyHandler extends ProxyHandler {
               }
             } else {
               msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "queryDevices": {
+          service.queryDevices(convertMap(json.getJsonObject("param").getMap()), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(DeviceDto::toJson).collect(Collectors.toList())));
             }
          });
           break;

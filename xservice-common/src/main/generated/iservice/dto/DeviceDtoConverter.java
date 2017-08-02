@@ -14,15 +14,15 @@
  * under the License.
  */
 
-package service.dto;
+package iservice.dto;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 /**
- * Converter for {@link service.dto.DeviceDto}.
+ * Converter for {@link iservice.dto.DeviceDto}.
  *
- * NOTE: This class has been automatically generated from the {@link service.dto.DeviceDto} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link iservice.dto.DeviceDto} original class using Vert.x codegen.
  */
 public class DeviceDtoConverter {
 
@@ -41,6 +41,9 @@ public class DeviceDtoConverter {
     }
     if (json.getValue("deviceType") instanceof String) {
       obj.setDeviceType((String)json.getValue("deviceType"));
+    }
+    if (json.getValue("id") instanceof Number) {
+      obj.setId(((Number)json.getValue("id")).longValue());
     }
     if (json.getValue("imei") instanceof String) {
       obj.setImei((String)json.getValue("imei"));
@@ -77,6 +80,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getDeviceType() != null) {
       json.put("deviceType", obj.getDeviceType());
+    }
+    if (obj.getId() != null) {
+      json.put("id", obj.getId());
     }
     if (obj.getImei() != null) {
       json.put("imei", obj.getImei());

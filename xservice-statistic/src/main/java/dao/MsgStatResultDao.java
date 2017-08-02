@@ -9,6 +9,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by lufei
  * Date : 2017/7/30 21:58
@@ -35,6 +38,9 @@ public interface MsgStatResultDao {
 
     void addMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<BaseResponse>> resultHandler);
 
+    void updateMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<BaseResponse>> resultHandler);
 
     void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler);
+
+    void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> resultHandler);
 }

@@ -66,6 +66,9 @@ public class MsgStatResultDtoConverter {
     if (json.getValue("clickSum") instanceof Number) {
       obj.setClickSum(((Number)json.getValue("clickSum")).longValue());
     }
+    if (json.getValue("id") instanceof Number) {
+      obj.setId(((Number)json.getValue("id")).longValue());
+    }
     if (json.getValue("msgId") instanceof String) {
       obj.setMsgId((String)json.getValue("msgId"));
     }
@@ -134,6 +137,9 @@ public class MsgStatResultDtoConverter {
     }
     if (obj.getClickSum() != null) {
       json.put("clickSum", obj.getClickSum());
+    }
+    if (obj.getId() != null) {
+      json.put("id", obj.getId());
     }
     if (obj.getMsgId() != null) {
       json.put("msgId", obj.getMsgId());

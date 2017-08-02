@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
  */
 @DataObject(generateConverter = true)
 public class MsgStatResultDto {
+    private Long id;
     //渠道
     private Integer channel;
     //消息id
@@ -54,6 +55,14 @@ public class MsgStatResultDto {
     private Long clickMiSum;
     //gcm渠道点击总数
     private Long clickGcmSum;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Integer getChannel() {
         return channel;
@@ -248,7 +257,7 @@ public class MsgStatResultDto {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MsgStatResultDto{");
+        final StringBuilder sb = new StringBuilder("MsgStatResultPage{");
         sb.append("channel=").append(channel);
         sb.append(", msgId='").append(msgId).append('\'');
         sb.append(", statTime='").append(statTime).append('\'');

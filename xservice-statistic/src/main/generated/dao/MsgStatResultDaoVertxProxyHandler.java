@@ -39,8 +39,10 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import java.util.List;
 import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
+import java.util.Map;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
 import dao.MsgStatResultDao;
@@ -138,6 +140,20 @@ public class MsgStatResultDaoVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
+        case "updateMsgStatResult": {
+          service.updateMsgStatResult(json.getJsonObject("msgStatResultDto") == null ? null : new service.dto.MsgStatResultDto(json.getJsonObject("msgStatResultDto")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
         case "getMsgStatResult": {
           service.getMsgStatResult(json.getJsonObject("msgStatResultDto") == null ? null : new service.dto.MsgStatResultDto(json.getJsonObject("msgStatResultDto")), res -> {
             if (res.failed()) {
@@ -148,6 +164,20 @@ public class MsgStatResultDaoVertxProxyHandler extends ProxyHandler {
               }
             } else {
               msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
+        case "queryMsgStatResultByPage": {
+          service.queryMsgStatResultByPage(convertMap(json.getJsonObject("params").getMap()), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("limit") == null ? null : (json.getLong("limit").intValue()), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(new JsonArray(res.result().stream().map(MsgStatResultDto::toJson).collect(Collectors.toList())));
             }
          });
           break;
