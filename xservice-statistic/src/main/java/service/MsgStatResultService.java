@@ -7,7 +7,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.dto.DeviceDto;
+import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -33,4 +37,11 @@ public interface MsgStatResultService {
      * @param result
      */
     void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result);
+
+
+    /**
+     * @param param
+     * @param result
+     */
+    void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> result);
 }
