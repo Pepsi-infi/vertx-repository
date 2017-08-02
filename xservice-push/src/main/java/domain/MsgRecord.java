@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  */
 @DataObject(generateConverter = true)
-public class AmqpConsumeMessage extends BaseModel implements Serializable{
+public class MsgRecord extends BaseModel implements Serializable{
 	
 	/**
 	 * 
@@ -49,9 +49,9 @@ public class AmqpConsumeMessage extends BaseModel implements Serializable{
 		this.channel = channel;
 	}
 
-	public AmqpConsumeMessage() {
+	public MsgRecord() {
 	}
-	public AmqpConsumeMessage(JsonObject json) {
+	public MsgRecord(JsonObject json) {
 		// A converter is generated to easy the conversion from and to JSON.
 		AmqpConsumeMessageConverter.fromJson(json,this);
 	}

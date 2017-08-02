@@ -1,7 +1,7 @@
 package service.impl;
 
 import dao.MsgRecordDao;
-import domain.AmqpConsumeMessage;
+import domain.MsgRecord;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -40,7 +40,7 @@ public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgReco
     }
 
     @Override
-    public void addMessage(AmqpConsumeMessage msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+    public void addMessage(MsgRecord msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         Future<BaseResponse> resultFuture = Future.future();
         msgRecordDao.addMessage(msg, resultFuture.completer());
         resultFuture.setHandler(handler -> {
