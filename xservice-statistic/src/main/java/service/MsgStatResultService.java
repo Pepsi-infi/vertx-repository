@@ -1,5 +1,6 @@
 package service;
 
+import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -27,7 +28,7 @@ public interface MsgStatResultService {
     public static final String SERVICE_ADDRESS = "http-msgStatResult-eb-service";
 
     static MsgStatResultService createProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(MsgStatResultService.class, vertx, MsgStatResultService.SERVICE_ADDRESS);
+        return XProxyHelper.createProxy(MsgStatResultService.class, MsgStatResultService.class, vertx, MsgStatResultService.SERVICE_ADDRESS);
     }
 
 

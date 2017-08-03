@@ -59,13 +59,33 @@ public class DeviceDao {
     return ret;
   }
 
-  public void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
-    delegate.addDevice(userDeviceDto, resultHandler);
+  public void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.addDevice(deviceDto, resultHandler);
   }
 
-  public Single<BaseResponse> rxAddDevice(DeviceDto userDeviceDto) { 
+  public Single<BaseResponse> rxAddDevice(DeviceDto deviceDto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      addDevice(userDeviceDto, fut);
+      addDevice(deviceDto, fut);
+    }));
+  }
+
+  public void updateDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.updateDevice(deviceDto, resultHandler);
+  }
+
+  public Single<BaseResponse> rxUpdateDevice(DeviceDto deviceDto) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      updateDevice(deviceDto, fut);
+    }));
+  }
+
+  public void getDevice(Map<String,String> params, Handler<AsyncResult<DeviceDto>> resultHandler) { 
+    delegate.getDevice(params, resultHandler);
+  }
+
+  public Single<DeviceDto> rxGetDevice(Map<String,String> params) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getDevice(params, fut);
     }));
   }
 

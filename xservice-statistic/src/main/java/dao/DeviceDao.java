@@ -1,5 +1,6 @@
 package dao;
 
+import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -32,11 +33,15 @@ public interface DeviceDao {
 
 
     static DeviceDao createProxy(Vertx vertx) {
-        return ProxyHelper.createProxy(DeviceDao.class, vertx, DeviceDao.SERVICE_ADDRESS);
+        return XProxyHelper.createProxy(DeviceDao.class, DeviceDao.class, vertx, DeviceDao.SERVICE_ADDRESS);
     }
 
 
-    void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+    void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+
+    void updateDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+
+    void getDevice(Map<String, String> params, Handler<AsyncResult<DeviceDto>> resultHandler);
 
     void queryDevices(Map<String, String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler);
 
