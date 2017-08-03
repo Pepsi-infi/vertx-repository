@@ -1,0 +1,43 @@
+= Cheatsheets
+
+[[BaseResponse]]
+== BaseResponse
+
+++++
+ Response基类
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[errorCode]]`errorCode`|`String`|-
+|[[errorMessage]]`errorMessage`|`String`|-
+|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|===
+
+[[MsgStatDto]]
+== MsgStatDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 15:56
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`Number (Integer)`|-
+|[[appCode]]`appCode`|`Number (Integer)`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[isAcceptPush]]`isAcceptPush`|`Number (Integer)`|-
+|[[msgId]]`msgId`|`String`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[sendTime]]`sendTime`|`String`|-
+|===
+

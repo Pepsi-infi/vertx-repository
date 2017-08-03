@@ -1,0 +1,21 @@
+= Cheatsheets
+
+[[AmqpConsumeMessage]]
+== AmqpConsumeMessage
+
+++++
+  消息体
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[amqpMsgId]]`amqpMsgId`|`String`|-
+|[[channel]]`channel`|`String`|-
+|[[id]]`id`|`Number (long)`|-
+|[[msgBody]]`msgBody`|`String`|-
+|[[status]]`status`|`Number (int)`|-
+|===
+
