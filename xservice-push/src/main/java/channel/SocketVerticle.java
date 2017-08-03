@@ -147,8 +147,9 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         chatMsgVO.setMsgBody(msgBody);
         chatMsgVO.setType(messageType.getType());
 
-        Future<Void> passEngerFuture = Future.future();
-        redisService.set(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
+        Future<Long> passEngerFuture = Future.future();
+        //消息id放入队列
+        redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
         //把消息保存到redis中
         Future<Void> msgFuture = Future.future();
         redisService.set(msgId, JsonUtil.toJsonString(chatMsgVO), msgFuture.completer());
@@ -160,7 +161,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Future<CompositeFuture> future = CompositeFuture.all(passEngerFuture, msgFuture, msgExpireFuture);
         future.setHandler(res -> {
             if (res.succeeded()) {
-//                Void passEngerRes = res.result().resultAt(0);
+//                Long passEngerRes = res.result().resultAt(0);
 //                Void msgRes = res.result().resultAt(1);
 //                Long expireRes = res.result().resultAt(2);
                 resultHandler.handle(Future.succeededFuture());
