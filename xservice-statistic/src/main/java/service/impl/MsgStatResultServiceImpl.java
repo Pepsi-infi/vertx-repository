@@ -94,6 +94,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
                 MsgStatResultPage msgStatResultPage = new MsgStatResultPage(ar1.result(), page, limit);
                 result.handle(Future.succeededFuture(msgStatResultPage));
             } else {
+                logger.error("[service] query msgStatResult error", ar1.cause());
                 result.handle(Future.failedFuture(ar1.cause()));
             }
         });

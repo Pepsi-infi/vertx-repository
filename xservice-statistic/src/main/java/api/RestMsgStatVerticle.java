@@ -79,7 +79,6 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         if (StringUtils.isNotBlank(msgId)) {
             params.put("msgId", msgId);
         }
-        Future<List<MsgStatResultDto>> future = Future.future();
         msgStatResultService.queryMsgStatResult(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
 
     }
