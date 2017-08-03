@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class MsgStatResultServiceImpl extends BaseServiceVerticle implements MsgStatResultService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MsgStatServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MsgStatResultServiceImpl.class);
 
     private RedisClient redisClient;
 

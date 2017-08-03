@@ -120,8 +120,10 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
                 if (result.succeeded()) {
                     Optional<JsonObject> jsonObject = result.result();
                     JsonObject jsonObject1 = jsonObject.orElse(null);
-                    resultHandler.handle(Future.succeededFuture(jsonObject1.mapTo(MsgStatResultDto.class)));
+                    MsgStatResultDto msgStatResultDto1 = jsonObject1 != null ? jsonObject1.mapTo(MsgStatResultDto.class) : null;
+                    resultHandler.handle(Future.succeededFuture(msgStatResultDto1));
                 } else {
+                    logger.error("[dao] get msgStatResult error.", result.cause());
                     resultHandler.handle(Future.failedFuture(result.cause()));
                 }
             });
