@@ -5,6 +5,7 @@ package constant;
  */
 public class  MsgConstant {
 
+    //socket推送时的一个字段默认值
     public static final int ZERO = 0;
 
 

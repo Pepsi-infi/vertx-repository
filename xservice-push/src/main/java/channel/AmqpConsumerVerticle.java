@@ -127,7 +127,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			// socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(receiveMsg.toString(), resultHandler);
+			socketPushService.sendMsg(receiveMsg, resultHandler);
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			// gcm推送
 			logger.info("开始走gcm推送");

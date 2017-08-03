@@ -8,9 +8,11 @@ public class ConnectionConsts {
 
 	public static String ACTIVE_QUEUE_TOPIC = "ylf";
 
-
-	public static String SOCKET_SENDTO_ADDRESS = "UDP_HOSTS_PASSENGER";
-
+	/**
+	 * SOCKET推送地址的ip和商品
+	 */
+	public static String SOCKET_PASSENGER_IP = "SOCKET_PASSENGER_IP";
+	public static String SOCKET_PASSENGER_PORT = "SOCKET_PASSENGER_PORT";
 
 	public static String JDBC_CONFIG_PATH = "jdbc.json";
 

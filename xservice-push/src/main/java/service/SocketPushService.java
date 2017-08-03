@@ -6,6 +6,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 import utils.BaseResponse;
 import utils.IPUtil;
@@ -40,6 +41,6 @@ public interface SocketPushService {
 	}
 
 
-	void sendMsg(String recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler);
+	void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler);
 
 }
