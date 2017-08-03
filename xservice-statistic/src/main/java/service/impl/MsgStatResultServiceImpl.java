@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class MsgStatResultServiceImpl extends BaseServiceVerticle implements MsgStatResultService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MsgStatServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MsgStatResultServiceImpl.class);
 
     private RedisClient redisClient;
 
@@ -94,6 +94,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
                 MsgStatResultPage msgStatResultPage = new MsgStatResultPage(ar1.result(), page, limit);
                 result.handle(Future.succeededFuture(msgStatResultPage));
             } else {
+                logger.error("[service] query msgStatResult error", ar1.cause());
                 result.handle(Future.failedFuture(ar1.cause()));
             }
         });

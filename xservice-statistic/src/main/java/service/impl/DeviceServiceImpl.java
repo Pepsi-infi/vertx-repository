@@ -59,7 +59,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                                 result.handle(Future.succeededFuture(baseResponse));
                             } else {
                                 logger.error("add device:{} to db error.", deviceDto, ar2.cause());
-                                buildErrorBaseResponse(baseResponse, null, ar2.cause().toString());
+                                buildErrorBaseResponse(baseResponse, ar2.cause().toString());
                                 result.handle(Future.succeededFuture(baseResponse));
                             }
                         });
@@ -70,7 +70,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                                 result.handle(Future.succeededFuture(baseResponse));
                             } else {
                                 logger.error("update device:{} from db error.", deviceDto, ar3.cause());
-                                buildErrorBaseResponse(baseResponse, null, ar3.cause().toString());
+                                buildErrorBaseResponse(baseResponse, ar3.cause().toString());
                                 result.handle(Future.succeededFuture(baseResponse));
                             }
                         });
@@ -98,10 +98,9 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
         });
     }
 
-    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String errCode, String message) {
+    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String message) {
         if (response != null) {
             response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
-            response.setErrorCode(errCode);
             response.setErrorMessage(message);
         }
     }
