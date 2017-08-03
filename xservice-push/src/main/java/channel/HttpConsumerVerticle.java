@@ -1,13 +1,5 @@
 package channel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -15,11 +7,7 @@ import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -31,15 +19,17 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.GcmPushService;
-import service.MsgRecordService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -140,16 +130,19 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			// this.saveMsgRecord(checkFuture);
 
 			// 消息推送成功后，调用上报消息接口
-			this.callStatPushMsg(pushFuture);
+			Future<BaseResponse> statFuture = Future.future();
+			this.callStatPushMsg(statFuture.completer(),pushFuture);
 
 			// 根据推送结果返回结果数据给http调用方
-			if (pushFuture.succeeded()) {
-				resp.putHeader("content-type", "text/plain;charset=UTF-8")
-						.end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
-			} else {
-				resp.putHeader("content-type", "text/plain;charset=UTF-8")
-						.end(new ResultData<Object>(ErrorCodeEnum.FAIL, null).toString());
-			}
+			statFuture.setHandler(statRes ->{
+				if (statRes.succeeded()) {
+					resp.putHeader("content-type", "text/plain;charset=UTF-8")
+							.end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
+				} else {
+					resp.putHeader("content-type", "text/plain;charset=UTF-8")
+							.end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), statRes.cause().getMessage(), null).toString());
+				}
+			});
 
 		});
 
@@ -160,7 +153,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	 * 已推送消息上报 //接口参见wiki :
 	 * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=329268
 	 */
-	private void callStatPushMsg(Future<AsyncResult<BaseResponse>> pushFuture) {
+	private void callStatPushMsg(Handler<AsyncResult<BaseResponse>> resultHandler, Future<AsyncResult<BaseResponse>> pushFuture) {
 		pushFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				// 已推送消息上报接口
@@ -174,23 +167,21 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				// 1发送，2接收
 				msgStatDto.setAction(1);
 				msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
-				msgStatService.statPushMsg(msgStatDto, this::pushMsgHandler);
+				msgStatService.statPushMsg(msgStatDto, statRes ->{
+					if (statRes.succeeded()) {
+						logger.info("已推送消息上报成功");
+						resultHandler.handle(Future.succeededFuture());
+					} else {
+						logger.error("已推送消息上报失败,失败原因：" + statRes.cause());
+						resultHandler.handle(Future.failedFuture(statRes.cause()));
+					}
+				});
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
+				resultHandler.handle(Future.failedFuture(pushFuture.cause().getMessage()));
 			}
 		});
-	}
-
-	/**
-	 * 已推送消息上报结果
-	 */
-	private void pushMsgHandler(AsyncResult<BaseResponse> resultHandler) {
-		if (resultHandler.succeeded()) {
-			logger.info("已推送消息上报成功");
-		} else {
-			logger.error("已推送消息上报失败,失败原因：" + resultHandler.cause());
-		}
 	}
 
 	private void initService() {
@@ -227,30 +218,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 			Map<String, String> param = new HashMap<>();
 			param.put("phone", phone);
-
 			deviceService.queryDevices(param, deviceFuture.completer());
-			// deviceHandler.setHandler(handler -> {
-			//
-			// if (handler.succeeded()) {
-			//
-			// deviceList = handler.result();
-			//
-			// if (CollectionUtils.isEmpty(deviceList)) {
-			// logger.error("设备token不存在,推送操作不执行");
-			// resultHandler.handle(Future.failedFuture("设备token不存在"));
-			// return;
-			// }
-			//
-			// token = deviceList.get(0).getDeviceToken();
-			//
-			// } else {
-			// logger.error("设备token获取异常");
-			// resultHandler.handle(Future.failedFuture(handler.cause()));
-			// return;
-			// }
-			//
-			// });
-
 		}
 
 		// 从上游接收到的 推送类型
@@ -271,21 +239,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
 		Future<String> redisFuture = Future.future();
 		redisService.get(redisMsgKey, redisFuture.completer());
-//		redisFuture.setHandler(res -> {
-//			if (res.succeeded()) {
-//				if (null != res.result()) {
-//					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送，msgId =" + msgId;
-//					resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
-//				} else {
-//					// 验证通过
-//					resultHandler.handle(Future.succeededFuture());
-//				}
-//			} else {
-//				logger.info("from redis get key fail : key = " + redisMsgKey);
-//				// getkey失败也不能影响主流程
-//				resultHandler.handle(Future.succeededFuture());
-//			}
-//		});
 
 		Future<CompositeFuture> compositFuture = CompositeFuture.all(deviceFuture, redisFuture);
 		compositFuture.setHandler(handler -> {
@@ -367,6 +320,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				}
 			} else {
 				logger.error("数据验证未通过，原因：" + checkFutrue.cause());
+				resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
 			}
 		});
 	}
