@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2017-08-01 10:37:53
+Date: 2017-08-03 15:24:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -35,7 +35,13 @@ CREATE TABLE `msg_stat` (
   `arriveSockSum` bigint(20) DEFAULT NULL COMMENT 'socket渠道达到总数',
   `arriveMiSum` bigint(20) DEFAULT NULL COMMENT '小米渠道到达总数',
   `arriveGcmSum` bigint(20) DEFAULT NULL COMMENT 'gcm渠道到达总数',
+  `clickSum` bigint(20) DEFAULT NULL COMMENT '点击总数',
+  `clickAndroidSum` bigint(20) DEFAULT NULL COMMENT 'android点击数',
+  `clickIosSum` bigint(20) DEFAULT NULL COMMENT 'ios点击数',
+  `clickSockSum` bigint(20) DEFAULT NULL COMMENT 'sock点击数',
+  `clickMiSum` bigint(20) DEFAULT NULL COMMENT '小米渠道点击数',
+  `clickGcmSum` bigint(20) DEFAULT NULL COMMENT 'gcm渠道点击数',
   PRIMARY KEY (`id`),
   KEY `ind_msgId` (`msgId`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=165 DEFAULT CHARSET=utf8;
 SET FOREIGN_KEY_CHECKS=1;
