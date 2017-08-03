@@ -82,7 +82,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         } catch (Exception e) {
             logger.error("stat msgStatDto : {} error.", msgStatDto, e);
             BaseResponse baseResponse = new BaseResponse();
-            buildErrorBaseResponse(baseResponse, null, e.getMessage());
+            buildErrorBaseResponse(baseResponse, e.getMessage());
             result.handle(Future.succeededFuture(baseResponse));
         }
 
@@ -125,10 +125,9 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         return fieldsList;
     }
 
-    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String errCode, String message) {
+    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String message) {
         if (response != null) {
             response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
-            response.setErrorCode(errCode);
             response.setErrorMessage(message);
         }
     }
