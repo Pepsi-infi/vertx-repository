@@ -54,10 +54,10 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 			return;
 		}
 
-		String title = EnumPassengerMessageType.ADVERTISEMENT.getName();
+		String title = recieveMsg.getString("title");
 		String content = recieveMsg.toString();
 
-		String description = "首汽约车";
+		String description = recieveMsg.getString("content");
 		String regId = null;
 		try {
 			regId = (String) recieveMsg.getValue("regId");
