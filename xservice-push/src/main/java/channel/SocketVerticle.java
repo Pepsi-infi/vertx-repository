@@ -1,7 +1,6 @@
 package channel;
 
 import constant.ConnectionConsts;
-import constant.MsgConstant;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
@@ -108,23 +107,25 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         List<Object> params = new ArrayList<>();
         params.add(customerId);
         params.add(messageType.getType());
-        params.add(MsgConstant.ZERO);
+        params.add(PushConsts.ZERO);
         params.add(msgInfo);
 
         Map<String, Object> sendMsgMap = new HashMap<>();
         DatagramSocket client = null;
         try {
-            String socketIpAddr = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_PASSENGER_IP);
+            String socketIp = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_PASSENGER_IP);
             String socketPort = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_PASSENGER_PORT);
-            sendMsgMap.put("method", MsgConstant.SendMethod.SEND_MSG.getMsg());
+            sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
             sendMsgMap.put("params", params);
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
-            client = new DatagramSocket();
-            InetAddress addr = InetAddress.getByName(socketIpAddr);
-            int port = Integer.valueOf(socketPort);
-            DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, addr, port);
 
-            logger.info(" Socket [" + socketIpAddr + ":" + socketPort + "], Push method [" + MsgConstant.SendMethod.SEND_MSG.getMsg() + "] : " +
+            client = new DatagramSocket();
+            InetAddress targetIp = InetAddress.getByName(socketIp);
+            int targetPort = Integer.valueOf(socketPort);
+            //调用下游服务
+            DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, targetIp, targetPort);
+
+            logger.info(" Socket [" + socketIp + ":" + socketPort + "], Push method [" + PushConsts.SOCKET_SEND_METHOD + "] : " +
                     new String(sendBuf, "UTF-8"));
             client.send(sendPacket);
             resultHandler.handle(Future.succeededFuture(new BaseResponse()));
