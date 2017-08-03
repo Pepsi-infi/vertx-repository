@@ -1,5 +1,13 @@
 package channel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -7,7 +15,11 @@ import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -19,23 +31,19 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.*;
+import service.GcmPushService;
+import service.MsgRecordService;
+import service.RedisService;
+import service.SocketPushService;
+import service.XiaoMiPushService;
 import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
-
-	private Object activity = null;
 
 	private SocketPushService socketPushService;
 
@@ -131,16 +139,17 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 			// 消息推送成功后，调用上报消息接口
 			Future<BaseResponse> statFuture = Future.future();
-			this.callStatPushMsg(statFuture.completer(),pushFuture);
+			this.callStatPushMsg(statFuture.completer(), pushFuture);
 
 			// 根据推送结果返回结果数据给http调用方
-			statFuture.setHandler(statRes ->{
+			statFuture.setHandler(statRes -> {
 				if (statRes.succeeded()) {
 					resp.putHeader("content-type", "text/plain;charset=UTF-8")
 							.end(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString());
 				} else {
-					resp.putHeader("content-type", "text/plain;charset=UTF-8")
-							.end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), statRes.cause().getMessage(), null).toString());
+					resp.putHeader("content-type", "text/plain;charset=UTF-8").end(
+							new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), statRes.cause().getMessage(), null)
+									.toString());
 				}
 			});
 
@@ -153,7 +162,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	 * 已推送消息上报 //接口参见wiki :
 	 * http://cowiki.01zhuanche.com/pages/viewpage.action?pageId=329268
 	 */
-	private void callStatPushMsg(Handler<AsyncResult<BaseResponse>> resultHandler, Future<AsyncResult<BaseResponse>> pushFuture) {
+	private void callStatPushMsg(Handler<AsyncResult<BaseResponse>> resultHandler,
+			Future<AsyncResult<BaseResponse>> pushFuture) {
 		pushFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				// 已推送消息上报接口
@@ -167,7 +177,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				// 1发送，2接收
 				msgStatDto.setAction(1);
 				msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
-				msgStatService.statPushMsg(msgStatDto, statRes ->{
+				msgStatService.statPushMsg(msgStatDto, statRes -> {
 					if (statRes.succeeded()) {
 						logger.info("已推送消息上报成功");
 						resultHandler.handle(Future.succeededFuture());
@@ -212,13 +222,19 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 
 		Future<List<DeviceDto>> deviceFuture = Future.future();
-		;
+
 		if (StringUtil.isNullOrEmpty(token)) {
 			logger.info("设备token为空，从数据库获取设备token");
 
 			Map<String, String> param = new HashMap<>();
 			param.put("phone", phone);
 			deviceService.queryDevices(param, deviceFuture.completer());
+		} else {
+			deviceList = new ArrayList<>();
+			DeviceDto dto = new DeviceDto();
+			dto.setDeviceToken(token);
+			deviceList.add(dto);
+			deviceFuture.handle(Future.succeededFuture(deviceList));
 		}
 
 		// 从上游接收到的 推送类型
@@ -243,27 +259,28 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		Future<CompositeFuture> compositFuture = CompositeFuture.all(deviceFuture, redisFuture);
 		compositFuture.setHandler(handler -> {
 			if (handler.succeeded()) {
-				
-				//校验并获取设备token
+
+				// 校验并获取设备token
 				deviceList = handler.result().resultAt(0);
+				logger.info(deviceList);
 				if (CollectionUtils.isEmpty(deviceList)) {
 					logger.error("设备token不存在,推送操作不执行");
 					resultHandler.handle(Future.failedFuture("设备token不存在"));
 					return;
-				}				
+				}
 				token = deviceList.get(0).getDeviceToken();
-				
-				//验证redis
-				String redisResult=handler.result().resultAt(1);
-				if(StringUtils.isNotBlank(redisResult)){
+
+				// 验证redis
+				String redisResult = handler.result().resultAt(1);
+				if (StringUtils.isNotBlank(redisResult)) {
 					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送，msgId =" + msgId;
 					resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
 					return;
 				}
-				
-				logger.info("from redis get key fail : key = " + redisMsgKey);			
+
+				logger.info("from redis get key fail : key = " + redisMsgKey);
 				resultHandler.handle(Future.succeededFuture());
-				
+
 			} else {
 				resultHandler.handle(Future.failedFuture(handler.cause()));
 			}
@@ -300,7 +317,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			Future<BaseResponse> checkFutrue) {
 		checkFutrue.setHandler(res -> {
 			if (res.succeeded()) {
-				logger.debug("token="+token);
+				logger.debug("token=" + token);
 				receiveMsg.put("regId", token);
 				if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 					// socket推送
@@ -329,14 +346,17 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		String errorMsg;
 		if (msg == null) {
 			errorMsg = "校验未通过，receiveMsg==" + msg;
+			logger.error(errorMsg);
 			return false;
 		}
 		if (msg.getValue("msgId") == null) {
 			errorMsg = "校验未通过：msgId为空";
+			logger.error(errorMsg);
 			return false;
 		}
 		if (msg.getValue("customerId") == null) {
 			errorMsg = "校验未通过：customerId为空";
+			logger.error(errorMsg);
 			return false;
 		}
 		return true;
