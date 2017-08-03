@@ -72,8 +72,11 @@ public class HttpConsumerVerticle extends AbstractVerticle {
     private String phone;
     // 用户ID
     private Object customerId;
-
+    //设备查询信息
     private List<DeviceDto> deviceList;
+    //apns推送
+	private ApplePushService applePushService;
+
 
     @Override
     public void start() throws Exception {
@@ -192,6 +195,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
         redisService = RedisService.createProxy(vertx);
         msgStatService = MsgStatService.createProxy(vertx);
         deviceService = DeviceService.createProxy(vertx);
+        applePushService = ApplePushService.createProxy(vertx);
     }
 
     private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
@@ -230,11 +234,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
         apnsToken = (String) receiveMsg.getValue("apnsToken");
         // 用户id
         customerId = receiveMsg.getValue("customerId");
-
-        if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
-            resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
-            return;
-        }
+/*
+ * 
+ * 涉及到加入苹果推送，对于apnsToken的校验将不做处理，只用作区分推送渠道
+ */
+//        if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
+//            resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
+//            return;
+//        }
 
         // 判断消息是否接收过
         String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
@@ -301,6 +308,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
                                      Future<BaseResponse> checkFutrue) {
         checkFutrue.setHandler(res -> {
             if (res.succeeded()) {
+            	
+            	if(!StringUtil.isNullOrEmpty(apnsToken)){
+					//苹果推送
+					logger.info("开始走苹果推送");
+					applePushService.sendMsg(receiveMsg,resultHandler);
+					return;
+				}
+            	
                 logger.debug("token=" + token);
                 receiveMsg.put("regId", token);
                 if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
