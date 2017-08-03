@@ -33,4 +33,82 @@ public class ByteUtil {
 		b[3] = (byte) i;
 		return b;
 	}
+
+	/**
+	 * 将一个4位字节数组转换为浮点数。<br>
+	 * 注意，函数中不会对字节数组长度进行判断，请自行保证传入参数的正确性。
+	 * 
+	 * @param b
+	 *            字节数组
+	 * @return 浮点数
+	 */
+	public static float bytesToFloat(byte[] b) {
+		return Float.intBitsToFloat(bytesToInt(b));
+	}
+
+	/**
+	 * 将一个浮点数转换为字节数组（4个字节），b[0]存储高位字符，大端
+	 * 
+	 * @param f
+	 *            浮点数
+	 * @return 代表浮点数的字节数组
+	 */
+	public static byte[] floatToBytes(float f) {
+		return intToBytes(Float.floatToIntBits(f));
+	}
+
+	/**
+	 * Convert byte[] to hex string
+	 * 
+	 * @param src
+	 * @return
+	 */
+	public static String bytesToHexString(byte[] src) {
+		StringBuilder stringBuilder = new StringBuilder("");
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		for (int i = 0; i < src.length; i++) {
+			int v = src[i] & 0xFF;
+			String hv = Integer.toHexString(v);
+			if (hv.length() < 2) {
+				stringBuilder.append(0);
+			}
+			stringBuilder.append(hv);
+		}
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Convert hex string to byte[]
+	 * 
+	 * @param hexString
+	 *            the hex string
+	 * @return byte[]
+	 */
+	public static byte[] hexStringToBytes(String hexString) {
+		if (hexString == null || hexString.equals("")) {
+			return null;
+		}
+		hexString = hexString.toUpperCase();
+		int length = hexString.length() / 2;
+		char[] hexChars = hexString.toCharArray();
+		byte[] d = new byte[length];
+		for (int i = 0; i < length; i++) {
+			int pos = i * 2;
+			d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+		}
+		return d;
+	}
+
+	/**
+	 * Convert char to byte
+	 * 
+	 * @param c
+	 *            char
+	 * @return byte
+	 */
+	private static byte charToByte(char c) {
+		return (byte) "0123456789ABCDEF".indexOf(c);
+	}
 }

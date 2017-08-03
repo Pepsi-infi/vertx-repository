@@ -5,8 +5,6 @@ import util.ByteUtil;
 
 public class MessageBuilder {
 
-	public static final int HEADER_LENGTH = 24;
-
 	/**
 	 * msg header: headerLength [0-4] clientVersion[5-8] cmdid[9-12] seq [13-16]
 	 * bodyLength [17-20]

@@ -19,9 +19,11 @@ public class TCPClient {
 		client.connect(4321, "localhost", res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
+
+				// 1001
 				byte[] headerLength = intToBytes(24);
 				byte[] clientVersion = intToBytes(10001);
-				byte[] cmdId = intToBytes(1002);
+				byte[] cmdId = intToBytes(1001);
 				byte[] seq = intToBytes(1);
 				JsonObject msgBody = new JsonObject().put("from", 11111);
 				byte[] bodyLength = intToBytes(msgBody.toString().length());
@@ -30,6 +32,26 @@ public class TCPClient {
 				// Buffer bf = Buffer.buffer();
 				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
 				socket.write(msg);
+
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				// 1002
+				byte[] headerLength2 = intToBytes(24);
+				byte[] clientVersion2 = intToBytes(10001);
+				byte[] cmdId2 = intToBytes(1002);
+				byte[] seq2 = intToBytes(1);
+				JsonObject msgBody2 = new JsonObject().put("from", 11111);
+				byte[] bodyLength2 = intToBytes(msgBody.toString().length());
+				Buffer msg2 = Buffer.buffer().appendBytes(headerLength2).appendBytes(clientVersion2).appendBytes(cmdId2)
+						.appendBytes(seq2).appendBytes(bodyLength2).appendString(msgBody.toString()).appendString("\n");
+				// Buffer bf = Buffer.buffer();
+				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
+				socket.write(msg2);
 			} else {
 				System.out.println("Failed to connect: " + res.cause().getMessage());
 			}
@@ -109,5 +131,54 @@ public class TCPClient {
 			cs[i] = digits[random.nextInt(digits.length)];
 		}
 		return new String(cs);
+	}
+
+	public static String bytesToHexString(byte[] src) {
+		StringBuilder stringBuilder = new StringBuilder("");
+		if (src == null || src.length <= 0) {
+			return null;
+		}
+		for (int i = 0; i < src.length; i++) {
+			int v = src[i] & 0xFF;
+			String hv = Integer.toHexString(v);
+			if (hv.length() < 2) {
+				stringBuilder.append(0);
+			}
+			stringBuilder.append(hv);
+		}
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Convert hex string to byte[]
+	 * 
+	 * @param hexString
+	 *            the hex string
+	 * @return byte[]
+	 */
+	public static byte[] hexStringToBytes(String hexString) {
+		if (hexString == null || hexString.equals("")) {
+			return null;
+		}
+		hexString = hexString.toUpperCase();
+		int length = hexString.length() / 2;
+		char[] hexChars = hexString.toCharArray();
+		byte[] d = new byte[length];
+		for (int i = 0; i < length; i++) {
+			int pos = i * 2;
+			d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+		}
+		return d;
+	}
+
+	/**
+	 * Convert char to byte
+	 * 
+	 * @param c
+	 *            char
+	 * @return byte
+	 */
+	private static byte charToByte(char c) {
+		return (byte) "0123456789ABCDEF".indexOf(c);
 	}
 }

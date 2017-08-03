@@ -1,5 +1,7 @@
 package server;
 
+import constants.CmdConstants;
+import constants.MessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -12,7 +14,6 @@ import io.vertx.core.parsetools.RecordParser;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
 import logic.C2CService;
-import protocol.CMDConstants;
 import util.ByteUtil;
 
 public class TCPServerVerticle extends AbstractVerticle {
@@ -46,13 +47,13 @@ public class TCPServerVerticle extends AbstractVerticle {
 				int cmd = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
 				int seq = ByteUtil.bytesToInt(buffer.getBytes(12, 16));
 				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(16, 20));
-				System.out.println(headerLength + " " + " " + clientVersion + " " + cmd + " " + seq + " " + bodyLength);
-				// int serverIp = ByteUtil.bytesToInt(buffer.getBytes(20, 24));// ?
 
 				JsonObject msgBody = null;
 				if (bodyLength != 0) {
 					try {
-						msgBody = buffer.getBuffer(20, 20 + bodyLength).toJsonObject();
+						msgBody = buffer
+								.getBuffer(MessageConstant.HEADER_LENGTH, MessageConstant.HEADER_LENGTH + bodyLength)
+								.toJsonObject();
 					} catch (Exception e) {
 						logger.error("Json parse error." + e.toString());
 					}
@@ -63,25 +64,25 @@ public class TCPServerVerticle extends AbstractVerticle {
 					Long from = msgBody.getLong("from");// uid
 					if (from != null) {
 						switch (cmd) {
-						case CMDConstants.login:
+						case CmdConstants.LOGIN:
 							sessionMap.put(from, socket.writeHandlerID());
 							sessionReverse.put(socket.writeHandlerID(), from);
 							break;
-						case CMDConstants.LOGOUT:
+						case CmdConstants.LOGOUT:
 							Long uid = sessionReverse.get(socket.writeHandlerID());
 							sessionReverse.remove(socket.writeHandlerID());
 							if (uid != null) {
 								sessionMap.remove(uid);
 							}
 							break;
-						case CMDConstants.msg_r:
+						case CmdConstants.MSG_R:
 							JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
 									.put("body", msgBody);
 
 							Future<JsonObject> msgRF = Future.future();
 							c2cService.doWithMsgRequest(rMsg, msgRF.completer());
 							break;
-						case CMDConstants.ack_r:
+						case CmdConstants.ACK_R:
 							JsonObject aMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
 									.put("body", msgBody);
 							Future<JsonObject> msgAF = Future.future();
