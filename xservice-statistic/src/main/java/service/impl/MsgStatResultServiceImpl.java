@@ -18,6 +18,7 @@ import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
 import service.dto.MsgStatResultPage;
+import service.dto.MsgStatResultPageWrapper;
 import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
@@ -57,16 +58,6 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
-        vertx.setPeriodic(10000, handler -> {
-            logger.info("msgStatResult timer run .....");
-            storeMsgStatResult(asyncResult -> {
-                if (asyncResult.succeeded()) {
-                    logger.info("msgStatResult timer success. ");
-                } else {
-                    logger.error("msgStatResult timer error", asyncResult.cause());
-                }
-            });
-        });
     }
 
 
@@ -86,13 +77,15 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
     }
 
     @Override
-    public void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPage>> result) {
+    public void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result) {
         Future<List<MsgStatResultDto>> future = Future.future();
         msgStatResultDao.queryMsgStatResultByPage(param, page, limit, future.completer());
         future.setHandler(ar1 -> {
             if (ar1.succeeded()) {
+                MsgStatResultPageWrapper wrapper = new MsgStatResultPageWrapper();
                 MsgStatResultPage msgStatResultPage = new MsgStatResultPage(ar1.result(), page, limit);
-                result.handle(Future.succeededFuture(msgStatResultPage));
+                wrapper.setData(msgStatResultPage);
+                result.handle(Future.succeededFuture(wrapper));
             } else {
                 logger.error("[service] query msgStatResult error", ar1.cause());
                 result.handle(Future.failedFuture(ar1.cause()));
