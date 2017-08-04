@@ -2,7 +2,6 @@ package service.dto;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
-import utils.BaseResponse;
 
 import java.util.List;
 

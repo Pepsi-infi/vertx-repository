@@ -6,10 +6,10 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
-import org.apache.commons.lang.StringUtils;
-import rxjava.RestAPIVerticle;
 import iservice.DeviceService;
 import iservice.dto.DeviceDto;
+import org.apache.commons.lang.StringUtils;
+import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 import utils.JsonUtil;
 
