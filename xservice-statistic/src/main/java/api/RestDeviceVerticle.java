@@ -1,11 +1,8 @@
 package api;
 
-import io.vertx.core.Handler;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
-import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
