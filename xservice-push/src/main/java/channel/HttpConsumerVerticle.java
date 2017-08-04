@@ -27,6 +27,7 @@ import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,6 +224,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
             Map<String, String> param = new HashMap<>();
             param.put("phone", phone);
             deviceService.queryDevices(param, deviceFuture.completer());
+        }else{
+            DeviceDto d = new DeviceDto();
+            d.setDeviceToken(token);
+            deviceFuture.handle(Future.succeededFuture(Arrays.asList(d)));
         }
 
 
