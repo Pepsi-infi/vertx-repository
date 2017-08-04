@@ -4,12 +4,12 @@ import constant.ConnectionConsts;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
-import helper.XProxyHelper;
 import io.vertx.core.*;
 import io.vertx.core.eventbus.MessageProducer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.serviceproxy.ProxyHelper;
 import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
@@ -51,11 +51,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     public void start() throws Exception {
         super.start();
+        ProxyHelper.registerService(SocketPushService.class, vertx, this, SocketPushService.class.getName());
 
-        XProxyHelper.registerService(SocketPushService.class, vertx, this, SocketPushService.SERVICE_ADDRESS);
-        publishEventBusService(SocketPushService.SERVICE_NAME, SocketPushService.SERVICE_ADDRESS, SocketPushService.class);
-
-        redisService = RedisService.createProxy(vertx);
     }
 
     public void stop() throws Exception {
@@ -70,6 +67,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
         //广告类的消息
         messageType = EnumPassengerMessageType.ADVERTISEMENT;
+        redisService = RedisService.createProxy(vertx);
         /**
          *  获取消息数据字段
          */
@@ -127,7 +125,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
             logger.info(" Socket [" + socketIp + ":" + socketPort + "], Push method [" + PushConsts.SOCKET_SEND_METHOD + "] : " +
                     new String(sendBuf, "UTF-8"));
-            client.send(sendPacket);
+//            client.send(sendPacket);
             resultHandler.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
             logger.error("socket推送消息出错 " + e.getMessage(), e);
@@ -179,9 +177,9 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     public static void main(String[] args) {
         Vertx vertx1 = Vertx.vertx();
         vertx1.deployVerticle(SocketVerticle.class.getName());
-        MessageProducer<String> mp = vertx1.eventBus().sender(PushConsts.PUSH_CHANNEL_VERTICLE_PREFIX);
-        String json = "";
-        mp.send(json);
+        MessageProducer<String> mp = vertx1.eventBus().sender(SocketPushService.SERVICE_ADDRESS);
+        String json = "{\"phone\":\"13211112222\",\"devicePushType\":\"1\",\"msgId\":\"a56e4029-99f7-4b9d-829f-8627be78821a\"," +
+                "\"customerId\":123,\"title\":\"发券啦\",\"content\":\"送您一张10元优惠券\"}";
         long timerID = vertx1.setTimer(3000, id -> {
             mp.send(json);
         });
