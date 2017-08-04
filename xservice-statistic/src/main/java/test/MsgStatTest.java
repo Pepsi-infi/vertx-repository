@@ -1,5 +1,7 @@
 package test;
 
+import api.RestMsgStatVerticle;
+import cron.CronMsgStatVerticle;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -60,9 +62,9 @@ public class MsgStatTest {
         DeploymentOptions deploymentOptions = new DeploymentOptions();
         deploymentOptions.setConfig(config());
 //        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
-//        vertx.deployVerticle(MsgStatResultServiceImpl.class.getName(), deploymentOptions, future.completer());
-
+//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
+        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
         return future.map(r -> null);
     }
 
