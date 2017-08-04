@@ -1,7 +1,31 @@
 {
-    "db_name": "lecom_copy",
-    "connection_string": "mongodb://admin:ODY3ZGYxNGFiOTd@10.212.23.161:9350,10.212.23.162:9350,10.212.23.163:9350",
-    "memcached.servers": "10.154.157.64:11211",
-    "memcached.timeout.ms": 1000,
-    "validate-on-connect": true
+	"host": "10.10.10.178",
+	"port": 27017,
+	"replicaSet": "foo",
+	"serverSelectionTimeoutMS": 30000,
+	"maxPoolSize": 50,
+	"minPoolSize": 25,
+	"maxIdleTimeMS": 300000,
+	"maxLifeTimeMS": 3600000,
+	"waitQueueMultiple": 10,
+	"waitQueueTimeoutMS": 10000,
+	"maintenanceFrequencyMS": 2000,
+	"maintenanceInitialDelayMS": 500,
+	"username": "im-mc",
+	"password": "im-mc",
+	"authSource": "im-mc",
+	"connectTimeoutMS": 300000,
+	"socketTimeoutMS": 100000,
+	"sendBufferSize": 8192,
+	"receiveBufferSize": 8192,
+	"keepAlive": true,
+	"heartbeat.socket": {
+		"connectTimeoutMS": 300000,
+		"socketTimeoutMS": 100000,
+		"sendBufferSize": 8192,
+		"receiveBufferSize": 8192,
+		"keepAlive": true
+	},
+	"heartbeatFrequencyMS": 1000,
+	"minHeartbeatFrequencyMS": 500
 }
