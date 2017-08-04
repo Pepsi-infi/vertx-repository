@@ -71,6 +71,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 			}
 			
 		} catch (Exception e) {
+			resultHandler.handle(Future.failedFuture(e));
 			logger.error("sendMsg error:regId=" + regId + ", mapName=" + title + ", recieveMsg=" + recieveMsg, e);
 		}
 	}

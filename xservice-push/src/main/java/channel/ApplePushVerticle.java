@@ -1,4 +1,4 @@
-package service.impl;
+package channel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +14,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.ApplePushService;
 import util.HttpUtils;
+import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
 
-public class ApplePushServiceImpl extends BaseServiceVerticle implements ApplePushService {
+public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 	
-	private static final Logger logger=LoggerFactory.getLogger(ApplePushServiceImpl.class);
+	private static final Logger logger=LoggerFactory.getLogger(ApplePushVerticle.class);
 	
 	@Override
 	public void start() throws Exception {
@@ -43,9 +44,16 @@ public class ApplePushServiceImpl extends BaseServiceVerticle implements ApplePu
 		params.put("body", receiveMsg.getString("content"));
 		params.put("msgbody", receiveMsg.toString());
 		
+		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host.dev");
+		
+		if(StringUtil.isNullOrEmpty(host)){
+			resultHandler.handle(Future.failedFuture("apple push host is null"));
+			return;
+		}
+		
 		String result = null;
 		try {
-			result = HttpUtils.URLPost(ServiceUrlConstant.APPLE_PUSH_URL, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
+			result = HttpUtils.URLPost(host+ServiceUrlConstant.APPLE_PUSH_URL, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
 		} catch (Exception e) {
 			logger.error("apns推送调用异常", e);
 			resultHandler.handle(Future.failedFuture(e));

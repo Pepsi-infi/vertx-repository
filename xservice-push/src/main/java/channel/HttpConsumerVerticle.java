@@ -216,7 +216,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
         token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 
         Future<List<DeviceDto>> deviceFuture = Future.future();
-        ;
+
         if (StringUtil.isNullOrEmpty(token)) {
             logger.info("设备token为空，从数据库获取设备token");
 
