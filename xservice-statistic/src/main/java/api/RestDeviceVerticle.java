@@ -1,10 +1,14 @@
 package api;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.buffer.Buffer;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
 import iservice.DeviceService;
@@ -30,7 +34,8 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         logger.info("Rest device verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route(StatRestConstants.Device.DEVICE_REPORT).handler(this::reportUserDevice);
+        router.route().handler(BodyHandler.create());
+        router.post(StatRestConstants.Device.DEVICE_REPORT).handler(this::reportUserDevice);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -62,17 +67,22 @@ public class RestDeviceVerticle extends RestAPIVerticle {
      */
     private DeviceDto buildDeviceDto(RoutingContext context) {
         DeviceDto userDeviceDto = new DeviceDto();
-        String uid = context.request().params().get("uid");
-        String phone = context.request().params().get("phone");
-        String deviceType = context.request().params().get("deviceType");
-        String deviceToken = context.request().params().get("deviceToken");
-        String imei = context.request().params().get("imei");
-        String osType = context.request().params().get("osType");
-        String osVersion = context.request().params().get("osVersion");
-        String appCode = context.request().params().get("appCode");
-        String appVersion = context.request().params().get("appVersion");
-        String antFingerprint = context.request().params().get("antFingerprint");
-        String isAcceptPush = context.request().params().get("isAcceptPush");
+        String uid = context.request().formAttributes().get("uid");
+        String phone = context.request().formAttributes().get("phone");
+        String deviceType = context.request().formAttributes().get("deviceType");
+        String deviceToken = context.request().formAttributes().get("deviceToken");
+        String imei = context.request().formAttributes().get("imei");
+        String osType = context.request().formAttributes().get("osType");
+        String osVersion = context.request().formAttributes().get("osVersion");
+        String appCode = context.request().formAttributes().get("appCode");
+        String appVersion = context.request().formAttributes().get("appVersion");
+        String antFingerprint = context.request().formAttributes().get("antFingerprint");
+        String isAcceptPush = context.request().formAttributes().get("isAcceptPush");
+
+        if (StringUtils.isBlank(antFingerprint)||StringUtils.isBlank(osType)||StringUtils.isBlank(appCode)
+                ||StringUtils.isBlank(appVersion)) {
+            badRequest(context, new Throwable("Param [antFingerprint or osType or appCode or appVersion] cannot be empty."));
+        }
 
         userDeviceDto.setDeviceToken(deviceToken);
         userDeviceDto.setOsVersion(osVersion);
