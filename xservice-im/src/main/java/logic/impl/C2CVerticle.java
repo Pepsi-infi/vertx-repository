@@ -20,8 +20,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	private EventBus eb;
 
 	private SharedData sharedData;
-	private LocalMap<Long, String> sessionMap;// uid -> handlerID
-	private LocalMap<String, Long> sessionReverse; // handlerID -> uid
+	private LocalMap<String, String> sessionMap;// uid -> handlerID
+	private LocalMap<String, String> sessionReverse; // handlerID -> uid
 
 	// private MongoService mongoService;
 
@@ -46,8 +46,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		mongoMsg.put("data", msg);
 
 		JsonObject body = msg.getJsonObject("body");
-		Long from = body.getLong("from");
-		Long to = body.getLong("to");
+		String from = body.getString("from");
+		String to = body.getString("to");
 
 		if (from != null && to != null) {
 			Future<JsonObject> saveF = Future.future();
@@ -66,6 +66,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			eb.send(fromHandlerId, aMsgHeader.appendString(aMsgBody.toString()));
 
 			// 给TO发N {ts: 时间戳}
+			// TODO 消息格式有点问题
 			String toHandlerId = sessionMap.get(to);
 			JsonObject nMsgBody = new JsonObject();
 			nMsgBody.put("from", from).put("content", body).put("ts", System.currentTimeMillis());

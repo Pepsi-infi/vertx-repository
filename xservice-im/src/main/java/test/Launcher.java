@@ -1,8 +1,9 @@
 package test;
 
+import cluster.impl.ConsistentHashingVerticle;
 import io.vertx.core.Vertx;
 import logic.impl.C2CVerticle;
-import persistence.impl.MongoVerticle;
+import logic.impl.SessionVerticle;
 import server.TCPServerVerticle;
 
 public class Launcher {
@@ -11,6 +12,8 @@ public class Launcher {
 		// vertx.deployVerticle(new TestTCPServerVerticle());
 		vertx.deployVerticle(new TCPServerVerticle());
 		vertx.deployVerticle(new C2CVerticle());
-//		vertx.deployVerticle(new MongoVerticle());
+		vertx.deployVerticle(new ConsistentHashingVerticle());
+		vertx.deployVerticle(new SessionVerticle());
+		// vertx.deployVerticle(new MongoVerticle());
 	}
 }

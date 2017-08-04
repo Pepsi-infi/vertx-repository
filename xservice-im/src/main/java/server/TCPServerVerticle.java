@@ -1,10 +1,12 @@
 package server;
 
+import cluster.ConsistentHashingService;
 import constants.CmdConstants;
 import constants.MessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -21,13 +23,16 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
 
 	private SharedData sharedData;
-	private LocalMap<Long, String> sessionMap;// uid -> handlerID
-	private LocalMap<String, Long> sessionReverse; // handlerID -> uid
+	private LocalMap<String, String> sessionMap;// uid -> handlerID
+	private LocalMap<String, String> sessionReverse; // handlerID -> uid
 
 	private C2CService c2cService;
+	private ConsistentHashingService consistentHashingService;
+	private EventBus eb;
 
 	@Override
 	public void start() throws Exception {
+		eb = vertx.eventBus();
 		sharedData = vertx.sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
@@ -36,6 +41,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		});
 
 		c2cService = C2CService.createProxy(vertx);
+		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
 		NetServer server = vertx.createNetServer(options);
@@ -61,19 +67,45 @@ public class TCPServerVerticle extends AbstractVerticle {
 				}
 
 				if (msgBody != null) {
-					Long from = msgBody.getLong("from");// uid
+					String from = msgBody.getString("from");// uid
 					if (from != null) {
+						// 把用户做一致性hash，分散到集群机器上
+						Future<String> nodeFuture = Future.future();
+						consistentHashingService.getNode(from, nodeFuture.completer());
 						switch (cmd) {
 						case CmdConstants.LOGIN:
-							sessionMap.put(from, socket.writeHandlerID());
-							sessionReverse.put(socket.writeHandlerID(), from);
+							nodeFuture.setHandler(res -> {
+								if (res.succeeded()) {
+									DeliveryOptions option = new DeliveryOptions();
+									option.addHeader("action", "setUserSocket");
+									option.setSendTimeout(3000);
+									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
+											.put("from", from);
+									eb.<JsonObject>send("session-eb-service" + res.result(), msg, option, reply -> {
+										// TODO
+									});
+								} else {
+									// TODO
+								}
+							});
+
 							break;
 						case CmdConstants.LOGOUT:
-							Long uid = sessionReverse.get(socket.writeHandlerID());
-							sessionReverse.remove(socket.writeHandlerID());
-							if (uid != null) {
-								sessionMap.remove(uid);
-							}
+							nodeFuture.setHandler(res -> {
+								if (res.succeeded()) {
+									DeliveryOptions option = new DeliveryOptions();
+									option.addHeader("action", "delUserSocket");
+									option.setSendTimeout(3000);
+									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
+											.put("from", from);
+									eb.<JsonObject>send("session-eb-service" + res.result(), msg, option, reply -> {
+										// TODO
+									});
+								} else {
+									// TODO
+								}
+							});
+
 							break;
 						case CmdConstants.MSG_R:
 							JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
@@ -96,7 +128,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 			}));
 
 			socket.closeHandler(v -> {
-				Long uid = sessionReverse.get(socket.writeHandlerID());
+				String uid = sessionReverse.get(socket.writeHandlerID());
 				sessionReverse.remove(socket.writeHandlerID());
 
 				if (uid != null) {
