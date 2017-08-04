@@ -27,13 +27,13 @@ import io.vertx.core.json.JsonArray;
 public class MsgStatResultPageConverter {
 
   public static void fromJson(JsonObject json, MsgStatResultPage obj) {
-    if (json.getValue("data") instanceof JsonArray) {
+    if (json.getValue("list") instanceof JsonArray) {
       java.util.ArrayList<service.dto.MsgStatResultDto> list = new java.util.ArrayList<>();
-      json.getJsonArray("data").forEach( item -> {
+      json.getJsonArray("list").forEach( item -> {
         if (item instanceof JsonObject)
           list.add(new service.dto.MsgStatResultDto((JsonObject)item));
       });
-      obj.setData(list);
+      obj.setList(list);
     }
     if (json.getValue("page") instanceof Number) {
       obj.setPage(((Number)json.getValue("page")).intValue());
@@ -44,10 +44,10 @@ public class MsgStatResultPageConverter {
   }
 
   public static void toJson(MsgStatResultPage obj, JsonObject json) {
-    if (obj.getData() != null) {
+    if (obj.getList() != null) {
       JsonArray array = new JsonArray();
-      obj.getData().forEach(item -> array.add(item.toJson()));
-      json.put("data", array);
+      obj.getList().forEach(item -> array.add(item.toJson()));
+      json.put("list", array);
     }
     json.put("page", obj.getPage());
     json.put("size", obj.getSize());

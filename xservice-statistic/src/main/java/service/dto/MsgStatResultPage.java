@@ -12,9 +12,9 @@ import java.util.List;
  * Description :
  */
 @DataObject(generateConverter = true)
-public class MsgStatResultPage extends BaseResponse {
+public class MsgStatResultPage {
     public static final int DEFAULT_PAGE_SIZE = 20;
-    private List<MsgStatResultDto> data;
+    private List<MsgStatResultDto> list;
     //总条数
 //    private int total;
     //当前页
@@ -22,12 +22,12 @@ public class MsgStatResultPage extends BaseResponse {
     //每页多少条
     private int size = MsgStatResultPage.DEFAULT_PAGE_SIZE;
 
-    public List<MsgStatResultDto> getData() {
-        return data;
+    public List<MsgStatResultDto> getList() {
+        return list;
     }
 
-    public void setData(List<MsgStatResultDto> data) {
-        this.data = data;
+    public void setList(List<MsgStatResultDto> list) {
+        this.list = list;
     }
 
     public int getPage() {
@@ -47,9 +47,9 @@ public class MsgStatResultPage extends BaseResponse {
     }
 
 
-    public MsgStatResultPage(List<MsgStatResultDto> data, int page, int size) {
+    public MsgStatResultPage(List<MsgStatResultDto> list, int page, int size) {
         super();
-        this.data = data;
+        this.list = list;
         this.page = page;
         this.size = size;
     }
@@ -72,7 +72,7 @@ public class MsgStatResultPage extends BaseResponse {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("MsgStatResultPage{");
-        sb.append("data=").append(data);
+        sb.append("list=").append(list);
         sb.append(", page=").append(page);
         sb.append(", size=").append(size);
         sb.append('}');

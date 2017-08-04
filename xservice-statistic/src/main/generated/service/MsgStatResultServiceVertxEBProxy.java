@@ -32,10 +32,10 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.dto.MsgStatResultPage;
 import utils.BaseResponse;
 import java.util.Map;
 import io.vertx.core.Vertx;
+import service.dto.MsgStatResultPageWrapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import service.MsgStatResultService;
@@ -83,7 +83,7 @@ public class MsgStatResultServiceVertxEBProxy implements MsgStatResultService {
     });
   }
 
-  public void queryMsgStatResult(Map<String,String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPage>> result) {
+  public void queryMsgStatResult(Map<String,String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -98,7 +98,7 @@ public class MsgStatResultServiceVertxEBProxy implements MsgStatResultService {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(res.result().body() == null ? null : new MsgStatResultPage(res.result().body())));
+        result.handle(Future.succeededFuture(res.result().body() == null ? null : new MsgStatResultPageWrapper(res.result().body())));
                       }
     });
   }
