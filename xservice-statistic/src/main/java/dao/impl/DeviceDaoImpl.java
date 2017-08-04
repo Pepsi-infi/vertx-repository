@@ -3,6 +3,7 @@ package dao.impl;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import dao.BaseDaoVerticle;
+import dao.DeviceDao;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -12,20 +13,16 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
+import iservice.dto.DeviceDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import dao.DeviceDao;
-import iservice.dto.DeviceDto;
-import org.apache.commons.lang.math.NumberUtils;
-import service.dto.MsgStatResultDto;
 import util.ConfigUtils;
 import utils.BaseResponse;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Created by lufei
