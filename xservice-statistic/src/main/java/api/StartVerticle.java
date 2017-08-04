@@ -1,15 +1,15 @@
 package api;
 
 import cron.CronMsgStatVerticle;
+import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import dao.impl.DeviceDaoImpl;
+import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
-import service.impl.DeviceServiceImpl;
 import xservice.BaseServiceVerticle;
 
 /**
