@@ -6,6 +6,9 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
+import io.vertx.rxjava.ext.web.handler.CorsHandler;
+import jdk.internal.org.objectweb.asm.Handle;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
@@ -38,6 +41,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
+        router.route().handler(CorsHandler.create("*"));
+        router.route().handler(BodyHandler.create());
         router.route(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
         router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
         Future<Void> voidFuture = Future.future();
@@ -94,6 +99,10 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String arriveTime = context.request().params().get("arriveTime");
         String imei = context.request().params().get("imei");
         String antFingerprint = context.request().params().get("antFingerprint");
+
+        if (StringUtils.isBlank(action) || StringUtils.isBlank(msgId) || StringUtils.isBlank(channel) || StringUtils.isBlank(osType)) {
+            badRequest(context, new Throwable("Param [action or msgId or channel or osType] cannot be empty."));
+        }
 
         MsgStatDto statDto = new MsgStatDto();
         if (StringUtils.isNotBlank(action)) {

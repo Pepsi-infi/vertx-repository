@@ -9,6 +9,7 @@ import io.vertx.core.Vertx;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.dto.MsgStatResultDto;
 import service.dto.MsgStatResultPage;
+import service.dto.MsgStatResultPageWrapper;
 import utils.BaseResponse;
 
 import java.util.List;
@@ -44,5 +45,5 @@ public interface MsgStatResultService {
      * @param param
      * @param result
      */
-    void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPage>> result);
+    void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result);
 }
