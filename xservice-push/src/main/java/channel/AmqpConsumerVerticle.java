@@ -165,7 +165,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	private void recivedMessage(){
 		AmqpBridge bridge = AmqpBridge.create(vertx);
 		//读取配置
-		Properties prop = PropertiesLoaderUtils.loadProperties("/" + ConnectionConsts.MQ_CONFIG_PATH);
+		Properties prop = PropertiesLoaderUtils.loadProperties(ConnectionConsts.MQ_CONFIG_PATH);
 		//bridge.start
 		String addr = prop.getProperty(ConnectionConsts.ACTIVEMQ_SERVER_URL);
 		int port = Integer.parseInt(prop.getProperty(ConnectionConsts.ACTIVE_SERVER_PORT));
