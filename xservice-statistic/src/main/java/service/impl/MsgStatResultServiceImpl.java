@@ -58,16 +58,6 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
-        vertx.setPeriodic(10000, handler -> {
-            logger.info("msgStatResult timer run .....");
-            storeMsgStatResult(asyncResult -> {
-                if (asyncResult.succeeded()) {
-                    logger.info("msgStatResult timer success. ");
-                } else {
-                    logger.error("msgStatResult timer error", asyncResult.cause());
-                }
-            });
-        });
     }
 
 
