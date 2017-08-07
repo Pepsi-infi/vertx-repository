@@ -19,7 +19,6 @@ package service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -58,21 +57,21 @@ public class RedisService {
     return ret;
   }
 
-  public void set(String key, String value, Handler<AsyncResult<BaseResponse>> result) { 
+  public void set(String key, String value, Handler<AsyncResult<Void>> result) { 
     delegate.set(key, value, result);
   }
 
-  public Single<BaseResponse> rxSet(String key, String value) { 
+  public Single<Void> rxSet(String key, String value) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       set(key, value, fut);
     }));
   }
 
-  public void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result) { 
+  public void expire(String key, long expire, Handler<AsyncResult<Long>> result) { 
     delegate.expire(key, expire, result);
   }
 
-  public Single<BaseResponse> rxExpire(String key, long expire) { 
+  public Single<Long> rxExpire(String key, long expire) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       expire(key, expire, fut);
     }));

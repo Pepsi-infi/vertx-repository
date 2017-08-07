@@ -19,8 +19,8 @@ package dao.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
+import domain.MsgRecord;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -59,11 +59,11 @@ public class MsgRecordDao {
     return ret;
   }
 
-  public void addMessage(AmqpConsumeMessage dto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+  public void addMessage(MsgRecord dto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
     delegate.addMessage(dto, resultHandler);
   }
 
-  public Single<BaseResponse> rxAddMessage(AmqpConsumeMessage dto) { 
+  public Single<BaseResponse> rxAddMessage(MsgRecord dto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       addMessage(dto, fut);
     }));

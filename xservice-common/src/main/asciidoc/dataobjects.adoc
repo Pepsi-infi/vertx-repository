@@ -33,15 +33,13 @@
 |===
 ^|Name | Type ^| Description
 |[[antFingerprint]]`antFingerprint`|`String`|-
-|[[apnsToken]]`apnsToken`|`String`|-
 |[[appCode]]`appCode`|`Number (Integer)`|-
 |[[appVersion]]`appVersion`|`String`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[deviceToken]]`deviceToken`|`String`|-
 |[[deviceType]]`deviceType`|`String`|-
-|[[gcmToken]]`gcmToken`|`String`|-
 |[[id]]`id`|`Number (Long)`|-
-|[[imei]]`imei`|`String`|-
 |[[isAcceptPush]]`isAcceptPush`|`Number (Integer)`|-
-|[[miToken]]`miToken`|`String`|-
 |[[osType]]`osType`|`Number (Integer)`|-
 |[[osVersion]]`osVersion`|`String`|-
 |[[phone]]`phone`|`String`|-

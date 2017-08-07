@@ -39,9 +39,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import domain.AmqpConsumeMessage;
 import utils.BaseResponse;
 import service.MsgRecordService;
+import domain.MsgRecord;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -127,7 +127,7 @@ public class MsgRecordServiceVertxProxyHandler extends ProxyHandler {
 
 
         case "addMessage": {
-          service.addMessage(json.getJsonObject("dto") == null ? null : new domain.AmqpConsumeMessage(json.getJsonObject("dto")), res -> {
+          service.addMessage(json.getJsonObject("dto") == null ? null : new domain.MsgRecord(json.getJsonObject("dto")), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

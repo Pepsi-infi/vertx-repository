@@ -32,7 +32,6 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
 import service.RedisService;
@@ -64,7 +63,7 @@ public class RedisServiceVertxEBProxy implements RedisService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void set(String key, String value, Handler<AsyncResult<BaseResponse>> result) {
+  public void set(String key, String value, Handler<AsyncResult<Void>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -74,16 +73,16 @@ public class RedisServiceVertxEBProxy implements RedisService {
     _json.put("value", value);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "set");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<Void>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
-                      }
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
     });
   }
 
-  public void expire(String key, long expire, Handler<AsyncResult<BaseResponse>> result) {
+  public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -93,12 +92,12 @@ public class RedisServiceVertxEBProxy implements RedisService {
     _json.put("expire", expire);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "expire");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<Long>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
-                      }
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
     });
   }
 
