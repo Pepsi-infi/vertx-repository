@@ -67,7 +67,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         String uid = context.request().formAttributes().get("uid");
         String phone = context.request().formAttributes().get("phone");
         String deviceType = context.request().formAttributes().get("deviceType");
-        String deviceToken = context.request().formAttributes().get("deviceToken");
+        String miToken = context.request().formAttributes().get("miToken");
         String gcmToken = context.request().formAttributes().get("gcmToken");
         String apnsToken = context.request().formAttributes().get("apnsToken");
         String imei = context.request().formAttributes().get("imei");
@@ -83,7 +83,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
             badRequest(context, new Throwable("Param [antFingerprint or osType or appCode or appVersion] cannot be empty."));
         }
 
-        userDeviceDto.setDeviceToken(deviceToken);
+        userDeviceDto.setMiToken(miToken);
         userDeviceDto.setGcmToken(gcmToken);
         userDeviceDto.setApnsToken(apnsToken);
         userDeviceDto.setOsVersion(osVersion);

@@ -39,9 +39,6 @@ public class DeviceDtoConverter {
     if (json.getValue("appVersion") instanceof String) {
       obj.setAppVersion((String)json.getValue("appVersion"));
     }
-    if (json.getValue("deviceToken") instanceof String) {
-      obj.setDeviceToken((String)json.getValue("deviceToken"));
-    }
     if (json.getValue("deviceType") instanceof String) {
       obj.setDeviceType((String)json.getValue("deviceType"));
     }
@@ -56,6 +53,9 @@ public class DeviceDtoConverter {
     }
     if (json.getValue("isAcceptPush") instanceof Number) {
       obj.setIsAcceptPush(((Number)json.getValue("isAcceptPush")).intValue());
+    }
+    if (json.getValue("miToken") instanceof String) {
+      obj.setMiToken((String)json.getValue("miToken"));
     }
     if (json.getValue("osType") instanceof Number) {
       obj.setOsType(((Number)json.getValue("osType")).intValue());
@@ -84,9 +84,6 @@ public class DeviceDtoConverter {
     if (obj.getAppVersion() != null) {
       json.put("appVersion", obj.getAppVersion());
     }
-    if (obj.getDeviceToken() != null) {
-      json.put("deviceToken", obj.getDeviceToken());
-    }
     if (obj.getDeviceType() != null) {
       json.put("deviceType", obj.getDeviceType());
     }
@@ -101,6 +98,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getIsAcceptPush() != null) {
       json.put("isAcceptPush", obj.getIsAcceptPush());
+    }
+    if (obj.getMiToken() != null) {
+      json.put("miToken", obj.getMiToken());
     }
     if (obj.getOsType() != null) {
       json.put("osType", obj.getOsType());

@@ -33,9 +33,9 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
     public interface Sql {
-        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,deviceToken,gcmToken,apnsToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
+        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,miToken,gcmToken,apnsToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
 
-        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,deviceToken=?,gcmToken=?,apnsToken=?,imei=?,osType=?," +
+        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,miToken=?,gcmToken=?,apnsToken=?,imei=?,osType=?," +
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? " +
                 "WHERE antFingerprint=?";
 
@@ -68,12 +68,12 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
             logger.error("[addDevice] the antFingerprint or imei or osType is null");
             resultHandler.handle(Future.failedFuture("the antFingerprint or imei or osType is null"));
         } else {
-            //(uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
+            //(uid,phone,deviceType,miToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
             JsonArray jsonArray = new JsonArray();
             jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
                     .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getDeviceToken())
+                    .add(deviceDto.getMiToken())
                     .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
                     .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
                     .add(deviceDto.getImei())
@@ -94,11 +94,11 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
             resultHandler.handle(Future.failedFuture("the antFingerprint is null"));
         } else {
             JsonArray jsonArray = new JsonArray();
-            //(uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint)
+            //(uid,phone,deviceType,miToken,imei,osType,osVersion,appCode,appVersion,antFingerprint)
             jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
                     .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getDeviceToken())
+                    .add(deviceDto.getMiToken())
                     .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
                     .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
                     .add(deviceDto.getImei())
