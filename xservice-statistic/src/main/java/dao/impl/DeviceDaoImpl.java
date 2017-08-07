@@ -33,9 +33,9 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
     public interface Sql {
-        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,miToken,gcmToken,apnsToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
+        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
 
-        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,miToken=?,gcmToken=?,apnsToken=?,imei=?,osType=?," +
+        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?," +
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? " +
                 "WHERE antFingerprint=?";
 
@@ -64,19 +64,17 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
     @Override
     public void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
-        if (StringUtils.isBlank(deviceDto.getAntFingerprint()) || StringUtils.isBlank(deviceDto.getImei()) || deviceDto.getOsType() <= 0) {
-            logger.error("[addDevice] the antFingerprint or imei or osType is null");
+        if (StringUtils.isBlank(deviceDto.getAntFingerprint()) || StringUtils.isBlank(deviceDto.getDeviceType()) || deviceDto.getOsType() <= 0) {
+            logger.error("[addDevice] the antFingerprint or deviceType or osType is null");
             resultHandler.handle(Future.failedFuture("the antFingerprint or imei or osType is null"));
         } else {
-            //(uid,phone,deviceType,miToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
+            //(uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
             JsonArray jsonArray = new JsonArray();
             jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
                     .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getMiToken())
-                    .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
-                    .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
-                    .add(deviceDto.getImei())
+                    .add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
+                    .add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
                     .add(deviceDto.getOsType())
                     .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
                     .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
@@ -98,10 +96,8 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
             jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
                     .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getMiToken())
-                    .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
-                    .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
-                    .add(deviceDto.getImei())
+                    .add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
+                    .add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
                     .add(deviceDto.getOsType())
                     .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
                     .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)

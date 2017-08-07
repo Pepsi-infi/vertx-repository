@@ -67,10 +67,8 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         String uid = context.request().formAttributes().get("uid");
         String phone = context.request().formAttributes().get("phone");
         String deviceType = context.request().formAttributes().get("deviceType");
-        String miToken = context.request().formAttributes().get("miToken");
-        String gcmToken = context.request().formAttributes().get("gcmToken");
-        String apnsToken = context.request().formAttributes().get("apnsToken");
-        String imei = context.request().formAttributes().get("imei");
+        String channel = context.request().formAttributes().get("channel");
+        String deviceToken = context.request().formAttributes().get("deviceToken");
         String osType = context.request().formAttributes().get("osType");
         String osVersion = context.request().formAttributes().get("osVersion");
         String appCode = context.request().formAttributes().get("appCode");
@@ -78,18 +76,15 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         String antFingerprint = context.request().formAttributes().get("antFingerprint");
         String isAcceptPush = context.request().formAttributes().get("isAcceptPush");
 
-        if (StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType) || StringUtils.isBlank(appCode)
-                || StringUtils.isBlank(appVersion)) {
-            badRequest(context, new Throwable("Param [antFingerprint or osType or appCode or appVersion] cannot be empty."));
+        if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
+                || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+            badRequest(context, new Throwable("Required  parameters cannot be empty."));
         }
 
-        userDeviceDto.setMiToken(miToken);
-        userDeviceDto.setGcmToken(gcmToken);
-        userDeviceDto.setApnsToken(apnsToken);
+        userDeviceDto.setDeviceToken(deviceToken);
         userDeviceDto.setOsVersion(osVersion);
         userDeviceDto.setPhone(phone);
         userDeviceDto.setDeviceType(deviceType);
-        userDeviceDto.setImei(imei);
         userDeviceDto.setAppVersion(appVersion);
         userDeviceDto.setAntFingerprint(antFingerprint);
         if (StringUtils.isNotBlank(osType)) {
@@ -100,6 +95,12 @@ public class RestDeviceVerticle extends RestAPIVerticle {
         }
         if (StringUtils.isNotBlank(appCode)) {
             userDeviceDto.setAppCode(Integer.valueOf(appCode));
+        }
+        if (StringUtils.isNotBlank(appCode)) {
+            userDeviceDto.setAppCode(Integer.valueOf(appCode));
+        }
+        if (StringUtils.isNotBlank(channel)) {
+            userDeviceDto.setChannel(Integer.valueOf(channel));
         }
         if (StringUtils.isNotBlank(isAcceptPush)) {
             userDeviceDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));

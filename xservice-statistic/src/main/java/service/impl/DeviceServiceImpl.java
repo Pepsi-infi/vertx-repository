@@ -64,7 +64,8 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                             }
                         });
                     } else {
-                        if (!deviceDto.equals(dbDevice)) {
+                        //TODO:
+//                        if (!deviceDto.equals(dbDevice)) {
                             logger.info("the device:{} has change", deviceDto);
                             deviceDao.updateDevice(deviceDto, ar3 -> {
                                 BaseResponse baseResponse = new BaseResponse();
@@ -76,7 +77,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                                     result.handle(Future.succeededFuture(baseResponse));
                                 }
                             });
-                        }
+//                        }
                     }
                 } else {
                     logger.error(ar1.cause());
