@@ -1,7 +1,7 @@
 = Cheatsheets
 
-[[AmqpConsumeMessage]]
-== AmqpConsumeMessage
+[[MsgRecord]]
+== MsgRecord
 
 ++++
   消息体
