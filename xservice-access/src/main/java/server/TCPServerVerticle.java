@@ -12,6 +12,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
+import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.parsetools.RecordParser;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
@@ -36,14 +37,13 @@ public class TCPServerVerticle extends AbstractVerticle {
 		sharedData = vertx.sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
-		vertx.setPeriodic(5000, id -> {
-			System.out.println(sessionMap.toString());
-		});
 
 		c2cService = C2CService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
+		options.setSsl(true).setPemKeyCertOptions(
+				new PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {

@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
+import io.vertx.core.net.PemTrustOptions;
 
 public class TCPClient {
 
@@ -15,6 +16,7 @@ public class TCPClient {
 		System.out.println(System.currentTimeMillis());
 		Vertx vertx = Vertx.vertx();
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
+		options.setSsl(true).setPemTrustOptions(new PemTrustOptions().addCertPath("server-cert.pem"));
 		NetClient client = vertx.createNetClient(options);
 		client.connect(4321, "localhost", res -> {
 			if (res.succeeded()) {
