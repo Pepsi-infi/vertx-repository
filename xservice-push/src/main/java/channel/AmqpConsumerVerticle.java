@@ -2,7 +2,7 @@ package channel;
 
 import constant.ConnectionConsts;
 import constant.PushConsts;
-import domain.AmqpConsumeMessage;
+import domain.MsgRecord;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
@@ -108,7 +108,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	 * 保存消息记录
 	 */
 	private void saveMsgRecord() {
-		AmqpConsumeMessage msg=new AmqpConsumeMessage();
+		MsgRecord msg=new MsgRecord();
 		msg.setAmqpMsgId(msgId);
 		msg.setChannel(sendType);
 		msg.setMsgBody(receiveMsg.toString());
@@ -174,9 +174,9 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 				System.out.println("Bridge startup failed: " + res.cause());
 				return;
 			}
-			MessageConsumer<AmqpConsumeMessage> consumer = bridge.createConsumer("topic1");
+			MessageConsumer<MsgRecord> consumer = bridge.createConsumer("topic1");
 			consumer.handler(vertxMsg -> {
-				AmqpConsumeMessage message = vertxMsg.body();
+				MsgRecord message = vertxMsg.body();
 				logger.info("Received a message with body : " + JsonUtil.toJsonString(message));
 				String body = message.getMsgBody();
 				logger.info("Received a message with body : " + body);
@@ -193,7 +193,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	}
 
 	public static void main(String[] args) {
-		AmqpConsumeMessage bean = new AmqpConsumeMessage();
+		MsgRecord bean = new MsgRecord();
 		bean.setAmqpMsgId("1231231241241");
 		bean.setMsgBody("aasdfsaddsafasdfaasdf");
 		bean.setStatus(2);

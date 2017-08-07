@@ -20,13 +20,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 
 /**
- * Converter for {@link domain.AmqpConsumeMessage}.
+ * Converter for {@link domain.MsgRecord}.
  *
- * NOTE: This class has been automatically generated from the {@link domain.AmqpConsumeMessage} original class using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link domain.MsgRecord} original class using Vert.x codegen.
  */
-public class AmqpConsumeMessageConverter {
+public class MsgRecordConverter {
 
-  public static void fromJson(JsonObject json, AmqpConsumeMessage obj) {
+  public static void fromJson(JsonObject json, MsgRecord obj) {
     if (json.getValue("amqpMsgId") instanceof String) {
       obj.setAmqpMsgId((String)json.getValue("amqpMsgId"));
     }
@@ -44,7 +44,7 @@ public class AmqpConsumeMessageConverter {
     }
   }
 
-  public static void toJson(AmqpConsumeMessage obj, JsonObject json) {
+  public static void toJson(MsgRecord obj, JsonObject json) {
     if (obj.getAmqpMsgId() != null) {
       json.put("amqpMsgId", obj.getAmqpMsgId());
     }

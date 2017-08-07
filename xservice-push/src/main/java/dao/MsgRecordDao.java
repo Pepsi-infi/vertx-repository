@@ -1,6 +1,6 @@
 package dao;
 
-import domain.AmqpConsumeMessage;
+import domain.MsgRecord;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -39,6 +39,6 @@ public interface MsgRecordDao {
         return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
     }
 
-    void addMessage(AmqpConsumeMessage dto, Handler<AsyncResult<BaseResponse>> resultHandler);
+    void addMessage(MsgRecord dto, Handler<AsyncResult<BaseResponse>> resultHandler);
 
 }

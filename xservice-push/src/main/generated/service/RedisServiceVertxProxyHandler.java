@@ -39,7 +39,6 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.AsyncResult;
 import service.RedisService;
@@ -126,31 +125,11 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
 
 
         case "set": {
-          service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+          service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
           break;
         }
         case "expire": {
-          service.expire((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+          service.expire((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), createHandler(msg));
           break;
         }
         case "get": {
