@@ -220,27 +220,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		msgId = (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
-
-		Future<List<DeviceDto>> deviceFuture = Future.future();
-
-		if (StringUtil.isNullOrEmpty(token)) {
-			logger.info("设备token为空，从数据库获取设备token");
-
-			Map<String, String> param = new HashMap<>();
-			param.put("phone", phone);
-			deviceService.queryDevices(param, deviceFuture.completer());
-		} else {
-			deviceList = new ArrayList<>();
-			DeviceDto dto = new DeviceDto();
-			dto.setDeviceToken(token);
-			deviceList.add(dto);
-			deviceFuture.handle(Future.succeededFuture(deviceList));
-		}
-
 		// 从上游接收到的 推送类型
-		devicePushType = (String) receiveMsg.getValue("devicePushType");
+		devicePushType = (String) receiveMsg.getValue("devicePushType");	
 		// 转化成下游需要的推送类型
-		sendType = MsgUtil.convertCode(devicePushType);
+		sendType = MsgUtil.convertCode(devicePushType);	
 		// IOS apnsToken
 		apnsToken = (String) receiveMsg.getValue("apnsToken");
 		// 用户id
@@ -249,6 +232,20 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
 			resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
 			return;
+		}
+				
+		Future<List<DeviceDto>> deviceFuture = Future.future();
+		if (StringUtil.isNullOrEmpty(token)) {
+			logger.info("设备token为空，从数据库获取设备token");
+			Map<String, String> param = new HashMap<>();
+			param.put("phone", phone);
+			deviceService.queryDevices(param, deviceFuture.completer());
+		} else {
+			deviceList = new ArrayList<>();
+			DeviceDto dto = new DeviceDto();
+			genDeviceDto(dto);
+			deviceList.add(dto);
+			deviceFuture.handle(Future.succeededFuture(deviceList));
 		}
 
 		// 判断消息是否接收过
@@ -268,7 +265,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					resultHandler.handle(Future.failedFuture("设备token不存在"));
 					return;
 				}
-				token = deviceList.get(0).getDeviceToken();
+				//token = deviceList.get(0).getDeviceToken();
 
 				// 验证redis
 				String redisResult = handler.result().resultAt(1);
@@ -287,6 +284,29 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		});
 
 	}
+
+	private void genDeviceDto(DeviceDto dto) {
+		
+		if(!StringUtil.isNullOrEmpty(apnsToken)){
+			dto.setApnsToken(apnsToken);
+			return;
+		}
+		
+		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
+			// socket推送
+		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
+			// gcm推送
+			dto.setGcmToken(token);
+		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
+			// 只用作对安卓手机进行推送
+			dto.setMiToken(token);
+		} else {
+			logger.error("无效推送渠道");
+			return;
+		}
+		
+	}
+
 
 	/**
 	 * 保存消息记录
