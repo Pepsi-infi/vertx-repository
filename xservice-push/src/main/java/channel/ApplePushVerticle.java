@@ -47,7 +47,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host.dev");
 		
 		if(StringUtil.isNullOrEmpty(host)){
-			resultHandler.handle(Future.failedFuture("apple push host is null"));
+			resultHandler.handle(Future.failedFuture("Apple push host is null"));
 			return;
 		}
 		
@@ -57,12 +57,13 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		} catch (Exception e) {
 			logger.error("apns推送调用异常", e);
 			resultHandler.handle(Future.failedFuture(e));
+			return;
 		}
 		
 		logger.info("apns推送返回结果："+result);
 		
 		if(StringUtil.isNullOrEmpty(result)){
-			resultHandler.handle(Future.failedFuture("App push result is null"));
+			resultHandler.handle(Future.failedFuture("Apple push result is null"));
 		}else{
 			resultHandler.handle(Future.succeededFuture(new BaseResponse()));
 		}

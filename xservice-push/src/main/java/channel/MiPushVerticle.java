@@ -1,13 +1,17 @@
 package channel;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
+
 import constant.PushConsts;
-import enums.EnumPassengerMessageType;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -20,10 +24,6 @@ import service.XiaoMiPushService;
 import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		String content = recieveMsg.toString();
 
 		String description = recieveMsg.getString("content");
-		String regId = null;
+		String regId = null; 
 		try {
 			regId = (String) recieveMsg.getValue("regId");
 			

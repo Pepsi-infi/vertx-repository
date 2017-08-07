@@ -1,5 +1,6 @@
 package api;
 
+import channel.ApplePushVerticle;
 import channel.HttpConsumerVerticle;
 import channel.MiPushVerticle;
 import channel.SocketVerticle;
@@ -30,6 +31,7 @@ public class StartVerticle extends AbstractVerticle{
 
 //        this.deployVerticle(AmqpConsumerVerticle.class.getName());
         this.deployVerticle(HttpConsumerVerticle.class.getName());
+        this.deployVerticle(ApplePushVerticle.class.getName());
         
         // 提供其他非EventBus服务
     }
