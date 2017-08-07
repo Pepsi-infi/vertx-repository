@@ -18,7 +18,7 @@ public class DeviceDto {
     //设备型号
     private String deviceType;
     //小米设备token
-    private String deviceToken;
+    private String miToken;
     //gcmToken
     private String gcmToken;
     //apple推送token
@@ -62,12 +62,12 @@ public class DeviceDto {
         this.phone = phone;
     }
 
-    public String getDeviceToken() {
-        return deviceToken;
+    public String getMiToken() {
+        return miToken;
     }
 
-    public void setDeviceToken(String deviceToken) {
-        this.deviceToken = deviceToken;
+    public void setMiToken(String miToken) {
+        this.miToken = miToken;
     }
 
     public String getImei() {
@@ -175,7 +175,7 @@ public class DeviceDto {
         if (uid != null ? !uid.equals(deviceDto.uid) : deviceDto.uid != null) return false;
         if (phone != null ? !phone.equals(deviceDto.phone) : deviceDto.phone != null) return false;
         if (deviceType != null ? !deviceType.equals(deviceDto.deviceType) : deviceDto.deviceType != null) return false;
-        if (deviceToken != null ? !deviceToken.equals(deviceDto.deviceToken) : deviceDto.deviceToken != null)
+        if (miToken != null ? !miToken.equals(deviceDto.miToken) : deviceDto.miToken != null)
             return false;
         if (gcmToken != null ? !gcmToken.equals(deviceDto.gcmToken) : deviceDto.gcmToken != null) return false;
         if (apnsToken != null ? !apnsToken.equals(deviceDto.apnsToken) : deviceDto.apnsToken != null) return false;
@@ -194,7 +194,7 @@ public class DeviceDto {
         int result = uid != null ? uid.hashCode() : 0;
         result = 31 * result + (phone != null ? phone.hashCode() : 0);
         result = 31 * result + (deviceType != null ? deviceType.hashCode() : 0);
-        result = 31 * result + (deviceToken != null ? deviceToken.hashCode() : 0);
+        result = 31 * result + (miToken != null ? miToken.hashCode() : 0);
         result = 31 * result + (gcmToken != null ? gcmToken.hashCode() : 0);
         result = 31 * result + (apnsToken != null ? apnsToken.hashCode() : 0);
         result = 31 * result + (imei != null ? imei.hashCode() : 0);
@@ -214,7 +214,7 @@ public class DeviceDto {
         sb.append(", uid=").append(uid);
         sb.append(", phone='").append(phone).append('\'');
         sb.append(", deviceType='").append(deviceType).append('\'');
-        sb.append(", deviceToken='").append(deviceToken).append('\'');
+        sb.append(", miToken='").append(miToken).append('\'');
         sb.append(", gcmToken='").append(gcmToken).append('\'');
         sb.append(", apnsToken='").append(apnsToken).append('\'');
         sb.append(", imei='").append(imei).append('\'');
