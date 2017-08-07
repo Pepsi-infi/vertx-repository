@@ -64,16 +64,19 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                             }
                         });
                     } else {
-                        deviceDao.updateDevice(deviceDto, ar3 -> {
-                            BaseResponse baseResponse = new BaseResponse();
-                            if (ar3.succeeded()) {
-                                result.handle(Future.succeededFuture(baseResponse));
-                            } else {
-                                logger.error("update device:{} from db error.", deviceDto, ar3.cause());
-                                buildErrorBaseResponse(baseResponse, ar3.cause().toString());
-                                result.handle(Future.succeededFuture(baseResponse));
-                            }
-                        });
+                        if (!deviceDto.equals(dbDevice)) {
+                            logger.info("the device:{} has change", deviceDto);
+                            deviceDao.updateDevice(deviceDto, ar3 -> {
+                                BaseResponse baseResponse = new BaseResponse();
+                                if (ar3.succeeded()) {
+                                    result.handle(Future.succeededFuture(baseResponse));
+                                } else {
+                                    logger.error("update device:{} from db error.", deviceDto, ar3.cause());
+                                    buildErrorBaseResponse(baseResponse, ar3.cause().toString());
+                                    result.handle(Future.succeededFuture(baseResponse));
+                                }
+                            });
+                        }
                     }
                 } else {
                     logger.error(ar1.cause());
