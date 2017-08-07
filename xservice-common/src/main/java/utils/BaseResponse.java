@@ -35,7 +35,7 @@ public class BaseResponse {
     
     private Integer status = RESPONSE_SUC_CODE;
     
-    private Integer resultStatus = RESPONSE_SUC_CODE;
+    private Integer resultStatus;
     
     private String errorCode;
 
