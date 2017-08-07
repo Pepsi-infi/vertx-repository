@@ -33,9 +33,9 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
     public interface Sql {
-        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
+        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,deviceToken,gcmToken,apnsToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
 
-        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,deviceToken=?,imei=?,osType=?," +
+        static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,deviceToken=?,gcmToken=?,apnsToken=?,imei=?,osType=?," +
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? " +
                 "WHERE antFingerprint=?";
 
@@ -63,22 +63,26 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 
     @Override
-    public void addDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
-        if (StringUtils.isBlank(userDeviceDto.getAntFingerprint()) || StringUtils.isBlank(userDeviceDto.getImei()) || userDeviceDto.getOsType() <= 0) {
+    public void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        if (StringUtils.isBlank(deviceDto.getAntFingerprint()) || StringUtils.isBlank(deviceDto.getImei()) || deviceDto.getOsType() <= 0) {
             logger.error("[addDevice] the antFingerprint or imei or osType is null");
             resultHandler.handle(Future.failedFuture("the antFingerprint or imei or osType is null"));
         } else {
             //(uid,phone,deviceType,deviceToken,imei,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
             JsonArray jsonArray = new JsonArray();
-            jsonArray.add(userDeviceDto.getUid() != null ? userDeviceDto.getUid() : "")
-                    .add(userDeviceDto.getPhone() != null ? userDeviceDto.getPhone() : "")
-                    .add(userDeviceDto.getDeviceType() != null ? userDeviceDto.getDeviceType() : "")
-                    .add(userDeviceDto.getDeviceToken()).add(userDeviceDto.getImei()).add(userDeviceDto.getOsType())
-                    .add(userDeviceDto.getOsVersion() != null ? userDeviceDto.getOsVersion() : "")
-                    .add(userDeviceDto.getAppCode() != null ? userDeviceDto.getAppCode() : 0)
-                    .add(userDeviceDto.getAppVersion() != null ? userDeviceDto.getAppVersion() : "")
-                    .add(userDeviceDto.getAntFingerprint() != null ? userDeviceDto.getAntFingerprint() : "")
-                    .add(userDeviceDto.getIsAcceptPush() != null ? userDeviceDto.getIsAcceptPush() : 0);
+            jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
+                    .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
+                    .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
+                    .add(deviceDto.getDeviceToken())
+                    .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
+                    .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
+                    .add(deviceDto.getImei())
+                    .add(deviceDto.getOsType())
+                    .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
+                    .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
+                    .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
+                    .add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "")
+                    .add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0);
             execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
         }
     }
@@ -94,7 +98,11 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
             jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
                     .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getDeviceToken()).add(deviceDto.getImei()).add(deviceDto.getOsType())
+                    .add(deviceDto.getDeviceToken())
+                    .add(deviceDto.getGcmToken() != null ? deviceDto.getGcmToken() : "")
+                    .add(deviceDto.getApnsToken() != null ? deviceDto.getApnsToken() : "")
+                    .add(deviceDto.getImei())
+                    .add(deviceDto.getOsType())
                     .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
                     .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
                     .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")

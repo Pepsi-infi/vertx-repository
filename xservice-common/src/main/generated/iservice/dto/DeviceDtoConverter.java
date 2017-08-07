@@ -30,6 +30,9 @@ public class DeviceDtoConverter {
     if (json.getValue("antFingerprint") instanceof String) {
       obj.setAntFingerprint((String)json.getValue("antFingerprint"));
     }
+    if (json.getValue("apnsToken") instanceof String) {
+      obj.setApnsToken((String)json.getValue("apnsToken"));
+    }
     if (json.getValue("appCode") instanceof Number) {
       obj.setAppCode(((Number)json.getValue("appCode")).intValue());
     }
@@ -41,6 +44,9 @@ public class DeviceDtoConverter {
     }
     if (json.getValue("deviceType") instanceof String) {
       obj.setDeviceType((String)json.getValue("deviceType"));
+    }
+    if (json.getValue("gcmToken") instanceof String) {
+      obj.setGcmToken((String)json.getValue("gcmToken"));
     }
     if (json.getValue("id") instanceof Number) {
       obj.setId(((Number)json.getValue("id")).longValue());
@@ -63,14 +69,14 @@ public class DeviceDtoConverter {
     if (json.getValue("uid") instanceof Number) {
       obj.setUid(((Number)json.getValue("uid")).longValue());
     }
-    if (json.getValue("userType") instanceof Number) {
-      obj.setUserType(((Number)json.getValue("userType")).intValue());
-    }
   }
 
   public static void toJson(DeviceDto obj, JsonObject json) {
     if (obj.getAntFingerprint() != null) {
       json.put("antFingerprint", obj.getAntFingerprint());
+    }
+    if (obj.getApnsToken() != null) {
+      json.put("apnsToken", obj.getApnsToken());
     }
     if (obj.getAppCode() != null) {
       json.put("appCode", obj.getAppCode());
@@ -83,6 +89,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getDeviceType() != null) {
       json.put("deviceType", obj.getDeviceType());
+    }
+    if (obj.getGcmToken() != null) {
+      json.put("gcmToken", obj.getGcmToken());
     }
     if (obj.getId() != null) {
       json.put("id", obj.getId());
@@ -104,9 +113,6 @@ public class DeviceDtoConverter {
     }
     if (obj.getUid() != null) {
       json.put("uid", obj.getUid());
-    }
-    if (obj.getUserType() != null) {
-      json.put("userType", obj.getUserType());
     }
   }
 }
