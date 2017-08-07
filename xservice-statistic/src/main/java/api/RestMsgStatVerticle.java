@@ -7,7 +7,6 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
-import io.vertx.rxjava.ext.web.handler.CorsHandler;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
 import org.apache.commons.lang.StringUtils;
@@ -38,9 +37,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
-        router.route().handler(CorsHandler.create("*"));
+//        router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
-        router.route(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
+        router.post(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
         router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
         Future<Void> voidFuture = Future.future();
 
@@ -87,15 +86,16 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
 
     private MsgStatDto buildMsgStatDto(RoutingContext context) {
-        String action = context.request().params().get("action");
-        String appCode = context.request().params().get("appCode");
-        String msgId = context.request().params().get("msgId");
-        String osType = context.request().params().get("osType");
-        String channel = context.request().params().get("channel");
-        String sendTime = context.request().params().get("sendTime");
-        String arriveTime = context.request().params().get("arriveTime");
-        String imei = context.request().params().get("imei");
-        String antFingerprint = context.request().params().get("antFingerprint");
+        String appCode = context.request().formAttributes().get("appCode");
+        String osType = context.request().formAttributes().get("osType");
+        String antFingerprint = context.request().formAttributes().get("antFingerprint");
+        String msgList = context.request().formAttributes().get("msgList");
+
+        String action = context.request().formAttributes().get("action");
+        String msgId = context.request().formAttributes().get("msgId");
+        String channel = context.request().formAttributes().get("channel");
+        String sendTime = context.request().formAttributes().get("sendTime");
+        String arriveTime = context.request().formAttributes().get("arriveTime");
 
         if (StringUtils.isBlank(action) || StringUtils.isBlank(msgId) || StringUtils.isBlank(channel) || StringUtils.isBlank(osType)) {
             badRequest(context, new Throwable("Param [action or msgId or channel or osType] cannot be empty."));
@@ -117,7 +117,6 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         statDto.setMsgId(msgId);
         statDto.setSendTime(sendTime);
         statDto.setArriveTime(arriveTime);
-        statDto.setImei(imei);
         statDto.setAntFingerprint(antFingerprint);
         return statDto;
     }
