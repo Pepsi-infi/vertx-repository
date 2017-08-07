@@ -1,6 +1,15 @@
 #!/bin/sh
+set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
-nohup java \
+
+pid=$(ps -ef | grep xservice-access | grep java | awk '{print $2}')
+if [ ! -z "$pid" ]
+then 
+  kill -9 $pid
+fi
+
+BUILD_ID=
+java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -17,4 +26,6 @@ nohup java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=mobile \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-access-fat.jar >> ${root_path}/nohup.out &
+-jar ${root_path}/xservice-access-fat.jar >/dev/null 2>&1
+
+exit 0
