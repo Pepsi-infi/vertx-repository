@@ -37,36 +37,35 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 				String action = headers.get("action");
 				String from = body.getString("from");
 				String handlerID = body.getString("handlerID");
-				Future<Integer> reply = Future.future();
 				logger.info("from={}action={}innerIP={}", from, action, innerIP);
 				switch (action) {
 				case "setUserSocket":
-					setUserSocket(from, handlerID, reply.completer());
+					res.reply(setUserSocket(from, handlerID));
 					break;
 				case "delUserSocket":
-					delUserSocket(from, handlerID, reply.completer());
+					res.reply(delUserSocket(from, handlerID));
 					break;
 				default:
+					res.reply(1);// Fail!
 					break;
 				}
 			}
 		});
+
 	}
 
-	@Override
-	public void setUserSocket(String uid, String handlerId, Handler<AsyncResult<Integer>> resultHandler) {
+	public int setUserSocket(String uid, String handlerId) {
 		this.sessionMap.put(uid, handlerId);
 		this.sessionReverse.put(handlerId, uid);
 
-		resultHandler.handle(Future.succeededFuture(0));
+		return 0;
 	}
 
-	@Override
-	public void delUserSocket(String uid, String handlerId, Handler<AsyncResult<Integer>> resultHandler) {
+	public int delUserSocket(String uid, String handlerId) {
 		this.sessionMap.remove(uid);
 		this.sessionReverse.remove(handlerId);
 
-		resultHandler.handle(Future.succeededFuture(0));
+		return 0;
 	}
 
 	@Override

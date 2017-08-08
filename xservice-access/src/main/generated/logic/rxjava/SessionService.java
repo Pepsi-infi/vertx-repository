@@ -47,26 +47,6 @@ public class SessionService {
     return ret;
   }
 
-  public void setUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler) { 
-    delegate.setUserSocket(uid, handlerID, resultHandler);
-  }
-
-  public Single<Integer> rxSetUserSocket(String uid, String handlerID) { 
-    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      setUserSocket(uid, handlerID, fut);
-    }));
-  }
-
-  public void delUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler) { 
-    delegate.delUserSocket(uid, handlerID, resultHandler);
-  }
-
-  public Single<Integer> rxDelUserSocket(String uid, String handlerID) { 
-    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      delUserSocket(uid, handlerID, fut);
-    }));
-  }
-
   public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) { 
     delegate.getHandlerIDByUid(uid, resultHandler);
   }

@@ -122,14 +122,6 @@ public class SessionServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "setUserSocket": {
-          service.setUserSocket((java.lang.String)json.getValue("uid"), (java.lang.String)json.getValue("handlerID"), createHandler(msg));
-          break;
-        }
-        case "delUserSocket": {
-          service.delUserSocket((java.lang.String)json.getValue("uid"), (java.lang.String)json.getValue("handlerID"), createHandler(msg));
-          break;
-        }
         case "getHandlerIDByUid": {
           service.getHandlerIDByUid((java.lang.String)json.getValue("uid"), createHandler(msg));
           break;
