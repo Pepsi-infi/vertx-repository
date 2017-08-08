@@ -167,6 +167,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		pushFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				// 已推送消息上报接口
+				List<MsgStatDto> msgList=new ArrayList<>();
 				MsgStatDto msgStatDto = new MsgStatDto();
 				// 首约app乘客端 1001；首约app司机端 1002
 				msgStatDto.setAppCode(1001);
@@ -177,7 +178,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				// 1发送，2接收
 				msgStatDto.setAction(1);
 				msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
-				msgStatService.statPushMsg(msgStatDto, statRes -> {
+				msgList.add(msgStatDto);
+				msgStatService.statPushMsg(msgList, statRes -> {
 					if (statRes.succeeded()) {
 						logger.info("已推送消息上报成功");
 						resultHandler.handle(Future.succeededFuture());
