@@ -14,6 +14,7 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
 import service.*;
 import util.JsonUtil;
 import util.MsgUtil;
@@ -80,7 +81,18 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		msgId =  (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 		String devicePushType = (String) receiveMsg.getValue("devicePushType"); // 消息推送类型
-		sendType = MsgUtil.convertCode(devicePushType);
+		// 从上游接收到的 推送类型
+		devicePushType = (String) receiveMsg.getValue("devicePushType");
+		// 转化成下游需要的推送类型
+		if(StringUtils.isNotBlank(devicePushType)){
+			try{
+				Integer pushType = Integer.valueOf(devicePushType);
+				sendType = MsgUtil.convertCode(pushType);
+			}catch (Exception e){
+				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
+				return;
+			}
+		}
 
 		Object customerId = receiveMsg.getValue("customerId");
 		String apnsToken = (String) receiveMsg.getValue("apnsToken");

@@ -27,10 +27,7 @@ import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -111,7 +108,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 			receiveMsg = new JsonObject(httpMsg);
 			if (receiveMsg == null) {
-				logger.error("请求数据为空，不做处理");
+				logger.error("body转换成json对象出错");
 				resp.putHeader("content-type", "text/plain;charset=UTF-8")
 						.end(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", null).toString());
 				return;
@@ -199,29 +196,40 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验必填项
-		if (!validateRecieveMsg(receiveMsg)) {
-			resultHandler.handle(Future.failedFuture("必填项字段不能为空"));
+		msgId = (String) receiveMsg.getValue("msgId");
+		if (StringUtils.isBlank(msgId)) {
+			resultHandler.handle(Future.failedFuture("msgId不能为空"));
+			return;
+		}
+		// 用户id
+		customerId = receiveMsg.getValue("customerId");
+		if (null == customerId) {
+			resultHandler.handle(Future.failedFuture("customerId不能为空"));
 			return;
 		}
 
 		phone = (String) receiveMsg.getValue("phone");
-
-		if (!StringUtils.isNotBlank(phone)) {
+		if (StringUtils.isBlank(phone)) {
 			resultHandler.handle(Future.failedFuture("上送手机号不能为空"));
 			return;
 		}
-
-		msgId = (String) receiveMsg.getValue("msgId");
-		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
+		// sokit、gcm,小米连接token
+		token = (String) receiveMsg.getValue("deviceToken");
 		// 从上游接收到的 推送类型
 		devicePushType = (String) receiveMsg.getValue("devicePushType");
 		// 转化成下游需要的推送类型
-		sendType = MsgUtil.convertCode(devicePushType);
+		if(StringUtils.isNotBlank(devicePushType)){
+			try{
+				Integer pushType = Integer.valueOf(devicePushType);
+				sendType = MsgUtil.convertCode(pushType);
+			}catch (Exception e){
+				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
+				return;
+			}
+		}
+
 		// IOS apnsToken
 		apnsToken = (String) receiveMsg.getValue("apnsToken");
-		// 用户id
-		customerId = receiveMsg.getValue("customerId");
-
 		if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
 			resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
 			return;
@@ -234,11 +242,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			param.put("phone", phone);
 			deviceService.queryDevices(param, deviceFuture.completer());
 		} else {
-			deviceList = new ArrayList<>();
 			DeviceDto dto = new DeviceDto();
 			genDeviceDto(dto);
-			deviceList.add(dto);
-			deviceFuture.handle(Future.succeededFuture(deviceList));
+			deviceFuture.handle(Future.succeededFuture(Arrays.asList(dto)));
 		}
 
 		// 判断消息是否接收过
@@ -258,7 +264,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					resultHandler.handle(Future.failedFuture("设备token不存在"));
 					return;
 				}
-				// token = deviceList.get(0).getDeviceToken();
+				token = deviceList.get(0).getDeviceToken();
 
 				// 验证redis
 				String redisResult = handler.result().resultAt(1);
@@ -278,29 +284,24 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	}
 
+	/**
+	 * 生成deviceDto数据
+	 * @param dto
+	 */
 	private void genDeviceDto(DeviceDto dto) {
-
 		if (!StringUtil.isNullOrEmpty(apnsToken)) {
-			dto.setChannel(4);
+			dto.setChannel(PushTypeEnum.APNS.getSrcCode());
 			dto.setDeviceToken(apnsToken);
 			return;
 		}
 
-		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
-			// socket推送
-		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
-			// gcm推送
-			dto.setChannel(2);
-			dto.setDeviceToken(token);
-		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
-			// 只用作对安卓手机进行推送
-			dto.setChannel(3);
-			dto.setDeviceToken(token);
-		} else {
-			logger.error("无效推送渠道");
-			return;
+		for(PushTypeEnum e : PushTypeEnum.values()){
+			if(e.getCode().equals(sendType)){
+				dto.setChannel(e.getSrcCode());
+			}
 		}
-
+		dto.setDeviceToken(token);
+		logger.info("genDeviceDto : sendType[" + sendType + "], token[" + dto.getDeviceToken() + "]");
 	}
 
 	/**
@@ -355,23 +356,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
                 resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
             }
         });
-    }
-
-    private boolean validateRecieveMsg(JsonObject msg) {
-        String errorMsg;
-        if (msg == null) {
-            errorMsg = "校验未通过，receiveMsg==" + msg;
-            return false;
-        }
-        if (msg.getValue("msgId") == null) {
-            errorMsg = "校验未通过：msgId为空";
-            return false;
-        }
-        if (msg.getValue("customerId") == null) {
-            errorMsg = "校验未通过：customerId为空";
-            return false;
-        }
-        return true;
     }
 
     public static void main(String[] args) {

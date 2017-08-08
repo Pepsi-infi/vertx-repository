@@ -1,9 +1,6 @@
 package api;
 
-import channel.ApplePushVerticle;
-import channel.HttpConsumerVerticle;
-import channel.MiPushVerticle;
-import channel.SocketVerticle;
+import channel.*;
 import dao.impl.MsgRecordDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -28,12 +25,10 @@ public class StartVerticle extends AbstractVerticle{
 
         this.deployVerticle(MiPushVerticle.class.getName());
 		this.deployVerticle(SocketVerticle.class.getName());
-//		vertx.deployVerticle(SocketVerticle.class.getName());
-
-//        this.deployVerticle(AmqpConsumerVerticle.class.getName());
-        this.deployVerticle(HttpConsumerVerticle.class.getName());
         this.deployVerticle(ApplePushVerticle.class.getName());
-        
+
+        this.deployVerticle(HttpConsumerVerticle.class.getName());
+//        this.deployVerticle(AmqpConsumerVerticle.class.getName());
         // 提供其他非EventBus服务
     }
 
