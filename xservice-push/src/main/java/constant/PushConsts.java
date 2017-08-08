@@ -17,9 +17,7 @@ public class PushConsts {
 
 	public static final int XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND = 1;
 
-	/**
-	 * ---------------------------------------- SOCKET推送相关的常量字段 ----------------------------------------
-	 */
+	// ---------------------------------------- SOCKET推送相关的常量字段 ----------------------------------------
 
 	// 用户消息队列key（乘客）
 	public static final String _MSG_LIST_PASSENGER = "MSGLIST_PASSENGER";
@@ -29,4 +27,16 @@ public class PushConsts {
 
 	//SOCKET推送，params中的一个字段默认值用到
 	public static final int ZERO = 0;
+
+
+	// ---------------------------------------------- 上报相关常量 ---------------------------------------------
+
+	//AppCode 乘客端
+	public static final Integer MsgStat_APPCODE_ENGER = 1001;
+
+	//系统类型， 安卓端
+	public static final Integer MsgStat_OSTYPE_ANDROID = 1;
+
+	//上报类型 1发送，2接收
+	public static final Integer MsgStat_ACTION_SEND = 1;
 }

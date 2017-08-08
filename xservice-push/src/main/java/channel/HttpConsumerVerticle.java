@@ -158,13 +158,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				List<MsgStatDto> msgList=new ArrayList<>();
 				MsgStatDto msgStatDto = new MsgStatDto();
 				// 首约app乘客端 1001；首约app司机端 1002
-				msgStatDto.setAppCode(1001);
+				msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 				msgStatDto.setChannel(Integer.parseInt(devicePushType));
 				msgStatDto.setMsgId(msgId);
 				// 1 安卓
-				msgStatDto.setOsType(1);
+				msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_ANDROID);
 				// 1发送，2接收
-				msgStatDto.setAction(1);
+				msgStatDto.setAction(PushConsts.MsgStat_ACTION_SEND);
 				msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
 				msgList.add(msgStatDto);
 				msgStatService.statPushMsg(msgList, statRes -> {
