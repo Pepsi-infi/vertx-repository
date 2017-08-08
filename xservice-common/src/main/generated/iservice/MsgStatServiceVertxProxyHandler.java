@@ -39,7 +39,7 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import utils.BaseResponse;
+import java.util.List;
 import io.vertx.core.Vertx;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
@@ -125,17 +125,7 @@ public class MsgStatServiceVertxProxyHandler extends ProxyHandler {
       switch (action) {
 
         case "statPushMsg": {
-          service.statPushMsg(json.getJsonObject("msgStatDto") == null ? null : new iservice.dto.MsgStatDto(json.getJsonObject("msgStatDto")), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+          service.statPushMsg(json.getJsonArray("msgStatDtos").stream().map(o -> new MsgStatDto((JsonObject)o)).collect(Collectors.toList()), createHandler(msg));
           break;
         }
         default: {

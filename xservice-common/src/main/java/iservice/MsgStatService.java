@@ -6,11 +6,9 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.serviceproxy.ProxyHelper;
 import iservice.dto.MsgStatDto;
-import utils.BaseResponse;
-import utils.IPUtil;
+
+import java.util.List;
 
 /**
  * Created by lufei
@@ -30,12 +28,9 @@ public interface MsgStatService {
     }
 
     /**
-     * 统计push消息
-     *
-     * @param msgStatDto
+     * @param msgStatDtos
      * @param result
      */
-    void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result);
-
+    void statPushMsg(List<MsgStatDto> msgStatDtos, Handler<AsyncResult<String>> result);
 
 }

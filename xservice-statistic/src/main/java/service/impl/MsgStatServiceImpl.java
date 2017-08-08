@@ -1,10 +1,12 @@
 package service.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import constants.CacheConstants;
 import constants.PushActionEnum;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
@@ -16,11 +18,14 @@ import io.vertx.redis.RedisOptions;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
 import util.ConfigUtils;
 import utils.BaseResponse;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -52,40 +57,41 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
     }
 
 
-    @Override
-    public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) {
+    private void statSinglePushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<Map>> result) {
         String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto);
         List<String> fields = getFieldsForMsgStat(msgStatDto);
         if (CollectionUtils.isEmpty(fields)) {
             logger.warn("the msgStat:{} need stat is null ", msgStatDto);
             result.handle(Future.failedFuture("the msgStat :" + msgStatDto + "need stat is null"));
-        }
-        try {
-            //设置过期时间 12小时
-            redisClient.expire(msgSendKey, 43200, handler -> {
-                if (handler.succeeded()) {
-                    logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
-                } else {
-                    logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
-                }
-            });
-            for (String field : fields) {
-                redisClient.hincrby(msgSendKey, field, 1, handler -> {
+        } else if (StringUtils.isEmpty(msgStatDto.getAntFingerprint())) {
+            logger.warn("the antFingerprint of msgStat:{} is null ", msgStatDto);
+            result.handle(Future.failedFuture("the antFingerprint of msgStat is null"));
+        } else {
+            try {
+                //设置过期时间 12小时
+                redisClient.expire(msgSendKey, 43200, handler -> {
                     if (handler.succeeded()) {
-                        logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
+                        logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
                     } else {
-                        logger.error("stat msgStatDto : {} by filed :{} error.", msgStatDto, field, handler.cause());
+                        logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
+                        result.handle(Future.failedFuture(handler.cause()));
                     }
                 });
+                for (String field : fields) {
+                    redisClient.hincrby(msgSendKey, field, 1, handler -> {
+                        if (handler.succeeded()) {
+                            logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
+                        } else {
+                            logger.error("stat msgStatDto : {} by filed :{} error.", msgStatDto, field, handler.cause());
+                        }
+                    });
+                }
+                result.handle(Future.succeededFuture(buildSuccessResponse()));
+            } catch (Exception e) {
+                logger.error("stat msgStatDto : {} error.", msgStatDto, e);
+                result.handle(Future.failedFuture(e.getCause()));
             }
-            result.handle(Future.succeededFuture(new BaseResponse()));
-        } catch (Exception e) {
-            logger.error("stat msgStatDto : {} error.", msgStatDto, e);
-            BaseResponse baseResponse = new BaseResponse();
-            buildErrorBaseResponse(baseResponse, e.getMessage());
-            result.handle(Future.succeededFuture(baseResponse));
         }
-
     }
 
     private List<String> getFieldsForMsgStat(MsgStatDto msgStatDto) {
@@ -125,11 +131,53 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         return fieldsList;
     }
 
+
+    @Override
+    public void statPushMsg(List<MsgStatDto> msgStatDtos, Handler<AsyncResult<String>> result) {
+        List<Future> pushFutureList = new ArrayList<>();
+        Map<Future<Map>, String> futureMap = Maps.newHashMap();
+        for (MsgStatDto msgStatDto : msgStatDtos) {
+            Future<Map> msgStatDtoFuture = Future.future();
+            pushFutureList.add(msgStatDtoFuture);
+            futureMap.put(msgStatDtoFuture, msgStatDto.getMsgId());
+            statSinglePushMsg(msgStatDto, msgStatDtoFuture.completer());
+        }
+        CompositeFuture compositeFuture = CompositeFuture.all(pushFutureList);
+        compositeFuture.setHandler(res -> {
+            if (res.succeeded()) {
+                result.handle(Future.succeededFuture(Json.encode(buildSuccessResponse())));
+            } else {
+                Map responseMap = Maps.newHashMap();
+                responseMap.put("status", BaseResponse.RESPONSE_FAIL_CODE);
+                List<Map> list = Lists.newArrayList();
+                for (int i = 0; i < pushFutureList.size(); i++) {
+                    Map msgMap = Maps.newHashMap();
+                    msgMap.put("msgId", futureMap.get(pushFutureList.get(i)));
+                    list.add(msgMap);
+                }
+                responseMap.put("msgList", list);
+                result.handle(Future.succeededFuture(Json.encode(responseMap)));
+            }
+        });
+    }
+
+    private Map buildErrorResponse(String msgId) {
+        Map map = Maps.newHashMap();
+        map.put("status", BaseResponse.RESPONSE_FAIL_CODE);
+        map.put("msgId", msgId);
+        return map;
+    }
+
+    private Map buildSuccessResponse() {
+        Map map = Maps.newHashMap();
+        map.put("status", BaseResponse.RESPONSE_SUC_CODE);
+        return map;
+    }
+
     private <T extends BaseResponse> void buildErrorBaseResponse(T response, String message) {
         if (response != null) {
             response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
             response.setErrorMessage(message);
         }
     }
-
 }
