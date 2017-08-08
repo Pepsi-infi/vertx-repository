@@ -12,6 +12,7 @@ import iservice.DeviceService;
 import iservice.dto.DeviceDto;
 import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
+import util.BeanUtils;
 import utils.BaseResponse;
 
 import java.util.List;
@@ -64,10 +65,9 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                             }
                         });
                     } else {
-                        //TODO:
-//                        if (!deviceDto.equals(dbDevice)) {
-                            logger.info("the device:{} has change", deviceDto);
-                            deviceDao.updateDevice(deviceDto, ar3 -> {
+                        if (!dbDevice.equals(deviceDto)) {
+                            BeanUtils.copyNotEmptyPropertiesQuietly(dbDevice, deviceDto);
+                            deviceDao.updateDevice(dbDevice, ar3 -> {
                                 BaseResponse baseResponse = new BaseResponse();
                                 if (ar3.succeeded()) {
                                     result.handle(Future.succeededFuture(baseResponse));
@@ -77,7 +77,10 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                                     result.handle(Future.succeededFuture(baseResponse));
                                 }
                             });
-//                        }
+                        } else {
+                            logger.info("the device:{} has not change", dbDevice);
+                            result.handle(Future.succeededFuture(new BaseResponse()));
+                        }
                     }
                 } else {
                     logger.error(ar1.cause());
