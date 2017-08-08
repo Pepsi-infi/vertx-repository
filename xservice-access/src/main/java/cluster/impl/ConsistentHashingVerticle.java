@@ -29,6 +29,7 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 
 	@Override
 	public void start() throws Exception {
+		logger.info("start ... ");
 		this.realNodes = new ArrayList<String>();
 
 		this.realNodes.add("10.10.10.193");// TODO
