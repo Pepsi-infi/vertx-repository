@@ -5,6 +5,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import logic.impl.SessionVerticle;
 import server.HttpServerVerticle;
 import server.TCPServerVerticle;
 
@@ -16,6 +17,7 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(SessionVerticle.class.getName(), readBossOpts().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {
