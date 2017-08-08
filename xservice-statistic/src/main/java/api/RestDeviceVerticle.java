@@ -78,7 +78,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
 
         if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
                 || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
-            badRequest(context, new Throwable("Required  parameters cannot be empty."));
+            paramBadRequest(context, "Required  parameters cannot be empty.");
         }
 
         userDeviceDto.setDeviceToken(deviceToken);

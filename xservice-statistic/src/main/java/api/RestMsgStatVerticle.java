@@ -1,21 +1,28 @@
 package api;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.vertx.core.Future;
+import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
+import io.vertx.rxjava.ext.web.handler.CorsHandler;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
 import service.MsgStatResultService;
 import utils.IPUtil;
 import utils.JsonUtil;
+import utils.TimeUtil;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,7 +44,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         logger.info("Rest message stat verticle: Start...");
 
         Router router = Router.router(vertx);
-//        router.route().handler(CorsHandler.create("*"));
+        router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
         router.post(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
         router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
@@ -62,13 +69,9 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     }
 
     private void statPushMsg(RoutingContext context) {
-        MsgStatDto statDto = buildMsgStatDto(context);
-        logger.info("stat pushMsg,the statDto: {}", statDto);
-        if (statDto.getAction() == null || statDto.getAction() < 0) {
-            logger.error("the action is null for {} ", statDto);
-            return;
-        }
-        msgStatService.statPushMsg(statDto, resultHandler(context, JsonUtil::encodePrettily));
+        List<MsgStatDto> msgStatDtos = buildMsgStatDto(context);
+        logger.info("stat pushMsg,the msgStatDtos: {}", Json.encode(msgStatDtos));
+        msgStatService.statPushMsg(msgStatDtos, resultStringHandler(context));
     }
 
     private void queryMsgStatResult(RoutingContext context) {
@@ -85,40 +88,36 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     }
 
 
-    private MsgStatDto buildMsgStatDto(RoutingContext context) {
+    private List<MsgStatDto> buildMsgStatDto(RoutingContext context) {
         String appCode = context.request().formAttributes().get("appCode");
         String osType = context.request().formAttributes().get("osType");
         String antFingerprint = context.request().formAttributes().get("antFingerprint");
         String msgList = context.request().formAttributes().get("msgList");
 
-        String action = context.request().formAttributes().get("action");
-        String msgId = context.request().formAttributes().get("msgId");
-        String channel = context.request().formAttributes().get("channel");
-        String sendTime = context.request().formAttributes().get("sendTime");
-        String arriveTime = context.request().formAttributes().get("arriveTime");
-
-        if (StringUtils.isBlank(action) || StringUtils.isBlank(msgId) || StringUtils.isBlank(channel) || StringUtils.isBlank(osType)) {
-            badRequest(context, new Throwable("Param [action or msgId or channel or osType] cannot be empty."));
+        if (StringUtils.isBlank(appCode) || StringUtils.isBlank(osType) || StringUtils.isBlank(msgList)) {
+            paramBadRequest(context, "Param [appCode or osType or msgList] cannot be empty.");
         }
-
-        MsgStatDto statDto = new MsgStatDto();
-        if (StringUtils.isNotBlank(action)) {
-            statDto.setAction(Integer.valueOf(action));
+        List<MsgStatDto> msgStatDtos = Lists.newArrayList();
+        List<HashMap> msgStatList = Json.decodeValue(msgList, List.class);
+        for (HashMap msgStatMap : msgStatList) {
+            MsgStatDto statDto = new MsgStatDto();
+            if (StringUtils.isNotBlank(osType)) {
+                statDto.setOsType(Integer.valueOf(osType));
+            }
+            if (StringUtils.isNotBlank(appCode)) {
+                statDto.setAppCode(Integer.valueOf(appCode));
+            }
+            statDto.setAntFingerprint(antFingerprint);
+            statDto.setAction(MapUtils.getInteger(msgStatMap, "action"));
+            statDto.setMsgId(MapUtils.getString(msgStatMap, "msgId"));
+            statDto.setChannel(MapUtils.getInteger(msgStatMap, "channel"));
+            Long arriveTime = MapUtils.getLong(msgStatMap, "arriveTime");
+            if (arriveTime != null) {
+                statDto.setArriveTime(TimeUtil.timestamp2date(arriveTime));
+            }
+            msgStatDtos.add(statDto);
         }
-        if (StringUtils.isNotBlank(osType)) {
-            statDto.setOsType(Integer.valueOf(osType));
-        }
-        if (StringUtils.isNotBlank(channel)) {
-            statDto.setChannel(Integer.valueOf(channel));
-        }
-        if (StringUtils.isNotBlank(appCode)) {
-            statDto.setAppCode(Integer.valueOf(appCode));
-        }
-        statDto.setMsgId(msgId);
-        statDto.setSendTime(sendTime);
-        statDto.setArriveTime(arriveTime);
-        statDto.setAntFingerprint(antFingerprint);
-        return statDto;
+        return msgStatDtos;
     }
 
 
