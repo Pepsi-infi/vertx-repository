@@ -32,6 +32,8 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
+		logger.info("start ... ");
+
 		eb = vertx.eventBus();
 		sharedData = vertx.sharedData();
 		sessionMap = sharedData.getLocalMap("session");
@@ -57,9 +59,8 @@ public class TCPServerVerticle extends AbstractVerticle {
 				JsonObject msgBody = null;
 				if (bodyLength != 0) {
 					try {
-						msgBody = buffer
-								.getBuffer(IMMessageConstant.HEADER_LENGTH, IMMessageConstant.HEADER_LENGTH + bodyLength)
-								.toJsonObject();
+						msgBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
+								IMMessageConstant.HEADER_LENGTH + bodyLength).toJsonObject();
 					} catch (Exception e) {
 						logger.error("Json parse error." + e.toString());
 					}
