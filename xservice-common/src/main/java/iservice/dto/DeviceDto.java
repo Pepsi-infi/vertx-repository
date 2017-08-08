@@ -145,6 +145,44 @@ public class DeviceDto {
         return json;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DeviceDto deviceDto = (DeviceDto) o;
+
+        if (uid != null ? !uid.equals(deviceDto.uid) : deviceDto.uid != null) return false;
+        if (phone != null ? !phone.equals(deviceDto.phone) : deviceDto.phone != null) return false;
+        if (deviceType != null ? !deviceType.equals(deviceDto.deviceType) : deviceDto.deviceType != null) return false;
+        if (channel != null ? !channel.equals(deviceDto.channel) : deviceDto.channel != null) return false;
+        if (deviceToken != null ? !deviceToken.equals(deviceDto.deviceToken) : deviceDto.deviceToken != null)
+            return false;
+        if (osType != null ? !osType.equals(deviceDto.osType) : deviceDto.osType != null) return false;
+        if (osVersion != null ? !osVersion.equals(deviceDto.osVersion) : deviceDto.osVersion != null) return false;
+        if (appCode != null ? !appCode.equals(deviceDto.appCode) : deviceDto.appCode != null) return false;
+        if (appVersion != null ? !appVersion.equals(deviceDto.appVersion) : deviceDto.appVersion != null) return false;
+        if (antFingerprint != null ? !antFingerprint.equals(deviceDto.antFingerprint) : deviceDto.antFingerprint != null)
+            return false;
+        return isAcceptPush != null ? isAcceptPush.equals(deviceDto.isAcceptPush) : deviceDto.isAcceptPush == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = uid != null ? uid.hashCode() : 0;
+        result = 31 * result + (phone != null ? phone.hashCode() : 0);
+        result = 31 * result + (deviceType != null ? deviceType.hashCode() : 0);
+        result = 31 * result + (channel != null ? channel.hashCode() : 0);
+        result = 31 * result + (deviceToken != null ? deviceToken.hashCode() : 0);
+        result = 31 * result + (osType != null ? osType.hashCode() : 0);
+        result = 31 * result + (osVersion != null ? osVersion.hashCode() : 0);
+        result = 31 * result + (appCode != null ? appCode.hashCode() : 0);
+        result = 31 * result + (appVersion != null ? appVersion.hashCode() : 0);
+        result = 31 * result + (antFingerprint != null ? antFingerprint.hashCode() : 0);
+        result = 31 * result + (isAcceptPush != null ? isAcceptPush.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public String toString() {
