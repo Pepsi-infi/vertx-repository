@@ -15,14 +15,10 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
+import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  *  保存消息记录
@@ -58,8 +54,7 @@ public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDa
         publishEventBusService(MsgRecordDao.LOCAL_SERVICE_NAME, MsgRecordDao.getLocalAddress(ip), MsgRecordDao.class);
 
 
-        String jdbcConfig = System.getProperty("jdbcConfig", ConnectionConsts.JDBC_CONFIG_PATH);
-        JsonObject jsonObject = this.getJsonConf(jdbcConfig);
+        JsonObject jsonObject = PropertiesLoaderUtils.getJsonConf(ConnectionConsts.JDBC_CONFIG_PATH);
         sqlClient = MySQLClient.createShared(vertx, jsonObject);
 
 //        MsgRecord dto = new MsgRecord();
@@ -71,27 +66,6 @@ public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDa
 //            System.out.println( " ================= " + result.result().getResultStatus());
 //        });
     }
-
-    private JsonObject getJsonConf(String configPath) {
-        logger.info("jdbc Path: " + configPath);
-        JsonObject conf = new JsonObject();
-        ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
-        InputStream is = ctxClsLoader.getResourceAsStream(configPath);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
-        try {
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            conf = new JsonObject(sb.toString());
-            logger.info("Loaded jdbc.json file from [" + configPath + "] : " + conf.toString());
-        } catch (Exception e) {
-            logger.error("Failed to load configuration file" + e);
-        }
-        return conf;
-    }
-
 
     @Override
     public void addMessage(MsgRecord msg, Handler<AsyncResult<BaseResponse>> resultHandler) {

@@ -11,10 +11,11 @@ public class MsgBody implements Serializable {
 	private static final long serialVersionUID = -8699727587980280720L;
 	private int pushType;//1:单条推送  2:批量推送
 	private int deviceType;//设备类型  1:IOS 2:ANDROID
-	private int channel;//渠道  0:apns(苹果专属推送)  1:SOKCET 2:XIAOMI 3:GCM
+	private int channel;//渠道  0:apns(苹果专属推送)  1:SOKCET 2:GCM 3:XIAOMI
+	private int jumpFlag;//页面跳转标识(需要和客户端讨论决定)
 	private String title;//标题
 	private String content;//消息内容
-	private String deviceNo;//设备号
+	private String deviceToken;//设备token apnstoken 小米token gcm-token等
 	private Date createdTime;//消息创建时间 
 	private Date sendTime;//消息发送时间
 	public int getPushType() {
@@ -47,12 +48,6 @@ public class MsgBody implements Serializable {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public String getDeviceNo() {
-		return deviceNo;
-	}
-	public void setDeviceNo(String deviceNo) {
-		this.deviceNo = deviceNo;
-	}
 	public Date getCreatedTime() {
 		return createdTime;
 	}
@@ -64,6 +59,18 @@ public class MsgBody implements Serializable {
 	}
 	public void setSendTime(Date sendTime) {
 		this.sendTime = sendTime;
+	}
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
+	}
+	public int getJumpFlag() {
+		return jumpFlag;
+	}
+	public void setJumpFlag(int jumpFlag) {
+		this.jumpFlag = jumpFlag;
 	}
 	
 	

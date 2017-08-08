@@ -89,6 +89,27 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
         });
     }
 
+    @Override
+    public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
+        redisClient.lpush(queue, key, handler ->{
+            if(handler.succeeded()){
+                result.handle(Future.succeededFuture(handler.result()));
+            } else {
+                result.handle(Future.failedFuture(handler.cause()));
+            }
+        });
+    }
+
+    @Override
+    public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
+        redisClient.lpush(queue, key, handler ->{
+            if(handler.succeeded()){
+                result.handle(Future.succeededFuture(handler.result()));
+            } else {
+                result.handle(Future.failedFuture(handler.cause()));
+            }
+        });
+    }
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();

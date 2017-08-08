@@ -1,13 +1,5 @@
 package channel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -15,11 +7,7 @@ import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -31,19 +19,22 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.GcmPushService;
-import service.MsgRecordService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import util.MsgUtil;
 import utils.BaseResponse;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class HttpConsumerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
 
 	private SocketPushService socketPushService;
 
@@ -346,7 +337,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 					// socket推送
 					logger.info("开始走socket推送");
-					socketPushService.sendMsg(receiveMsg.toString(), resultHandler);
+					socketPushService.sendMsg(receiveMsg, resultHandler);
 				} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 					// gcm推送
 					logger.info("开始走gcm推送");
@@ -357,37 +348,34 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 				} else {
 					logger.error("无效推送渠道");
-					return;
-				}
-			} else {
-				logger.error("数据验证未通过，原因：" + checkFutrue.cause());
-				resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
-			}
-		});
-	}
+                    return;
+                }
+            } else {
+                logger.error("数据验证未通过，原因：" + checkFutrue.cause());
+                resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
+            }
+        });
+    }
 
-	private boolean validateRecieveMsg(JsonObject msg) {
-		String errorMsg;
-		if (msg == null) {
-			errorMsg = "校验未通过，receiveMsg==" + msg;
-			logger.error(errorMsg);
-			return false;
-		}
-		if (msg.getValue("msgId") == null) {
-			errorMsg = "校验未通过：msgId为空";
-			logger.error(errorMsg);
-			return false;
-		}
-		if (msg.getValue("customerId") == null) {
-			errorMsg = "校验未通过：customerId为空";
-			logger.error(errorMsg);
-			return false;
-		}
-		return true;
-	}
+    private boolean validateRecieveMsg(JsonObject msg) {
+        String errorMsg;
+        if (msg == null) {
+            errorMsg = "校验未通过，receiveMsg==" + msg;
+            return false;
+        }
+        if (msg.getValue("msgId") == null) {
+            errorMsg = "校验未通过：msgId为空";
+            return false;
+        }
+        if (msg.getValue("customerId") == null) {
+            errorMsg = "校验未通过：customerId为空";
+            return false;
+        }
+        return true;
+    }
 
-	public static void main(String[] args) {
-		System.out.println(!StringUtils.isNotBlank(null));
-		System.out.println(!StringUtils.isNotBlank(""));
-	}
+    public static void main(String[] args) {
+        System.out.println(!StringUtils.isNotBlank(null));
+        System.out.println(!StringUtils.isNotBlank(""));
+    }
 }

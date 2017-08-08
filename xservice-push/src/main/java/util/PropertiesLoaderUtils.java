@@ -1,5 +1,6 @@
 package util;
 
+import constant.ConnectionConsts;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -16,8 +17,8 @@ import java.util.Properties;
 public final class PropertiesLoaderUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(PropertiesLoaderUtils.class);
-	private static String PUSH_CONFIG = "/push-config.properties";
-	private static String[] resources = { "/push-config.properties", "/activemq.properties" };
+	private static String PUSH_CONFIG = "push-config.properties";
+	private static String[] resources = {"push-config.properties","activemq.properties"};
 	public static Properties multiProp;
 	public static Properties singleProp;
 
@@ -34,17 +35,15 @@ public final class PropertiesLoaderUtils {
 		if (singleProp != null) {
 			return singleProp;
 		}
-
-		String config = System.getProperty("push.config", PUSH_CONFIG);
-
+		String configPath = getResourceStreamEnv(PUSH_CONFIG);
 		singleProp = new Properties();
 		InputStream is = null;
-
 		try {
-			is = PropertiesLoaderUtils.class.getResourceAsStream(config);
+			is = PropertiesLoaderUtils.class.getResourceAsStream(configPath);
 			singleProp.load(is);
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(" loadSingleProperties error : " + e);
 		} finally {
 			if (is != null) {
 				try {
@@ -66,12 +65,14 @@ public final class PropertiesLoaderUtils {
 		InputStream is = null;
 
 		try {
-			for (String location : resources) {
-				is = PropertiesLoaderUtils.class.getResourceAsStream(location);
+			for (String conf : resources) {
+				String configPath = getResourceStreamEnv(conf);
+				is = PropertiesLoaderUtils.class.getResourceAsStream(configPath);
 				multiProp.load(is);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(" loadMultiProperties error :" + e);
 		} finally {
 			if (is != null) {
 				try {
@@ -92,12 +93,13 @@ public final class PropertiesLoaderUtils {
 	public static Properties loadProperties(String filePath) {
 		Properties prop = new Properties();
 		InputStream is = null;
-
+		filePath = getResourceStreamEnv(filePath);
 		try {
 			is = PropertiesLoaderUtils.class.getResourceAsStream(filePath);
 			prop.load(is);
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(" loadProperties(String filePath) error : " + e);
 		} finally {
 			if (is != null) {
 				try {
@@ -118,6 +120,7 @@ public final class PropertiesLoaderUtils {
 	 * @return
 	 */
 	public static JsonObject getJsonConf(String configPath) {
+		configPath = getInputStreamEnv(configPath);
 		logger.info("config Path: " + configPath);
 		JsonObject conf = new JsonObject();
 		ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
@@ -135,6 +138,24 @@ public final class PropertiesLoaderUtils {
 			logger.error("Failed to load config file" + e);
 		}
 		return conf;
+	}
+
+	/**
+	 * InputStream 记取文件的方式
+	 * @param configPath
+	 * @return
+	 */
+	private static String getInputStreamEnv(String configPath){
+		return ConnectionConsts.ENV_PATH + "/" + configPath;
+	}
+
+	/**
+	 *  ClassLoader.getSystemResourceAsStream读取文件的方式,需要前面带"/"
+	 * @param configPath
+	 * @return
+	 */
+	private static String getResourceStreamEnv(String configPath){
+		return "/" + ConnectionConsts.ENV_PATH + "/" + configPath;
 	}
 
 	public static void main(String[] args) {
