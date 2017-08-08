@@ -20,8 +20,8 @@ java \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
 -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
--Xloggc:/letv/logs/mobile/channel/gc.log \
--Dlog.path=/letv/logs/mobile/channel \
+-Xloggc:${root_path}/access/gc.log \
+-Dlog.path=${root_path}/access \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=mobile \
