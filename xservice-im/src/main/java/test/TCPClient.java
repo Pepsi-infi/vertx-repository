@@ -36,13 +36,6 @@ public class TCPClient {
 				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
 				socket.write(msg);
 
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
 				// 1002
 				// byte[] headerLength2 = intToBytes(24);
 				// byte[] clientVersion2 = intToBytes(10001);

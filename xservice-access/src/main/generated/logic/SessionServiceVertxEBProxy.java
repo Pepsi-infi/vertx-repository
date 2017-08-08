@@ -63,44 +63,6 @@ public class SessionServiceVertxEBProxy implements SessionService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void setUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("uid", uid);
-    _json.put("handlerID", handlerID);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "setUserSocket");
-    _vertx.eventBus().<Integer>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void delUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("uid", uid);
-    _json.put("handlerID", handlerID);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "delUserSocket");
-    _vertx.eventBus().<Integer>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
   public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
