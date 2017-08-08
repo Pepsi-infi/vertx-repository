@@ -31,7 +31,7 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 	public void start() throws Exception {
 		this.realNodes = new ArrayList<String>();
 
-		this.realNodes.add("127.0.0.1");// TODO
+		this.realNodes.add("10.10.10.193");// TODO
 		init();
 
 		XProxyHelper.registerService(ConsistentHashingService.class, vertx, this,
