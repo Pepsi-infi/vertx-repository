@@ -84,13 +84,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 											.put("from", from);
 									logger.info("from={}cmd={}node={}handlerID={}", from, cmd, res.result(),
 											socket.writeHandlerID());
-									eb.<JsonObject>send("session-eb-service" + res.result(), msg, option, reply -> {
-										if (reply.succeeded()) {
-
-										} else {
-											logger.error("session-eb-service reply={}", reply.cause());
-										}
-									});
+									eb.send("session-eb-service" + res.result(), msg, option);
 								} else {
 									// TODO
 								}
@@ -105,9 +99,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 									option.setSendTimeout(3000);
 									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
 											.put("from", from);
-									eb.<JsonObject>send("session-eb-service" + res.result(), msg, option, reply -> {
-										// TODO
-									});
+									eb.send("session-eb-service" + res.result(), msg, option);
 								} else {
 									// TODO
 								}

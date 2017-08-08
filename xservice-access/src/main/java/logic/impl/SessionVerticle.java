@@ -51,6 +51,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 				}
 			}
 		});
+
 	}
 
 	public int setUserSocket(String uid, String handlerId) {
