@@ -7,7 +7,6 @@ import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
 import constant.PushConsts;
-import enums.EnumPassengerMessageType;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -59,7 +58,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		String msgId=recieveMsg.getString("msgId");
 
 		String description = recieveMsg.getString("content");
-		String regId = null;
+		String regId = null; 
 		try {
 			regId = (String) recieveMsg.getValue("regId");
 			
@@ -72,6 +71,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 			}
 			
 		} catch (Exception e) {
+			resultHandler.handle(Future.failedFuture(e));
 			logger.error("sendMsg error:regId=" + regId + ", mapName=" + title + ", recieveMsg=" + recieveMsg, e);
 		}
 	}

@@ -14,6 +14,7 @@ import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import org.apache.commons.lang.StringUtils;
 import service.*;
 import util.JsonUtil;
 import util.MsgUtil;
@@ -80,7 +81,18 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		msgId =  (String) receiveMsg.getValue("msgId");
 		token = (String) receiveMsg.getValue("deviceToken"); // sokit、gcm,小米连接token
 		String devicePushType = (String) receiveMsg.getValue("devicePushType"); // 消息推送类型
-		sendType = MsgUtil.convertCode(devicePushType);
+		// 从上游接收到的 推送类型
+		devicePushType = (String) receiveMsg.getValue("devicePushType");
+		// 转化成下游需要的推送类型
+		if(StringUtils.isNotBlank(devicePushType)){
+			try{
+				Integer pushType = Integer.valueOf(devicePushType);
+				sendType = MsgUtil.convertCode(pushType);
+			}catch (Exception e){
+				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
+				return;
+			}
+		}
 
 		Object customerId = receiveMsg.getValue("customerId");
 		String apnsToken = (String) receiveMsg.getValue("apnsToken");
@@ -127,7 +139,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 			// socket推送
 			logger.info("开始走socket推送");
-			socketPushService.sendMsg(receiveMsg.toString(), resultHandler);
+			socketPushService.sendMsg(receiveMsg, resultHandler);
 		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
 			// gcm推送
 			logger.info("开始走gcm推送");
@@ -165,7 +177,7 @@ public class AmqpConsumerVerticle extends AbstractVerticle {
 	private void recivedMessage(){
 		AmqpBridge bridge = AmqpBridge.create(vertx);
 		//读取配置
-		Properties prop = PropertiesLoaderUtils.loadProperties("/" + ConnectionConsts.MQ_CONFIG_PATH);
+		Properties prop = PropertiesLoaderUtils.loadProperties(ConnectionConsts.MQ_CONFIG_PATH);
 		//bridge.start
 		String addr = prop.getProperty(ConnectionConsts.ACTIVEMQ_SERVER_URL);
 		int port = Integer.parseInt(prop.getProperty(ConnectionConsts.ACTIVE_SERVER_PORT));

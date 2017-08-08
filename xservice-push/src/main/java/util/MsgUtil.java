@@ -21,7 +21,7 @@ public class MsgUtil {
     /**
      *  上游推送类型 转换成 下游推送类型
      */
-    public static String convertCode(String srcCode){
+    public static String convertCode(Integer srcCode){
         for(PushTypeEnum e : PushTypeEnum.values()){
             if(e.getSrcCode().equals(srcCode)){
                 return e.getCode();
@@ -68,6 +68,9 @@ public class MsgUtil {
         return bs;
     }
 
+    public static void main(String[] args) {
 
+        System.out.println( convertCode(1));
+    }
 
 }

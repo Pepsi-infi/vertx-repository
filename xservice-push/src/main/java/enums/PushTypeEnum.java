@@ -2,15 +2,15 @@ package enums;
 
 public enum PushTypeEnum {
 	
-	SOCKET("1","sokit","套接字推送"),
-	GCM("2","gcm","谷歌推送"),
-	XIAOMI("3","xiaomi","小米推送");
-
+	SOCKET(1,"sokit","套接字推送"),
+	GCM(2,"gcm","谷歌推送"),
+	XIAOMI(3,"xiaomi","小米推送"),
+	APNS(4,"apns","苹果推送");
 
 	/**
 	 * 上游使用的标志
 	 */
-	private String srcCode;
+	private Integer srcCode;
 	/**
 	 * 推送类型
 	 */
@@ -20,17 +20,17 @@ public enum PushTypeEnum {
 	 */
 	private String msg;
 	
-	private PushTypeEnum(String srcCode,String code,String msg) {
+	private PushTypeEnum(Integer srcCode,String code,String msg) {
 		this.srcCode = srcCode;
 		this.code=code;
 		this.msg=msg;
 	}
 
-	public String getSrcCode() {
+	public Integer getSrcCode() {
 		return srcCode;
 	}
 
-	public void setSrcCode(String srcCode) {
+	public void setSrcCode(Integer srcCode) {
 		this.srcCode = srcCode;
 	}
 
