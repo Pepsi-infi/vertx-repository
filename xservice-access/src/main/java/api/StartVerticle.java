@@ -15,7 +15,7 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
-//		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {

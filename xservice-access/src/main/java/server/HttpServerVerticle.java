@@ -25,6 +25,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	@Override
 	public void start() throws Exception {
+		super.start();
+
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
