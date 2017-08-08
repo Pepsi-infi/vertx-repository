@@ -42,9 +42,11 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
     @Override
     public void reportDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> result) {
+        BaseResponse baseResponse = new BaseResponse();
         if (StringUtils.isBlank(deviceDto.getAntFingerprint())) {
             logger.error("the antFingerprint is null");
-            result.handle(Future.failedFuture("the antFingerprint is null"));
+            buildErrorBaseResponse(baseResponse, "the antFingerprint is null");
+            result.handle(Future.succeededFuture(baseResponse));
         } else {
             Future<DeviceDto> getDeviceFuture = Future.future();
             Map<String, String> params = Maps.newHashMap();
@@ -55,7 +57,6 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                     DeviceDto dbDevice = ar1.result();
                     if (dbDevice == null) {
                         deviceDao.addDevice(deviceDto, ar2 -> {
-                            BaseResponse baseResponse = new BaseResponse();
                             if (ar2.succeeded()) {
                                 result.handle(Future.succeededFuture(baseResponse));
                             } else {
@@ -68,7 +69,6 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                         if (!dbDevice.equals(deviceDto)) {
                             BeanUtils.copyNotEmptyPropertiesQuietly(dbDevice, deviceDto);
                             deviceDao.updateDevice(dbDevice, ar3 -> {
-                                BaseResponse baseResponse = new BaseResponse();
                                 if (ar3.succeeded()) {
                                     result.handle(Future.succeededFuture(baseResponse));
                                 } else {
@@ -79,12 +79,13 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                             });
                         } else {
                             logger.info("the device:{} has not change", dbDevice);
-                            result.handle(Future.succeededFuture(new BaseResponse()));
+                            result.handle(Future.succeededFuture(baseResponse));
                         }
                     }
                 } else {
                     logger.error(ar1.cause());
-                    result.handle(Future.failedFuture(ar1.cause()));
+                    buildErrorBaseResponse(baseResponse, ar1.cause().toString());
+                    result.handle(Future.succeededFuture(baseResponse));
                 }
             });
         }

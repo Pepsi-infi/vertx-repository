@@ -68,17 +68,23 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             result.handle(Future.failedFuture("the antFingerprint of msgStat is null"));
         } else {
             try {
+                List<Future> futures = Lists.newArrayList();
                 //设置过期时间 12小时
-                redisClient.expire(msgSendKey, 43200, handler -> {
+                Future<Long> expireFuture = Future.future();
+                futures.add(expireFuture);
+                redisClient.expire(msgSendKey, 43200, expireFuture.completer());
+                expireFuture.setHandler(handler -> {
                     if (handler.succeeded()) {
                         logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
                     } else {
                         logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
-                        result.handle(Future.failedFuture(handler.cause()));
                     }
                 });
                 for (String field : fields) {
-                    redisClient.hincrby(msgSendKey, field, 1, handler -> {
+                    Future<Long> fieldSetFuture = Future.future();
+                    futures.add(fieldSetFuture);
+                    redisClient.hincrby(msgSendKey, field, 1, fieldSetFuture.completer());
+                    fieldSetFuture.setHandler(handler -> {
                         if (handler.succeeded()) {
                             logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
                         } else {
@@ -86,7 +92,15 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
                         }
                     });
                 }
-                result.handle(Future.succeededFuture(buildSuccessResponse()));
+                CompositeFuture compositeFuture = CompositeFuture.all(futures);
+                compositeFuture.setHandler(res -> {
+                    if (res.succeeded()) {
+                        result.handle(Future.succeededFuture());
+                    } else {
+                        logger.error(res.cause());
+                        result.handle(Future.failedFuture(res.cause()));
+                    }
+                });
             } catch (Exception e) {
                 logger.error("stat msgStatDto : {} error.", msgStatDto, e);
                 result.handle(Future.failedFuture(e.getCause()));
