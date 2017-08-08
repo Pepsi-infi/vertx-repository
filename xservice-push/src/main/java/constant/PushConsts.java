@@ -31,10 +31,10 @@ public class PushConsts {
 
 	// ---------------------------------------------- 上报相关常量 ---------------------------------------------
 
-	//AppCode 乘客端
+	//AppCode 乘客端1001, 司机端1002
 	public static final Integer MsgStat_APPCODE_ENGER = 1001;
 
-	//系统类型， 安卓端
+	//系统类型， 安卓端:1; ISO:2;
 	public static final Integer MsgStat_OSTYPE_ANDROID = 1;
 
 	//上报类型 1发送，2接收
