@@ -1,7 +1,7 @@
 package logic.impl;
 
-import constants.CmdConstants;
-import constants.MessageConstant;
+import constants.IMCmdConstants;
+import constants.IMMessageConstant;
 import helper.XProxyHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -64,8 +64,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					// 给FROM发A
 					JsonObject aMsgBody = new JsonObject();
 					aMsgBody.put("ts", ts);
-					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageConstant.HEADER_LENGTH,
-							msg.getInteger("clientVersion"), CmdConstants.MSG_A, msg.getInteger("seq"),
+					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+							msg.getInteger("clientVersion"), IMCmdConstants.MSG_A, msg.getInteger("seq"),
 							aMsgBody.toString().length());
 					eb.send(fromHandlerId, aMsgHeader.appendString(aMsgBody.toString()));
 
@@ -74,8 +74,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					String toHandlerId = sessionMap.get(to);
 					JsonObject nMsgBody = new JsonObject();
 					nMsgBody.put("from", from).put("content", body).put("ts", System.currentTimeMillis());
-					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(MessageConstant.HEADER_LENGTH,
-							msg.getInteger("clientVersion"), CmdConstants.MSG_N, msg.getInteger("seq"),
+					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+							msg.getInteger("clientVersion"), IMCmdConstants.MSG_N, msg.getInteger("seq"),
 							nMsgBody.toString().length());
 
 					eb.send(toHandlerId, nMsgHeader.appendString(nMsgBody.toString()));
@@ -106,8 +106,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					// ack 给FROM发 A
 					JsonObject aMsgBody = new JsonObject();
 					aMsgBody.put("ts", System.currentTimeMillis());
-					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageConstant.HEADER_LENGTH,
-							msg.getInteger("clientVersion"), CmdConstants.ACK_A, msg.getInteger("seq"),
+					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+							msg.getInteger("clientVersion"), IMCmdConstants.ACK_A, msg.getInteger("seq"),
 							aMsgBody.toString().length());
 					eb.send(fromHandlerId, aMsgHeader.appendString(aMsgBody.toString()));
 
@@ -115,8 +115,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					String toHandlerId = sessionMap.get(to);
 					JsonObject nMsgBody = new JsonObject();
 					nMsgBody.put("from", from).put("content", body).put("ts", System.currentTimeMillis());
-					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(MessageConstant.HEADER_LENGTH,
-							msg.getInteger("clientVersion"), CmdConstants.ACK_N, msg.getInteger("seq"),
+					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+							msg.getInteger("clientVersion"), IMCmdConstants.ACK_N, msg.getInteger("seq"),
 							nMsgBody.toString().length());
 
 					eb.send(toHandlerId, nMsgHeader.appendString(nMsgBody.toString()));

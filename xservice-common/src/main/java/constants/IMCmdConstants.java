@@ -1,6 +1,6 @@
 package constants;
 
-public class CmdConstants {
+public class IMCmdConstants {
 
 	/**
 	 * user login

@@ -13,8 +13,12 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 public class ConsistentHashingVerticle extends AbstractVerticle implements ConsistentHashingService {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;

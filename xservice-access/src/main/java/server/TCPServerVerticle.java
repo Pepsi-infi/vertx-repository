@@ -1,8 +1,8 @@
 package server;
 
 import cluster.ConsistentHashingService;
-import constants.CmdConstants;
-import constants.MessageConstant;
+import constants.IMCmdConstants;
+import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -12,7 +12,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.parsetools.RecordParser;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
@@ -42,8 +41,9 @@ public class TCPServerVerticle extends AbstractVerticle {
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
-		options.setSsl(true).setPemKeyCertOptions(
-				new PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
+		// options.setSsl(true).setPemKeyCertOptions(
+		// new
+		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {
@@ -58,7 +58,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 				if (bodyLength != 0) {
 					try {
 						msgBody = buffer
-								.getBuffer(MessageConstant.HEADER_LENGTH, MessageConstant.HEADER_LENGTH + bodyLength)
+								.getBuffer(IMMessageConstant.HEADER_LENGTH, IMMessageConstant.HEADER_LENGTH + bodyLength)
 								.toJsonObject();
 					} catch (Exception e) {
 						logger.error("Json parse error." + e.toString());
@@ -73,7 +73,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 						Future<String> nodeFuture = Future.future();
 						consistentHashingService.getNode(from, nodeFuture.completer());
 						switch (cmd) {
-						case CmdConstants.LOGIN:
+						case IMCmdConstants.LOGIN:
 							nodeFuture.setHandler(res -> {
 								if (res.succeeded()) {
 									DeliveryOptions option = new DeliveryOptions();
@@ -81,8 +81,14 @@ public class TCPServerVerticle extends AbstractVerticle {
 									option.setSendTimeout(3000);
 									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
 											.put("from", from);
+									logger.info("from={}cmd={}node={}handlerID={}", from, cmd, res.result(),
+											socket.writeHandlerID());
 									eb.<JsonObject>send("session-eb-service" + res.result(), msg, option, reply -> {
-										// TODO
+										if (reply.succeeded()) {
+
+										} else {
+											logger.error("session-eb-service reply={}", reply.cause());
+										}
 									});
 								} else {
 									// TODO
@@ -90,7 +96,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 							});
 
 							break;
-						case CmdConstants.LOGOUT:
+						case IMCmdConstants.LOGOUT:
 							nodeFuture.setHandler(res -> {
 								if (res.succeeded()) {
 									DeliveryOptions option = new DeliveryOptions();
@@ -107,14 +113,14 @@ public class TCPServerVerticle extends AbstractVerticle {
 							});
 
 							break;
-						case CmdConstants.MSG_R:
+						case IMCmdConstants.MSG_R:
 							JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
 									.put("body", msgBody);
 
 							Future<JsonObject> msgRF = Future.future();
 							c2cService.doWithMsgRequest(rMsg, msgRF.completer());
 							break;
-						case CmdConstants.ACK_R:
+						case IMCmdConstants.ACK_R:
 							JsonObject aMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
 									.put("body", msgBody);
 							Future<JsonObject> msgAF = Future.future();

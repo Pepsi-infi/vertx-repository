@@ -1,6 +1,6 @@
 package test;
 
-import io.vertx.core.DeploymentOptions;
+import cluster.impl.ConsistentHashingVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import server.TCPServerVerticle;
@@ -9,7 +9,8 @@ public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(TCPServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(TCPServerVerticle.class.getName());
+		vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
 	}
 
 	private static JsonObject config() {

@@ -6,8 +6,9 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
 import logic.SessionService;
@@ -15,11 +16,11 @@ import utils.IPUtil;
 
 public class SessionVerticle extends AbstractVerticle implements SessionService {
 
+	private static final Logger logger = LoggerFactory.getLogger(SessionVerticle.class);
+
 	private SharedData sharedData;
 	private LocalMap<String, String> sessionMap;// uid -> handlerID
 	private LocalMap<String, String> sessionReverse; // handlerID -> uid
-	private String innerIP;
-	private MessageConsumer<String> consumer;
 
 	@Override
 	public void start() throws Exception {
@@ -29,7 +30,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 		String innerIP = IPUtil.getInnerIP();
 		EventBus eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + "127.0.0.1", res -> {
+		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
@@ -37,6 +38,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 				String from = body.getString("from");
 				String handlerID = body.getString("handlerID");
 				Future<Integer> reply = Future.future();
+				logger.info("from={}action={}innerIP={}", from, action, innerIP);
 				switch (action) {
 				case "setUserSocket":
 					setUserSocket(from, handlerID, reply.completer());
