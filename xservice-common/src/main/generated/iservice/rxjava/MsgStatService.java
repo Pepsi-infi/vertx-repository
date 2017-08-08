@@ -19,7 +19,7 @@ package iservice.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import utils.BaseResponse;
+import java.util.List;
 import io.vertx.rxjava.core.Vertx;
 import iservice.dto.MsgStatDto;
 import io.vertx.core.AsyncResult;
@@ -58,22 +58,20 @@ public class MsgStatService {
   }
 
   /**
-   * 统计push消息
-   * @param msgStatDto 
+   * @param msgStatDtos 
    * @param result 
    */
-  public void statPushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<BaseResponse>> result) { 
-    delegate.statPushMsg(msgStatDto, result);
+  public void statPushMsg(List<MsgStatDto> msgStatDtos, Handler<AsyncResult<String>> result) { 
+    delegate.statPushMsg(msgStatDtos, result);
   }
 
   /**
-   * 统计push消息
-   * @param msgStatDto 
+   * @param msgStatDtos 
    * @return 
    */
-  public Single<BaseResponse> rxStatPushMsg(MsgStatDto msgStatDto) { 
+  public Single<String> rxStatPushMsg(List<MsgStatDto> msgStatDtos) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      statPushMsg(msgStatDto, fut);
+      statPushMsg(msgStatDtos, fut);
     }));
   }
 
