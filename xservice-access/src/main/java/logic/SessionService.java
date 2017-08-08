@@ -19,10 +19,6 @@ public interface SessionService {
 		return ProxyHelper.createProxy(SessionService.class, vertx, SERVICE_ADDRESS);
 	}
 
-	void setUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler);
-
-	void delUserSocket(String uid, String handlerID, Handler<AsyncResult<Integer>> resultHandler);
-
 	void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler);
 
 	void getUidByHandlerId(String handlerId, Handler<AsyncResult<String>> resultHandler);
