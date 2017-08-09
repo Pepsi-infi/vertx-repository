@@ -395,12 +395,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private void pushMessage2AndroidDevice(String checkResult, Handler<AsyncResult<BaseResponse>> resultHandler) {
 		
-		Boolean flag=false;
-		
+		Boolean flag=false;	
 		//查看socket连接是否存在
-		if(StringUtil.isNullOrEmpty(checkResult)){
-			logger.error("检查socket连接是否有效接口调用异常,接口返回数据为空");
-		}else{
+		if(!StringUtil.isNullOrEmpty(checkResult)){
 			JsonObject json=new JsonObject(checkResult);
 			String returnCode=json.getString("returnCode");
 			String isValid=json.getString("isValid");
@@ -415,20 +412,12 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			socketPushService.sendMsg(receiveMsg, resultHandler);
 			return;
 		}
-			
-		if (PushTypeEnum.GCM.getCode().equals(sendType)) {
-			// gcm推送
-			logger.info("开始走gcm推送");
-			gcmPushService.sendMsg(receiveMsg, resultHandler);
-		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
-			// 只用作对安卓手机进行推送
-			logger.info("开始走小米推送");
-			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
-		} else {
-			logger.error("无效推送渠道");
-			return;
-		}
 		
+		// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
+		logger.info("开始走小米推送");
+		xiaomiPushService.sendMsg(receiveMsg, resultHandler);
+		
+					
 //		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 //			// socket推送
 //			logger.info("开始走socket推送");
