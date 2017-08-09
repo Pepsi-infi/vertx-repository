@@ -2,8 +2,8 @@ package enums;
 
 public enum ErrorCodeEnum {
 	
-	SUCCESS(1,"成功"),
-	FAIL(0,"失败"),
+	SUCCESS(0,"成功"),
+	FAIL(1,"失败"),
 	VALIDATE_ERR(2,"数据校验未通过")
 	;
 	
