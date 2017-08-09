@@ -85,6 +85,8 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		String msgId = recieveMsg.getString("msgId");
 		int jumpPage = recieveMsg.getInteger("jumpPage");
 		String content = recieveMsg.getString("content");
+		int isIntoPsnCenter=recieveMsg.getInteger("isIntoPsnCenter");
+		jumpPage=isIntoPsnCenter==1?JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode():jumpPage;
 
 		Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
 				.extra("messageId", msgId).extra("action", getEnumByCode(jumpPage).getMsg()).extra("title", title)
