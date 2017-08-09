@@ -70,7 +70,7 @@ public class HttpUtils {
 	 * @throws java.io.IOException
 	 *             IO异常
 	 */
-	public static String URLPost(String url, Map<String, String> params, String enc) {
+	public static String URLPost(String url, Map<String, String> params, String enc) throws IOException {
 
 		String response = EMPTY;
 		PostMethod postMethod = null;
@@ -98,10 +98,10 @@ public class HttpUtils {
 			}
 		} catch (HttpException e) {
 			log.error("发生致命的异常，可能是协议不对或者返回的内容有问题", e);
-			e.printStackTrace();
+			throw e;
 		} catch (IOException e) {
 			log.error("发生网络异常", e);
-			e.printStackTrace();
+			throw e;
 		} finally {
 			if (postMethod != null) {
 				postMethod.releaseConnection();

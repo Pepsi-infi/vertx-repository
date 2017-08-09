@@ -15,6 +15,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
@@ -70,6 +71,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private Object customerId;
 
 	private List<DeviceDto> deviceList;
+	
+	private ApplePushService applePushService;
 
 	@Override
 	public void start() throws Exception {
@@ -94,6 +97,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			return;
 		}
 
+		router.route().handler(BodyHandler.create());
+				
 		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
 			HttpServerResponse resp = context.response();
 			HttpServerRequest request = context.request();
@@ -192,6 +197,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		redisService = RedisService.createProxy(vertx);
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
+		applePushService = ApplePushService.createProxy(vertx);
 	}
 
 	private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
@@ -230,10 +236,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		// IOS apnsToken
 		apnsToken = (String) receiveMsg.getValue("apnsToken");
-		if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
-			resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
-			return;
-		}
+//		if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
+//			resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
+//			return;
+//		}
 
 		Future<List<DeviceDto>> deviceFuture = Future.future();
 		if (StringUtil.isNullOrEmpty(token)) {
@@ -335,6 +341,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				logger.debug("token=" + token);
 				receiveMsg.put("regId", token);
+				
+				if (!StringUtil.isNullOrEmpty(apnsToken)) {
+					logger.info("开始走apns推送");
+					applePushService.sendMsg(receiveMsg, resultHandler);
+					return;
+				}
+									
 				if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 					// socket推送
 					logger.info("开始走socket推送");
