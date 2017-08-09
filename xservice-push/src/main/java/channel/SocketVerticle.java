@@ -135,7 +135,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
             logger.info(" Socket [" + targetIp + ":" + targetPort + "], Push method [" + PushConsts.SOCKET_SEND_METHOD + "] : " +
                     new String(sendBuf, "UTF-8"));
-//            client.send(sendPacket);
+            client.send(sendPacket);
             resultHandler.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
             logger.error("socket推送消息出错 " + e.getMessage(), e);
