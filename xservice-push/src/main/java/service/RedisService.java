@@ -6,6 +6,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.redis.RedisClient;
 import io.vertx.serviceproxy.ProxyHelper;
 import utils.IPUtil;
 
@@ -47,4 +48,7 @@ public interface RedisService {
 	void lpush(String queue, String key, Handler<AsyncResult<Long>> result);
 
 	void rpush(String queue, String key, Handler<AsyncResult<Long>> result);
+
+	public RedisClient getRedisClient();
+
 }
