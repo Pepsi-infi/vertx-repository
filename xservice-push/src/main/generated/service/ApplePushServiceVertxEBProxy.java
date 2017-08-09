@@ -16,7 +16,7 @@
 
 package service;
 
-import service.SocketPushService;
+import service.ApplePushService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,30 +32,30 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.SocketPushService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import service.ApplePushService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class SocketPushServiceVertxEBProxy implements SocketPushService {
+public class ApplePushServiceVertxEBProxy implements ApplePushService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public SocketPushServiceVertxEBProxy(Vertx vertx, String address) {
+  public ApplePushServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public SocketPushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public ApplePushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -65,13 +65,13 @@ public class SocketPushServiceVertxEBProxy implements SocketPushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("recieveMsg", recieveMsg);
+    _json.put("receiveMsg", receiveMsg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "sendMsg");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {

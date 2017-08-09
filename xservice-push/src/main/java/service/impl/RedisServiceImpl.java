@@ -54,6 +54,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
             redisOptions.setTcpNoDelay(Boolean.getBoolean(jsonObject.getString("tcpNoDelay")));
         }
         redisClient = RedisClient.create(vertx, redisOptions);
+
     }
 
     @Override
