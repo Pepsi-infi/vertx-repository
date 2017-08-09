@@ -1,6 +1,7 @@
 package enums;
 
 public enum JumpFlagEnum {
+	
 	MESSAGE_CENTER_PAGE(0,"sqyc://01zhuanche.com/messageCenter","消息中心页"),
 	MEMBER_LEVEL_PAGE(1,"sqyc://01zhuanche.com/memberLevel","用户等级页"),
 	MEMBER_ACCOUNT_PAGE(2,"sqyc://01zhuanche.com/account","个人账户页"),
@@ -12,14 +13,13 @@ public enum JumpFlagEnum {
 	private int code;
 	private String msg;
 	private String description;
-	
-	JumpFlagEnum(int code,String msg,String description) {
-		this.code=code;
-		this.msg=msg;
-		this.description=description;
+
+	JumpFlagEnum(int code, String msg, String description) {
+		this.code = code;
+		this.msg = msg;
+		this.description = description;
 	}
-	
-	
+
 	public int getCode() {
 		return code;
 	}

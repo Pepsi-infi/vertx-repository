@@ -86,15 +86,9 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		int jumpPage = recieveMsg.getInteger("jumpPage");
 		String content = recieveMsg.getString("content");
 
-		Message message = new Message.Builder()
-				.title(title)
-				.description(content)
-				.payload(wholeMsg)
-				.extra("messageId", msgId)
-				.extra("action", getEnumByCode(jumpPage).getMsg())
-				.extra("title", title)
-				.extra("content", content)
-				.restrictedPackageName(packageName)
+		Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
+				.extra("messageId", msgId).extra("action", getEnumByCode(jumpPage).getMsg()).extra("title", title)
+				.extra("content", content).restrictedPackageName(packageName)
 				.passThrough(PushConsts.XIAOMI_PASS_THROUGH_TOUCHUAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
 				.notifyType(PushConsts.XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND) // 使用默认提示音提示
 				.build();

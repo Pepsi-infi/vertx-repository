@@ -373,7 +373,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 				Map<String, String> params = new HashMap<>();
 				params.put("uid", customerId + "");
-				
+
 				String checkResult;
 				try {
 					logger.info("开始获取socket连接状态");
@@ -381,11 +381,11 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 							params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
 				} catch (IOException e) {
 					logger.error("检查socket连接是否有效接口调用异常", e);
-					checkResult=null;
+					checkResult = null;
 				}
-				logger.info("socket连接状态获取结束，result="+checkResult);
-				pushMessage2AndroidDevice(checkResult,resultHandler);
-					
+				logger.info("socket连接状态获取结束，result=" + checkResult);
+				pushMessage2AndroidDevice(checkResult, resultHandler);
+
 			} else {
 				logger.error("数据验证未通过，原因：" + checkFutrue.cause());
 				resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
@@ -394,47 +394,46 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void pushMessage2AndroidDevice(String checkResult, Handler<AsyncResult<BaseResponse>> resultHandler) {
-		
-		Boolean flag=false;	
-		//查看socket连接是否存在
-		if(!StringUtil.isNullOrEmpty(checkResult)){
-			JsonObject json=new JsonObject(checkResult);
-			String returnCode=json.getString("returnCode");
-			String isValid=json.getString("isValid");
-			
-			if("0".equals(returnCode)&&"1".equals(isValid)){
-				flag=true;
-			}			
+
+		Boolean flag = false;
+		// 查看socket连接是否存在
+		if (!StringUtil.isNullOrEmpty(checkResult)) {
+			JsonObject json = new JsonObject(checkResult);
+			String returnCode = json.getString("returnCode");
+			String isValid = json.getString("isValid");
+
+			if ("0".equals(returnCode) && "1".equals(isValid)) {
+				flag = true;
+			}
 		}
-			
-		if(flag){
+
+		if (flag) {
 			logger.info("开始走socket推送");
 			socketPushService.sendMsg(receiveMsg, resultHandler);
 			return;
 		}
-		
+
 		// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 		logger.info("开始走小米推送");
 		xiaomiPushService.sendMsg(receiveMsg, resultHandler);
-		
-					
-//		if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
-//			// socket推送
-//			logger.info("开始走socket推送");
-//			socketPushService.sendMsg(receiveMsg, resultHandler);
-//		} else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
-//			// gcm推送
-//			logger.info("开始走gcm推送");
-//			gcmPushService.sendMsg(receiveMsg, resultHandler);
-//		} else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
-//			// 只用作对安卓手机进行推送
-//			logger.info("开始走小米推送");
-//			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
-//		} else {
-//			logger.error("无效推送渠道");
-//			return;
-//		}
-		
+
+		// if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
+		// // socket推送
+		// logger.info("开始走socket推送");
+		// socketPushService.sendMsg(receiveMsg, resultHandler);
+		// } else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
+		// // gcm推送
+		// logger.info("开始走gcm推送");
+		// gcmPushService.sendMsg(receiveMsg, resultHandler);
+		// } else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
+		// // 只用作对安卓手机进行推送
+		// logger.info("开始走小米推送");
+		// xiaomiPushService.sendMsg(receiveMsg, resultHandler);
+		// } else {
+		// logger.error("无效推送渠道");
+		// return;
+		// }
+
 	}
 
 	/**
