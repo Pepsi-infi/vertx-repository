@@ -246,12 +246,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		// 从上游接收到的 推送类型
 		devicePushType = (String) receiveMsg.getValue("devicePushType");
 		// 转化成下游需要的推送类型
-		if (StringUtils.isNotBlank(devicePushType)) {
+		if (!StringUtil.isNullOrEmpty(devicePushType)) {
 			try {
 				Integer pushType = Integer.valueOf(devicePushType);
 				sendType = MsgUtil.convertCode(pushType);
 			} catch (Exception e) {
 				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
+				resultHandler.handle(Future.failedFuture("devicePushType format is error"));
 				return;
 			}
 		}
