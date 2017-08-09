@@ -130,6 +130,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			// 保存消息到数据库
 			// this.saveMsgRecord(checkFuture);
 
+			//推送成功的消息把msgId保存到redis,用来防止重复推送
+			Future setRedisFuture = Future.future();
+			setMsgToRedis(setRedisFuture, pushFuture);
+
 			// 消息推送成功后，调用上报消息接口
 			Future<BaseResponse> statFuture = Future.future();
 			this.callStatPushMsg(statFuture.completer(), pushFuture);
@@ -370,6 +374,20 @@ public class HttpConsumerVerticle extends AbstractVerticle {
             }
         });
     }
+
+	/**
+	 *  推送成功的消息保存到redis中
+	 * @param resultHandler
+	 */
+	private void setMsgToRedis(Handler<AsyncResult<Void>> resultHandler, Future<AsyncResult<BaseResponse>> pushFuture){
+		pushFuture.setHandler(res ->{
+			if (res.succeeded()) {
+				String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
+				Future<String> redisFuture = Future.future();
+				redisService.set(redisMsgKey, msgId, resultHandler);
+			}
+		});
+	}
 
     public static void main(String[] args) {
         System.out.println(!StringUtils.isNotBlank(null));

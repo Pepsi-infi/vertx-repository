@@ -8,7 +8,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -20,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
 import service.SocketPushService;
+import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
@@ -187,9 +187,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
         //把消息保存到redis中
         Future<Void> msgFuture = Future.future();
-        Buffer buffer = Buffer.buffer();
-        buffer.appendBytes(ByteUtils.objectToByte(chatMsgVO));
-        redisService.getRedisClient().setBinary(msgId, buffer, msgFuture.completer());
+        redisService.set(msgId, JsonUtil.toJsonString(chatMsgVO), msgFuture.completer());
         //设置过期时间
         Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
         Future<Long> msgExpireFuture = Future.future();

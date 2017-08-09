@@ -11,7 +11,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
-import io.vertx.redis.impl.RedisClientImpl;
 import service.RedisService;
 import util.PropertiesLoaderUtils;
 import utils.IPUtil;
@@ -26,8 +25,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
     RedisClient redisClient;
 
-    RedisClientImpl redisImpl;
-
     public void start() throws Exception {
         super.start();
 
@@ -40,7 +37,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
         //连接redis
         this.initRedisClient();
-
 
     }
 
@@ -59,7 +55,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
         }
         redisClient = RedisClient.create(vertx, redisOptions);
 
-        redisImpl = new RedisClientImpl(vertx, redisOptions);
     }
 
     @Override
@@ -115,10 +110,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
                 result.handle(Future.failedFuture(handler.cause()));
             }
         });
-    }
-
-    public RedisClient getRedisClient(){
-        return redisClient;
     }
 
     public static void main(String[] args) {

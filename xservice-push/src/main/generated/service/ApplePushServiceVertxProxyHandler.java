@@ -16,7 +16,7 @@
 
 package service;
 
-import service.RedisService;
+import service.ApplePushService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,35 +39,37 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import utils.BaseResponse;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
-import service.RedisService;
 import io.vertx.core.Handler;
+import service.ApplePushService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class RedisServiceVertxProxyHandler extends ProxyHandler {
+public class ApplePushServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final RedisService service;
+  private final ApplePushService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service, long timeoutInSecond) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service, boolean topLevel, long timeoutSeconds) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -124,24 +126,18 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
 
 
 
-        case "set": {
-          service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
-          break;
-        }
-        case "expire": {
-          service.expire((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), createHandler(msg));
-          break;
-        }
-        case "get": {
-          service.get((java.lang.String)json.getValue("key"), createHandler(msg));
-          break;
-        }
-        case "lpush": {
-          service.lpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
-          break;
-        }
-        case "rpush": {
-          service.rpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
+        case "sendMsg": {
+          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("receiveMsg"), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
           break;
         }
         default: {

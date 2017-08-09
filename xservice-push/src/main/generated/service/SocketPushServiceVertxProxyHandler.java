@@ -42,6 +42,7 @@ import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import service.SocketPushService;
 import utils.BaseResponse;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -126,7 +127,7 @@ public class SocketPushServiceVertxProxyHandler extends ProxyHandler {
 
 
         case "sendMsg": {
-          service.sendMsg((java.lang.String)json.getValue("recieveMsg"), res -> {
+          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

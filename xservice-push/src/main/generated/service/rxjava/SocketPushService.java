@@ -21,6 +21,7 @@ import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -58,11 +59,11 @@ public class SocketPushService {
     return ret;
   }
 
-  public void sendMsg(String recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) { 
     delegate.sendMsg(recieveMsg, resultHandler);
   }
 
-  public Single<BaseResponse> rxSendMsg(String recieveMsg) { 
+  public Single<BaseResponse> rxSendMsg(JsonObject recieveMsg) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       sendMsg(recieveMsg, fut);
     }));
