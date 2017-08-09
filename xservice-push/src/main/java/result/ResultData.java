@@ -12,9 +12,9 @@ public class ResultData<T> implements Serializable {
      */
     private static final long serialVersionUID = 863932252336268833L;
 
-    public static final int SUCCESS = 1;
+    public static final int SUCCESS = 0;
 
-    public static final int FAIL = 0;
+    public static final int FAIL = 1;
 
     public static final String COMMON_ERR_MSG = "网络异常";
 
