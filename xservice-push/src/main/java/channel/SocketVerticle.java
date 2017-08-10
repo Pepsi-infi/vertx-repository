@@ -37,19 +37,19 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     private Logger logger = LoggerFactory.getLogger(SocketVerticle.class);
     //下游地址列表
-    private static List<KeyValue> hostList = new ArrayList<>();
+    private List<KeyValue> hostList = new ArrayList<>();
 
     private RedisService redisService;
     //消息id
-    private static String msgId;
+    private String msgId;
     //用户id
-    private static String customerId;
+    private String customerId;
     //token
-    private static String token;
+    private String token;
     //超时时间
-    private static Long expireTime;
+    private Long expireTime;
     //消息内容
-    private static String msgBody;
+    private String msgBody;
     //消息类型杖举
     private EnumPassengerMessageType messageType;
 
@@ -128,8 +128,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
             client = new DatagramSocket();
             KeyValue host = getPollHost();
-            InetAddress targetIp = InetAddress.getByName((String)host.getKey());
-            int targetPort = Integer.valueOf((String)host.getValue());
+            InetAddress targetIp = InetAddress.getByName((String) host.getKey());
+            int targetPort = Integer.valueOf((String) host.getValue());
             //调用下游服务
             DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, targetIp, targetPort);
 
@@ -148,20 +148,21 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     }
 
 
-    protected void initSendTo(){
+    protected void initSendTo() {
         //当前verticle加载时从配置文件中读取下游SOCKET的地址列表
         String socketAddrs = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_HOSTS);
 //        String socketAddrs = "12.12.12.1:9000,32.32.22.33:9999";
         logger.info(" upstream socket addr : [" + socketAddrs + "]");
         String[] addrArray = socketAddrs.split(",");
-        if(ArrayUtils.isNotEmpty(addrArray)){
-            for(String addr : addrArray){
+        if (ArrayUtils.isNotEmpty(addrArray)) {
+            for (String addr : addrArray) {
                 final String[] host = addr.split(":");
                 KeyValue kv = new KeyValue() {
                     @Override
                     public Object getKey() {
                         return host[0];
                     }
+
                     @Override
                     public Object getValue() {
                         return host[1];
@@ -171,7 +172,6 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             }
         }
     }
-
 
 
     private void setRedisCache(Handler<AsyncResult<BaseResponse>> resultHandler) {
@@ -208,30 +208,33 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     //轮询指针
     private static Integer pos = 0;
+
     /**
-     *  轮询取出地址
+     * 轮询取出地址
+     *
      * @return
      */
-    private KeyValue getPollHost(){
+    private KeyValue getPollHost() {
         KeyValue host = null;
-        if(CollectionUtils.isNotEmpty(hostList)){
-            if(pos > hostList.size()){
+        if (CollectionUtils.isNotEmpty(hostList)) {
+            if (pos > hostList.size()) {
                 pos = 0;
             }
             host = hostList.get(pos);
-            pos ++;
+            pos++;
         }
         return host;
     }
 
     /**
-     *  随机取出地址
+     * 随机取出地址
+     *
      * @return
      */
-    private static KeyValue getRandomHost(){
+    private KeyValue getRandomHost() {
         KeyValue host = null;
         int pos = 0;
-        if(CollectionUtils.isNotEmpty(hostList)){
+        if (CollectionUtils.isNotEmpty(hostList)) {
             Random r = new Random();
             pos = r.nextInt(hostList.size());
             host = hostList.get(pos);
