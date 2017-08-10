@@ -1,17 +1,17 @@
 package test;
 
-import api.RestMsgStatVerticle;
-import cron.CronMsgStatVerticle;
+import cron.CronTransferDevcieVerticle;
+import dao.impl.CarBizEuroDaoImpl;
+import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
-import api.RestDeviceVerticle;
-import dao.impl.DeviceDaoImpl;
+import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
-import service.impl.DeviceServiceImpl;
+import service.impl.TransferDeviceServiceImpl;
 
 /**
  * Created by lufei
@@ -43,6 +43,9 @@ public class MsgStatTest {
             vertx.deployVerticle(MsgStatResultDaoImpl.class.getName(), deploymentOptions);
             vertx.deployVerticle(MsgStatResultServiceImpl.class.getName(), deploymentOptions);
 
+            vertx.deployVerticle(CarBizEuroDaoImpl.class.getName(), deploymentOptions);
+            vertx.deployVerticle(TransferDeviceServiceImpl.class.getName(), deploymentOptions);
+
             Thread.sleep(3000);
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +66,8 @@ public class MsgStatTest {
         deploymentOptions.setConfig(config());
 //        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
-        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+        vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
         return future.map(r -> null);
     }

@@ -1,12 +1,15 @@
 package api;
 
 import cron.CronMsgStatVerticle;
+import cron.CronTransferDevcieVerticle;
+import dao.impl.CarBizEuroDaoImpl;
 import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import service.TransferDeviceService;
 import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
@@ -42,10 +45,15 @@ public class StartVerticle extends BaseServiceVerticle {
 
         this.deployVerticle(MsgStatResultDaoImpl.class.getName());
         this.deployVerticle(MsgStatResultServiceImpl.class.getName());
+
+        this.deployVerticle(CarBizEuroDaoImpl.class.getName());
+        this.deployVerticle(TransferDeviceService.class.getName());
+
     }
 
     private void deployEventBusService() {
         this.deployCronVerticle(CronMsgStatVerticle.class.getName());
+        this.deployCronVerticle(CronTransferDevcieVerticle.class.getName());
     }
 
     public void deployVerticle(String verticleName) {

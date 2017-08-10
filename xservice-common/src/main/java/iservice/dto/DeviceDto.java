@@ -33,6 +33,11 @@ public class DeviceDto {
     private String antFingerprint;
     //是否接收推送消息 1：是 0 否
     private Integer isAcceptPush;
+    //创建时间
+    private String createTime;
+    //更新时间
+    private String updateTime;
+
 
     public Long getId() {
         return id;
@@ -130,6 +135,22 @@ public class DeviceDto {
         this.deviceToken = deviceToken;
     }
 
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
+    }
+
     public DeviceDto() {
         super();
     }
@@ -199,6 +220,8 @@ public class DeviceDto {
         sb.append(", appVersion='").append(appVersion).append('\'');
         sb.append(", antFingerprint='").append(antFingerprint).append('\'');
         sb.append(", isAcceptPush=").append(isAcceptPush);
+        sb.append(", createTime='").append(createTime).append('\'');
+        sb.append(", updateTime='").append(updateTime).append('\'');
         sb.append('}');
         return sb.toString();
     }

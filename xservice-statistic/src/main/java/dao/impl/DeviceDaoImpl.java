@@ -19,8 +19,10 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import util.ConfigUtils;
 import utils.BaseResponse;
+import utils.CalendarUtil;
 
 import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +35,11 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
     public interface Sql {
-        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush) values (?,?,?,?,?,?,?,?,?,?,?)";
+        static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush,createTime,updateTime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?," +
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? " +
+                "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=? " +
                 "WHERE antFingerprint=?";
 
         static final String QUERY_USER_DEVICE = "SELECT * FROM device WHERE 1=1 %s ORDER BY id DESC";
@@ -64,25 +67,23 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
     @Override
     public void addDevice(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
-        if (StringUtils.isBlank(deviceDto.getAntFingerprint()) || StringUtils.isBlank(deviceDto.getDeviceType()) || deviceDto.getOsType() <= 0) {
-            logger.error("[addDevice] the antFingerprint or deviceType or osType is null");
-            resultHandler.handle(Future.failedFuture("the antFingerprint or imei or osType is null"));
-        } else {
-            //(uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
-            JsonArray jsonArray = new JsonArray();
-            jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
-                    .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
-                    .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
-                    .add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
-                    .add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
-                    .add(deviceDto.getOsType())
-                    .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
-                    .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
-                    .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
-                    .add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "")
-                    .add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0);
-            execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
-        }
+        //(uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush)
+        JsonArray jsonArray = new JsonArray();
+        jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : -1)
+                .add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
+                .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
+                .add(deviceDto.getChannel() != null ? deviceDto.getChannel() : -1)
+                .add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
+                .add(deviceDto.getOsType() != null ? deviceDto.getOsType() : -1)
+                .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
+                .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : -1)
+                .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
+                .add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "")
+                .add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
+                .add(CalendarUtil.format(new Date()))
+                .add(CalendarUtil.format(new Date()));
+        execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
+
     }
 
     @Override
@@ -103,6 +104,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
                     .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
                     .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
                     .add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
+                    .add(CalendarUtil.format(new Date()))
                     .add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "");
             execute(jsonArray, Sql.UPDATE_USER_DEVICE, new BaseResponse(), resultHandler);
         }
@@ -142,6 +144,10 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
         String phone = MapUtils.getString(params, "phone");
         if (StringUtils.isNotBlank(phone)) {
             sb.append(" and phone = '").append(phone).append("'");
+        }
+        String deviceToken = MapUtils.getString(params, "deviceToken");
+        if (StringUtils.isNotBlank(deviceToken)) {
+            sb.append(" and deviceToken = '").append(deviceToken).append("'");
         }
         sql = String.format(sql, sb.toString());
         Future<List<JsonObject>> future = retrieveMany(new JsonArray(), sql);

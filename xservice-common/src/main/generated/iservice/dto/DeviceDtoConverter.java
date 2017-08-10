@@ -39,6 +39,9 @@ public class DeviceDtoConverter {
     if (json.getValue("channel") instanceof Number) {
       obj.setChannel(((Number)json.getValue("channel")).intValue());
     }
+    if (json.getValue("createTime") instanceof String) {
+      obj.setCreateTime((String)json.getValue("createTime"));
+    }
     if (json.getValue("deviceToken") instanceof String) {
       obj.setDeviceToken((String)json.getValue("deviceToken"));
     }
@@ -63,6 +66,9 @@ public class DeviceDtoConverter {
     if (json.getValue("uid") instanceof Number) {
       obj.setUid(((Number)json.getValue("uid")).longValue());
     }
+    if (json.getValue("updateTime") instanceof String) {
+      obj.setUpdateTime((String)json.getValue("updateTime"));
+    }
   }
 
   public static void toJson(DeviceDto obj, JsonObject json) {
@@ -77,6 +83,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getChannel() != null) {
       json.put("channel", obj.getChannel());
+    }
+    if (obj.getCreateTime() != null) {
+      json.put("createTime", obj.getCreateTime());
     }
     if (obj.getDeviceToken() != null) {
       json.put("deviceToken", obj.getDeviceToken());
@@ -101,6 +110,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getUid() != null) {
       json.put("uid", obj.getUid());
+    }
+    if (obj.getUpdateTime() != null) {
+      json.put("updateTime", obj.getUpdateTime());
     }
   }
 }

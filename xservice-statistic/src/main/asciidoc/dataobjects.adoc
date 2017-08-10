@@ -1,5 +1,25 @@
 = Cheatsheets
 
+[[CarBizEuroDto]]
+== CarBizEuroDto
+
+++++
+ Created by lufei
+ Date : 2017/8/9 18:02
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[customerId]]`customerId`|`Number (Long)`|-
+|[[deviceToken]]`deviceToken`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[phone]]`phone`|`String`|-
+|===
+
 [[MsgStatResultDto]]
 == MsgStatResultDto
 
@@ -53,12 +73,29 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
-|[[data]]`data`|`Array of link:dataobjects.html#MsgStatResultDto[MsgStatResultDto]`|-
+|[[list]]`list`|`Array of link:dataobjects.html#MsgStatResultDto[MsgStatResultDto]`|-
+|[[page]]`page`|`Number (int)`|-
+|[[size]]`size`|`Number (int)`|-
+|===
+
+[[MsgStatResultPageWrapper]]
+== MsgStatResultPageWrapper
+
+++++
+ Created by lufei
+ Date : 2017/8/3 17:43
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[data]]`data`|`link:dataobjects.html#MsgStatResultPage[MsgStatResultPage]`|-
 |[[errorCode]]`errorCode`|`String`|-
 |[[errorMessage]]`errorMessage`|`String`|-
-|[[page]]`page`|`Number (int)`|-
 |[[resultStatus]]`resultStatus`|`Number (Integer)`|-
-|[[size]]`size`|`Number (int)`|-
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
