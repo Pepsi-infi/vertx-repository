@@ -214,7 +214,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验必填项
-		msgId = (String) receiveMsg.getValue("msgId");
+		msgId = receiveMsg.getValue("msgId")+"";
 		if (StringUtils.isBlank(msgId)) {
 			resultHandler.handle(Future.failedFuture("msgId不能为空"));
 			return;
