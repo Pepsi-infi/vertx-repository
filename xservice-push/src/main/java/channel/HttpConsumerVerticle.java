@@ -385,6 +385,13 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					List<DeviceDto> list =  devRes.result();
 					if(CollectionUtils.isNotEmpty(list)){
 						token = list.get(0).getDeviceToken();
+
+						if(StringUtils.isNotBlank(token)){
+							// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
+							logger.info("开始走小米推送");
+							xiaomiPushService.sendMsg(receiveMsg, resultHandler);
+							channel = PushTypeEnum.XIAOMI.getSrcCode();
+						}
 					}else{
 						errorMsg = "设备token不存在,推送操作不执行";
 						logger.error(errorMsg);
@@ -398,16 +405,12 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					return;
 				}
 			});
-		}
-
-		//如果最终token还为空，不推送
-		if(StringUtils.isNotBlank(token)){
+		}else{
 			// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 			logger.info("开始走小米推送");
 			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 			channel = PushTypeEnum.XIAOMI.getSrcCode();
 		}
-
 	}
 
 	/**
