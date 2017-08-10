@@ -217,7 +217,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     private KeyValue getPollHost() {
         KeyValue host = null;
         if (CollectionUtils.isNotEmpty(hostList)) {
-            if (pos > hostList.size()) {
+            if (pos >= hostList.size()) {
                 pos = 0;
             }
             host = hostList.get(pos);
