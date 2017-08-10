@@ -1,15 +1,5 @@
 package channel;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -17,11 +7,7 @@ import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
 import enums.PushTypeEnum;
 import io.netty.util.internal.StringUtil;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -34,18 +20,17 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.ApplePushService;
-import service.GcmPushService;
-import service.MsgRecordService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import util.HttpUtils;
-import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
+
+import java.io.IOException;
+import java.util.*;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -77,7 +62,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	// 小米，GCM token
 	private String token;
 	// 推送类型
-	private String devicePushType;
+	private Integer channel;
 	// 推送类型，下游需要
 	private String sendType;
 	// apnsToken
@@ -186,7 +171,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				MsgStatDto msgStatDto = new MsgStatDto();
 				// 首约app乘客端 1001；首约app司机端 1002
 				msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
-				msgStatDto.setChannel(Integer.parseInt(devicePushType));
+				msgStatDto.setChannel(channel);
 				msgStatDto.setMsgId(msgId);
 				// 1 安卓
 				msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_ANDROID);
@@ -243,26 +228,22 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 		// sokit、gcm,小米连接token
 		token = (String) receiveMsg.getValue("deviceToken");
-		// 从上游接收到的 推送类型
-		devicePushType = (String) receiveMsg.getValue("devicePushType");
-		// 转化成下游需要的推送类型
-		if (!StringUtil.isNullOrEmpty(devicePushType)) {
-			try {
-				Integer pushType = Integer.valueOf(devicePushType);
-				sendType = MsgUtil.convertCode(pushType);
-			} catch (Exception e) {
-				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
-				resultHandler.handle(Future.failedFuture("devicePushType format is error"));
-				return;
-			}
-		}
+//		// 从上游接收到的 推送类型
+//		devicePushType = (String) receiveMsg.getValue("devicePushType");
+//		// 转化成下游需要的推送类型
+//		if (!StringUtil.isNullOrEmpty(devicePushType)) {
+//			try {
+//				Integer pushType = Integer.valueOf(devicePushType);
+//				sendType = MsgUtil.convertCode(pushType);
+//			} catch (Exception e) {
+//				logger.error("Recived Param Error devicePushType [" + devicePushType + "]");
+//				resultHandler.handle(Future.failedFuture("devicePushType format is error"));
+//				return;
+//			}
+//		}
 
 		// IOS apnsToken
 		apnsToken = (String) receiveMsg.getValue("apnsToken");
-		// if (StringUtils.isNotBlank(apnsToken) && !"null".equals(apnsToken)) {
-		// resultHandler.handle(Future.failedFuture("apnsToken不为空，请调用其它推送服务"));
-		// return;
-		// }
 
 		Future<List<DeviceDto>> deviceFuture = Future.future();
 		if (StringUtil.isNullOrEmpty(token)) {
@@ -272,7 +253,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			deviceService.queryDevices(param, deviceFuture.completer());
 		} else {
 			DeviceDto dto = new DeviceDto();
-			genDeviceDto(dto);
+			dto.setDeviceToken(token);
 			deviceFuture.handle(Future.succeededFuture(Arrays.asList(dto)));
 		}
 
@@ -314,27 +295,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	/**
-	 * 生成deviceDto数据
-	 *
-	 * @param dto
-	 */
-	private void genDeviceDto(DeviceDto dto) {
-		if (!StringUtil.isNullOrEmpty(apnsToken)) {
-			dto.setChannel(PushTypeEnum.APNS.getSrcCode());
-			dto.setDeviceToken(apnsToken);
-			return;
-		}
-
-		for (PushTypeEnum e : PushTypeEnum.values()) {
-			if (e.getCode().equals(sendType)) {
-				dto.setChannel(e.getSrcCode());
-			}
-		}
-		dto.setDeviceToken(token);
-		logger.info("genDeviceDto : sendType[" + sendType + "], token[" + dto.getDeviceToken() + "]");
-	}
-
-	/**
 	 * 保存消息记录
 	 */
 	private void saveMsgRecord(Future<BaseResponse> checkFutrue) {
@@ -369,6 +329,9 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				if (!StringUtil.isNullOrEmpty(apnsToken)) {
 					logger.info("开始走apns推送");
 					applePushService.sendMsg(receiveMsg, resultHandler);
+					//上报要用token
+					token = apnsToken;
+					channel = PushTypeEnum.APNS.getSrcCode();
 					return;
 				}
 
@@ -411,12 +374,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		if (flag) {
 			logger.info("开始走socket推送");
 			socketPushService.sendMsg(receiveMsg, resultHandler);
+			channel = PushTypeEnum.SOCKET.getSrcCode();
 			return;
 		}
 
 		// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 		logger.info("开始走小米推送");
 		xiaomiPushService.sendMsg(receiveMsg, resultHandler);
+		channel = PushTypeEnum.XIAOMI.getSrcCode();
 
 		// if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
 		// // socket推送
