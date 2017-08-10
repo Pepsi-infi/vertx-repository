@@ -78,7 +78,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         String packageName = PropertiesLoaderUtils.singleProp.getProperty("xiaomi.packagename");
         String title = recieveMsg.getString("title");
         String wholeMsg = recieveMsg.toString();
-        String msgId = recieveMsg.getString("msgId");
+        String msgId = recieveMsg.getValue("msgId")+"";
         Integer jumpPage = recieveMsg.getInteger("jumpPage");
         String content = recieveMsg.getString("content");
         Integer isIntoPsnCenter = recieveMsg.getInteger("isIntoPsnCenter");
