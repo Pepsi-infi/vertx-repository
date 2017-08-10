@@ -1,5 +1,6 @@
 package util;
 
+import enums.JumpFlagEnum;
 import enums.PushTypeEnum;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -66,6 +67,18 @@ public class MsgUtil {
             e.printStackTrace();
         }
         return bs;
+    }
+
+    public static String getEnumByCode(Integer code) {
+        if(code == null){
+            return "";
+        }
+        for (JumpFlagEnum jump : JumpFlagEnum.values()) {
+            if (jump.getCode() == code) {
+                return jump.getMsg();
+            }
+        }
+        return "";
     }
 
     public static void main(String[] args) {
