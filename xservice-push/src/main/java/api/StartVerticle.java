@@ -28,7 +28,6 @@ public class StartVerticle extends AbstractVerticle{
         this.deployVerticle(ApplePushVerticle.class.getName());
 
         this.deployVerticle(HttpConsumerVerticle.class.getName());
-//        this.deployVerticle(AmqpConsumerVerticle.class.getName());
         // 提供其他非EventBus服务
     }
 
