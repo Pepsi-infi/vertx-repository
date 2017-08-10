@@ -39,12 +39,12 @@
 
         </el-table-column>
         <el-table-column
-          prop="sendSum"
+          prop="arriveSum"
           label="到达总数"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="sendSum"
+          prop="clickSum"
           label="点击总数"
           width="120">
         </el-table-column>

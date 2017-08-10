@@ -36,9 +36,11 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
     public interface Sql {
         static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush,createTime,updateTime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        //
+        (13666050,13621241006,OPPOX9077,3,FpXBF9sOub875uWnPRyasdXnec/turJwqI8fsJmgb
+        lk=,1,4.4.4,1001,30,0,2017-08-10 21:40:34,BwgJYcNo6AocD5Rixh1ZovU5ceefCAfZUxTW3QT1OjwauJEbyPgX6mP/nM/Ffx33Elro1A==)
 
         static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?," +
-                "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? " +
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=? " +
                 "WHERE antFingerprint=?";
 
@@ -99,7 +101,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
                     .add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
                     .add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
                     .add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
-                    .add(deviceDto.getOsType())
+                    .add(deviceDto.getOsType() != null ? deviceDto.getOsType() : -1)
                     .add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
                     .add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
                     .add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
