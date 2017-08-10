@@ -422,8 +422,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				resultHandler.handle(Future.succeededFuture());
 			} else {
 				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
-				logger.error(errorMsg);
-				resultHandler.handle(Future.failedFuture(errorMsg + setRes.cause()));
+				logger.error(errorMsg,setRes.cause());
+				resultHandler.handle(Future.failedFuture(setRes.cause()));
 			}
 		});
 

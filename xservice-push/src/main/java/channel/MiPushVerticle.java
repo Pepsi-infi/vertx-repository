@@ -16,6 +16,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.XiaoMiPushService;
 import util.JsonUtil;
+import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 
@@ -85,7 +86,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         if(isIntoPsnCenter != null && isIntoPsnCenter == 1){
             jumpPage = JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode();
         }
-        String action = getEnumByCode(jumpPage);
+        String action = MsgUtil.getEnumByCode(jumpPage);
 
         Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
                 .extra("messageId", msgId).extra("action", action).extra("title", title)
@@ -96,16 +97,6 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         return message;
     }
 
-    String getEnumByCode(Integer code) {
-        if(code == null){
-            return "";
-        }
-        for (JumpFlagEnum jump : JumpFlagEnum.values()) {
-            if (jump.getCode() == code) {
-                return jump.getMsg();
-            }
-        }
-        return "";
-    }
+
 
 }

@@ -20,6 +20,7 @@ import serializer.ByteUtils;
 import service.RedisService;
 import service.SocketPushService;
 import util.JsonUtil;
+import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
@@ -83,6 +84,19 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         msgId = jsonMsg.getValue("msgId") + "";
         customerId = jsonMsg.getValue("customerId") + "";
         token = jsonMsg.getString("deviceToken");
+
+        /**
+         * 跳转页面
+         */
+        Object jumpPage = jsonMsg.getValue("jumpPage");
+        if(jumpPage != null){
+            Integer jumpPageCode = (Integer) jumpPage;
+            String action = MsgUtil.getEnumByCode(jumpPageCode);
+            jsonMsg.put("action", action);
+        }else{
+            jsonMsg.put("action", "");
+        }
+
         //消息内容
         msgBody = jsonMsg.toString();
         //超时时间，秒
