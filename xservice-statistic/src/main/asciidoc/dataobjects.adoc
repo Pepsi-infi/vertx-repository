@@ -1,5 +1,25 @@
 = Cheatsheets
 
+[[CarBizEuroDto]]
+== CarBizEuroDto
+
+++++
+ Created by lufei
+ Date : 2017/8/9 18:02
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[customerId]]`customerId`|`Number (Long)`|-
+|[[deviceToken]]`deviceToken`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[phone]]`phone`|`String`|-
+|===
+
 [[MsgStatResultDto]]
 == MsgStatResultDto
 

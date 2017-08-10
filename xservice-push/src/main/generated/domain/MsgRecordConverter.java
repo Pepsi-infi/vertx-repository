@@ -30,8 +30,8 @@ public class MsgRecordConverter {
     if (json.getValue("amqpMsgId") instanceof String) {
       obj.setAmqpMsgId((String)json.getValue("amqpMsgId"));
     }
-    if (json.getValue("channel") instanceof String) {
-      obj.setChannel((String)json.getValue("channel"));
+    if (json.getValue("channel") instanceof Number) {
+      obj.setChannel(((Number)json.getValue("channel")).intValue());
     }
     if (json.getValue("id") instanceof Number) {
       obj.setId(((Number)json.getValue("id")).longValue());

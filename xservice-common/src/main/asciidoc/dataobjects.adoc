@@ -22,9 +22,7 @@
 == DeviceDto
 
 ++++
- Created by lufei
- Date : 2017/7/26 17:21
- Description :
+ Created by lufei Date : 2017/7/26 17:21 Description :
 ++++
 '''
 
@@ -36,6 +34,7 @@
 |[[appCode]]`appCode`|`Number (Integer)`|-
 |[[appVersion]]`appVersion`|`String`|-
 |[[channel]]`channel`|`Number (Integer)`|-
+|[[createTime]]`createTime`|`String`|-
 |[[deviceToken]]`deviceToken`|`String`|-
 |[[deviceType]]`deviceType`|`String`|-
 |[[id]]`id`|`Number (Long)`|-
@@ -44,6 +43,7 @@
 |[[osVersion]]`osVersion`|`String`|-
 |[[phone]]`phone`|`String`|-
 |[[uid]]`uid`|`Number (Long)`|-
+|[[updateTime]]`updateTime`|`String`|-
 |===
 
 [[MsgStatDto]]
