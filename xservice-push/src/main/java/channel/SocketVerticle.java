@@ -80,8 +80,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         /**
          *  获取消息数据字段
          */
-        msgId = jsonMsg.getString("msgId");
-        customerId = jsonMsg.getString("customerId");
+        msgId = jsonMsg.getValue("msgId") + "";
+        customerId = jsonMsg.getValue("customerId") + "";
         token = jsonMsg.getString("deviceToken");
         //消息内容
         msgBody = jsonMsg.toString();
