@@ -63,8 +63,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private String token;
 	// 推送类型
 	private Integer channel;
-	// 推送类型，下游需要
-	private String sendType;
 	// apnsToken
 	private String apnsToken;
 	// 用户手机号
@@ -302,7 +300,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			if (handler.succeeded()) {
 				MsgRecord msg = new MsgRecord();
 				msg.setAmqpMsgId(msgId);
-				msg.setChannel(sendType);
+				msg.setChannel(channel);
 				msg.setMsgBody(receiveMsg.toString());
 				msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
 				msgRecordService.addMessage(msg, res -> {
@@ -382,24 +380,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		logger.info("开始走小米推送");
 		xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 		channel = PushTypeEnum.XIAOMI.getSrcCode();
-
-		// if (PushTypeEnum.SOCKET.getCode().equals(sendType)) {
-		// // socket推送
-		// logger.info("开始走socket推送");
-		// socketPushService.sendMsg(receiveMsg, resultHandler);
-		// } else if (PushTypeEnum.GCM.getCode().equals(sendType)) {
-		// // gcm推送
-		// logger.info("开始走gcm推送");
-		// gcmPushService.sendMsg(receiveMsg, resultHandler);
-		// } else if (PushTypeEnum.XIAOMI.getCode().equals(sendType)) {
-		// // 只用作对安卓手机进行推送
-		// logger.info("开始走小米推送");
-		// xiaomiPushService.sendMsg(receiveMsg, resultHandler);
-		// } else {
-		// logger.error("无效推送渠道");
-		// return;
-		// }
-
 	}
 
 	/**

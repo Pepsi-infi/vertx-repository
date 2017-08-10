@@ -20,7 +20,7 @@ public class MsgRecord extends BaseModel implements Serializable{
 	private String amqpMsgId;//消费后生成的msgId
 	private String msgBody;//消息体内容  json格式的字符串
 	private int status;//消息状态  0消费失败  1消费成功  2未知
-	private String channel;//推送渠道  socket  xiaomi  gcm 
+	private Integer channel;//推送渠道PushTypeEnum.srcCode
 	
 	public String getAmqpMsgId() {
 		return amqpMsgId;
@@ -42,10 +42,12 @@ public class MsgRecord extends BaseModel implements Serializable{
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	public String getChannel() {
+
+	public Integer getChannel() {
 		return channel;
 	}
-	public void setChannel(String channel) {
+
+	public void setChannel(Integer channel) {
 		this.channel = channel;
 	}
 
