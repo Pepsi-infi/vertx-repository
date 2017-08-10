@@ -406,9 +406,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			logger.info("开始走小米推送");
 			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 			channel = PushTypeEnum.XIAOMI.getSrcCode();
-		}else{
-			resultHandler.handle(Future.failedFuture("设备token未找到"));
-			return;
 		}
 
 	}
