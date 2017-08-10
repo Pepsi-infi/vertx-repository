@@ -1,7 +1,18 @@
 package dao.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import dao.BaseDaoVerticle;
 import dao.DeviceDao;
 import helper.XProxyHelper;
@@ -14,17 +25,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import iservice.dto.DeviceDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import util.ConfigUtils;
 import utils.BaseResponse;
-import javax.annotation.Nullable;
 import utils.CalendarUtil;
-import javax.annotation.Nullable;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei Date : 2017/7/26 10:32 Description :
@@ -36,7 +39,6 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush,createTime,updateTime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?,"
-				+ "osVersion=?,appCode=?,appVersion=?,isAcceptPush=? "
 				+ "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=? " + "WHERE antFingerprint=?";
 
 		static final String QUERY_USER_DEVICE = "SELECT * FROM device WHERE 1=1 %s ORDER BY id DESC";
@@ -77,6 +79,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				.add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
 				.add(CalendarUtil.format(new Date())).add(CalendarUtil.format(new Date()));
 		execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
+
 	}
 
 	@Override
@@ -92,7 +95,8 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 					.add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
 					.add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
 					.add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
-					.add(deviceDto.getOsType()).add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
+					.add(deviceDto.getOsType() != null ? deviceDto.getOsType() : -1)
+					.add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
 					.add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
 					.add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
 					.add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
@@ -160,5 +164,4 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 			}
 		});
 	}
-
 }
