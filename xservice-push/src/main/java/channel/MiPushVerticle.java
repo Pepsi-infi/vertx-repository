@@ -96,6 +96,20 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
                 .build();
         return message;
     }
+    
+    public static void main(String[] args) throws Exception {
+    	
+    	MiPushVerticle verticle=new MiPushVerticle();
+    	
+    	JsonObject recieveMsg=new JsonObject();
+		recieveMsg.put("msgId", "1231313132");
+		recieveMsg.put("regId", "FpXBF9sOub875uWnPRyasdXnec/turJwqI8fsJmgblk=");
+		recieveMsg.put("title", "发券啦");
+		recieveMsg.put("content", "送您一张10元优惠券");
+		recieveMsg.put("jumpPage", 4);
+		recieveMsg.put("isIntoPsnCenter", 0);
+    	System.out.println(verticle.sendMessage(recieveMsg));
+	}
 
 
 

@@ -4,6 +4,7 @@ import constant.ConnectionConsts;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
+import enums.JumpFlagEnum;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -85,13 +86,15 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         customerId = jsonMsg.getValue("customerId") + "";
         token = jsonMsg.getString("deviceToken");
 
-        /**
-         * 跳转页面
-         */
+        //判断要跳转到那个url
+        Object isIntoPsnCenter = jsonMsg.getValue("isIntoPsnCenter");
         Object jumpPage = jsonMsg.getValue("jumpPage");
+        if(isIntoPsnCenter != null){
+            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
+        }
         if(jumpPage != null){
-            Integer jumpPageCode = (Integer) jumpPage;
-            String action = MsgUtil.getEnumByCode(jumpPageCode);
+            Integer actionCode = (Integer) jumpPage;
+            String action = MsgUtil.getEnumByCode(actionCode);
             jsonMsg.put("action", action);
         }else{
             jsonMsg.put("action", "");
@@ -270,5 +273,21 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 //        long timerID = vertx1.setTimer(3000, id -> {
 //            mp.send(json);
 //        });
+
+        //2 测试action取值
+//        JsonObject jsonMsg = new JsonObject("{\"jumpPage\":4 ,\"isIntoPsnCenter\":1}");
+//        Object isIntoPsnCenter = jsonMsg.getValue("isIntoPsnCenter");
+//        Object jumpPage = jsonMsg.getValue("jumpPage");
+//        if(isIntoPsnCenter != null){
+//            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
+//        }
+//        if(jumpPage != null){
+//            Integer actionCode = (Integer) jumpPage;
+//            String action = MsgUtil.getEnumByCode(actionCode);
+//            jsonMsg.put("action", action);
+//        }else{
+//            jsonMsg.put("action", "");
+//        }
+//        System.out.println( jsonMsg.toString());
     }
 }
