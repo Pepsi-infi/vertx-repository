@@ -2,6 +2,7 @@ package api;
 
 import cron.CronMsgStatVerticle;
 import dao.impl.CarBizEuroDaoImpl;
+import dao.impl.CarBizEuroVerticle;
 import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
@@ -43,6 +44,8 @@ public class StartVerticle extends BaseServiceVerticle {
 
 		this.deployVerticle(CarBizEuroDaoImpl.class.getName());
 		this.deployVerticle(TransferDeviceServiceImpl.class.getName());
+
+		this.deployVerticle(CarBizEuroVerticle.class.getName());
 
 	}
 

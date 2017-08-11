@@ -1,64 +1,64 @@
 {
-  "mysql": {
-    "mc-device": {
-      "host": "10.10.10.178",
-      "port": 3306,
-      "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
-      "database": "device",
-      "charset": "UTF-8",
-      "queryTimeout": 3000
-    },
-    "rentcar": {
-      "host": "10.10.10.103",
-      "port": 3306,
-      "maxPoolSize": 100,
-      "username": "sqhc_rentcar",
-      "password": "BzkmQM%O^U7Dy8X3",
-      "database": "rentcar",
-      "charset": "UTF-8",
-      "queryTimeout": 3000
-    },
-    "mc-statistic": {
-      "host": "10.10.10.178",
-      "port": 3306,
-      "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
-      "database": "statistic",
-      "charset": "UTF-8",
-      "queryTimeout": 3000
-    }
-  },
-  "redis": {
-    "redis.cluster.password": "lbstest",
-    "redis.node": [
-      {
-        "host": "10.10.10.169",
-        "port": 6379
-      },
-      {
-        "host": "10.10.10.169",
-        "port": 6380
-      },
-      {
-        "host": "10.10.10.170",
-        "port": 6379
-      },
-      {
-        "host": "10.10.10.170",
-        "port": 6380
-      },
-      {
-        "host": "10.10.10.171",
-        "port": 6379
-      },
-      {
-        "host": "10.10.10.171",
-        "port": 6380
-      }
-    ]
-  },
-  "service.port":9100
+	"mysql": {
+		"mc-device": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "device",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		},
+		"rentcar": {
+			"host": "10.10.10.103",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqhc_rentcar",
+			"password": "BzkmQM%O^U7Dy8X3",
+			"database": "rentcar",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		},
+		"mc-statistic": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "statistic",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
+	},
+	"redis": {
+		"redis.cluster.password": "lbstest",
+		"redis.node": [
+			{
+				"host": "10.10.10.169",
+				"port": 6379
+			},
+			{
+				"host": "10.10.10.169",
+				"port": 6380
+			},
+			{
+				"host": "10.10.10.170",
+				"port": 6379
+			},
+			{
+				"host": "10.10.10.170",
+				"port": 6380
+			},
+			{
+				"host": "10.10.10.171",
+				"port": 6379
+			},
+			{
+				"host": "10.10.10.171",
+				"port": 6380
+			}
+		]
+	},
+	"service.port": 9100
 }
