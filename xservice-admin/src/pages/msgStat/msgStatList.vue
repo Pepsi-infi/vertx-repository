@@ -113,11 +113,18 @@
           length: this.length
         })
           .then(({data: {list, page, total}}) => {
-
+            let tempList = [];
+            list.forEach((ele, index) => {
+                if (ele !== null) {
+                    tempList.push(ele);
+                }
+                ele.msgId = 'AD_PASSENGER_COUNT_'+ele.msgId;
+            });
             this.table_data = list
             this.currentPage = page
             this.total = total
             this.load_data = false
+
           })
           .catch(() => {
             this.load_data = false
