@@ -63,7 +63,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         if (CollectionUtils.isEmpty(fields)) {
             logger.warn("the msgStat:{} need stat is null ", msgStatDto);
             result.handle(Future.failedFuture("the msgStat :" + msgStatDto + "need stat is null"));
-        } else if (StringUtils.isEmpty(msgStatDto.getAntFingerprint())) {
+        } else if (PushActionEnum.SEND.getType() != msgStatDto.getAction() && StringUtils.isEmpty(msgStatDto.getAntFingerprint())) {
             logger.warn("the antFingerprint of msgStat:{} is null ", msgStatDto);
             result.handle(Future.failedFuture("the antFingerprint of msgStat is null"));
         } else {
@@ -148,6 +148,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 
     @Override
     public void statPushMsg(List<MsgStatDto> msgStatDtos, Handler<AsyncResult<String>> result) {
+        logger.info("[MsgStatServiceImpl] the need msgStatDtos:{}", Json.encode(msgStatDtos));
         List<Future> pushFutureList = new ArrayList<>();
         Map<Future<Map>, String> futureMap = Maps.newHashMap();
         for (MsgStatDto msgStatDto : msgStatDtos) {
