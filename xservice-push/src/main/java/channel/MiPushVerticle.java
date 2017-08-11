@@ -4,6 +4,7 @@ import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
+import constant.ConnectionConsts;
 import constant.PushConsts;
 import enums.JumpFlagEnum;
 import io.vertx.core.AbstractVerticle;
@@ -37,17 +38,19 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
     }
 
     @Override
-    public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+    public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        //测试专用，防止测试推错推到线上
+        receiveMsg = testSendControl(receiveMsg);
 
         logger.info("进入小米推送Verticle");
 
-        if (recieveMsg == null) {
+        if (receiveMsg == null) {
             logger.error("尚无消息");
             return;
         }
 
         try {
-            Result result = sendMessage(recieveMsg);
+            Result result = sendMessage(receiveMsg);
 
             if (ErrorCode.Success == result.getErrorCode()) {
                 resultHandler.handle(Future.succeededFuture(new BaseResponse()));
@@ -57,7 +60,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
         } catch (Exception e) {
             resultHandler.handle(Future.failedFuture(e));
-            logger.error("recieveMsg=" + recieveMsg, e);
+            logger.error("recieveMsg=" + receiveMsg, e);
         }
     }
 
@@ -96,7 +99,20 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
                 .build();
         return message;
     }
-    
+
+    //测试专用，防止消息推送到线上用户
+    private JsonObject testSendControl(JsonObject jsonMsg){
+        if("dev".equals(ConnectionConsts.ENV_PATH)){
+            String phone = PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.phone");
+            String token = PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.token");
+            if(jsonMsg != null){
+                jsonMsg.put("phone", phone);
+                jsonMsg.put("regId", token);
+            }
+        }
+        return jsonMsg;
+    }
+
     public static void main(String[] args) throws Exception {
     	
     	MiPushVerticle verticle=new MiPushVerticle();

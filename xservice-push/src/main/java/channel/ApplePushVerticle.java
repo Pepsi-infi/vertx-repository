@@ -1,8 +1,6 @@
 package channel;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import constant.ConnectionConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -16,6 +14,11 @@ import util.HttpUtils;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static constant.PushConsts.apnsToken;
 
 public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 	
@@ -34,7 +37,9 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 	@Override
 	public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
-		
+		//测试专用，防止测试推错推到线上
+		receiveMsg = testSendControl(receiveMsg);
+
 		logger.info("enter applePushService sendMsg method");
 		
 		Map<String, String> params=new HashMap<>();
@@ -66,7 +71,17 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		}else{
 			resultHandler.handle(Future.succeededFuture(new BaseResponse()));
 		}
-				
-		
+
+	}
+
+	//测试专用，防止消息推送到线上用户
+	private JsonObject testSendControl(JsonObject jsonMsg){
+		if("dev".equals(ConnectionConsts.ENV_PATH)){
+			String apnsToken = PropertiesLoaderUtils.multiProp.getProperty("apple.test.apnsToken");
+			if(jsonMsg != null){
+				jsonMsg.put("apnsToken", apnsToken);
+			}
+		}
+		return jsonMsg;
 	}
 }

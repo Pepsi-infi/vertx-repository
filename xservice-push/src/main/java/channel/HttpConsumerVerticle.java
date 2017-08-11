@@ -1,15 +1,5 @@
 package channel;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
-import constant.ConnectionConsts;
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -33,18 +23,21 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.ApplePushService;
-import service.GcmPushService;
-import service.MsgRecordService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import util.HttpUtils;
 import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -325,12 +318,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				
 				if (!StringUtil.isNullOrEmpty(apnsToken)) {
 					logger.info("开始走apns推送");
-					
-					//测试专用  防止群推  只推送到指定设备 apple
-					if("dev".equals(ConnectionConsts.ENV_PATH)){
-						receiveMsg.put("apnsToken", PropertiesLoaderUtils.multiProp.getProperty("apple.test.apnsToken"));
-					}
-					
 					applePushService.sendMsg(receiveMsg, resultHandler);
 					//上报要用token
 					token = apnsToken;
@@ -382,13 +369,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			channel = PushTypeEnum.SOCKET.getSrcCode();
 			return;
 		}
-		
-		//测试专用  防止群推  只推送到指定设备 小米/gcm
-		if("dev".equals(ConnectionConsts.ENV_PATH)){
-			phone=PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.phone");
-			token=PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.token");
-		}
-		
 
 		//如果设备token为空，从库中查询token出来
 		if(StringUtils.isBlank(token)) {	
