@@ -1,5 +1,14 @@
 package channel;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -23,21 +32,18 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.*;
+import service.ApplePushService;
+import service.GcmPushService;
+import service.MsgRecordService;
+import service.RedisService;
+import service.SocketPushService;
+import service.XiaoMiPushService;
 import util.DateUtil;
 import util.HttpUtils;
 import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -315,9 +321,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			Future<BaseResponse> checkFutrue) {
 		checkFutrue.setHandler(res -> {
 			if (res.succeeded()) {
-				logger.debug("token=" + token);
-				receiveMsg.put("regId", token);
-
+				
 				if (!StringUtil.isNullOrEmpty(apnsToken)) {
 					logger.info("开始走apns推送");
 					applePushService.sendMsg(receiveMsg, resultHandler);
@@ -385,7 +389,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					List<DeviceDto> list =  devRes.result();
 					if(CollectionUtils.isNotEmpty(list)){
 						token = list.get(0).getDeviceToken();
-
+						receiveMsg.put("regId", token);
+						
 						if(StringUtils.isNotBlank(token)){
 							// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 							logger.info("开始走小米推送");
@@ -408,6 +413,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}else{
 			// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 			logger.info("开始走小米推送");
+			receiveMsg.put("regId", token);
 			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 			channel = PushTypeEnum.XIAOMI.getSrcCode();
 		}
