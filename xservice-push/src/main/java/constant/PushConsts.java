@@ -10,6 +10,8 @@ public class PushConsts {
 	public final static String apnsToken = "apnsToken";
 	
 	public final static String PUSH_CHANNEL_VERTICLE_PREFIX = "PUSH_CHANNEL_VERTICLE_PREFIX_";
+
+	//----------------------------------------- 小米推送相关 ------------------------------------
 	//小米推送:通知栏
 	public static final int XIAOMI_PASS_THROUGH_TONGZHILAN = 0;
 	//小米推送：透传
@@ -17,7 +19,7 @@ public class PushConsts {
 	//小米推送声音：默认
 	public static final int XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND = 1;
 
-	// ---------------------------------------- SOCKET推送相关的常量字段 ----------------------------------------
+	// ---------------------------------------- SOCKET推送相关 ----------------------------------------
 
 	// 用户消息队列key（乘客）
 	public static final String _MSG_LIST_PASSENGER = "MSGLIST_PASSENGER";
@@ -39,7 +41,10 @@ public class PushConsts {
 
 	//上报类型 1发送，2接收
 	public static final Integer MsgStat_ACTION_SEND = 1;
-	
+
+	public static final Integer MsgStat_StatPushMsg_SUCCESS = 1;
+
+	// ----------------------------------------------- 消息到达跳转 ----------------------------------------------------------
 	//推送跳转标识:我的账户
 	public static final int JUMP_FLAG_MY_ACCOUNT=0;
 	
