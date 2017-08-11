@@ -13,6 +13,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
 import utils.CalendarUtil;
 
 public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroService {
@@ -58,37 +59,40 @@ public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroSe
 	}
 
 	public void transData() {
-		rentCarMySQLClient.getConnection(res -> {
-			if (res.succeeded()) {
-				res.result().queryStream(SQL.select_all_ios_token_from_car_biz_europ, stream -> {
-					if (stream.succeeded()) {
-						stream.result().handler(row -> {
-							JsonArray params = new JsonArray().add(-1).add(row.getString(0)).add("").add(-1)
-									.add(row.getString(1)).add(-1).add("").add(-1).add("").add("").add(0)
-									.add(CalendarUtil.format(new Date())).add(CalendarUtil.format(new Date()));
 
-							deviceMySQLClient.getConnection(con -> {
-								if (con.succeeded()) {
-									con.result().updateWithParams(SQL.replace_into_device, params, r -> {
+		Future<SQLConnection> conFuture = Future.future();
+
+		deviceMySQLClient.getConnection(con -> {
+			if (conFuture.succeeded()) {
+				rentCarMySQLClient.getConnection(res -> {
+					if (res.succeeded()) {
+						res.result().queryStream(SQL.select_all_ios_token_from_car_biz_europ, stream -> {
+							if (stream.succeeded()) {
+								stream.result().handler(row -> {
+									JsonArray params = new JsonArray().add(-1).add(row.getString(0)).add("").add(-1)
+											.add(row.getString(1)).add(-1).add("").add(-1).add("").add("").add(0)
+											.add(CalendarUtil.format(new Date())).add(CalendarUtil.format(new Date()));
+									conFuture.result().updateWithParams(SQL.replace_into_device, params, r -> {
 										if (r.succeeded()) {
 											logger.info(r.result());
 										} else {
 											logger.error(r.cause());
 										}
 									});
-								} else {
-
-								}
-							}).close();
+								});
+							} else {
+								logger.error(stream.cause());
+							}
 						});
 					} else {
-						logger.error(stream.cause());
+						logger.error(res.cause());
 					}
-				});
+				}).close();
 			} else {
-				logger.error(res.cause());
+
 			}
 		}).close();
+
 	}
 
 	interface SQL {
