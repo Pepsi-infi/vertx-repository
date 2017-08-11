@@ -9,10 +9,10 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import service.TransferDeviceService;
 import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
+import service.impl.TransferDeviceServiceImpl;
 import xservice.BaseServiceVerticle;
 
 /**
@@ -47,7 +47,7 @@ public class StartVerticle extends BaseServiceVerticle {
         this.deployVerticle(MsgStatResultServiceImpl.class.getName());
 
         this.deployVerticle(CarBizEuroDaoImpl.class.getName());
-        this.deployVerticle(TransferDeviceService.class.getName());
+        this.deployVerticle(TransferDeviceServiceImpl.class.getName());
 
     }
 
