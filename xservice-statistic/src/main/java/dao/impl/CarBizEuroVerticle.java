@@ -27,6 +27,8 @@ public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroSe
 	public void start() throws Exception {
 		super.start();
 
+		logger.info("rentcat " + config().getJsonObject("rentcar"));
+		logger.info("mc-device " + config().getJsonObject("mc-device"));
 		rentCarMySQLClient = MySQLClient.createNonShared(vertx, config().getJsonObject("rentcar"));
 
 		deviceMySQLClient = MySQLClient.createNonShared(vertx, config().getJsonObject("mc-device"));
