@@ -55,6 +55,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			return;
 		}
 		
+		logger.info("请求地址："+host+"参数："+params);
 		String result = null;
 		try {
 			result = HttpUtils.URLPost(host, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
