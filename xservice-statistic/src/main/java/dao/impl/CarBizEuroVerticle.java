@@ -60,10 +60,8 @@ public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroSe
 
 	public void transData() {
 
-		Future<SQLConnection> conFuture = Future.future();
-
 		deviceMySQLClient.getConnection(con -> {
-			if (conFuture.succeeded()) {
+			if (con.succeeded()) {
 				rentCarMySQLClient.getConnection(res -> {
 					if (res.succeeded()) {
 						res.result().queryStream(SQL.select_all_ios_token_from_car_biz_europ, stream -> {
@@ -72,7 +70,7 @@ public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroSe
 									JsonArray params = new JsonArray().add(-1).add(row.getString(0)).add("").add(-1)
 											.add(row.getString(1)).add(-1).add("").add(-1).add("").add("").add(0)
 											.add(CalendarUtil.format(new Date())).add(CalendarUtil.format(new Date()));
-									conFuture.result().updateWithParams(SQL.replace_into_device, params, r -> {
+									con.result().updateWithParams(SQL.replace_into_device, params, r -> {
 										if (r.succeeded()) {
 											logger.info(r.result());
 										} else {
