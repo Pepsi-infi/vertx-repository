@@ -45,7 +45,7 @@ public class StartVerticle extends BaseServiceVerticle {
 		this.deployVerticle(CarBizEuroDaoImpl.class.getName());
 		this.deployVerticle(TransferDeviceServiceImpl.class.getName());
 
-		this.deployVerticle(CarBizEuroVerticle.class.getName());
+		vertx.deployVerticle(CarBizEuroVerticle.class.getName(), new DeploymentOptions().setWorker(true));
 
 	}
 
