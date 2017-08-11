@@ -12,6 +12,7 @@
 		<module>xservice-statistic</module>
 		<module>xservice-push</module>
 		<module>xservice-im</module>
+		<module>xservice-access</module>
 	</modules>
 
 	<!-- 配置变量 -->

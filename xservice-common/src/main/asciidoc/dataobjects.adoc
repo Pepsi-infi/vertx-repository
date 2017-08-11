@@ -18,3 +18,56 @@
 |[[status]]`status`|`Number (Integer)`|-
 |===
 
+[[DeviceDto]]
+== DeviceDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 17:21
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[antFingerprint]]`antFingerprint`|`String`|-
+|[[appCode]]`appCode`|`Number (Integer)`|-
+|[[appVersion]]`appVersion`|`String`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[deviceToken]]`deviceToken`|`String`|-
+|[[deviceType]]`deviceType`|`String`|-
+|[[id]]`id`|`Number (Long)`|-
+|[[isAcceptPush]]`isAcceptPush`|`Number (Integer)`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[osVersion]]`osVersion`|`String`|-
+|[[phone]]`phone`|`String`|-
+|[[uid]]`uid`|`Number (Long)`|-
+|===
+
+[[MsgStatDto]]
+== MsgStatDto
+
+++++
+ Created by lufei
+ Date : 2017/7/26 15:56
+ Description :
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`Number (Integer)`|-
+|[[antFingerprint]]`antFingerprint`|`String`|-
+|[[appCode]]`appCode`|`Number (Integer)`|-
+|[[arriveTime]]`arriveTime`|`String`|-
+|[[channel]]`channel`|`Number (Integer)`|-
+|[[imei]]`imei`|`String`|-
+|[[msgId]]`msgId`|`String`|-
+|[[osType]]`osType`|`Number (Integer)`|-
+|[[sendTime]]`sendTime`|`String`|-
+|===
+

@@ -11,6 +11,7 @@ import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.sstore.ClusteredSessionStore;
 import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
+import utils.BaseResponse;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -22,13 +23,10 @@ public class RestAPIVerticle extends BaseServiceVerticle {
 
     /**
      * Create http server for the REST service.
-     * 
-     * @param router
-     *            router instance
-     * @param host
-     *            http host
-     * @param port
-     *            http port
+     *
+     * @param router router instance
+     * @param host   http host
+     * @param port   http port
      * @return async result of the procedure
      */
     protected Future<Void> createHttpServer(Router router, String host, int port) {
@@ -39,11 +37,9 @@ public class RestAPIVerticle extends BaseServiceVerticle {
 
     /**
      * Enable simple heartbeat check mechanism via HTTP.
-     * 
-     * @param router
-     *            router instance
-     * @param config
-     *            configuration object
+     *
+     * @param router router instance
+     * @param config configuration object
      */
     protected void enableHeartbeatCheck(Router router, JsonObject config) {
         router.get(config.getString("heartbeat.path", "/health")).handler(context -> {
@@ -54,9 +50,8 @@ public class RestAPIVerticle extends BaseServiceVerticle {
 
     /**
      * Enable local session storage in requests.
-     * 
-     * @param router
-     *            router instance
+     *
+     * @param router router instance
      */
     protected void enableLocalSession(Router router) {
         router.route().handler(CookieHandler.create());
@@ -65,9 +60,8 @@ public class RestAPIVerticle extends BaseServiceVerticle {
 
     /**
      * Enable clustered session storage in requests.
-     * 
-     * @param router
-     *            router instance
+     *
+     * @param router router instance
      */
     protected void enableClusteredSession(Router router) {
         router.route().handler(CookieHandler.create());
@@ -127,13 +121,10 @@ public class RestAPIVerticle extends BaseServiceVerticle {
      * This method generates handler for async methods in REST APIs. Use the
      * result directly and use given {@code converter} to convert result to
      * string as the response. The content type is JSON.
-     * 
-     * @param context
-     *            routing context instance
-     * @param converter
-     *            a converter that converts result to a string
-     * @param <T>
-     *            result type
+     *
+     * @param context   routing context instance
+     * @param converter a converter that converts result to a string
+     * @param <T>       result type
      * @return generated handler
      */
     protected <T> Handler<AsyncResult<T>> resultHandler(RoutingContext context, Function<T, String> converter) {
@@ -153,14 +144,33 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     }
 
     /**
+     * @param context
+     * @param <T>
+     * @return
+     */
+    protected <T> Handler<AsyncResult<T>> resultStringHandler(RoutingContext context) {
+        return ar -> {
+            if (ar.succeeded()) {
+                T res = ar.result();
+                if (res == null) {
+                    serviceUnavailable(context, "invalid_result");
+                } else {
+                    context.response().putHeader("content-type", "application/json").end(res.toString(), ENCODE);
+                }
+            } else {
+                internalError(context, ar.cause());
+                ar.cause().printStackTrace();
+            }
+        };
+    }
+
+    /**
      * This method generates handler for async methods in REST APIs. The result
      * requires non-empty. If empty, return <em>404 Not Found</em> status. The
      * content type is JSON.
-     * 
-     * @param context
-     *            routing context instance
-     * @param <T>
-     *            result type
+     *
+     * @param context routing context instance
+     * @param <T>     result type
      * @return generated handler
      */
     protected <T> Handler<AsyncResult<T>> resultHandlerNonEmpty(RoutingContext context) {
@@ -182,11 +192,9 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     /**
      * This method generates handler for async methods in REST APIs. The content
      * type is originally raw text.
-     * 
-     * @param context
-     *            routing context instance
-     * @param <T>
-     *            result type
+     *
+     * @param context routing context instance
+     * @param <T>     result type
      * @return generated handler
      */
     protected <T> Handler<AsyncResult<T>> rawResultHandler(RoutingContext context) {
@@ -208,13 +216,10 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     /**
      * This method generates handler for async methods in REST APIs. The result
      * is not needed. Only the state of the async result is required.
-     * 
-     * @param context
-     *            routing context instance
-     * @param result
-     *            result content
-     * @param status
-     *            status code
+     *
+     * @param context routing context instance
+     * @param result  result content
+     * @param status  status code
      * @return generated handler
      */
     protected Handler<AsyncResult<Void>> resultVoidHandler(RoutingContext context, JsonObject result, int status) {
@@ -246,9 +251,8 @@ public class RestAPIVerticle extends BaseServiceVerticle {
      * Return format in JSON (successful status = 204): <code>
      * {"message": "delete_success"}
      * </code>
-     * 
-     * @param context
-     *            routing context instance
+     *
+     * @param context routing context instance
      * @return generated handler
      */
     protected Handler<AsyncResult<Void>> deleteResultHandler(RoutingContext context) {
@@ -270,6 +274,14 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                 .end(new JsonObject().put("error", ex.getMessage()).encodePrettily(), ENCODE);
     }
 
+    protected void paramBadRequest(RoutingContext context, String msg) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("status", BaseResponse.RESPONSE_FAIL_CODE);
+        jsonObject.put("errorMessage", msg);
+        context.response().setStatusCode(200).putHeader("content-type", "application/json")
+                .end(jsonObject.encodePrettily(), ENCODE);
+    }
+
     protected void notFound(RoutingContext context) {
         context.response().setStatusCode(404).putHeader("content-type", "application/json")
                 .end(new JsonObject().put("message", "not_found").encodePrettily());
@@ -289,7 +301,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
         ex.printStackTrace();
         context.response().setStatusCode(502).putHeader("content-type", "application/json")
                 .end(new JsonObject().put("error", "bad_gateway")
-                // .put("message", ex.getMessage())
+                        // .put("message", ex.getMessage())
                         .encodePrettily());
     }
 

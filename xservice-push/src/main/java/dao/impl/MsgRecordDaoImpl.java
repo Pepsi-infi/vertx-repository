@@ -1,0 +1,117 @@
+package dao.impl;
+
+import constant.ConnectionConsts;
+import dao.MsgRecordDao;
+import domain.MsgRecord;
+import helper.XProxyHelper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.asyncsql.MySQLClient;
+import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
+import util.PropertiesLoaderUtils;
+import utils.BaseResponse;
+import utils.IPUtil;
+import xservice.BaseServiceVerticle;
+
+/**
+ *  保存消息记录
+ */
+public class MsgRecordDaoImpl extends BaseServiceVerticle implements MsgRecordDao {
+    private static final Logger logger = LoggerFactory.getLogger(MsgRecordDaoImpl.class);
+
+    private SQLClient sqlClient;
+
+    public interface Sql {
+
+        //保存消息记录
+        public static final String ADD_MESSAGE = "insert into amqp_consume_message "
+                + "(amqp_msg_id,channel,msg_body,status,"
+                + "created_time,updated_time) "
+                + "values "
+                + "(?,?,?,?,now(),now())";
+
+    }
+
+    public MsgRecordDaoImpl() {
+    }
+
+    @Override
+    public void start() throws Exception {
+        super.start();
+
+        XProxyHelper.registerService(MsgRecordDao.class, vertx, this, MsgRecordDao.SERVICE_ADDRESS);
+        publishEventBusService(MsgRecordDao.SERVICE_NAME, MsgRecordDao.SERVICE_ADDRESS, MsgRecordDao.class);
+
+        String ip = IPUtil.getInnerIP();
+        XProxyHelper.registerService(MsgRecordDao.class, vertx, this, MsgRecordDao.getLocalAddress(ip));
+        publishEventBusService(MsgRecordDao.LOCAL_SERVICE_NAME, MsgRecordDao.getLocalAddress(ip), MsgRecordDao.class);
+
+
+        JsonObject jsonObject = PropertiesLoaderUtils.getJsonConf(ConnectionConsts.JDBC_CONFIG_PATH);
+        sqlClient = MySQLClient.createShared(vertx, jsonObject);
+
+//        MsgRecord dto = new MsgRecord();
+//        dto.setAmqpMsgId("qqqq");
+//        dto.setChannel("aaaa");
+//        dto.setMsgBody("qdaslfjasdf");
+//        dto.setStatus(2);
+//        addMessage(dto, result -> {
+//            System.out.println( " ================= " + result.result().getResultStatus());
+//        });
+    }
+
+    @Override
+    public void addMessage(MsgRecord msg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        if (msg == null) {
+            logger.warn("the msg is null");
+            return;
+        }
+        JsonArray array = new JsonArray().add(msg.getAmqpMsgId()).add(msg.getChannel()).add(msg.getMsgBody()).add(msg.getStatus());
+        execute(array, Sql.ADD_MESSAGE, new BaseResponse(), resultHandler);
+    }
+
+    protected <R> void execute(JsonArray params, String sql, R ret, Handler<AsyncResult<R>> resultHandler) {
+        sqlClient.getConnection(connHandler(resultHandler, connection -> {
+            connection.updateWithParams(sql, params, r -> {
+                if (r.succeeded()) {
+                    resultHandler.handle(Future.succeededFuture(ret));
+                } else {
+                    logger.error( " insert msgRecord error : " + r.cause());
+                    resultHandler.handle(Future.failedFuture(r.cause()));
+                }
+                connection.close();
+            });
+        }));
+    }
+
+    /**
+     * A helper methods that generates async handler for SQLConnection
+     *
+     * @return generated handler
+     */
+    protected <R> Handler<AsyncResult<SQLConnection>> connHandler(Handler<AsyncResult<R>> h1, Handler<SQLConnection> h2) {
+        return conn -> {
+            if (conn.succeeded()) {
+                final SQLConnection connection = conn.result();
+                h2.handle(connection);
+            } else {
+                h1.handle(Future.failedFuture(conn.cause()));
+            }
+        };
+    }
+
+
+    public static void main(String[] args) {
+
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle("dao.impl.MsgRecordDaoImpl");
+
+    }
+}
