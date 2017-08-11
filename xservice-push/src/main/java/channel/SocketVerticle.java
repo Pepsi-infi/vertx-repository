@@ -75,6 +75,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
      * @param jsonMsg
      */
     public void sendMsg(JsonObject jsonMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        //测试专用，防止测试推错推到线上
+        jsonMsg = testSendControl(jsonMsg);
 
         //广告类的消息
         messageType = EnumPassengerMessageType.ADVERTISEMENT;
@@ -141,6 +143,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
             sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
             sendMsgMap.put("params", params);
+            logger.info("Socket push objectToByte before :" + JsonUtil.toJsonString(sendMsgMap));
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
 
             client = new DatagramSocket();
@@ -257,6 +260,19 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             host = hostList.get(pos);
         }
         return host;
+    }
+
+    //测试专用，防止消息推送到线上用户
+    private JsonObject testSendControl(JsonObject jsonMsg){
+       if("dev".equals(ConnectionConsts.ENV_PATH)){
+           String customerId = PropertiesLoaderUtils.singleProp.getProperty("socket.test.customerId");
+           String phone = PropertiesLoaderUtils.singleProp.getProperty("socket.test.phone");
+           if(jsonMsg != null){
+               jsonMsg.put("phone", phone);
+               jsonMsg.put("customerId", customerId);
+           }
+       }
+       return jsonMsg;
     }
 
     /**
