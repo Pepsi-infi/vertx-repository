@@ -186,10 +186,10 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				msgList.add(msgStatDto);
 				msgStatService.statPushMsg(msgList, statRes -> {
 					if (statRes.succeeded()) {
-						logger.info("已推送消息上报成功");
-						resultHandler.handle(Future.succeededFuture());
+						String result = statRes.result();
+						exeStatPushMsgResult(result, resultHandler);
 					} else {
-						logger.error("已推送消息上报失败,失败原因：" + statRes.cause());
+						logger.error("已推送消息上报失败",statRes.cause());
 						resultHandler.handle(Future.failedFuture(statRes.cause()));
 					}
 				});
@@ -199,6 +199,35 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				resultHandler.handle(Future.failedFuture(pushFuture.cause().getMessage()));
 			}
 		});
+	}
+
+	/**
+	 * 处理返回结果
+	 * @param result
+	 * @param resultHandler
+	 */
+	private void exeStatPushMsgResult(String result , Handler<AsyncResult<BaseResponse>> resultHandler){
+		if(StringUtils.isNotBlank(result)){
+			logger.info("exeStatPushMsgResult result :" + result);
+			JsonObject  json = new JsonObject(result);
+			if(json != null){
+				Object status = json.getValue("status");
+				Integer sts = (status != null) ? (Integer)status : null;
+				if(sts != null && PushConsts.MsgStat_StatPushMsg_SUCCESS == sts){
+					logger.error("消息上报成功");
+					resultHandler.handle(Future.succeededFuture());
+				}else{
+					logger.error("消息上报失败，msgId :" + msgId);
+					resultHandler.handle(Future.failedFuture("消息上报失败，msgId :" + msgId));
+				}
+			}else{
+				logger.error("消息上报返回结果转换json失败，msgId :" + msgId);
+				resultHandler.handle(Future.failedFuture("消息上报返回结果转换json失败，msgId :" + msgId));
+			}
+		}else{
+			logger.error("消息上报没有返回结果msgId :" + msgId);
+			resultHandler.handle(Future.failedFuture("消息上报没有返回结果msgId :" + msgId));
+		}
 	}
 
 	private void initService() {
