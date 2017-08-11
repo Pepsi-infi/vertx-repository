@@ -94,14 +94,14 @@ public class CarBizEuroVerticle extends AbstractVerticle implements CarBizEuroSe
 	interface SQL {
 		static final String COUNT_CAR_BIZ_EURO = "select count(*) from car_biz_europ where 1=1 and device_token !='' ";
 
-		static final String select_all_ios_token_from_car_biz_europ = "select phone, device_token from car_biz_europ where 1=1 and device_token !='' limit 10";
+		static final String select_all_ios_token_from_car_biz_europ = "select phone, device_token from car_biz_europ where 1=1 and device_token !=''";
 
 		static final String replace_into_device = "replace into "
 				+ "device (uid, phone, deviceType, channel, deviceToken, "
 				+ "osType, osVersion, appCode, appVersion, antFingerprint, " + "isAcceptPush, createTime, updateTime) "
 				+ "values " + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-		static final String select_all_from_device = "select * from device limit 10";
+		static final String select_all_from_device = "select * from device";
 
 		static final String QUERY_CAR_BIZ_EURO = "SELECT * FROM car_biz_europ WHERE device_token !='' ORDER BY id LIMIT ?,?;";
 
