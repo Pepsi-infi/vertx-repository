@@ -1,6 +1,6 @@
 package channel;
 
-import constant.ServiceUrlConstant;
+import constant.ConnectionConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -17,6 +17,8 @@ import xservice.BaseServiceVerticle;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static constant.PushConsts.apnsToken;
 
 public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 	
@@ -35,7 +37,9 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 	@Override
 	public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
-		
+		//测试专用，防止测试推错推到线上
+		receiveMsg = testSendControl(receiveMsg);
+
 		logger.info("enter applePushService sendMsg method");
 		
 		Map<String, String> params=new HashMap<>();
@@ -44,7 +48,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		params.put("body", receiveMsg.getString("content"));
 		params.put("msgbody", receiveMsg.toString());
 		
-		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host.dev");
+		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host");
 		
 		if(StringUtil.isNullOrEmpty(host)){
 			resultHandler.handle(Future.failedFuture("Apple push host is null"));
@@ -53,7 +57,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		
 		String result = null;
 		try {
-			result = HttpUtils.URLPost(host+ServiceUrlConstant.APPLE_PUSH_URL, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
+			result = HttpUtils.URLPost(host, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
 		} catch (Exception e) {
 			logger.error("apns推送调用异常", e);
 			resultHandler.handle(Future.failedFuture(e));
@@ -67,7 +71,17 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		}else{
 			resultHandler.handle(Future.succeededFuture(new BaseResponse()));
 		}
-				
-		
+
+	}
+
+	//测试专用，防止消息推送到线上用户
+	private JsonObject testSendControl(JsonObject jsonMsg){
+		if("dev".equals(ConnectionConsts.ENV_PATH)){
+			String apnsToken = PropertiesLoaderUtils.multiProp.getProperty("apple.test.apnsToken");
+			if(jsonMsg != null){
+				jsonMsg.put("apnsToken", apnsToken);
+			}
+		}
+		return jsonMsg;
 	}
 }

@@ -72,9 +72,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
 
     /**
-     * @param jsonMsg
+     * @param receiveMsg
      */
-    public void sendMsg(JsonObject jsonMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+    public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        //测试专用，防止测试推错推到线上
+        receiveMsg = testSendControl(receiveMsg);
 
         //广告类的消息
         messageType = EnumPassengerMessageType.ADVERTISEMENT;
@@ -82,28 +84,28 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         /**
          *  获取消息数据字段
          */
-        msgId = jsonMsg.getValue("msgId") + "";
-        customerId = jsonMsg.getValue("customerId") + "";
-        token = jsonMsg.getString("deviceToken");
+        msgId = receiveMsg.getValue("msgId") + "";
+        customerId = receiveMsg.getValue("customerId") + "";
+        token = receiveMsg.getString("deviceToken");
 
         //判断要跳转到那个url
-        Object isIntoPsnCenter = jsonMsg.getValue("isIntoPsnCenter");
-        Object jumpPage = jsonMsg.getValue("jumpPage");
+        Object isIntoPsnCenter = receiveMsg.getValue("isIntoPsnCenter");
+        Object jumpPage = receiveMsg.getValue("jumpPage");
         if(isIntoPsnCenter != null){
             jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
         }
         if(jumpPage != null){
             Integer actionCode = (Integer) jumpPage;
             String action = MsgUtil.getEnumByCode(actionCode);
-            jsonMsg.put("action", action);
+            receiveMsg.put("action", action);
         }else{
-            jsonMsg.put("action", "");
+            receiveMsg.put("action", "");
         }
 
         //消息内容
-        msgBody = jsonMsg.toString();
+        msgBody = receiveMsg.toString();
         //超时时间，秒
-        expireTime = jsonMsg.getLong("expireTime");
+        expireTime = receiveMsg.getLong("expireTime");
 
         //缓存到redis
         Future redisFuture = Future.future();
@@ -141,6 +143,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
             sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
             sendMsgMap.put("params", params);
+            logger.info("Socket push objectToByte before :" + JsonUtil.toJsonString(sendMsgMap));
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
 
             client = new DatagramSocket();
@@ -257,6 +260,19 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             host = hostList.get(pos);
         }
         return host;
+    }
+
+    //测试专用，防止消息推送到线上用户
+    private JsonObject testSendControl(JsonObject jsonMsg){
+       if("dev".equals(ConnectionConsts.ENV_PATH)){
+           String customerId = PropertiesLoaderUtils.singleProp.getProperty("socket.test.customerId");
+           String phone = PropertiesLoaderUtils.singleProp.getProperty("socket.test.phone");
+           if(jsonMsg != null){
+               jsonMsg.put("phone", phone);
+               jsonMsg.put("customerId", customerId);
+           }
+       }
+       return jsonMsg;
     }
 
     /**
