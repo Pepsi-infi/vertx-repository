@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
+import constant.ConnectionConsts;
 import constant.PushConsts;
 import constant.ServiceUrlConstant;
 import domain.MsgRecord;
@@ -375,9 +376,17 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			channel = PushTypeEnum.SOCKET.getSrcCode();
 			return;
 		}
+		
+		//测试专用  防止群推  只推送到指定设备
+		if("dev".equals(ConnectionConsts.ENV_PATH)){
+			phone=PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.phone");
+			token=PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.token");
+		}
+		
 
 		//如果设备token为空，从库中查询token出来
-		if(StringUtils.isBlank(token)) {
+		if(StringUtils.isBlank(token)) {	
+			
 			Map<String, String> param = new HashMap<>();
 			param.put("phone", phone);
 			Future<List<DeviceDto>> deviceFuture = Future.future();

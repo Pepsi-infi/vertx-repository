@@ -1,6 +1,8 @@
 package channel;
 
-import constant.ServiceUrlConstant;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,9 +16,6 @@ import util.HttpUtils;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 	
@@ -44,7 +43,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		params.put("body", receiveMsg.getString("content"));
 		params.put("msgbody", receiveMsg.toString());
 		
-		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host.dev");
+		String host=PropertiesLoaderUtils.multiProp.getProperty("apple.push.host");
 		
 		if(StringUtil.isNullOrEmpty(host)){
 			resultHandler.handle(Future.failedFuture("Apple push host is null"));
@@ -53,7 +52,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		
 		String result = null;
 		try {
-			result = HttpUtils.URLPost(host+ServiceUrlConstant.APPLE_PUSH_URL, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
+			result = HttpUtils.URLPost(host, params, HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
 		} catch (Exception e) {
 			logger.error("apns推送调用异常", e);
 			resultHandler.handle(Future.failedFuture(e));
