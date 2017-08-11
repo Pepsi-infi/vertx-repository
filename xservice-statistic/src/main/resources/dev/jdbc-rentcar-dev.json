@@ -3,7 +3,7 @@
   "port": 3306,
   "maxPoolSize": 100,
   "username": "root",
-  "password": "jiuzhong!@#testdb"
+  "password": "jiuzhong!@#testdb",
   "database": "rentcar",
   "charset": "UTF-8",
   "queryTimeout": 3000
