@@ -13,7 +13,7 @@
 |===
 ^|Name | Type ^| Description
 |[[amqpMsgId]]`amqpMsgId`|`String`|-
-|[[channel]]`channel`|`String`|-
+|[[channel]]`channel`|`Number (Integer)`|-
 |[[id]]`id`|`Number (long)`|-
 |[[msgBody]]`msgBody`|`String`|-
 |[[status]]`status`|`Number (int)`|-
