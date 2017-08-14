@@ -381,7 +381,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 						if ("0".equals(returnCode) && "1".equals(isValid)) {
 							resultHandler.handle(Future.succeededFuture(true));
 						} else {
-							logger.info("检测到socket未连接，" + JsonUtil.toJsonString(checkSocket));
 							resultHandler.handle(Future.succeededFuture(false));
 						}
 					} else {
