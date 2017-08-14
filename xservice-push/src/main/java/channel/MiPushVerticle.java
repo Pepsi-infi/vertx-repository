@@ -40,7 +40,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
     @Override
     public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         //测试专用，防止测试推错推到线上
-        receiveMsg = testSendControl(receiveMsg);
+//        receiveMsg = testSendControl(receiveMsg);
 
         logger.info("进入小米推送Verticle");
 
