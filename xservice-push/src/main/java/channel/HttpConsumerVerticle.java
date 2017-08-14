@@ -252,19 +252,19 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验必填项
-		String msgId = receiveMsg.getValue("msgId") + "";
+		msgId = receiveMsg.getValue("msgId") + "";
 		if (StringUtils.isBlank(msgId)) {
 			resultHandler.handle(Future.failedFuture("msgId不能为空"));
 			return;
 		}
 		// 用户id
-		Object customerId = receiveMsg.getValue("customerId");
+		customerId = receiveMsg.getValue("customerId");
 		if (null == customerId) {
 			resultHandler.handle(Future.failedFuture("customerId不能为空"));
 			return;
 		}
 
-		String phone = (String) receiveMsg.getValue("phone");
+		phone = (String) receiveMsg.getValue("phone");
 		if (StringUtils.isBlank(phone)) {
 			resultHandler.handle(Future.failedFuture("上送手机号不能为空"));
 			return;
