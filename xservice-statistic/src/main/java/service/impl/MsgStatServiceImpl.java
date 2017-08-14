@@ -10,7 +10,6 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
@@ -49,9 +48,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.SERVICE_ADDRESS);
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
-        String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/redis-" + env + ".json");
-        RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
+        RedisOptions redisOptions = ConfigUtils.getRedisOptions(config().getJsonObject("redis"));
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
     }

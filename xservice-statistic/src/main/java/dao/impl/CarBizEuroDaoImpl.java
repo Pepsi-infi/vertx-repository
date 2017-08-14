@@ -13,7 +13,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import service.dto.CarBizEuroDto;
-import util.ConfigUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -45,9 +44,8 @@ public class CarBizEuroDaoImpl extends BaseDaoVerticle implements CarBizEuroDao 
         publishEventBusService(CarBizEuroDao.SERVICE_NAME, CarBizEuroDao.SERVICE_ADDRESS, CarBizEuroDao.class);
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-rentcar-" + env + ".json");
 
-        client = MySQLClient.createNonShared(vertx, jsonObject);
+        client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("rentcar"));
 
     }
 

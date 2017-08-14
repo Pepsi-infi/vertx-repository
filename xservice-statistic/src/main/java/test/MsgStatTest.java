@@ -1,6 +1,6 @@
 package test;
 
-import cron.CronTransferDevcieVerticle;
+import api.RestDeviceVerticle;
 import dao.impl.CarBizEuroDaoImpl;
 import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
@@ -12,6 +12,11 @@ import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
 import service.impl.TransferDeviceServiceImpl;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by lufei
@@ -33,6 +38,7 @@ public class MsgStatTest {
             msgStatTest.deployRestService();
 
             DeploymentOptions deploymentOptions = new DeploymentOptions();
+
             deploymentOptions.setConfig(config());
 
             vertx.deployVerticle(MsgStatServiceImpl.class.getName(), deploymentOptions);
@@ -46,7 +52,6 @@ public class MsgStatTest {
             vertx.deployVerticle(CarBizEuroDaoImpl.class.getName(), deploymentOptions);
             vertx.deployVerticle(TransferDeviceServiceImpl.class.getName(), deploymentOptions);
 
-            Thread.sleep(3000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -65,17 +70,29 @@ public class MsgStatTest {
         DeploymentOptions deploymentOptions = new DeploymentOptions();
         deploymentOptions.setConfig(config());
 //        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
+        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-        vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
         return future.map(r -> null);
     }
 
     private static JsonObject config() {
-        String prop = "{\"service.name\":\"le.mc.statistic\",\"service.host\":\"127.0.0.1\",\"service.port\":2203,\"service.root\":\"/mc-statistic\","
-                + "\"redis.properties\":{ \"host\": \"localhost\", \"port\": 6379,\"encoding\": \"UTF-8\",\"tcpKeepAlive\": \"true\",\"tcpNoDelay\": \"true\",\"password\":\"redis\"}}";
-        JsonObject jsonObject = new JsonObject(prop);
-        return jsonObject;
+        ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
+        InputStream is = ctxClsLoader.getResourceAsStream("dev/config.json");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+        try {
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            return new JsonObject(sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+
+
     }
 }

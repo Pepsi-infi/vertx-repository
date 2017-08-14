@@ -7,7 +7,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
@@ -52,9 +51,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
 
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
 
-        String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/redis-" + env + ".json");
-        RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
+        RedisOptions redisOptions = ConfigUtils.getRedisOptions(config().getJsonObject("redis"));
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
     }

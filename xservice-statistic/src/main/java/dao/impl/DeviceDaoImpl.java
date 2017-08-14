@@ -17,7 +17,6 @@ import iservice.dto.DeviceDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
@@ -57,9 +56,8 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-device-" + env + ".json");
 
-        client = MySQLClient.createNonShared(vertx, jsonObject);
+        client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
 
     }
 
