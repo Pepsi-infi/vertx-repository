@@ -6,6 +6,7 @@ import dao.BaseDaoVerticle;
 import dao.MsgStatResultDao;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -16,10 +17,13 @@ import io.vertx.ext.asyncsql.MySQLClient;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import service.dto.MsgStatResultDto;
+import service.dto.MsgStatResultPage;
+import service.dto.MsgStatResultPageWrapper;
 import util.ConfigUtils;
 import utils.BaseResponse;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +57,8 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
         static final String GET_MSG_STAT_RESULT = "SELECT * FROM `msg_stat` WHERE msgId=? ORDER BY id DESC LIMIT 1;";
 
         static final String QUERY_MSG_STAT_RESULT = "SELECT * FROM `msg_stat` WHERE 1=1 %s ORDER BY id DESC LIMIT ?,?;";
+
+        static final String COUNT_MSG_STAT_RESULT = "SELECT COUNT(*) FROM `msg_stat` WHERE 1=? %s ";
 
     }
 
@@ -126,28 +132,44 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
     }
 
     @Override
-    public void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> resultHandler) {
-        String sql = Sql.QUERY_MSG_STAT_RESULT;
+    public void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> resultHandler) {
+        String querySql = Sql.QUERY_MSG_STAT_RESULT;
+        String countSql = Sql.COUNT_MSG_STAT_RESULT;
         StringBuilder sb = new StringBuilder();
         String msgId = MapUtils.getString(params, "msgId");
         if (StringUtils.isNotBlank(msgId)) {
             sb.append(" and msgId = '").append(msgId).append("'");
         }
-        sql = String.format(sql, sb.toString());
-        Future<List<JsonObject>> future = retrieveByPage(page, limit, sql);
-        future.setHandler(result -> {
-            if (result.succeeded()) {
-                List<MsgStatResultDto> msgStatResultDtos = Lists.transform(result.result(), new Function<JsonObject, MsgStatResultDto>() {
+        querySql = String.format(querySql, sb.toString());
+        countSql = String.format(countSql, sb.toString());
+
+        List<Future> futures = new ArrayList<>();
+        Future<List<JsonObject>> future = retrieveByPage(page, limit, querySql);
+        futures.add(future);
+
+        Future<Optional<JsonObject>> countFuture = retrieveOne(1, countSql);
+        futures.add(countFuture);
+
+        CompositeFuture compositeFuture = CompositeFuture.all(futures);
+        compositeFuture.setHandler(asr1 -> {
+            if (asr1.succeeded()) {
+                List<JsonObject> jsonObjects = asr1.result().resultAt(0);
+                List<MsgStatResultDto> msgStatResultDtos = Lists.transform(jsonObjects, new Function<JsonObject, MsgStatResultDto>() {
                     @Nullable
                     @Override
                     public MsgStatResultDto apply(@Nullable JsonObject jsonObject) {
                         return jsonObject.mapTo(MsgStatResultDto.class);
                     }
                 });
-                resultHandler.handle(Future.succeededFuture(msgStatResultDtos));
+                Optional<JsonObject> jsonObject = asr1.result().resultAt(1);
+                Long count = jsonObject.orElse(new JsonObject()).getLong("COUNT(*)");
+                MsgStatResultPageWrapper wrapper = new MsgStatResultPageWrapper();
+                MsgStatResultPage msgStatResultPage = new MsgStatResultPage(msgStatResultDtos, page, limit, count);
+                wrapper.setData(msgStatResultPage);
+                resultHandler.handle(Future.succeededFuture(wrapper));
             } else {
-                logger.error(result.cause());
-                resultHandler.handle(Future.failedFuture(result.cause()));
+                logger.error(asr1.cause());
+                resultHandler.handle(Future.failedFuture(asr1.cause()));
             }
         });
 

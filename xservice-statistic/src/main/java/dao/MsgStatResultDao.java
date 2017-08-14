@@ -7,9 +7,9 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import service.dto.MsgStatResultDto;
+import service.dto.MsgStatResultPageWrapper;
 import utils.BaseResponse;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,5 +42,5 @@ public interface MsgStatResultDao {
 
     void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler);
 
-    void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> resultHandler);
+    void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> resultHandler);
 }

@@ -39,11 +39,11 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import java.util.List;
 import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
 import java.util.Map;
 import io.vertx.core.Vertx;
+import service.dto.MsgStatResultPageWrapper;
 import io.vertx.core.AsyncResult;
 import dao.MsgStatResultDao;
 import io.vertx.core.Handler;
@@ -177,7 +177,7 @@ public class MsgStatResultDaoVertxProxyHandler extends ProxyHandler {
                 msg.reply(new ServiceException(-1, res.cause().getMessage()));
               }
             } else {
-              msg.reply(new JsonArray(res.result().stream().map(MsgStatResultDto::toJson).collect(Collectors.toList())));
+              msg.reply(res.result() == null ? null : res.result().toJson());
             }
          });
           break;

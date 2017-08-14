@@ -19,11 +19,11 @@ package dao.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import java.util.List;
 import service.dto.MsgStatResultDto;
 import utils.BaseResponse;
 import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
+import service.dto.MsgStatResultPageWrapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -89,11 +89,11 @@ public class MsgStatResultDao {
     }));
   }
 
-  public void queryMsgStatResultByPage(Map<String,String> params, int page, int limit, Handler<AsyncResult<List<MsgStatResultDto>>> resultHandler) { 
+  public void queryMsgStatResultByPage(Map<String,String> params, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> resultHandler) { 
     delegate.queryMsgStatResultByPage(params, page, limit, resultHandler);
   }
 
-  public Single<List<MsgStatResultDto>> rxQueryMsgStatResultByPage(Map<String,String> params, int page, int limit) { 
+  public Single<MsgStatResultPageWrapper> rxQueryMsgStatResultByPage(Map<String,String> params, int page, int limit) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       queryMsgStatResultByPage(params, page, limit, fut);
     }));
