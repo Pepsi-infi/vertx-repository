@@ -15,7 +15,7 @@ public class MsgStatResultPage {
     public static final int DEFAULT_PAGE_SIZE = 20;
     private List<MsgStatResultDto> list;
     //总条数
-//    private int total;
+    private long total;
     //当前页
     private int page;
     //每页多少条
@@ -45,12 +45,27 @@ public class MsgStatResultPage {
         this.size = size;
     }
 
+    public long getTotal() {
+        return total;
+    }
+
+    public void setTotal(long total) {
+        this.total = total;
+    }
 
     public MsgStatResultPage(List<MsgStatResultDto> list, int page, int size) {
         super();
         this.list = list;
         this.page = page;
         this.size = size;
+    }
+
+    public MsgStatResultPage(List<MsgStatResultDto> list, int page, int size, long total) {
+        super();
+        this.list = list;
+        this.page = page;
+        this.size = size;
+        this.total = total;
     }
 
     public MsgStatResultPage() {
@@ -72,6 +87,7 @@ public class MsgStatResultPage {
     public String toString() {
         final StringBuilder sb = new StringBuilder("MsgStatResultPage{");
         sb.append("list=").append(list);
+        sb.append(", total=").append(total);
         sb.append(", page=").append(page);
         sb.append(", size=").append(size);
         sb.append('}');

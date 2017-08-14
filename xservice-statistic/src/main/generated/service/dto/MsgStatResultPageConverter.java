@@ -41,6 +41,9 @@ public class MsgStatResultPageConverter {
     if (json.getValue("size") instanceof Number) {
       obj.setSize(((Number)json.getValue("size")).intValue());
     }
+    if (json.getValue("total") instanceof Number) {
+      obj.setTotal(((Number)json.getValue("total")).longValue());
+    }
   }
 
   public static void toJson(MsgStatResultPage obj, JsonObject json) {
@@ -51,5 +54,6 @@ public class MsgStatResultPageConverter {
     }
     json.put("page", obj.getPage());
     json.put("size", obj.getSize());
+    json.put("total", obj.getTotal());
   }
 }

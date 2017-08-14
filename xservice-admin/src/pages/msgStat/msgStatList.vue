@@ -10,6 +10,15 @@
       </router-link>
       -->
     </panel-title>
+    <el-row justify="space-between" style="margin-top: 12px;">
+        <el-col :span="6">
+           <el-input v-model="queryMsgId" placeholder="消息Id"  style="margin-left: 18px;">
+           </el-input>
+        </el-col>
+        <el-col :span="4" style="margin-left: 30px;">
+            <el-button icon="search" class=""  @click="search">搜索</el-button>
+        </el-col>
+    </el-row>
     <div class="panel-body">
       <el-table
         :data="table_data"
@@ -65,7 +74,7 @@
           <el-pagination
             @current-change="handleCurrentChange"
             :current-page="currentPage"
-            :page-size="10"
+            :page-size="20"
             layout="total, prev, pager, next"
             :total="total">
           </el-pagination>
@@ -75,6 +84,9 @@
   </div>
 </template>
 <script type="text/javascript">
+  import Vue from 'vue';
+  import ElementUI from 'element-ui';
+  Vue.use(ElementUI);
   import {panelTitle, bottomToolBar} from 'components'
 
   export default{
@@ -86,11 +98,12 @@
         //数据总条目
         total: 0,
         //每页显示多少条数据
-        length: 15,
+        length: 20,
         //请求时的loading效果
         load_data: true,
         //批量选择数组
-        batch_select: []
+        batch_select: [],
+        queryMsgId:''
       }
     },
     components: {
@@ -98,19 +111,26 @@
       bottomToolBar
     },
     created(){
-      this.get_table_data()
+      this.get_table_data(1)
     },
     methods: {
       //刷新
       on_refresh(){
-        this.get_table_data()
+        this.get_table_data(1)
       },
       //获取数据
-      get_table_data(){
+      get_table_data(page = this.currentPage){
         this.load_data = true
+        var msgId = this.queryMsgId;
+        var searchMsgId;
+        if(msgId !== undefined){
+            let pos = msgId.lastIndexOf('_');
+            searchMsgId = msgId.substring(pos+1, msgId.length);
+        }
         this.$fetch.api_table.list({
-          page: this.currentPage,
-          length: this.length
+          page: page,
+          size: this.length,
+          msgId: searchMsgId
         })
           .then(({data: {list, page, total}}) => {
             let tempList = [];
@@ -130,6 +150,9 @@
             this.load_data = false
           })
       },
+      search() {
+          this.get_table_data(1);
+      },
       //单个删除
       delete_data(item){
         this.$confirm('此操作将删除该数据, 是否继续?', '提示', {
@@ -141,7 +164,7 @@
             this.load_data = true
             this.$fetch.api_table.del(item)
               .then(({msg}) => {
-                this.get_table_data()
+                this.get_table_data(1)
                 this.$message.success(msg)
               })
               .catch(() => {
@@ -153,7 +176,7 @@
       //页码选择
       handleCurrentChange(val) {
         this.currentPage = val
-        this.get_table_data()
+        this.get_table_data(val)
       },
       //批量选择
       on_batch_select(val){
@@ -170,7 +193,7 @@
             this.load_data = true
             this.$fetch.api_table.batch_del(this.batch_select)
               .then(({msg}) => {
-                this.get_table_data()
+                this.get_table_data(1)
                 this.$message.success(msg)
               })
               .catch(() => {
@@ -182,3 +205,4 @@
     }
   }
 </script>
+
