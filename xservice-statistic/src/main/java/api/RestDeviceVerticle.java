@@ -1,5 +1,6 @@
 package api;
 
+import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
@@ -82,6 +83,7 @@ public class RestDeviceVerticle extends RestAPIVerticle {
 
         if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
                 || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+            logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
             return null;
         }
 
