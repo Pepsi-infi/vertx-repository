@@ -1,7 +1,6 @@
 package api;
 
 import channel.*;
-import dao.impl.MsgRecordDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
@@ -18,9 +17,7 @@ public class StartVerticle extends AbstractVerticle{
     public void start() throws Exception {
         super.start();
         // 提供EventBus服务
-        
 
-		this.deployVerticle(MsgRecordDaoImpl.class.getName());
         this.deployVerticle(MsgRecordServiceImpl.class.getName());
         this.deployVerticle(RedisServiceImpl.class.getName());
 
