@@ -18,7 +18,7 @@
       "password": "BzkmQM%O^U7Dy8X3",
       "database": "rentcar",
       "charset": "UTF-8",
-      "queryTimeout": 3600000
+      "queryTimeout": 3000
     },
     "mc-statistic": {
       "host": "10.10.10.178",
