@@ -9,6 +9,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.RedisServiceImpl;
+import xservice.HttpClientVerticle;
 
 public class StartVerticle extends AbstractVerticle{
 
@@ -28,6 +29,7 @@ public class StartVerticle extends AbstractVerticle{
         this.deployVerticle(ApplePushVerticle.class.getName());
 
         this.deployVerticle(HttpConsumerVerticle.class.getName());
+        this.deployVerticle(HttpClientVerticle.class.getName());
         // 提供其他非EventBus服务
     }
 
