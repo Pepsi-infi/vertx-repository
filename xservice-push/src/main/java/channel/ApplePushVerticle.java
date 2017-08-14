@@ -1,5 +1,8 @@
 package channel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import constant.ConnectionConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
@@ -8,18 +11,12 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.ApplePushService;
-import util.HttpUtils;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
-import xservice.HttpClientVerticle;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static constant.PushConsts.apnsToken;
 
 public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 
@@ -41,59 +38,43 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		logger.info("enter applePushService sendMsg method");
 
-		Map<String, String> params = new HashMap<>();
-		params.put("deviceToken", receiveMsg.getString("apnsToken"));
-		params.put("title", receiveMsg.getString("title"));
-		params.put("body", receiveMsg.getString("content"));
-		params.put("msgbody", receiveMsg.toString());
+		Map<String, String> addQueryParam = new HashMap<>();
+		addQueryParam.put("deviceToken", receiveMsg.getString("apnsToken"));
+		addQueryParam.put("title", receiveMsg.getString("title"));
+		addQueryParam.put("body", receiveMsg.getString("content"));
+		addQueryParam.put("msgbody", receiveMsg.toString());
 
-		String host = PropertiesLoaderUtils.multiProp.getProperty("apple.push.host");
-		String uri = PropertiesLoaderUtils.multiProp.getProperty("apple.push.uri");
+		String appleUrl = PropertiesLoaderUtils.multiProp.getProperty("apple.push.url");
 
-		if (StringUtil.isNullOrEmpty(host)) {
+		if (StringUtil.isNullOrEmpty(appleUrl)) {
 			resultHandler.handle(Future.failedFuture("Apple push host is null"));
 			return;
 		}
 
-		HttpClientVerticle.getHttpClient().getNow(host, uri, responseHandler -> {
+		WebClient webClient = WebClient.create(vertx);
 
-			if (responseHandler.statusCode() == 200) {
-				responseHandler.handler(handler -> {
-					String result = handler.toString();
+		webClient.postAbs(appleUrl)
+				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+				.addQueryParam("deviceToken", receiveMsg.getString("apnsToken"))
+				.addQueryParam("title", receiveMsg.getString("title"))
+				.addQueryParam("body", receiveMsg.getString("content"))
+				.addQueryParam("msgbody", receiveMsg.toString())
+				.send(responseHandler -> {
 
-					logger.info("apns推送返回结果：" + result);
+					if (responseHandler.succeeded()) {
+						String result = responseHandler.result().bodyAsString();
+						logger.info("apns推送返回结果：" + result);
 
-					if (StringUtil.isNullOrEmpty(result)) {
-						resultHandler.handle(Future.failedFuture("Apple push result is null"));
+						if (StringUtil.isNullOrEmpty(result)) {
+							resultHandler.handle(Future.failedFuture("Apple push result is null"));
+						} else {
+							resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+						}
 					} else {
-						resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+						resultHandler.handle(Future.failedFuture("Apple push error:" + responseHandler.cause()));
 					}
+
 				});
-			} else {
-				resultHandler.handle(Future.failedFuture("Apple push error:" + responseHandler.statusCode() + ""));
-			}
-
-		});
-
-		// logger.info("请求地址："+host+"参数："+params);
-		// String result = null;
-		// try {
-		// result = HttpUtils.URLPost(host, params,
-		// HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
-		// } catch (Exception e) {
-		// logger.error("apns推送调用异常", e);
-		// resultHandler.handle(Future.failedFuture(e));
-		// return;
-		// }
-		//
-		// logger.info("apns推送返回结果："+result);
-		//
-		// if(StringUtil.isNullOrEmpty(result)){
-		// resultHandler.handle(Future.failedFuture("Apple push result is
-		// null"));
-		// }else{
-		// resultHandler.handle(Future.succeededFuture(new BaseResponse()));
-		// }
 
 	}
 
@@ -107,4 +88,5 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		}
 		return jsonMsg;
 	}
+
 }
