@@ -26,6 +26,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.handler.BodyHandler;
 import iservice.DeviceService;
 import iservice.MsgStatService;
@@ -42,7 +43,6 @@ import util.DateUtil;
 import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
-import xservice.HttpClientVerticle;
 
 public class HttpConsumerVerticle extends AbstractVerticle {
 
@@ -414,26 +414,29 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private void getSocketCheckResult(Map<String, String> params, Handler<AsyncResult<Boolean>> resultHandler) {
 
-		HttpClientVerticle.getHttpClient().getNow(PropertiesLoaderUtils.multiProp.getProperty("socket.valid.host"),
-				PropertiesLoaderUtils.multiProp.getProperty("socket.valid.uri"), responseHandler -> {
+		WebClient webClient = WebClient.create(vertx);
 
-					logger.info("socket状态检查返回结果：" + responseHandler.statusCode());
+		webClient.postAbs(PropertiesLoaderUtils.multiProp.getProperty("socket.valid.url"))
+				.addQueryParam("uid", params.get("uid")).send(responseHandler -> {
 
-					if (responseHandler.statusCode() == 200) {
-						responseHandler.handler(handler -> {
-							JsonObject checkSocket = handler.toJsonObject();
-							logger.info("socket状态检查返回结果：" + checkSocket);
-							String returnCode = checkSocket.getString("returnCode");
-							String isValid = checkSocket.getString("isValid");
-							if ("0".equals(returnCode) && "1".equals(isValid)) {
-								resultHandler.handle(Future.succeededFuture(true));
-							} else {
-								logger.info("检测到socket未连接，" + JsonUtil.toJsonString(checkSocket));
-								resultHandler.handle(Future.succeededFuture(false));
-							}
-						});
+					if (responseHandler.succeeded()) {
+						
+						JsonObject checkSocket = responseHandler.result().bodyAsJsonObject();
+						logger.info("socket状态检查返回结果：" + checkSocket);
+						if(checkSocket==null){
+							resultHandler.handle(Future.succeededFuture(false));
+							return;
+						}
+						String returnCode = checkSocket.getString("returnCode");
+						String isValid = checkSocket.getString("isValid");
+						if ("0".equals(returnCode) && "1".equals(isValid)) {
+							resultHandler.handle(Future.succeededFuture(true));
+						} else {
+							logger.info("检测到socket未连接，" + JsonUtil.toJsonString(checkSocket));
+							resultHandler.handle(Future.succeededFuture(false));
+						}
 					} else {
-						logger.error("sokcet状态检查异常" + responseHandler.statusCode());
+						logger.error("sokcet状态检查异常" + responseHandler.cause());
 						resultHandler.handle(Future.succeededFuture(false));
 					}
 				});
