@@ -2,6 +2,9 @@ package test;
 
 import api.RestMsgStatVerticle;
 import cron.CronMsgStatVerticle;
+import cron.CronTransferDevcieVerticle;
+import dao.impl.CarBizEuroDaoImpl;
+import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -12,66 +15,74 @@ import dao.impl.DeviceDaoImpl;
 import service.impl.MsgStatResultServiceImpl;
 import service.impl.MsgStatServiceImpl;
 import service.impl.DeviceServiceImpl;
+import service.impl.DeviceServiceImpl;
+import service.impl.MsgStatResultServiceImpl;
+import service.impl.MsgStatServiceImpl;
+import service.impl.TransferDeviceServiceImpl;
 
 /**
- * Created by lufei
- * Date : 2017/7/25 14:27
- * Description :
+ * Created by lufei Date : 2017/7/25 14:27 Description :
  */
 public class MsgStatTest {
 
-    private Vertx vertx;
+	private Vertx vertx;
 
-    public MsgStatTest(Vertx vertx) {
-        this.vertx = vertx;
-    }
+	public MsgStatTest(Vertx vertx) {
+		this.vertx = vertx;
+	}
 
-    public static void main(String[] args) {
-        try {
-            Vertx vertx = Vertx.vertx();
-            MsgStatTest msgStatTest = new MsgStatTest(vertx);
-            msgStatTest.deployRestService();
+	public static void main(String[] args) {
+		try {
+			Vertx vertx = Vertx.vertx();
+			MsgStatTest msgStatTest = new MsgStatTest(vertx);
+			msgStatTest.deployRestService();
 
-            DeploymentOptions deploymentOptions = new DeploymentOptions();
-            deploymentOptions.setConfig(config());
+			DeploymentOptions deploymentOptions = new DeploymentOptions();
+			deploymentOptions.setConfig(config());
 
-            vertx.deployVerticle(MsgStatServiceImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(MsgStatServiceImpl.class.getName(), deploymentOptions);
 
-            vertx.deployVerticle(DeviceDaoImpl.class.getName(), deploymentOptions);
-            vertx.deployVerticle(DeviceServiceImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(DeviceDaoImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(DeviceServiceImpl.class.getName(), deploymentOptions);
 
-            vertx.deployVerticle(MsgStatResultDaoImpl.class.getName(), deploymentOptions);
-            vertx.deployVerticle(MsgStatResultServiceImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(MsgStatResultDaoImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(MsgStatResultServiceImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(CarBizEuroDaoImpl.class.getName(), deploymentOptions);
+			vertx.deployVerticle(TransferDeviceServiceImpl.class.getName(), deploymentOptions);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-            Thread.sleep(3000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	// private Future<Void> deployVerticle(String name) {
+	// Future<String> future = Future.future();
+	// DeploymentOptions deploymentOptions = new DeploymentOptions();
+	// deploymentOptions.setConfig(config());
+	// vertx.deployVerticle(name, deploymentOptions, future.completer());
+	// return future.map(r -> null);
+	// }
 
-//    private Future<Void> deployVerticle(String name) {
-//        Future<String> future = Future.future();
-//        DeploymentOptions deploymentOptions = new DeploymentOptions();
-//        deploymentOptions.setConfig(config());
-//        vertx.deployVerticle(name, deploymentOptions, future.completer());
-//        return future.map(r -> null);
-//    }
+	private Future<Void> deployRestService() {
+		Future<String> future = Future.future();
+		DeploymentOptions deploymentOptions = new DeploymentOptions();
+		deploymentOptions.setConfig(config());
+		// vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions,
+		// future.completer());
+		// vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions,
+		// future.completer());
+		vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
+		// vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions,
+		// future.completer());
+		vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(), deploymentOptions, future.completer());
+		// vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions,
+		// future.completer());
+		return future.map(r -> null);
+	}
 
-    private Future<Void> deployRestService() {
-        Future<String> future = Future.future();
-        DeploymentOptions deploymentOptions = new DeploymentOptions();
-        deploymentOptions.setConfig(config());
-//        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
-        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
-        return future.map(r -> null);
-    }
-
-    private static JsonObject config() {
-        String prop = "{\"service.name\":\"le.mc.statistic\",\"service.host\":\"127.0.0.1\",\"service.port\":2203,\"service.root\":\"/mc-statistic\","
-                + "\"redis.properties\":{ \"host\": \"localhost\", \"port\": 6379,\"encoding\": \"UTF-8\",\"tcpKeepAlive\": \"true\",\"tcpNoDelay\": \"true\",\"password\":\"redis\"}}";
-        JsonObject jsonObject = new JsonObject(prop);
-        return jsonObject;
-    }
+	private static JsonObject config() {
+		String prop = "{\"service.name\":\"le.mc.statistic\",\"service.host\":\"127.0.0.1\",\"service.port\":2203,\"service.root\":\"/mc-statistic\","
+				+ "\"redis.properties\":{ \"host\": \"localhost\", \"port\": 6379,\"encoding\": \"UTF-8\",\"tcpKeepAlive\": \"true\",\"tcpNoDelay\": \"true\",\"password\":\"redis\"}}";
+		JsonObject jsonObject = new JsonObject(prop);
+		return jsonObject;
+	}
 }
