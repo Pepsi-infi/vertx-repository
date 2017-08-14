@@ -12,7 +12,6 @@ import iservice.DeviceService;
 import iservice.dto.DeviceDto;
 import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
-import util.BeanUtils;
 import utils.BaseResponse;
 
 import java.util.List;
@@ -52,31 +51,19 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
             Map<String, String> params = Maps.newHashMap();
             params.put("antFingerprint", deviceDto.getAntFingerprint());
             deviceDao.getDevice(params, getDeviceFuture.completer());
+
+            Future<BaseResponse> addFuture = Future.future();
+            Future<BaseResponse> updateFuture = Future.future();
+
             getDeviceFuture.setHandler(ar1 -> {
                 if (ar1.succeeded()) {
                     DeviceDto dbDevice = ar1.result();
                     if (dbDevice == null) {
-                        deviceDao.addDevice(deviceDto, ar2 -> {
-                            if (ar2.succeeded()) {
-                                result.handle(Future.succeededFuture(baseResponse));
-                            } else {
-                                logger.error("add device:{} to db error.", deviceDto, ar2.cause());
-                                buildErrorBaseResponse(baseResponse, ar2.cause().toString());
-                                result.handle(Future.succeededFuture(baseResponse));
-                            }
-                        });
+                        deviceDao.addDevice(deviceDto, addFuture.completer());
                     } else {
                         if (!dbDevice.equals(deviceDto)) {
-                            BeanUtils.copyNotEmptyPropertiesQuietly(dbDevice, deviceDto);
-                            deviceDao.updateDevice(dbDevice, ar3 -> {
-                                if (ar3.succeeded()) {
-                                    result.handle(Future.succeededFuture(baseResponse));
-                                } else {
-                                    logger.error("update device:{} from db error.", deviceDto, ar3.cause());
-                                    buildErrorBaseResponse(baseResponse, ar3.cause().toString());
-                                    result.handle(Future.succeededFuture(baseResponse));
-                                }
-                            });
+                            copyDevice(dbDevice, deviceDto);
+                            deviceDao.updateDevice(dbDevice, updateFuture.completer());
                         } else {
                             logger.info("the device:{} has not change", dbDevice);
                             result.handle(Future.succeededFuture(baseResponse));
@@ -85,6 +72,25 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
                 } else {
                     logger.error(ar1.cause());
                     buildErrorBaseResponse(baseResponse, ar1.cause().toString());
+                    result.handle(Future.succeededFuture(baseResponse));
+                }
+            });
+
+            addFuture.setHandler(ar2 -> {
+                if (ar2.succeeded()) {
+                    result.handle(Future.succeededFuture(baseResponse));
+                } else {
+                    logger.error("add device:{} to db error.", deviceDto, ar2.cause());
+                    buildErrorBaseResponse(baseResponse, ar2.cause().toString());
+                    result.handle(Future.succeededFuture(baseResponse));
+                }
+            });
+            updateFuture.setHandler(ar3 -> {
+                if (ar3.succeeded()) {
+                    result.handle(Future.succeededFuture(baseResponse));
+                } else {
+                    logger.error("update device:{} from db error.", deviceDto, ar3.cause());
+                    buildErrorBaseResponse(baseResponse, ar3.cause().toString());
                     result.handle(Future.succeededFuture(baseResponse));
                 }
             });
@@ -110,6 +116,42 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
         if (response != null) {
             response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
             response.setErrorMessage(message);
+        }
+    }
+
+    private void copyDevice(DeviceDto dest, DeviceDto src) {
+        if (null != src.getAppCode()) {
+            dest.setAppCode(src.getAppCode());
+        }
+        if (null != src.getChannel()) {
+            dest.setChannel(src.getChannel());
+        }
+        if (null != src.getDeviceToken()) {
+            dest.setDeviceToken(src.getDeviceToken());
+        }
+        if (null != src.getPhone()) {
+            dest.setPhone(src.getPhone());
+        }
+        if (null != src.getAntFingerprint()) {
+            dest.setAntFingerprint(src.getAntFingerprint());
+        }
+        if (null != src.getAppVersion()) {
+            dest.setAppVersion(src.getAppVersion());
+        }
+        if (null != src.getDeviceType()) {
+            dest.setDeviceType(src.getDeviceType());
+        }
+        if (null != src.getIsAcceptPush()) {
+            dest.setIsAcceptPush(src.getIsAcceptPush());
+        }
+        if (null != src.getOsType()) {
+            dest.setOsType(src.getOsType());
+        }
+        if (null != src.getOsVersion()) {
+            dest.setOsVersion(src.getOsVersion());
+        }
+        if (null != src.getUid()) {
+            dest.setUid(src.getUid());
         }
     }
 }
