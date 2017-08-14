@@ -1,7 +1,5 @@
 package com.message.push;
 
-import java.util.UUID;
-
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonObject;
