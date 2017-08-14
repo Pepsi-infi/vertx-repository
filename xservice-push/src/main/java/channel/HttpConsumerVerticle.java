@@ -99,7 +99,19 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	}
 
+	private void initService() {
+		socketPushService = SocketPushService.createProxy(vertx);
+		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
+		gcmPushService = GcmPushService.createProxy(vertx);
+		msgRecordService = MsgRecordService.createProxy(vertx);
+		redisService = RedisService.createProxy(vertx);
+		msgStatService = MsgStatService.createProxy(vertx);
+		deviceService = DeviceService.createProxy(vertx);
+		applePushService = ApplePushService.createProxy(vertx);
+	}
+
 	private void recivedHttpMessage() {
+
 		httpServer = vertx.createHttpServer();
 		if (httpServer == null) {
 			logger.error("HttpServer is null");
@@ -238,76 +250,36 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		}
 	}
 
-	private void initService() {
-		socketPushService = SocketPushService.createProxy(vertx);
-		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
-		gcmPushService = GcmPushService.createProxy(vertx);
-		msgRecordService = MsgRecordService.createProxy(vertx);
-		redisService = RedisService.createProxy(vertx);
-		msgStatService = MsgStatService.createProxy(vertx);
-		deviceService = DeviceService.createProxy(vertx);
-		applePushService = ApplePushService.createProxy(vertx);
-	}
-
 	private void checkRecivedMsg(Handler<AsyncResult<BaseResponse>> resultHandler) {
 		// 校验必填项
-		msgId = receiveMsg.getValue("msgId") + "";
+		String msgId = receiveMsg.getValue("msgId") + "";
 		if (StringUtils.isBlank(msgId)) {
 			resultHandler.handle(Future.failedFuture("msgId不能为空"));
 			return;
 		}
 		// 用户id
-		customerId = receiveMsg.getValue("customerId");
+		Object customerId = receiveMsg.getValue("customerId");
 		if (null == customerId) {
 			resultHandler.handle(Future.failedFuture("customerId不能为空"));
 			return;
 		}
 
-		phone = (String) receiveMsg.getValue("phone");
+		String phone = (String) receiveMsg.getValue("phone");
 		if (StringUtils.isBlank(phone)) {
 			resultHandler.handle(Future.failedFuture("上送手机号不能为空"));
 			return;
 		}
 		// sokit、gcm,小米连接token
 		token = (String) receiveMsg.getValue("deviceToken");
-		// // 从上游接收到的 推送类型
-		// devicePushType = (String) receiveMsg.getValue("devicePushType");
-		// // 转化成下游需要的推送类型
-		// if (!StringUtil.isNullOrEmpty(devicePushType)) {
-		// try {
-		// Integer pushType = Integer.valueOf(devicePushType);
-		// sendType = MsgUtil.convertCode(pushType);
-		// } catch (Exception e) {
-		// logger.error("Recived Param Error devicePushType [" + devicePushType
-		// + "]");
-		// resultHandler.handle(Future.failedFuture("devicePushType format is
-		// error"));
-		// return;
-		// }
-		// }
 
 		// IOS apnsToken
 		apnsToken = (String) receiveMsg.getValue("apnsToken");
-
-		// Future<List<DeviceDto>> deviceFuture = Future.future();
-		// if (StringUtil.isNullOrEmpty(token)) {
-		// logger.info("设备token为空，从数据库获取设备token");
-		// Map<String, String> param = new HashMap<>();
-		// param.put("phone", phone);
-		// deviceService.queryDevices(param, deviceFuture.completer());
-		// } else {
-		// DeviceDto dto = new DeviceDto();
-		// dto.setDeviceToken(token);
-		// deviceFuture.handle(Future.succeededFuture(Arrays.asList(dto)));
-		// }
 
 		// 判断消息是否接收过
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
 		Future<String> redisFuture = Future.future();
 		redisService.get(redisMsgKey, redisFuture.completer());
 
-		// Future<CompositeFuture> compositFuture =
-		// CompositeFuture.all(deviceFuture, redisFuture);
 		redisFuture.setHandler(handler -> {
 			if (handler.succeeded()) {
 				// 验证redis
@@ -367,7 +339,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 				Map<String, String> params = new HashMap<>();
 				params.put("uid", customerId + "");
-
 				Future<Boolean> socketFuture = Future.future();
 				this.getSocketCheckResult(params, socketFuture.completer());
 
@@ -382,29 +353,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					}
 				});
 
-				// try {
-				// logger.info("开始获取socket连接状态");
-				//
-				// String checkResult = HttpUtils.URLPost(
-				// PropertiesLoaderUtils.multiProp.getProperty("socket.valid.url"),
-				// params,
-				// HttpUtils.URL_PARAM_DECODECHARSET_UTF8);
-				// if (StringUtils.isNotBlank(checkResult)) {
-				// JsonObject checkSocket = new JsonObject(checkResult);
-				// String returnCode = checkSocket.getString("returnCode");
-				// String isValid = checkSocket.getString("isValid");
-				// if ("0".equals(returnCode) && "1".equals(isValid)) {
-				// isUseSocket = true;
-				// } else {
-				// logger.info("检测到socket未连接，" +
-				// JsonUtil.toJsonString(checkResult));
-				// }
-				// } else {
-				// logger.info("调用获取socket连接状态成功，但无结果返回");
-				// }
-				// } catch (IOException e) {
-				// logger.error("检查socket连接是否有效接口调用异常", e);
-				// }
 			} else {
 				logger.error("数据验证未通过，原因：" + checkFutrue.cause());
 				resultHandler.handle(Future.failedFuture(checkFutrue.cause().getMessage()));
@@ -417,13 +365,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		WebClient webClient = WebClient.create(vertx);
 
 		webClient.postAbs(PropertiesLoaderUtils.multiProp.getProperty("socket.valid.url"))
+				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 				.addQueryParam("uid", params.get("uid")).send(responseHandler -> {
 
 					if (responseHandler.succeeded()) {
-						
+
 						JsonObject checkSocket = responseHandler.result().bodyAsJsonObject();
 						logger.info("socket状态检查返回结果：" + checkSocket);
-						if(checkSocket==null){
+						if (checkSocket == null) {
 							resultHandler.handle(Future.succeededFuture(false));
 							return;
 						}
