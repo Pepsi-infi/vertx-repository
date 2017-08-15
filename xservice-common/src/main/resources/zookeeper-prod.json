@@ -1,9 +1,8 @@
 {
-  "zookeeperHosts":"10.212.25.44:2181,10.212.25.81:2181,10.212.25.35:2181",
+  "zookeeperHosts":"10.0.7.56:2183,10.0.7.57:2183,10.0.7.58:2183",
   "sessionTimeout":20000,
   "connectTimeout":3000,
-  "rootPath":"xservice",
-  "auth":"xservice:xservicexservice",
+  "rootPath":"mc",
   "retry": {
     "initialSleepTime":100,
     "intervalTimes":10000,
