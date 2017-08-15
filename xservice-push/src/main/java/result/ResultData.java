@@ -1,15 +1,12 @@
 package result;
 
-import java.io.Serializable;
-
 import enums.ErrorCodeEnum;
 import io.vertx.core.json.JsonObject;
 
+import java.io.Serializable;
+
 public class ResultData<T> implements Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 863932252336268833L;
 
     public static final int SUCCESS = 0;
@@ -40,15 +37,19 @@ public class ResultData<T> implements Serializable {
     private T data;
 
     public ResultData() {
-        this.code = FAIL;
-        this.msg = "";
+        this.code = SUCCESS;
+        this.msg = "成功";
         this.data = null;
     }
 
-    public ResultData(T data) {
-        this.code = FAIL;
-        this.msg = "";
-        this.data = data;
+    public ResultData(ErrorCodeEnum errorEnum) {
+        this.code = errorEnum.getCode();
+        this.msg = errorEnum.getMsg();
+    }
+
+    public ResultData(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
     public ResultData(int code, String msg, T data) {
@@ -93,10 +94,13 @@ public class ResultData<T> implements Serializable {
         this.data = data;
         return this;
     }
-    
+
+    public void reSetResult(int code, String msg){
+        this.code = code;
+        this.msg = msg;
+    }
     @Override
     public String toString() {
-    	
     	return JsonObject.mapFrom(this).toString();
     }
 }

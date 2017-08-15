@@ -9,6 +9,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -20,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
 import service.SocketPushService;
-import util.JsonUtil;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
@@ -42,18 +42,6 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     private List<KeyValue> hostList = new ArrayList<>();
 
     private RedisService redisService;
-    //消息id
-    private String msgId;
-    //用户id
-    private String customerId;
-    //token
-    private String token;
-    //超时时间
-    private Long expireTime;
-    //消息内容
-    private String msgBody;
-    //消息类型杖举
-    private EnumPassengerMessageType messageType;
 
     public void start() throws Exception {
         super.start();
@@ -76,17 +64,38 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
      */
     public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         //测试专用，防止测试推错推到线上
-        receiveMsg = testSendControl(receiveMsg);
+//        receiveMsg = testSendControl(receiveMsg);
 
+        //转成下游结构
+        Map<String, Object> sendMsgMap = this.convertMsgToBean(receiveMsg);
+
+        //缓存到redis
+        Future<BaseResponse> redisFuture = Future.future();
+        this.setRedisCache(receiveMsg, redisFuture.completer());
+
+        //发送数据
+        this.socketSend(sendMsgMap, resultHandler);
+    }
+
+    /**
+     * 消息转成下游需要的bean结构
+     * @param receiveMsg
+     * @return
+     */
+    public Map<String, Object> convertMsgToBean(JsonObject receiveMsg){
         //广告类的消息
-        messageType = EnumPassengerMessageType.ADVERTISEMENT;
+        EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
 
         /**
          *  获取消息数据字段
          */
-        msgId = receiveMsg.getValue("msgId") + "";
-        customerId = receiveMsg.getValue("customerId") + "";
-        token = receiveMsg.getString("deviceToken");
+        String msgId = receiveMsg.getValue("msgId") + "";
+        String customerId = receiveMsg.getValue("customerId") + "";
+        String token = receiveMsg.getString("deviceToken");
+        //消息内容
+        String msgBody = receiveMsg.toString();
+        //超时时间，秒
+        Long expireTime = receiveMsg.getLong("expireTime");
 
         //判断要跳转到那个url
         Object isIntoPsnCenter = receiveMsg.getValue("isIntoPsnCenter");
@@ -102,25 +111,6 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             receiveMsg.put("action", "");
         }
 
-        //消息内容
-        msgBody = receiveMsg.toString();
-        //超时时间，秒
-        expireTime = receiveMsg.getLong("expireTime");
-
-        //缓存到redis
-        Future redisFuture = Future.future();
-        this.setRedisCache(redisFuture.completer());
-
-        //组装数据发送
-        this.socketSend(resultHandler);
-    }
-
-    /**
-     * 组装发送soket需要的数据，并且通过socket发送
-     *
-     * @param resultHandler
-     */
-    private void socketSend(Handler<AsyncResult<BaseResponse>> resultHandler) {
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
         msgInfo.put("msgId", msgId);
@@ -137,15 +127,22 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         params.add(msgInfo);
 
         Map<String, Object> sendMsgMap = new HashMap<>();
+        sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
+        sendMsgMap.put("params", params);
+        return sendMsgMap;
+    }
+
+    /**
+     * 组装发送soket需要的数据，并且通过socket发送
+     *
+     * @param resultHandler
+     */
+    private void socketSend(Map<String, Object> sendMsgMap, Handler<AsyncResult<BaseResponse>> resultHandler) {
+
         DatagramSocket client = null;
         try {
-
-
-            sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
-            sendMsgMap.put("params", params);
-            logger.info("Socket push objectToByte before :" + JsonUtil.toJsonString(sendMsgMap));
+            logger.info("Socket push objectToByte before :" + Json.encode(sendMsgMap));
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
-
             client = new DatagramSocket();
             KeyValue host = getPollHost();
             InetAddress targetIp = InetAddress.getByName((String) host.getKey());
@@ -194,7 +191,20 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     }
 
 
-    private void setRedisCache(Handler<AsyncResult<BaseResponse>> resultHandler) {
+    private void setRedisCache(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+        //广告类的消息
+        EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
+        /**
+         *  获取消息数据字段
+         */
+        String msgId = receiveMsg.getValue("msgId") + "";
+        String customerId = receiveMsg.getValue("customerId") + "";
+        String token = receiveMsg.getString("deviceToken");
+        //消息内容
+        String msgBody = receiveMsg.toString();
+        //超时时间，秒
+        Long expireTime = receiveMsg.getLong("expireTime");
+
         //保存msgId对应消息体到redis
         ChatMsgVO chatMsgVO = new ChatMsgVO();
         chatMsgVO.setTo(Integer.parseInt(customerId));
@@ -207,7 +217,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
         //把消息保存到redis中
         Future<Void> msgFuture = Future.future();
-        redisService.set(msgId, JsonUtil.toJsonString(chatMsgVO), msgFuture.completer());
+        redisService.set(msgId, Json.encode(chatMsgVO), msgFuture.completer());
         //设置过期时间
         Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
         Future<Long> msgExpireFuture = Future.future();
