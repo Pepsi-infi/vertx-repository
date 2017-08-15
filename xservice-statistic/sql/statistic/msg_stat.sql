@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 本机
-Source Server Version : 50717
-Source Host           : localhost:3306
+Source Server         : （测试消息中心）10.10.10.178
+Source Server Version : 50626
+Source Host           : 10.10.10.178:3306
 Source Database       : statistic
 
 Target Server Type    : MYSQL
-Target Server Version : 50717
+Target Server Version : 50626
 File Encoding         : 65001
 
-Date: 2017-08-03 15:24:10
+Date: 2017-08-15 15:12:43
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `msg_stat`;
 CREATE TABLE `msg_stat` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `msgId` varchar(45) NOT NULL DEFAULT '0' COMMENT '消息id',
-  `statTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '统计时间',
+  `statTime` datetime NOT NULL COMMENT '统计时间',
   `sendSum` bigint(20) DEFAULT NULL COMMENT '发送总数',
   `sendAndroidSum` bigint(20) DEFAULT NULL COMMENT 'Android发送总量',
   `sendIosSum` bigint(20) DEFAULT NULL COMMENT 'ios发送总量',
@@ -42,6 +42,6 @@ CREATE TABLE `msg_stat` (
   `clickMiSum` bigint(20) DEFAULT NULL COMMENT '小米渠道点击数',
   `clickGcmSum` bigint(20) DEFAULT NULL COMMENT 'gcm渠道点击数',
   PRIMARY KEY (`id`),
-  KEY `ind_msgId` (`msgId`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=165 DEFAULT CHARSET=utf8;
+  KEY `idx_msgId` (`msgId`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 SET FOREIGN_KEY_CHECKS=1;
