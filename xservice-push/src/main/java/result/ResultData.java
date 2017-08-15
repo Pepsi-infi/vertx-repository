@@ -38,7 +38,7 @@ public class ResultData<T> implements Serializable {
 
     public ResultData() {
         this.code = SUCCESS;
-        this.msg = "";
+        this.msg = "成功";
         this.data = null;
     }
 
