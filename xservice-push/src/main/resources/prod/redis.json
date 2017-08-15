@@ -1,6 +1,6 @@
 {
-     "host": "10.10.10.125",
-     "port": 6381,
+     "host": "10.0.7.56",
+     "port": 26384,
      "encoding": "UTF-8",
      "tcpKeepAlive": "true",
      "tcpNoDelay": "true"
