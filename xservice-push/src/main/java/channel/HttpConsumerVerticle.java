@@ -155,7 +155,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		});
 
-		httpServer.requestHandler(router::accept).listen(8989);
+		httpServer.requestHandler(router::accept).listen(8080);
 	}
 
 	/**

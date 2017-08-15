@@ -9,7 +9,7 @@ public class StatRestConstants {
 
     interface Stat {
 
-        static final int HTTP_PORT = 9100;
+        static final int HTTP_PORT = 8081;
 
         static final String SERVICE_NAME = "/mc-statistic";
 
@@ -24,7 +24,7 @@ public class StatRestConstants {
     }
 
     interface Device {
-        static final int HTTP_PORT = 9110;
+        static final int HTTP_PORT = 8081;
 
         //用户设备关系上报接口
         static final String DEVICE_REPORT = "/mc-statistic/v1/devices/report.json";
