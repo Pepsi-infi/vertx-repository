@@ -77,19 +77,22 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void recivedHttpMessage() {
-
-		Future<JsonObject> httpFuture = Future.future();
-		this.getMsgFromHttpRequest(httpFuture.completer());
-		httpFuture.setHandler(handler -> {
-			JsonObject receiveMsg;
-			if (handler.succeeded()) {
-				receiveMsg = handler.result();
-				this.dealHttpMessage(receiveMsg);
-			} else {
-				responseError(resp, handler.cause().getMessage());
+		httpServer = vertx.createHttpServer();
+		router = Router.router(vertx);
+		router.route().handler(BodyHandler.create());
+		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
+			resp = context.response();
+			HttpServerRequest request = context.request();
+			String httpMsg = request.getParam("body");
+			logger.info(" 接收到的消息内容：" + httpMsg);
+			if (StringUtil.isNullOrEmpty(httpMsg)) {
+				logger.error("body is null");
+				responseError(resp, "body is null");
+			}else{
+				this.dealHttpMessage(new JsonObject(httpMsg));
 			}
 		});
-
+		httpServer.requestHandler(router::accept).listen(8989);
 	}
 
 	private void dealHttpMessage(JsonObject receiveMsg) {
@@ -135,40 +138,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				responseError(resp, res.cause().getMessage());
 			}
 		});
-
-	}
-
-	private void getMsgFromHttpRequest(Handler<AsyncResult<JsonObject>> handler) {
-		httpServer = vertx.createHttpServer();
-		if (httpServer == null) {
-			logger.error("HttpServer is null");
-			handler.handle(Future.failedFuture("server is error"));
-			return;
-		}
-		router = Router.router(vertx);
-		if (router == null) {
-			logger.error("Router is null");
-			handler.handle(Future.failedFuture("server is error"));
-			return;
-		}
-
-		router.route().handler(BodyHandler.create());
-		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
-
-			resp = context.response();
-			HttpServerRequest request = context.request();
-			String httpMsg = request.getParam("body");
-			logger.info(" 接收到的消息内容：" + httpMsg);
-			if (StringUtil.isNullOrEmpty(httpMsg)) {
-				logger.error("body is null");
-				handler.handle(Future.failedFuture("body is null"));
-				return;
-			}
-
-			handler.handle(Future.succeededFuture(new JsonObject(httpMsg)));
-		});
-
-		httpServer.requestHandler(router::accept).listen(8989);
 
 	}
 
@@ -348,7 +317,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		Future<List<DeviceDto>> deviceFuture = Future.future();
 		deviceService.queryDevices(param, deviceFuture.completer());
 		deviceFuture.setHandler(devRes -> {
-
 			if (devRes.succeeded()) {
 				String errorMsg;
 				List<DeviceDto> list = devRes.result();
@@ -362,20 +330,16 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					} else {
 						this.pushByAndroid(receiveMsg, resultHandler);
 					}
-
 				} else {
 					errorMsg = "设备token不存在,推送操作不执行";
 					logger.error(errorMsg);
 					resultHandler.handle(Future.failedFuture(errorMsg));
 					return;
 				}
-
 			} else {
 				resultHandler.handle(Future.failedFuture(devRes.cause()));
 			}
-
 		});
-
 	}
 
 	private void pushByAndroid(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
