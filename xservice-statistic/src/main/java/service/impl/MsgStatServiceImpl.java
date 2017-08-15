@@ -173,12 +173,6 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         return fieldsList;
     }
 
-    private Map<String, Object> buildErrorResponse(String msgId) {
-        Map map = Maps.newHashMap();
-        map.put("status", BaseResponse.RESPONSE_FAIL_CODE);
-        map.put("msgId", msgId);
-        return map;
-    }
 
     private Map<String, Object> buildSuccessResponse() {
         Map map = Maps.newHashMap();
@@ -186,10 +180,4 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         return map;
     }
 
-    private <T extends BaseResponse> void buildErrorBaseResponse(T response, String message) {
-        if (response != null) {
-            response.setStatus(BaseResponse.RESPONSE_FAIL_CODE);
-            response.setErrorMessage(message);
-        }
-    }
 }

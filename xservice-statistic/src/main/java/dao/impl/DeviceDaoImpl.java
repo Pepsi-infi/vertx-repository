@@ -54,11 +54,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
         XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
         publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
-
-        String env = System.getProperty("env", "dev");
-
         client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
-
     }
 
 
