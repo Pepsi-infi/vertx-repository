@@ -142,6 +142,10 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
         if (StringUtils.isNotBlank(deviceToken)) {
             sb.append(" and deviceToken = '").append(deviceToken).append("'");
         }
+        String channel = MapUtils.getString(params, "channel");
+        if (StringUtils.isNotBlank(channel)) {
+            sb.append(" and channel = ").append(channel);
+        }
         sql = String.format(sql, sb.toString());
         Future<List<JsonObject>> future = retrieveMany(new JsonArray(), sql);
         future.setHandler(result -> {
