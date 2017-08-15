@@ -60,6 +60,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private ApplePushService applePushService;
 
+	private HttpServerResponse resp;
+
 	private String token;
 	private Integer channel;
 
@@ -75,79 +77,99 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	}
 
 	private void recivedHttpMessage() {
+
+		Future<JsonObject> httpFuture = Future.future();
+		this.getMsgFromHttpRequest(httpFuture.completer());
+		httpFuture.setHandler(handler -> {
+			JsonObject receiveMsg;
+			if (handler.succeeded()) {
+				receiveMsg = handler.result();
+				this.dealHttpMessage(receiveMsg);
+			} else {
+				responseError(resp, handler.cause().getMessage());
+			}
+		});
+
+	}
+
+	private void dealHttpMessage(JsonObject receiveMsg) {
+		// 验证必填项
+		ResultData checkResult = checkRecivedMsg(receiveMsg);
+		if (ResultData.FAIL == checkResult.getCode()) {
+			responseError(resp, checkResult.getMsg());
+			return;
+		}
+
+		// 验证消息是否重复推送
+		Future<BaseResponse> repeatFuture = Future.future();
+		
+		// 推送给下游
+		Future<BaseResponse> pushFuture = Future.future();
+		checkRepeatMsg(receiveMsg, repeatFuture.completer());
+		repeatFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				pushMsgToDownStream(receiveMsg, pushFuture.completer());
+			} else {
+				logger.error("消息重复推送：" + res.cause());
+				responseError(resp, res.cause().getMessage());
+			}
+		});
+		
+		// 消息推送成功后，调用上报消息接口
+		Future<BaseResponse> statFuture = Future.future();
+		pushFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				callStatPushMsg(receiveMsg, statFuture.completer());
+			} else {
+				// 输出推送时的错误
+				logger.error("调用推送时出错：" + pushFuture.cause());
+				responseError(resp, res.cause().getMessage());
+			}
+		});
+
+		// 根据推送结果返回结果数据给http调用方
+		statFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				responseSuccess(resp, new ResultData().toString());
+			} else {
+				responseError(resp, res.cause().getMessage());
+			}
+		});
+
+	}
+
+	private void getMsgFromHttpRequest(Handler<AsyncResult<JsonObject>> handler) {
 		httpServer = vertx.createHttpServer();
 		if (httpServer == null) {
 			logger.error("HttpServer is null");
+			handler.handle(Future.failedFuture("server is error"));
 			return;
 		}
 		router = Router.router(vertx);
 		if (router == null) {
 			logger.error("Router is null");
+			handler.handle(Future.failedFuture("server is error"));
 			return;
 		}
 
 		router.route().handler(BodyHandler.create());
 		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
 
-			HttpServerResponse resp = context.response();
+			resp = context.response();
 			HttpServerRequest request = context.request();
 			String httpMsg = request.getParam("body");
 			logger.info(" 接收到的消息内容：" + httpMsg);
 			if (StringUtil.isNullOrEmpty(httpMsg)) {
 				logger.error("body is null");
-				responseError(resp, "body is null");
+				handler.handle(Future.failedFuture("body is null"));
 				return;
 			}
 
-			JsonObject receiveMsg = new JsonObject(httpMsg);
-
-			// 验证必填项
-			ResultData checkResult = checkRecivedMsg(receiveMsg);
-			if (ResultData.FAIL == checkResult.getCode()) {
-				responseError(resp, checkResult.getMsg());
-				return;
-			}
-
-			// 验证消息是否重复推送
-			Future<BaseResponse> repeatFuture = Future.future();
-
-			// 推送给下游
-			Future<BaseResponse> pushFuture = Future.future();
-
-			checkRepeatMsg(receiveMsg, repeatFuture.completer());
-			repeatFuture.setHandler(res -> {
-				if (res.succeeded()) {
-					pushMsgToDownStream(receiveMsg, pushFuture.completer());
-				} else {
-					logger.error("消息重复推送：" + res.cause());
-					responseError(resp, res.cause().getMessage());
-				}
-			});
-
-			// 消息推送成功后，调用上报消息接口
-			Future<BaseResponse> statFuture = Future.future();
-			pushFuture.setHandler(res -> {
-				if (res.succeeded()) {
-					callStatPushMsg(receiveMsg, statFuture.completer());
-				} else {
-					// 输出推送时的错误
-					logger.error("调用推送时出错：" + pushFuture.cause());
-					responseError(resp, res.cause().getMessage());
-				}
-			});
-
-			// 根据推送结果返回结果数据给http调用方
-			statFuture.setHandler(res -> {
-				if (res.succeeded()) {
-					responseSuccess(resp, new ResultData().toString());
-				} else {
-					responseError(resp, res.cause().getMessage());
-				}
-			});
-
+			handler.handle(Future.succeededFuture(new JsonObject(httpMsg)));
 		});
 
 		httpServer.requestHandler(router::accept).listen(8989);
+
 	}
 
 	public void responseSuccess(HttpServerResponse resp, String msg) {
@@ -216,9 +238,6 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 					logger.error("消息上报失败，msgId :" + msgId);
 					resultHandler.handle(Future.failedFuture("消息上报失败，msgId :" + msgId));
 				}
-			} else {
-				logger.error("消息上报返回结果转换json失败，msgId :" + msgId);
-				resultHandler.handle(Future.failedFuture("消息上报返回结果转换json失败，msgId :" + msgId));
 			}
 		} else {
 			logger.error("消息上报没有返回结果msgId :" + msgId);
@@ -323,7 +342,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 			this.pushByApple(receiveMsg, resultHandler);
 			return;
 		}
-		
+
 		Map<String, String> param = new HashMap<>();
 		param.put("phone", phone);
 		Future<List<DeviceDto>> deviceFuture = Future.future();
