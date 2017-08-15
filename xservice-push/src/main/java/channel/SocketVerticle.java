@@ -9,6 +9,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -20,7 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
 import service.SocketPushService;
-import util.JsonUtil;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
@@ -141,7 +141,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
         DatagramSocket client = null;
         try {
-            logger.info("Socket push objectToByte before :" + JsonUtil.toJsonString(sendMsgMap));
+            logger.info("Socket push objectToByte before :" + Json.encode(sendMsgMap));
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
             client = new DatagramSocket();
             KeyValue host = getPollHost();
@@ -217,7 +217,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
         //把消息保存到redis中
         Future<Void> msgFuture = Future.future();
-        redisService.set(msgId, JsonUtil.toJsonString(chatMsgVO), msgFuture.completer());
+        redisService.set(msgId, Json.encode(chatMsgVO), msgFuture.completer());
         //设置过期时间
         Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
         Future<Long> msgExpireFuture = Future.future();

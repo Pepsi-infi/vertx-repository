@@ -14,6 +14,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -29,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import result.ResultData;
 import service.*;
 import util.DateUtil;
-import util.JsonUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 
@@ -406,7 +406,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 						if ("0".equals(returnCode) && "1".equals(isValid)) {
 							resultHandler.handle(Future.succeededFuture(true));
 						} else {
-							logger.info("检测到socket未连接，" + JsonUtil.toJsonString(checkSocket));
+							logger.info("检测到socket未连接，" + Json.encode(checkSocket));
 							resultHandler.handle(Future.succeededFuture(false));
 						}
 					} else {

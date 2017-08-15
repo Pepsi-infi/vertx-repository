@@ -11,12 +11,12 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.XiaoMiPushService;
-import util.JsonUtil;
 import util.MsgUtil;
 import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
@@ -71,10 +71,10 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
         Message message = buildMessage(recieveMsg);
 
-        logger.info("xiaomi send before :" + JsonUtil.toJsonString(message));
+        logger.info("xiaomi send before :" + Json.encode(message));
         Result sendResult = sender.send(message, regId, 0); // 根据regID，发送消息到指定设备上，不重试。
 
-        logger.info("regId: " + regId + ", 小米推送返回结果：" + JsonUtil.toJsonString(sendResult));
+        logger.info("regId: " + regId + ", 小米推送返回结果：" + Json.encode(sendResult));
         return sendResult;
     }
 
