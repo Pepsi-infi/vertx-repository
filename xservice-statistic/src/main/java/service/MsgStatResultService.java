@@ -6,10 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import service.dto.MsgStatResultPageWrapper;
 import utils.BaseResponse;
-
-import java.util.Map;
 
 /**
  * Created by lufei
@@ -37,9 +34,4 @@ public interface MsgStatResultService {
     void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result);
 
 
-    /**
-     * @param param
-     * @param result
-     */
-    void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result);
 }

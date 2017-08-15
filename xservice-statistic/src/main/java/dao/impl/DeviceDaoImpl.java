@@ -25,7 +25,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import iservice.dto.DeviceDto;
-import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
@@ -56,9 +55,8 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
 		String env = System.getProperty("env", "dev");
-		JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-device-" + env + ".json");
 
-		client = MySQLClient.createNonShared(vertx, jsonObject);
+		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
 
 	}
 

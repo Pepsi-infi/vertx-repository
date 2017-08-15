@@ -1,33 +1,35 @@
 {
-	"mc-device": {
-		"host": "10.10.10.178",
-		"port": 3306,
-		"maxPoolSize": 100,
-		"username": "sqyc_message",
-		"password": "sqyc_message@01zhuanche.com",
-		"database": "device",
-		"charset": "UTF-8",
-		"queryTimeout": 3000
-	},
-	"rentcar": {
-		"host": "10.10.10.103",
-		"port": 3306,
-		"maxPoolSize": 100,
-		"username": "sqhc_rentcar",
-		"password": "BzkmQM%O^U7Dy8X3",
-		"database": "rentcar",
-		"charset": "UTF-8",
-		"queryTimeout": 3600000
-	},
-	"mc-statistic": {
-		"host": "10.10.10.178",
-		"port": 3306,
-		"maxPoolSize": 100,
-		"username": "sqyc_message",
-		"password": "sqyc_message@01zhuanche.com",
-		"database": "statistic",
-		"charset": "UTF-8",
-		"queryTimeout": 3000
+	"mysql": {
+		"mc-device": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "device",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		},
+		"rentcar": {
+			"host": "10.10.10.103",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqhc_rentcar",
+			"password": "BzkmQM%O^U7Dy8X3",
+			"database": "rentcar",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		},
+		"mc-statistic": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "statistic",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
 	},
 	"redis": {
 		"host": "10.10.10.126",
@@ -36,5 +38,9 @@
 		"tcpKeepAlive": "true",
 		"tcpNoDelay": "true",
 		"password": ""
-	}
+	},
+	"service.name": "sy.mc.statistic",
+	"service.host": "127.0.0.1",
+	"service.port": 1203,
+	"service.root": "/mc-statistic"
 }

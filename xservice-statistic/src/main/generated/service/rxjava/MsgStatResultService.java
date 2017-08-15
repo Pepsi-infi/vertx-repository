@@ -20,9 +20,7 @@ import java.util.Map;
 import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
-import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
-import service.dto.MsgStatResultPageWrapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -73,28 +71,6 @@ public class MsgStatResultService {
   public Single<BaseResponse> rxStoreMsgStatResult() { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       storeMsgStatResult(fut);
-    }));
-  }
-
-  /**
-   * @param param 
-   * @param page 
-   * @param limit 
-   * @param result 
-   */
-  public void queryMsgStatResult(Map<String,String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result) { 
-    delegate.queryMsgStatResult(param, page, limit, result);
-  }
-
-  /**
-   * @param param 
-   * @param page 
-   * @param limit 
-   * @return 
-   */
-  public Single<MsgStatResultPageWrapper> rxQueryMsgStatResult(Map<String,String> param, int page, int limit) { 
-    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      queryMsgStatResult(param, page, limit, fut);
     }));
   }
 

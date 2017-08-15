@@ -19,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import service.dto.MsgStatResultDto;
 import service.dto.MsgStatResultPage;
 import service.dto.MsgStatResultPageWrapper;
-import util.ConfigUtils;
 import utils.BaseResponse;
 
 import javax.annotation.Nullable;
@@ -71,9 +70,8 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
         publishEventBusService(MsgStatResultDao.SERVICE_NAME, MsgStatResultDao.SERVICE_ADDRESS, MsgStatResultDao.class);
 
         String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-statistic-" + env + ".json");
 
-        client = MySQLClient.createNonShared(vertx, jsonObject);
+        client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-statistic"));
     }
 
 

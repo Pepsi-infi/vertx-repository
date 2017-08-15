@@ -1,14 +1,7 @@
 <template>
-  <div class="panel">
+  <div class="panel" style="padding: 15px;">
     <panel-title :title="$route.meta.title">
-      <el-button @click.stop="on_refresh" size="small">
-        <i class="fa fa-refresh"></i>
-      </el-button>
-      <!--
-      <router-link :to="{name: 'tableAdd'}" tag="span">
-        <el-button type="primary" icon="plus" size="small">添加数据</el-button>
-      </router-link>
-      -->
+
     </panel-title>
     <el-row justify="space-between" style="margin-top: 12px;">
         <el-col :span="6">
@@ -28,24 +21,19 @@
         @selection-change="on_batch_select"
         style="width: 100%;">
         <el-table-column
-          type="selection"
-          width="55">
-        </el-table-column>
-        <el-table-column
           prop="msgId"
           label="消息id"
-          width="300">
+          width="200">
         </el-table-column>
         <el-table-column
           prop="statTime"
           label="统计时间"
-          width="200">
+          width="190">
         </el-table-column>
         <el-table-column
           prop="sendSum"
           label="发送总数"
           width="100">
-
         </el-table-column>
         <el-table-column
           prop="arriveSum"
@@ -55,18 +43,37 @@
         <el-table-column
           prop="clickSum"
           label="点击总数"
-          width="120">
+          width="100">
         </el-table-column>
         <el-table-column
-          label="操作"
-          width="180">
-          <template scope="props">
-            <router-link :to="{name: 'tableUpdate', params: {id: props.row.id}}" tag="span">
-            <!--
-              <el-button type="info" size="small" icon="edit">修改</el-button>
-              -->
-            </router-link>
-          </template>
+          prop="sendAndroidSum"
+          label="Android发送数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+           prop="sendIosSum"
+           label="IOS发送数"
+           width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveAndroidSum"
+          label="Android到达数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveIosSum"
+          label="IOS到达数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="clickAndroidSum"
+          label="Android点击数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="clickIosSum"
+          label="IOS点击数"
+          width="100">
         </el-table-column>
       </el-table>
       <bottom-tool-bar>
@@ -74,7 +81,7 @@
           <el-pagination
             @current-change="handleCurrentChange"
             :current-page="currentPage"
-            :page-size="20"
+            :page-size="15"
             layout="total, prev, pager, next"
             :total="total">
           </el-pagination>
@@ -98,7 +105,7 @@
         //数据总条目
         total: 0,
         //每页显示多少条数据
-        length: 20,
+        length: 15,
         //请求时的loading效果
         load_data: true,
         //批量选择数组

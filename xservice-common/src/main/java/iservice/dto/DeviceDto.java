@@ -60,36 +60,20 @@ public class DeviceDto {
 		this.phone = phone;
 	}
 
-	public String getDeviceType() {
-		return deviceType;
-	}
-
-	public void setDeviceType(String deviceType) {
-		this.deviceType = deviceType;
-	}
-
-	public Integer getChannel() {
-		return channel;
-	}
-
-	public void setChannel(Integer channel) {
-		this.channel = channel;
-	}
-
-	public String getDeviceToken() {
-		return deviceToken;
-	}
-
-	public void setDeviceToken(String deviceToken) {
-		this.deviceToken = deviceToken;
-	}
-
 	public Integer getOsType() {
 		return osType;
 	}
 
 	public void setOsType(Integer osType) {
 		this.osType = osType;
+	}
+
+	public String getAppVersion() {
+		return appVersion;
+	}
+
+	public void setAppVersion(String appVersion) {
+		this.appVersion = appVersion;
 	}
 
 	public String getOsVersion() {
@@ -100,20 +84,20 @@ public class DeviceDto {
 		this.osVersion = osVersion;
 	}
 
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
 	public Integer getAppCode() {
 		return appCode;
 	}
 
 	public void setAppCode(Integer appCode) {
 		this.appCode = appCode;
-	}
-
-	public String getAppVersion() {
-		return appVersion;
-	}
-
-	public void setAppVersion(String appVersion) {
-		this.appVersion = appVersion;
 	}
 
 	public String getAntFingerprint() {
@@ -130,6 +114,22 @@ public class DeviceDto {
 
 	public void setIsAcceptPush(Integer isAcceptPush) {
 		this.isAcceptPush = isAcceptPush;
+	}
+
+	public Integer getChannel() {
+		return channel;
+	}
+
+	public void setChannel(Integer channel) {
+		this.channel = channel;
+	}
+
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
 	}
 
 	public String getCreateTime() {
@@ -190,10 +190,8 @@ public class DeviceDto {
 			return false;
 		if (appVersion != null ? !appVersion.equals(deviceDto.appVersion) : deviceDto.appVersion != null)
 			return false;
-		if (antFingerprint != null ? !antFingerprint.equals(deviceDto.antFingerprint)
-				: deviceDto.antFingerprint != null)
-			return false;
-		return isAcceptPush != null ? isAcceptPush.equals(deviceDto.isAcceptPush) : deviceDto.isAcceptPush == null;
+		return antFingerprint != null ? antFingerprint.equals(deviceDto.antFingerprint)
+				: deviceDto.antFingerprint == null;
 
 	}
 
@@ -209,7 +207,6 @@ public class DeviceDto {
 		result = 31 * result + (appCode != null ? appCode.hashCode() : 0);
 		result = 31 * result + (appVersion != null ? appVersion.hashCode() : 0);
 		result = 31 * result + (antFingerprint != null ? antFingerprint.hashCode() : 0);
-		result = 31 * result + (isAcceptPush != null ? isAcceptPush.hashCode() : 0);
 		return result;
 	}
 
