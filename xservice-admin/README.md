@@ -61,3 +61,11 @@ npm run build
 ├── package.json              // 项目配置文件
 </pre>
 
+####快速开始
+page：分模块构建页面
+      访问api目录下的js 通过 this.$fetch.api_msgStat.list 的方式
+router：分模块添加router
+      见router目录 readme.md
+api：配置路径
+    ├── index.js 配置需要引入api js文件
+    ├──XXX.js 添加对应api js

@@ -134,7 +134,7 @@
             let pos = msgId.lastIndexOf('_');
             searchMsgId = msgId.substring(pos+1, msgId.length);
         }
-        this.$fetch.api_table.list({
+        this.$fetch.api_msgStat.list({
           page: page,
           size: this.length,
           msgId: searchMsgId
@@ -169,7 +169,7 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_table.del(item)
+            this.$fetch.api_msgStat.del(item)
               .then(({msg}) => {
                 this.get_table_data(1)
                 this.$message.success(msg)
@@ -198,7 +198,7 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_table.batch_del(this.batch_select)
+            this.$fetch.api_msgStat.batch_del(this.batch_select)
               .then(({msg}) => {
                 this.get_table_data(1)
                 this.$message.success(msg)
