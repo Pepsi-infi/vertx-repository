@@ -22,7 +22,6 @@ import serializer.ByteUtils;
 import service.RedisService;
 import service.SocketPushService;
 import util.MsgUtil;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
 
@@ -43,6 +42,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     private RedisService redisService;
 
+    private JsonObject config;
+
     public void start() throws Exception {
         super.start();
         ProxyHelper.registerService(SocketPushService.class, vertx, this, SocketPushService.class.getName());
@@ -50,6 +51,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         //生成redis代理
         redisService = RedisService.createProxy(vertx);
 
+        config = config().getJsonObject("push.config");
         //加载下游地址
         this.initSendTo();
     }
@@ -167,7 +169,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     protected void initSendTo() {
         //当前verticle加载时从配置文件中读取下游SOCKET的地址列表
-        String socketAddrs = PropertiesLoaderUtils.singleProp.getProperty(ConnectionConsts.SOCKET_HOSTS);
+        String socketAddrs = config.getString(ConnectionConsts.SOCKET_HOSTS);
 //        String socketAddrs = "12.12.12.1:9000,32.32.22.33:9999";
         logger.info(" upstream socket addr : [" + socketAddrs + "]");
         String[] addrArray = socketAddrs.split(",");
@@ -275,8 +277,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
     //测试专用，防止消息推送到线上用户
     private JsonObject testSendControl(JsonObject jsonMsg){
        if("dev".equals(ConnectionConsts.ENV_PATH)){
-           String customerId = PropertiesLoaderUtils.singleProp.getProperty("socket.test.customerId");
-           String phone = PropertiesLoaderUtils.singleProp.getProperty("socket.test.phone");
+           String customerId = config.getString("socket.test.customerId");
+           String phone = config.getString("socket.test.phone");
            if(jsonMsg != null){
                jsonMsg.put("phone", phone);
                jsonMsg.put("customerId", customerId);

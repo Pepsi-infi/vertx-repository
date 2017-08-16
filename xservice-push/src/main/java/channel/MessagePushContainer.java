@@ -1,7 +1,6 @@
 package channel;
 
 import constant.PushConsts;
-import constant.ServiceUrlConstant;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
@@ -30,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import result.ResultData;
 import service.*;
 import util.DateUtil;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 
 import java.util.ArrayList;
@@ -38,9 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HttpConsumerVerticle extends AbstractVerticle {
+public class MessagePushContainer extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessagePushContainer.class);
 
 	private SocketPushService socketPushService;
 
@@ -65,13 +63,14 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 	private String token;
 	private Integer channel;
 
+	private JsonObject config;
 	@Override
 	public void start() throws Exception {
+		logger.info("conf():" + config());
+		config = config().getJsonObject("push.config");
 
 		// 初始化化服务
 		this.initService();
-
-		System.out.println("conf():" + config());
 
 		// 接收消息
 		this.recivedHttpMessage();
@@ -82,7 +81,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		httpServer = vertx.createHttpServer();
 		router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
-		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
+		router.route(config.getString("PUSH_MSG_URL")).handler(context -> {
 			resp = context.response();
 			HttpServerRequest request = context.request();
 			String httpMsg = request.getParam("body");
@@ -94,7 +93,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 				this.dealHttpMessage(new JsonObject(httpMsg));
 			}
 		});
-		httpServer.requestHandler(router::accept).listen(8989);
+		httpServer.requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 	}
 
 	private void dealHttpMessage(JsonObject receiveMsg) {
@@ -376,7 +375,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		WebClient webClient = WebClient.create(vertx);
 
-		webClient.postAbs(PropertiesLoaderUtils.multiProp.getProperty("socket.valid.url"))
+		webClient.postAbs(config.getString("socket.valid.url"))
 				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 				.addQueryParam("uid", params.get("uid")).send(responseHandler -> {
 					if (responseHandler.succeeded()) {
