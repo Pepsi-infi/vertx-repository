@@ -1,15 +1,17 @@
 <template>
-  <div class="panel">
+  <div class="panel" style="padding: 15px;">
     <panel-title :title="$route.meta.title">
-      <el-button @click.stop="on_refresh" size="small">
-        <i class="fa fa-refresh"></i>
-      </el-button>
-      <!--
-      <router-link :to="{name: 'tableAdd'}" tag="span">
-        <el-button type="primary" icon="plus" size="small">添加数据</el-button>
-      </router-link>
-      -->
+
     </panel-title>
+    <el-row justify="space-between" style="margin-top: 12px;">
+        <el-col :span="6">
+           <el-input v-model="queryMsgId" placeholder="消息Id"  style="margin-left: 18px;">
+           </el-input>
+        </el-col>
+        <el-col :span="4" style="margin-left: 30px;">
+            <el-button icon="search" class=""  @click="search">搜索</el-button>
+        </el-col>
+    </el-row>
     <div class="panel-body">
       <el-table
         :data="table_data"
@@ -19,53 +21,59 @@
         @selection-change="on_batch_select"
         style="width: 100%;">
         <el-table-column
-          type="selection"
-          width="55">
-        </el-table-column>
-        <el-table-column
           prop="msgId"
           label="消息id"
-          width="300">
+          width="200">
         </el-table-column>
         <el-table-column
           prop="statTime"
           label="统计时间"
-          width="200">
+          width="190">
         </el-table-column>
         <el-table-column
           prop="sendSum"
           label="发送总数"
           width="100">
-
         </el-table-column>
         <el-table-column
-<<<<<<< HEAD
-          prop="sendSum"
-=======
           prop="arriveSum"
->>>>>>> 797e50e25bc7f9662d611ea1288a341195504047
           label="到达总数"
           width="100">
         </el-table-column>
         <el-table-column
-<<<<<<< HEAD
-          prop="sendSum"
-=======
           prop="clickSum"
->>>>>>> 797e50e25bc7f9662d611ea1288a341195504047
           label="点击总数"
-          width="120">
+          width="100">
         </el-table-column>
         <el-table-column
-          label="操作"
-          width="180">
-          <template scope="props">
-            <router-link :to="{name: 'tableUpdate', params: {id: props.row.id}}" tag="span">
-            <!--
-              <el-button type="info" size="small" icon="edit">修改</el-button>
-              -->
-            </router-link>
-          </template>
+          prop="sendAndroidSum"
+          label="Android发送数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+           prop="sendIosSum"
+           label="IOS发送数"
+           width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveAndroidSum"
+          label="Android到达数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveIosSum"
+          label="IOS到达数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="clickAndroidSum"
+          label="Android点击数"
+          width="100">
+        </el-table-column>
+        <el-table-column
+          prop="clickIosSum"
+          label="IOS点击数"
+          width="100">
         </el-table-column>
       </el-table>
       <bottom-tool-bar>
@@ -73,7 +81,7 @@
           <el-pagination
             @current-change="handleCurrentChange"
             :current-page="currentPage"
-            :page-size="10"
+            :page-size="15"
             layout="total, prev, pager, next"
             :total="total">
           </el-pagination>
@@ -83,6 +91,9 @@
   </div>
 </template>
 <script type="text/javascript">
+  import Vue from 'vue';
+  import ElementUI from 'element-ui';
+  Vue.use(ElementUI);
   import {panelTitle, bottomToolBar} from 'components'
 
   export default{
@@ -98,7 +109,8 @@
         //请求时的loading效果
         load_data: true,
         //批量选择数组
-        batch_select: []
+        batch_select: [],
+        queryMsgId:''
       }
     },
     components: {
@@ -106,30 +118,47 @@
       bottomToolBar
     },
     created(){
-      this.get_table_data()
+      this.get_table_data(1)
     },
     methods: {
       //刷新
       on_refresh(){
-        this.get_table_data()
+        this.get_table_data(1)
       },
       //获取数据
-      get_table_data(){
+      get_table_data(page = this.currentPage){
         this.load_data = true
-        this.$fetch.api_table.list({
-          page: this.currentPage,
-          length: this.length
+        var msgId = this.queryMsgId;
+        var searchMsgId;
+        if(msgId !== undefined){
+            let pos = msgId.lastIndexOf('_');
+            searchMsgId = msgId.substring(pos+1, msgId.length);
+        }
+        this.$fetch.api_msgStat.list({
+          page: page,
+          size: this.length,
+          msgId: searchMsgId
         })
           .then(({data: {list, page, total}}) => {
-
+            let tempList = [];
+            list.forEach((ele, index) => {
+                if (ele !== null) {
+                    tempList.push(ele);
+                }
+                ele.msgId = 'AD_PASSENGER_COUNT_'+ele.msgId;
+            });
             this.table_data = list
             this.currentPage = page
             this.total = total
             this.load_data = false
+
           })
           .catch(() => {
             this.load_data = false
           })
+      },
+      search() {
+          this.get_table_data(1);
       },
       //单个删除
       delete_data(item){
@@ -140,9 +169,9 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_table.del(item)
+            this.$fetch.api_msgStat.del(item)
               .then(({msg}) => {
-                this.get_table_data()
+                this.get_table_data(1)
                 this.$message.success(msg)
               })
               .catch(() => {
@@ -154,7 +183,7 @@
       //页码选择
       handleCurrentChange(val) {
         this.currentPage = val
-        this.get_table_data()
+        this.get_table_data(val)
       },
       //批量选择
       on_batch_select(val){
@@ -169,9 +198,9 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_table.batch_del(this.batch_select)
+            this.$fetch.api_msgStat.batch_del(this.batch_select)
               .then(({msg}) => {
-                this.get_table_data()
+                this.get_table_data(1)
                 this.$message.success(msg)
               })
               .catch(() => {
@@ -183,3 +212,4 @@
     }
   }
 </script>
+

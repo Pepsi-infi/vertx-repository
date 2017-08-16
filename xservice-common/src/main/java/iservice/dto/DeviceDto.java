@@ -190,10 +190,8 @@ public class DeviceDto {
 			return false;
 		if (appVersion != null ? !appVersion.equals(deviceDto.appVersion) : deviceDto.appVersion != null)
 			return false;
-		if (antFingerprint != null ? !antFingerprint.equals(deviceDto.antFingerprint)
-				: deviceDto.antFingerprint != null)
-			return false;
-		return isAcceptPush != null ? isAcceptPush.equals(deviceDto.isAcceptPush) : deviceDto.isAcceptPush == null;
+		return antFingerprint != null ? antFingerprint.equals(deviceDto.antFingerprint)
+				: deviceDto.antFingerprint == null;
 
 	}
 
@@ -209,7 +207,6 @@ public class DeviceDto {
 		result = 31 * result + (appCode != null ? appCode.hashCode() : 0);
 		result = 31 * result + (appVersion != null ? appVersion.hashCode() : 0);
 		result = 31 * result + (antFingerprint != null ? antFingerprint.hashCode() : 0);
-		result = 31 * result + (isAcceptPush != null ? isAcceptPush.hashCode() : 0);
 		return result;
 	}
 

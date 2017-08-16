@@ -17,7 +17,6 @@ import iservice.dto.DeviceDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
@@ -52,11 +51,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
 		publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
-		String env = System.getProperty("env", "dev");
-		JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/jdbc-device-" + env + ".json");
-
-		client = MySQLClient.createNonShared(vertx, jsonObject);
-
+		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
 	}
 
 	@Override
@@ -76,6 +71,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				.add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
 				.add(CalendarUtil.format(new Date())).add(CalendarUtil.format(new Date()));
 		execute(jsonArray, Sql.ADD_USER_DEVICE, new BaseResponse(), resultHandler);
+
 	}
 
 	@Override
@@ -142,6 +138,10 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		if (StringUtils.isNotBlank(deviceToken)) {
 			sb.append(" and deviceToken = '").append(deviceToken).append("'");
 		}
+		String channel = MapUtils.getString(params, "channel");
+		if (StringUtils.isNotBlank(channel)) {
+			sb.append(" and channel = ").append(channel);
+		}
 		sql = String.format(sql, sb.toString());
 		Future<List<JsonObject>> future = retrieveMany(new JsonArray(), sql);
 		future.setHandler(result -> {
@@ -160,5 +160,4 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 			}
 		});
 	}
-
 }

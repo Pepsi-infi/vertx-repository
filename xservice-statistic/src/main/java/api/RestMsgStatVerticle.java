@@ -2,6 +2,7 @@ package api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import dao.MsgStatResultDao;
 import io.vertx.core.Future;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -16,7 +17,6 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
-import service.MsgStatResultService;
 import utils.IPUtil;
 import utils.JsonUtil;
 import utils.TimeUtil;
@@ -35,7 +35,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private MsgStatService msgStatService;
 
-    private MsgStatResultService msgStatResultService;
+    private MsgStatResultDao msgStatResultDao;
 
     @Override
     public void start() throws Exception {
@@ -61,7 +61,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
 
     private void initMsgStatService() {
         msgStatService = MsgStatService.createProxy(vertx.getDelegate());
-        msgStatResultService = MsgStatResultService.createProxy(vertx.getDelegate());
+        msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
@@ -71,7 +71,11 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     private void statPushMsg(RoutingContext context) {
         List<MsgStatDto> msgStatDtos = buildMsgStatDto(context);
         logger.info("stat pushMsg,the msgStatDtos: {}", Json.encode(msgStatDtos));
-        msgStatService.statPushMsg(msgStatDtos, resultStringHandler(context));
+        if (null == msgStatDtos) {
+            paramBadRequest(context, "Param [appCode or osType or msgList] cannot be empty.");
+        } else {
+            msgStatService.statPushMsg(msgStatDtos, resultStringHandler(context));
+        }
     }
 
     private void queryMsgStatResult(RoutingContext context) {
@@ -83,7 +87,7 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         if (StringUtils.isNotBlank(msgId)) {
             params.put("msgId", msgId);
         }
-        msgStatResultService.queryMsgStatResult(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
+        msgStatResultDao.queryMsgStatResultByPage(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
 
     }
 
@@ -95,7 +99,8 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         String msgList = context.request().formAttributes().get("msgList");
 
         if (StringUtils.isBlank(appCode) || StringUtils.isBlank(osType) || StringUtils.isBlank(msgList)) {
-            paramBadRequest(context, "Param [appCode or osType or msgList] cannot be empty.");
+            logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
+            return null;
         }
         List<MsgStatDto> msgStatDtos = Lists.newArrayList();
         List<HashMap> msgStatList = Json.decodeValue(msgList, List.class);

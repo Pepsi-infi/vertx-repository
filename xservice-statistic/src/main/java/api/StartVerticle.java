@@ -1,7 +1,6 @@
 package api;
 
 import cron.CronMsgStatVerticle;
-import cron.CronTransferDevcieVerticle;
 import dao.impl.CarBizEuroDaoImpl;
 import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
@@ -42,13 +41,15 @@ public class StartVerticle extends BaseServiceVerticle {
 
 		this.deployVerticle(MsgStatResultDaoImpl.class.getName());
 		this.deployVerticle(MsgStatResultServiceImpl.class.getName());
+
 		this.deployVerticle(CarBizEuroDaoImpl.class.getName());
 		this.deployVerticle(TransferDeviceServiceImpl.class.getName());
+
 	}
 
 	private void deployEventBusService() {
 		this.deployCronVerticle(CronMsgStatVerticle.class.getName());
-		this.deployCronVerticle(CronTransferDevcieVerticle.class.getName());
+		// this.deployCronVerticle(CronTransferDevcieVerticle.class.getName());
 	}
 
 	public void deployVerticle(String verticleName) {

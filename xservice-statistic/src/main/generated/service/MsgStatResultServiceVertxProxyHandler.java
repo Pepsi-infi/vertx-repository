@@ -40,9 +40,7 @@ import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import utils.BaseResponse;
-import java.util.Map;
 import io.vertx.core.Vertx;
-import service.dto.MsgStatResultPageWrapper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import service.MsgStatResultService;
@@ -127,20 +125,6 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
 
         case "storeMsgStatResult": {
           service.storeMsgStatResult(res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
-          break;
-        }
-        case "queryMsgStatResult": {
-          service.queryMsgStatResult(convertMap(json.getJsonObject("param").getMap()), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("limit") == null ? null : (json.getLong("limit").intValue()), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());

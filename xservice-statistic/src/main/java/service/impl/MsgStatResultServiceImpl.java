@@ -7,7 +7,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
@@ -17,15 +16,12 @@ import org.apache.commons.lang.math.NumberUtils;
 import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
-import service.dto.MsgStatResultPage;
-import service.dto.MsgStatResultPageWrapper;
 import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei
@@ -53,9 +49,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
 
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
 
-        String env = System.getProperty("env", "dev");
-        JsonObject jsonObject = ConfigUtils.getJsonConf(env + "/redis-" + env + ".json");
-        RedisOptions redisOptions = ConfigUtils.getRedisOptions(jsonObject);
+        RedisOptions redisOptions = ConfigUtils.getRedisOptions(config().getJsonObject("redis"));
         redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
 
     }
@@ -76,30 +70,13 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         });
     }
 
-    @Override
-    public void queryMsgStatResult(Map<String, String> param, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> result) {
-        Future<List<MsgStatResultDto>> future = Future.future();
-        msgStatResultDao.queryMsgStatResultByPage(param, page, limit, future.completer());
-        future.setHandler(ar1 -> {
-            if (ar1.succeeded()) {
-                MsgStatResultPageWrapper wrapper = new MsgStatResultPageWrapper();
-                MsgStatResultPage msgStatResultPage = new MsgStatResultPage(ar1.result(), page, limit);
-                wrapper.setData(msgStatResultPage);
-                result.handle(Future.succeededFuture(wrapper));
-            } else {
-                logger.error("[service] query msgStatResult error", ar1.cause());
-                result.handle(Future.failedFuture(ar1.cause()));
-            }
-        });
-    }
 
     private void processRedisMsgStatResult(JsonArray jsonArray, Handler<AsyncResult<BaseResponse>> result) {
         List<String> keys = jsonArray.getList();
         if (CollectionUtils.isEmpty(keys)) {
             logger.info("need stat msg is null");
             result.handle(Future.succeededFuture());
-        }
-        try {
+        } else {
             for (String key : keys) {
                 Future<JsonArray> mgetFuture = Future.future();
                 redisClient.hmget(key, CacheConstants.PUSH_MSG_FIELDS, mgetFuture.completer());
@@ -120,9 +97,6 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
                 });
             }
             result.handle(Future.succeededFuture());
-        } catch (Exception e) {
-            logger.error("process redis msgStat result error.", e);
-            result.handle(Future.failedFuture(e.getCause()));
         }
 
     }
@@ -130,21 +104,17 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
     private void saveOrUpdateMsgStatResultToDb(String key, List<String> values, Handler<AsyncResult<BaseResponse>> result) {
         MsgStatResultDto msgStatResultDto = buildMsgStatResult(key, values);
         logger.info("the msgStatResultDto:{}", msgStatResultDto);
-        //获取db数据
+
         Future<MsgStatResultDto> getDbMsgStatFuture = Future.future();
+        Future<BaseResponse> addFuture = Future.future();
+        Future<BaseResponse> updateFuture = Future.future();
+
         msgStatResultDao.getMsgStatResult(msgStatResultDto, getDbMsgStatFuture.completer());
         getDbMsgStatFuture.setHandler(result1 -> {
             if (result1.succeeded()) {
                 MsgStatResultDto dbMsgStatResult = result1.result();
                 if (dbMsgStatResult == null) {
-                    msgStatResultDao.addMsgStatResult(msgStatResultDto, ar1 -> {
-                        if (ar1.succeeded()) {
-                            result.handle(Future.succeededFuture(new BaseResponse()));
-                        } else {
-                            logger.error("add msgStatResult:{} to db error.", msgStatResultDto, ar1.cause());
-                            result.handle(Future.failedFuture(ar1.cause()));
-                        }
-                    });
+                    msgStatResultDao.addMsgStatResult(msgStatResultDto, addFuture.completer());
                 } else {
                     if (dbMsgStatResult != null && dbMsgStatResult.getSendSum() >= msgStatResultDto.getSendSum() &&
                             dbMsgStatResult.getArriveSum() >= msgStatResultDto.getArriveSum() &&
@@ -152,21 +122,29 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
                         logger.info("the data of  msgStatResult :{} in db gt in redis.", msgStatResultDto);
                         result.handle(Future.succeededFuture());
                     } else {
-                        Future<BaseResponse> future = Future.future();
-                        msgStatResultDao.updateMsgStatResult(msgStatResultDto, future.completer());
-                        future.setHandler(resultHandler -> {
-                            if (resultHandler.succeeded()) {
-                                result.handle(Future.succeededFuture(new BaseResponse()));
-                            } else {
-                                logger.error("update msgStatResult:{} to db error.", msgStatResultDto, resultHandler.cause());
-                                result.handle(Future.failedFuture(resultHandler.cause()));
-                            }
-                        });
+                        msgStatResultDao.updateMsgStatResult(msgStatResultDto, updateFuture.completer());
                     }
                 }
             } else {
                 logger.error("get msgStatResult:{} from db error.", msgStatResultDto, result1.cause());
                 result.handle(Future.failedFuture(result1.cause()));
+            }
+        });
+
+        addFuture.setHandler(ar1 -> {
+            if (ar1.succeeded()) {
+                result.handle(Future.succeededFuture(new BaseResponse()));
+            } else {
+                logger.error("add msgStatResult:{} to db error.", msgStatResultDto, ar1.cause());
+                result.handle(Future.failedFuture(ar1.cause()));
+            }
+        });
+        updateFuture.setHandler(resultHandler -> {
+            if (resultHandler.succeeded()) {
+                result.handle(Future.succeededFuture(new BaseResponse()));
+            } else {
+                logger.error("update msgStatResult:{} to db error.", msgStatResultDto, resultHandler.cause());
+                result.handle(Future.failedFuture(resultHandler.cause()));
             }
         });
     }

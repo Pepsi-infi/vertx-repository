@@ -76,6 +76,7 @@
 |[[list]]`list`|`Array of link:dataobjects.html#MsgStatResultDto[MsgStatResultDto]`|-
 |[[page]]`page`|`Number (int)`|-
 |[[size]]`size`|`Number (int)`|-
+|[[total]]`total`|`Number (long)`|-
 |===
 
 [[MsgStatResultPageWrapper]]

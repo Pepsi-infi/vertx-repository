@@ -88,7 +88,7 @@
       //获取数据
       get_form_data(){
         this.load_data = true
-        this.$fetch.api_table.get({
+        this.$fetch.api_msgStat.get({
           id: this.route_id
         })
           .then(({data}) => {
@@ -108,7 +108,7 @@
         this.$refs.form.validate((valid) => {
           if (!valid) return false
           this.on_submit_loading = true
-          this.$fetch.api_table.save(this.form)
+          this.$fetch.api_msgStat.save(this.form)
             .then(({msg}) => {
               this.$message.success(msg)
               setTimeout(this.$router.back(), 500)

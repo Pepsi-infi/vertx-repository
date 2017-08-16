@@ -19,7 +19,7 @@ Mock.mock(new RegExp(port_user.login), ({body}) => {
       status: port_code.success,
       msg: "登录成功",
       data: {
-        'name': '@cname',
+        'name': 'admin',
         'avatar': 'https://avatars0.githubusercontent.com/u/16893554?v=3&s=240',
         'age|20-25': 20,
         'desc': '@csentence()'

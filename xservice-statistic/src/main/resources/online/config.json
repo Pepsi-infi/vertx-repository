@@ -1,0 +1,46 @@
+{
+  "mysql": {
+    "mc-device": {
+      "host": "10.0.10.211",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
+      "database": "device",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    },
+    "rentcar": {
+      "host": "10.0.10.82",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "stat_query",
+      "password": "pggXNBviboEfl@hk",
+      "database": "rentcar",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    },
+    "mc-statistic": {
+      "host": "10.0.10.211",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
+      "database": "statistic",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    }
+  },
+  "redis": {
+    "host": "10.0.7.57",
+    "port": 26384,
+    "encoding": "UTF-8",
+    "tcpKeepAlive": "true",
+    "tcpNoDelay": "true",
+    "password": ""
+  },
+  "service.name": "sy.mc.statistic",
+  "service.host": "127.0.0.1",
+  "service.port": 1203,
+  "service.root": "/mc-statistic"
+}
