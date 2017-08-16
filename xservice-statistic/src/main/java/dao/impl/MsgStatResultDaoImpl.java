@@ -69,8 +69,6 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
         XProxyHelper.registerService(MsgStatResultDao.class, vertx, this, MsgStatResultDao.SERVICE_ADDRESS);
         publishEventBusService(MsgStatResultDao.SERVICE_NAME, MsgStatResultDao.SERVICE_ADDRESS, MsgStatResultDao.class);
 
-        String env = System.getProperty("env", "dev");
-
         client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-statistic"));
     }
 

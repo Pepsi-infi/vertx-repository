@@ -43,8 +43,6 @@ public class CarBizEuroDaoImpl extends BaseDaoVerticle implements CarBizEuroDao 
         XProxyHelper.registerService(CarBizEuroDao.class, vertx, this, CarBizEuroDao.SERVICE_ADDRESS);
         publishEventBusService(CarBizEuroDao.SERVICE_NAME, CarBizEuroDao.SERVICE_ADDRESS, CarBizEuroDao.class);
 
-        String env = System.getProperty("env", "dev");
-
         client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("rentcar"));
 
     }

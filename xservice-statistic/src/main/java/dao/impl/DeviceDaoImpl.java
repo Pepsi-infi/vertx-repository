@@ -54,10 +54,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
 		publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
-		String env = System.getProperty("env", "dev");
-
 		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
-
 	}
 
 	@Override
@@ -143,6 +140,10 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		String deviceToken = MapUtils.getString(params, "deviceToken");
 		if (StringUtils.isNotBlank(deviceToken)) {
 			sb.append(" and deviceToken = '").append(deviceToken).append("'");
+		}
+		String channel = MapUtils.getString(params, "channel");
+		if (StringUtils.isNotBlank(channel)) {
+			sb.append(" and channel = ").append(channel);
 		}
 		sql = String.format(sql, sb.toString());
 		Future<List<JsonObject>> future = retrieveMany(new JsonArray(), sql);
