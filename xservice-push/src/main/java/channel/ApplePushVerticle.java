@@ -1,9 +1,6 @@
 package channel;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import constant.ConnectionConsts;
+import constant.PushConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -14,21 +11,23 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.ApplePushService;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApplePushVerticle.class);
 
+	private JsonObject config;
 	@Override
 	public void start() throws Exception {
-
 		super.start();
-
 		ProxyHelper.registerService(ApplePushService.class, vertx, this, ApplePushService.class.getName());
 
+		config = config().getJsonObject("push.config");
 	}
 
 	@Override
@@ -44,7 +43,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		addQueryParam.put("body", receiveMsg.getString("content"));
 		addQueryParam.put("msgbody", receiveMsg.toString());
 
-		String appleUrl = PropertiesLoaderUtils.multiProp.getProperty("apple.push.url");
+		String appleUrl = config().getJsonObject("push.config").getString("apple.push.url");
 
 		if (StringUtil.isNullOrEmpty(appleUrl)) {
 			resultHandler.handle(Future.failedFuture("Apple push host is null"));
@@ -80,8 +79,8 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 	// 测试专用，防止消息推送到线上用户
 	private JsonObject testSendControl(JsonObject jsonMsg) {
-		if ("dev".equals(ConnectionConsts.ENV_PATH)) {
-			String apnsToken = PropertiesLoaderUtils.multiProp.getProperty("apple.test.apnsToken");
+		if ("dev".equals(PushConsts.ENV_PATH)) {
+			String apnsToken = config.getString("apple.test.apnsToken");
 			if (jsonMsg != null) {
 				jsonMsg.put("apnsToken", apnsToken);
 			}

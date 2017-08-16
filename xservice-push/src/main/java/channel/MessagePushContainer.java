@@ -1,7 +1,14 @@
 package channel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import constant.PushConsts;
-import constant.ServiceUrlConstant;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
 import enums.MsgStatusEnum;
@@ -19,28 +26,25 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.handler.BodyHandler;
 import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.*;
+import service.ApplePushService;
+import service.MsgRecordService;
+import service.RedisService;
+import service.SocketPushService;
+import service.XiaoMiPushService;
 import util.DateUtil;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+public class MessagePushContainer extends AbstractVerticle {
 
-public class HttpConsumerVerticle extends AbstractVerticle {
-
-	private static final Logger logger = LoggerFactory.getLogger(HttpConsumerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(MessagePushContainer.class);
 
 	private SocketPushService socketPushService;
 
@@ -60,13 +64,15 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 	private ApplePushService applePushService;
 
-	private HttpServerResponse resp;
-
 	private String token;
 	private Integer channel;
 
+	private JsonObject config;
+
 	@Override
 	public void start() throws Exception {
+		logger.info("conf():" + config());
+		config = config().getJsonObject("push.config");
 
 		// 初始化化服务
 		this.initService();
@@ -80,22 +86,24 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 		httpServer = vertx.createHttpServer();
 		router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
-		router.route(ServiceUrlConstant.PUSH_MSG_URL).handler(context -> {
-			resp = context.response();
-			HttpServerRequest request = context.request();
-			String httpMsg = request.getParam("body");
-			logger.info(" 接收到的消息内容：" + httpMsg);
-			if (StringUtil.isNullOrEmpty(httpMsg)) {
-				logger.error("body is null");
-				responseError(resp, "body is null");
-			} else {
-				this.dealHttpMessage(new JsonObject(httpMsg));
-			}
-		});
-		httpServer.requestHandler(router::accept).listen(8080);
+		router.route(config.getString("PUSH_MSG_URL")).handler(this::pushMsg);
+		httpServer.requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 	}
 
-	private void dealHttpMessage(JsonObject receiveMsg) {
+	private void pushMsg(RoutingContext context) {
+		HttpServerResponse resp = context.response();
+		HttpServerRequest request = context.request();
+		String httpMsg = request.getParam("body");
+		logger.info(" 接收到的消息内容：" + httpMsg);
+		if (StringUtil.isNullOrEmpty(httpMsg)) {
+			logger.error("body is null");
+			responseError(resp, "body is null");
+		} else {
+			this.dealHttpMessage(new JsonObject(httpMsg), resp);
+		}
+	};
+
+	private void dealHttpMessage(JsonObject receiveMsg, HttpServerResponse resp) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
 		if (ResultData.FAIL == checkResult.getCode()) {
@@ -374,7 +382,7 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		WebClient webClient = WebClient.create(vertx);
 
-		webClient.postAbs(PropertiesLoaderUtils.multiProp.getProperty("socket.valid.url"))
+		webClient.postAbs(config.getString("socket.valid.url"))
 				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 				.addQueryParam("uid", params.get("uid")).send(responseHandler -> {
 					if (responseHandler.succeeded()) {

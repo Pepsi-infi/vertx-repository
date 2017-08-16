@@ -24,7 +24,6 @@ java \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--Dprofiles.path=dev \
 -Dconfig=dev \
 -jar ${root_path}/xservice-push-fat.jar >/dev/null 2>&1
 
