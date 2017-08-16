@@ -41,6 +41,7 @@ public class PushConsts {
 
 	//系统类型， 安卓端:1; ISO:2;
 	public static final Integer MsgStat_OSTYPE_ANDROID = 1;
+	public static final Integer MsgStat_OSTYPE_IOS = 2;
 
 	//上报类型 1发送，2接收
 	public static final Integer MsgStat_ACTION_SEND = 1;

@@ -1,13 +1,5 @@
 package channel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -33,14 +25,17 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.ApplePushService;
-import service.MsgRecordService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import utils.BaseResponse;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MessagePushContainer extends AbstractVerticle {
 
@@ -178,11 +173,17 @@ public class MessagePushContainer extends AbstractVerticle {
 		msgStatDto.setChannel(channel);
 		msgStatDto.setMsgId(msgId);
 		// 1 安卓
-		msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_ANDROID);
+		if(PushTypeEnum.APNS.getSrcCode() == channel){
+			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
+		}else {
+			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_ANDROID);
+		}
+
 		// 1发送，2接收
 		msgStatDto.setAction(PushConsts.MsgStat_ACTION_SEND);
 		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
 		msgList.add(msgStatDto);
+		logger.info("已推送消息上报msg：" + Json.encode(msgList));
 		msgStatService.statPushMsg(msgList, statRes -> {
 			if (statRes.succeeded()) {
 				String result = statRes.result();
