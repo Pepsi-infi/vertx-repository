@@ -1,6 +1,5 @@
 package channel;
 
-import constant.ConnectionConsts;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
@@ -169,7 +168,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     protected void initSendTo() {
         //当前verticle加载时从配置文件中读取下游SOCKET的地址列表
-        String socketAddrs = config.getString(ConnectionConsts.SOCKET_HOSTS);
+        String socketAddrs = config.getString("SOCKET_HOSTS");
 //        String socketAddrs = "12.12.12.1:9000,32.32.22.33:9999";
         logger.info(" upstream socket addr : [" + socketAddrs + "]");
         String[] addrArray = socketAddrs.split(",");
@@ -276,7 +275,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
     //测试专用，防止消息推送到线上用户
     private JsonObject testSendControl(JsonObject jsonMsg){
-       if("dev".equals(ConnectionConsts.ENV_PATH)){
+       if("dev".equals(PushConsts.ENV_PATH)){
            String customerId = config.getString("socket.test.customerId");
            String phone = config.getString("socket.test.phone");
            if(jsonMsg != null){
