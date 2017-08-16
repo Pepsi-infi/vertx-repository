@@ -93,8 +93,6 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         String msgId = receiveMsg.getValue("msgId") + "";
         String customerId = receiveMsg.getValue("customerId") + "";
         String token = receiveMsg.getString("deviceToken");
-        //消息内容
-        String msgBody = receiveMsg.toString();
         //超时时间，秒
         Long expireTime = receiveMsg.getLong("expireTime");
 
@@ -116,7 +114,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         msgInfo.put("nick", null);
         msgInfo.put("msgId", msgId);
         msgInfo.put("title", messageType.getName());
-        msgInfo.put("body", msgBody);
+        msgInfo.put("body", receiveMsg.toString());
         if (StringUtils.isNotBlank(token) && token.length() > 10) {
             msgInfo.put("token", token);
         }
