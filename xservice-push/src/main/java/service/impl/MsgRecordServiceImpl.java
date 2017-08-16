@@ -1,6 +1,5 @@
 package service.impl;
 
-import constant.ConnectionConsts;
 import domain.MsgRecord;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -14,7 +13,6 @@ import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
 import service.MsgRecordService;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -53,8 +51,8 @@ public class MsgRecordServiceImpl extends BaseServiceVerticle implements MsgReco
         XProxyHelper.registerService(MsgRecordService.class, vertx, this, MsgRecordService.getLocalAddress(ip));
         publishEventBusService(MsgRecordService.LOCAL_SERVICE_NAME, MsgRecordService.getLocalAddress(ip), MsgRecordService.class);
 
-        JsonObject jsonObject = PropertiesLoaderUtils.getJsonConf(ConnectionConsts.JDBC_CONFIG_PATH);
-        sqlClient = MySQLClient.createShared(vertx, jsonObject);
+        JsonObject mysqlOptions = config().getJsonObject("mysql.config");
+        sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
     }
 
     @Override

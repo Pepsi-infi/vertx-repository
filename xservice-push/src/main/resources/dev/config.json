@@ -1,0 +1,37 @@
+{
+  "push.config": {
+    "xiaomi.appid": "2882303761517343895",
+    "xiaomi.appkey": "5171734310895",
+    "xiaomi.appsecret": "blB92D/FTTyd1aa/ep4WFw==",
+    "xiaomi.packagename": "com.ichinait.gbpassenger",
+    "SOCKET_HOSTS": "10.10.10.102:9099",
+    "apple.push.url": "http://10.10.10.105:18085/apns/push",
+    "socket.valid.url": "http://10.10.10.105:18080/webservice/passenger/webservice/chat/checkSocket",
+    "PUSH_MSG_URL":"/mc-push/message/push.json",
+    "PUSH_MSG_PORT":8080
+  },
+  "redis.config": {
+    "host": "10.10.10.125",
+    "port": 6381,
+    "encoding": "UTF-8",
+    "tcpKeepAlive": "true",
+    "tcpNoDelay": "true"
+  },
+  "mysql.config": {
+    "host": "10.10.10.178",
+    "port": 3306,
+    "maxPoolSize": 100,
+    "username": "sqyc_message",
+    "password": "sqyc_message@01zhuanche.com",
+    "database": "message_center",
+    "charset": "UTF-8",
+    "queryTimeout": 3000
+  },
+  "test.config": {
+    "xiaomi.test.phone": "18810616483",
+    "xiaomi.test.token": "FpXBF9sOub875uWnPRyasdXnec/turJwqI8fsJmgblk=",
+    "apple.test.apnsToken": "f476872c95b470282795ff92124ec9079c4935a8c181f1bdd10a6fb9ce0c28ce",
+    "socket.test.customerId": "13666050",
+    "socket.test.phone": "13621241006"
+  }
+}

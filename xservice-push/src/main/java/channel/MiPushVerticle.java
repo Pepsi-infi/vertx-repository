@@ -18,7 +18,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
 import service.XiaoMiPushService;
 import util.MsgUtil;
-import util.PropertiesLoaderUtils;
 import utils.BaseResponse;
 
 /**
@@ -30,11 +29,13 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
     private static final Logger logger = LoggerFactory.getLogger(MiPushVerticle.class);
 
+    private JsonObject config;
     @Override
     public void start() throws Exception {
         super.start();
         ProxyHelper.registerService(XiaoMiPushService.class, vertx, this, XiaoMiPushService.class.getName());
 
+        config = config().getJsonObject("push.config");
     }
 
     @Override
@@ -67,7 +68,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
     public Result sendMessage(JsonObject recieveMsg) throws Exception {
 
         String regId = (String) recieveMsg.getValue("regId");
-        Sender sender = new Sender(PropertiesLoaderUtils.singleProp.getProperty("xiaomi.appsecret"));
+        Sender sender = new Sender(config.getString("xiaomi.appsecret"));
 
         Message message = buildMessage(recieveMsg);
 
@@ -80,7 +81,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
     private Message buildMessage(JsonObject recieveMsg) throws Exception {
         // app包名
-        String packageName = PropertiesLoaderUtils.singleProp.getProperty("xiaomi.packagename");
+        String packageName = config.getString("xiaomi.packagename");
         String title = recieveMsg.getString("title");
         String wholeMsg = recieveMsg.toString();
         String msgId = recieveMsg.getValue("msgId")+"";
@@ -104,8 +105,8 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
     //测试专用，防止消息推送到线上用户
     private JsonObject testSendControl(JsonObject jsonMsg){
         if("dev".equals(ConnectionConsts.ENV_PATH)){
-            String phone = PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.phone");
-            String token = PropertiesLoaderUtils.multiProp.getProperty("xiaomi.test.token");
+            String phone = config.getString("xiaomi.test.phone");
+            String token = config.getString("xiaomi.test.token");
             if(jsonMsg != null){
                 jsonMsg.put("phone", phone);
                 jsonMsg.put("regId", token);
