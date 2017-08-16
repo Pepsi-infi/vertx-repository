@@ -4,7 +4,6 @@ import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
-import constant.ConnectionConsts;
 import constant.PushConsts;
 import enums.JumpFlagEnum;
 import io.vertx.core.AbstractVerticle;
@@ -104,7 +103,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
     //测试专用，防止消息推送到线上用户
     private JsonObject testSendControl(JsonObject jsonMsg){
-        if("dev".equals(ConnectionConsts.ENV_PATH)){
+        if("dev".equals(PushConsts.ENV_PATH)){
             String phone = config.getString("xiaomi.test.phone");
             String token = config.getString("xiaomi.test.token");
             if(jsonMsg != null){

@@ -1,6 +1,6 @@
 package channel;
 
-import constant.ConnectionConsts;
+import constant.PushConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -79,7 +79,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 	// 测试专用，防止消息推送到线上用户
 	private JsonObject testSendControl(JsonObject jsonMsg) {
-		if ("dev".equals(ConnectionConsts.ENV_PATH)) {
+		if ("dev".equals(PushConsts.ENV_PATH)) {
 			String apnsToken = config.getString("apple.test.apnsToken");
 			if (jsonMsg != null) {
 				jsonMsg.put("apnsToken", apnsToken);

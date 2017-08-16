@@ -44,4 +44,5 @@ public class StartVerticle extends AbstractVerticle{
         options.setInstances(Runtime.getRuntime().availableProcessors());
         return options;
     }
+
 }
