@@ -1,39 +1,39 @@
 {
   "mysql": {
     "mc-device": {
-      "host": "10.10.10.178",
-      "port": 3306,
+      "host": "10.0.10.211",
+      "port": 5310,
       "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
       "database": "device",
       "charset": "UTF-8",
       "queryTimeout": 3000
     },
     "rentcar": {
-      "host": "10.10.10.103",
-      "port": 3306,
+      "host": "10.0.10.82",
+      "port": 5310,
       "maxPoolSize": 100,
-      "username": "sqhc_rentcar",
-      "password": "BzkmQM%O^U7Dy8X3",
+      "username": "stat_query",
+      "password": "pggXNBviboEfl@hk",
       "database": "rentcar",
       "charset": "UTF-8",
       "queryTimeout": 3000
     },
     "mc-statistic": {
-      "host": "10.10.10.178",
-      "port": 3306,
+      "host": "10.0.10.211",
+      "port": 5310,
       "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
       "database": "statistic",
       "charset": "UTF-8",
       "queryTimeout": 3000
     }
   },
   "redis": {
-    "host": "10.10.10.126",
-    "port": 6381,
+    "host": "10.0.7.57",
+    "port": 26384,
     "encoding": "UTF-8",
     "tcpKeepAlive": "true",
     "tcpNoDelay": "true",
