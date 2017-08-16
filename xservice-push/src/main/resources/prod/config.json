@@ -8,7 +8,7 @@
     "apple.push.url": "http://10.0.200.8/apns/push",
     "socket.valid.url": "http://10.0.200.54/webservice/passenger/webservice/chat/checkSocket",
     "PUSH_MSG_URL":"/mc-push/message/push.json",
-    "PUSH_MSG_PORT":8080
+    "PUSH_MSG_PORT":8989
   },
   "redis.config": {
     "host": "10.0.7.56",
