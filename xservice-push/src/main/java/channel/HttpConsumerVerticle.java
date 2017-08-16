@@ -73,14 +73,8 @@ public class HttpConsumerVerticle extends AbstractVerticle {
 
 		System.out.println("conf():" + config());
 
-		JsonObject conf = config();
-		JsonObject push = conf.getJsonObject("push.properties");
-		logger.info(push.toString());
-
-		JsonObject redis = conf.getJsonObject("redis.properties");
-		logger.info(redis.toString());
 		// 接收消息
-//		this.recivedHttpMessage();
+		this.recivedHttpMessage();
 
 	}
 
