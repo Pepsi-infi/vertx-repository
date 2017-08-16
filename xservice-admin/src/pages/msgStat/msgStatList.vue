@@ -51,23 +51,23 @@
           width="100">
         </el-table-column>
         <el-table-column
-           prop="sendIosSum"
-           label="IOS发送数"
-           width="100">
-        </el-table-column>
-        <el-table-column
           prop="arriveAndroidSum"
           label="Android到达数"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="arriveIosSum"
-          label="IOS到达数"
+          prop="clickAndroidSum"
+          label="Android点击数"
           width="100">
         </el-table-column>
         <el-table-column
-          prop="clickAndroidSum"
-          label="Android点击数"
+           prop="sendIosSum"
+           label="IOS发送数"
+           width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveIosSum"
+          label="IOS到达数"
           width="100">
         </el-table-column>
         <el-table-column
