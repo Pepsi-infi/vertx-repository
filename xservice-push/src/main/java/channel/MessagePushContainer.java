@@ -342,7 +342,8 @@ public class MessagePushContainer extends AbstractVerticle {
 				} else {
 					errorMsg = "设备token不存在,推送操作不执行";
 					logger.error(errorMsg);
-					resultHandler.handle(Future.failedFuture(errorMsg));
+					this.pushByAndroid(receiveMsg, resultHandler);
+					//resultHandler.handle(Future.failedFuture(errorMsg));
 					return;
 				}
 			} else {
