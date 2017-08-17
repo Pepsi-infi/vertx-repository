@@ -103,7 +103,11 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
         deviceDao.getDevice(param, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             if (handler.succeeded()) {
-                result.handle(Future.succeededFuture(Lists.newArrayList(handler.result())));
+                List<DeviceDto> list = Lists.newArrayList();
+                if (handler.result() != null) {
+                    list.add(handler.result());
+                }
+                result.handle(Future.succeededFuture(list));
             } else {
                 logger.error("query devices error.", handler.cause());
                 result.handle(Future.failedFuture(handler.cause()));
