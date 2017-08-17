@@ -11,8 +11,33 @@
     "PUSH_MSG_PORT":8989
   },
   "redis.config": {
-    "host": "10.10.10.125",
-    "port": 6381,
+  	"redis.cluster.password": "lbstest",
+	"redis.slaves": [
+		{
+			"host": "10.10.10.169",
+			"port": 6379
+		},
+		{
+			"host": "10.10.10.169",
+			"port": 6380
+		},
+		{
+			"host": "10.10.10.170",
+			"port": 6379
+		},
+		{
+			"host": "10.10.10.170",
+			"port": 6380
+		},
+		{
+			"host": "10.10.10.171",
+			"port": 6379
+		},
+		{
+			"host": "10.10.10.171",
+			"port": 6380
+		}
+	],
     "encoding": "UTF-8",
     "tcpKeepAlive": "true",
     "tcpNoDelay": "true"
