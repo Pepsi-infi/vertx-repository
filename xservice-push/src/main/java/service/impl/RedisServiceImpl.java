@@ -66,7 +66,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 	@Override
 	public void set(String key, String value, Handler<AsyncResult<Void>> result) {
-		redisCluster.set(PushConsts.REDIS_PREFIX_MESSAGE_CENTER_PUSH + key, value, handler -> {
+		redisCluster.set(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -77,7 +77,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 	@Override
 	public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
-		redisCluster.expireat(PushConsts.REDIS_PREFIX_MESSAGE_CENTER_PUSH + key, expire, handler -> {
+		redisCluster.expireat(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, expire, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -88,7 +88,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 	@Override
 	public void get(String key, Handler<AsyncResult<String>> result) {
-		redisCluster.get(PushConsts.REDIS_PREFIX_MESSAGE_CENTER_PUSH + key, handler -> {
+		redisCluster.get(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -99,7 +99,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 	@Override
 	public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER_PUSH + key, handler -> {
+		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -110,7 +110,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 	@Override
 	public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER_PUSH + key, handler -> {
+		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
