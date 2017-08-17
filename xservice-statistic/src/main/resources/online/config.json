@@ -36,8 +36,7 @@
     "port": 26384,
     "encoding": "UTF-8",
     "tcpKeepAlive": "true",
-    "tcpNoDelay": "true",
-    "password": ""
+    "tcpNoDelay": "true"
   },
   "service.name": "sy.mc.statistic",
   "service.host": "127.0.0.1",

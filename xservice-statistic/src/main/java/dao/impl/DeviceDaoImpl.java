@@ -48,8 +48,8 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
     }
 
     @Override
-    public void start() throws Exception {
-        super.start();
+    public void start(Future<Void> startFuture) throws Exception {
+        super.start(startFuture);
 
         XProxyHelper.registerService(DeviceDao.class, vertx, this, DeviceDao.SERVICE_ADDRESS);
         publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);

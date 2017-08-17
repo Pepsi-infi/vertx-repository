@@ -3,6 +3,7 @@ package service.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import constants.CacheConstants;
+import constants.OsTypeEnum;
 import constants.PushActionEnum;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -10,6 +11,7 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
@@ -19,7 +21,6 @@ import iservice.dto.MsgStatDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
-import util.ConfigUtils;
 import utils.BaseResponse;
 
 import java.util.ArrayList;
@@ -48,8 +49,8 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.SERVICE_ADDRESS);
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
-        RedisOptions redisOptions = ConfigUtils.getRedisOptions(config().getJsonObject("redis"));
-        redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
+        JsonObject jsonObject = config().getJsonObject("redis");
+        redisClient = RedisClient.create(vertx.getDelegate(), jsonObject.mapTo(RedisOptions.class));
 
     }
 
@@ -147,6 +148,11 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             if (msgStatDto.getChannel() != null && msgStatDto.getChannel() > 0) {
                 String filed = new StringBuilder(CacheConstants.PUSH_SEND_CHANNEL).append(msgStatDto.getChannel()).toString();
                 fieldsList.add(filed);
+            }
+            //IOS 发送即到达
+            if (OsTypeEnum.IOS.getType() == msgStatDto.getOsType()) {
+                fieldsList.add(CacheConstants.PUSH_ARRIVE_SUM);
+                fieldsList.add(new StringBuilder(CacheConstants.PUSH_ARRIVE_OSTYPE).append(OsTypeEnum.IOS.getType()).toString());
             }
         } else if (PushActionEnum.ARRIVE.getType() == msgStatDto.getAction()) {
             fieldsList.add(CacheConstants.PUSH_ARRIVE_SUM);

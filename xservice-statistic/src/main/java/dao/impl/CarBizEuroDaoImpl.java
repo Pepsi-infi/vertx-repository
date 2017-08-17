@@ -37,8 +37,8 @@ public class CarBizEuroDaoImpl extends BaseDaoVerticle implements CarBizEuroDao 
     }
 
     @Override
-    public void start() throws Exception {
-        super.start();
+    public void start(Future<Void> startFuture) throws Exception {
+        super.start(startFuture);
 
         XProxyHelper.registerService(CarBizEuroDao.class, vertx, this, CarBizEuroDao.SERVICE_ADDRESS);
         publishEventBusService(CarBizEuroDao.SERVICE_NAME, CarBizEuroDao.SERVICE_ADDRESS, CarBizEuroDao.class);
