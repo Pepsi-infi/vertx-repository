@@ -1,5 +1,6 @@
 package service.impl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dao.DeviceDao;
 import helper.XProxyHelper;
@@ -100,11 +101,11 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
     @Override
     public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
-        Future<List<DeviceDto>> resultFuture = Future.future();
-        deviceDao.queryDevices(param, resultFuture.completer());
+        Future<DeviceDto> resultFuture = Future.future();
+        deviceDao.getDevice(param, resultFuture.completer());
         resultFuture.setHandler(handler -> {
             if (handler.succeeded()) {
-                result.handle(Future.succeededFuture(handler.result()));
+                result.handle(Future.succeededFuture(Lists.newArrayList(handler.result())));
             } else {
                 logger.error("query devices error.", handler.cause());
                 result.handle(Future.failedFuture(handler.cause()));

@@ -40,7 +40,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
                 "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=? " +
                 "WHERE antFingerprint=?";
 
-        static final String QUERY_USER_DEVICE = "SELECT * FROM device WHERE 1=1 %s ORDER BY id DESC";
+        static final String QUERY_USER_DEVICE = "SELECT * FROM device WHERE 1=1 %s ORDER BY updateTime DESC limit 1";
 
     }
 
@@ -111,8 +111,12 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
         if (StringUtils.isNotBlank(antFingerprint)) {
             sb.append(" and antFingerprint = '").append(antFingerprint).append("'");
         }
+        String phone = MapUtils.getString(params, "phone");
+        if (StringUtils.isNotBlank(phone)) {
+            sb.append(" and phone = '").append(phone).append("'");
+        }
         sql = String.format(sql, sb.toString());
-        Future<List<JsonObject>> future = retrieveMany(new JsonArray(), sql);
+        Future<List<JsonObject>> future = retrieveAll(sql);
         future.setHandler(result -> {
             if (result.succeeded()) {
                 List<DeviceDto> deviceDtos = Lists.transform(result.result(), new Function<JsonObject, DeviceDto>() {
