@@ -71,5 +71,5 @@ public class PushConsts {
 	public static final int PUSH_OPEN_TYPE_HTML=2;
 	
 	//消息中心redis前缀
-	public static final String REDIS_PREFIX_MESSAGE_CENTER="mc_";
+	public static final String REDIS_PREFIX_MESSAGE_CENTER_PUSH="mc_push_";
 }
