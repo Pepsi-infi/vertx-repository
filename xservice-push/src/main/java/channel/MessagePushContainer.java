@@ -151,7 +151,7 @@ public class MessagePushContainer extends AbstractVerticle {
 	public void responseError(HttpServerResponse resp, String msg) {
 		ResultData resultData = new ResultData(ErrorCodeEnum.FAIL);
 		resultData.setMsg(msg);
-		resp.putHeader("content-type", "text/plain;charset=UTF-8").end(msg);
+		resp.putHeader("content-type", "text/plain;charset=UTF-8").end(resultData.toString());
 	}
 
 	/**
