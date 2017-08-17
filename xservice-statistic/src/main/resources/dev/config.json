@@ -59,9 +59,5 @@
         "port": 6380
       }
     ]
-  },
-  "service.name": "sy.mc.statistic",
-  "service.host": "127.0.0.1",
-  "service.port": 1203,
-  "service.root": "/mc-statistic"
+  }
 }
