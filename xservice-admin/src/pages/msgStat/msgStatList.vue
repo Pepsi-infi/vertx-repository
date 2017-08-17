@@ -40,11 +40,13 @@
           label="到达总数"
           width="100">
         </el-table-column>
+        <!--
         <el-table-column
           prop="clickSum"
           label="点击总数"
           width="100">
         </el-table-column>
+        -->
         <el-table-column
           prop="sendAndroidSum"
           label="Android发送数"
@@ -70,11 +72,13 @@
           label="IOS到达数"
           width="100">
         </el-table-column>
+        <!--
         <el-table-column
           prop="clickIosSum"
           label="IOS点击数"
           width="100">
         </el-table-column>
+        -->
       </el-table>
       <bottom-tool-bar>
         <div slot="page">

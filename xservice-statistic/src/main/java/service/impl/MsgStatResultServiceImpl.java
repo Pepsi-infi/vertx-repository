@@ -7,6 +7,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisClient;
@@ -16,7 +17,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
-import util.ConfigUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
@@ -49,8 +49,8 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
 
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
 
-        RedisOptions redisOptions = ConfigUtils.getRedisOptions(config().getJsonObject("redis"));
-        redisClient = RedisClient.create(vertx.getDelegate(), redisOptions);
+        JsonObject jsonObject = config().getJsonObject("redis");
+        redisClient = RedisClient.create(vertx.getDelegate(), jsonObject.mapTo(RedisOptions.class));
 
     }
 

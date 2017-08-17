@@ -63,8 +63,8 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
 
 
     @Override
-    public void start() throws Exception {
-        super.start();
+    public void start(Future<Void> startFuture) throws Exception {
+        super.start(startFuture);
 
         XProxyHelper.registerService(MsgStatResultDao.class, vertx, this, MsgStatResultDao.SERVICE_ADDRESS);
         publishEventBusService(MsgStatResultDao.SERVICE_NAME, MsgStatResultDao.SERVICE_ADDRESS, MsgStatResultDao.class);
