@@ -1,14 +1,19 @@
 package service.impl;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.redis.RedisClient;
 import io.vertx.redis.RedisOptions;
+import redis.HostAndPort;
+import redis.RedisCluster;
+import redis.RedisClusterOptions;
 import service.RedisService;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -19,8 +24,8 @@ import xservice.BaseServiceVerticle;
 public class RedisServiceImpl extends BaseServiceVerticle implements RedisService {
 
     private static final Logger logger = LoggerFactory.getLogger(MsgRecordServiceImpl.class);
-
-    RedisClient redisClient;
+    
+    RedisCluster redisCluster;
 
     public void start() throws Exception {
         super.start();
@@ -38,17 +43,29 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
     }
 
     private void initRedisClient() {
-        //读取配置文件
-        JsonObject redisConf = config().getJsonObject("redis.config");
-        RedisOptions redisOptions = redisConf.mapTo(RedisOptions.class);
+    	
+    	RedisOptions rOptions = new RedisOptions();
+    	JsonObject redisConf = config().getJsonObject("redis.config");
+		String password = redisConf.getString("redis.cluster.password");
+		rOptions.setAuth(password);
+		RedisClusterOptions redisOptions = new RedisClusterOptions();
+		redisOptions.setRedisOptions(rOptions);
+		JsonArray array = redisConf.getJsonArray("redis.slaves");
+		if (array != null && !CollectionUtils.isEmpty(array.getList())) {
+			for (int i = 0; i < array.size(); i++) {
+				String slaveHost = array.getJsonObject(i).getString("host");
+				Integer slavePort = array.getJsonObject(i).getInteger("port");
+				redisOptions.addNode(new HostAndPort(slaveHost, slavePort));
+			}
+		}
 
-        redisClient = RedisClient.create(vertx, redisOptions);
+		redisCluster = RedisCluster.create(vertx, redisOptions);
 
     }
 
     @Override
     public void set(String key, String value, Handler<AsyncResult<Void>> result) {
-        redisClient.set(key, value, handler -> {
+    	redisCluster.set(key, value, handler -> {
             if (handler.succeeded()) {
                 result.handle(Future.succeededFuture(handler.result()));
             } else {
@@ -59,18 +76,18 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
     @Override
     public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
-        redisClient.expire(key, expire, handler -> {
-            if (handler.succeeded()) {
-                result.handle(Future.succeededFuture(handler.result()));
-            } else {
-                result.handle(Future.failedFuture(handler.cause()));
-            }
-        });
+    	redisCluster.expireat(key, expire, handler->{
+    		 if (handler.succeeded()) {
+               result.handle(Future.succeededFuture(handler.result()));
+           } else {
+               result.handle(Future.failedFuture(handler.cause()));
+           }
+    	});
     }
 
     @Override
     public void get(String key, Handler<AsyncResult<String>> result) {
-        redisClient.get(key, handler -> {
+    	redisCluster.get(key, handler -> {
             if (handler.succeeded()) {
                 result.handle(Future.succeededFuture(handler.result()));
             } else {
@@ -81,7 +98,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
     @Override
     public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-        redisClient.lpush(queue, key, handler -> {
+    	redisCluster.lpush(queue, key, handler -> {
             if (handler.succeeded()) {
                 result.handle(Future.succeededFuture(handler.result()));
             } else {
@@ -92,7 +109,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
     @Override
     public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-        redisClient.lpush(queue, key, handler -> {
+    	redisCluster.lpush(queue, key, handler -> {
             if (handler.succeeded()) {
                 result.handle(Future.succeededFuture(handler.result()));
             } else {
