@@ -1,6 +1,6 @@
 package test;
 
-import api.RestDeviceVerticle;
+import api.RestStatVerticle;
 import dao.impl.CarBizEuroDaoImpl;
 import dao.impl.DeviceDaoImpl;
 import dao.impl.MsgStatResultDaoImpl;
@@ -69,8 +69,8 @@ public class MsgStatTest {
         Future<String> future = Future.future();
         DeploymentOptions deploymentOptions = new DeploymentOptions();
         deploymentOptions.setConfig(config());
-//        vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
-        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
+        vertx.deployVerticle(RestStatVerticle.class.getName(), deploymentOptions, future.completer());
+//        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(), deploymentOptions, future.completer());
 //        vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());

@@ -37,10 +37,9 @@ public class StartVerticle extends BaseServiceVerticle {
     private void deployRestService() {
         this.deployVerticle(DeviceDaoImpl.class.getName());
         this.deployVerticle(DeviceServiceImpl.class.getName());
-        this.deployVerticle(RestDeviceVerticle.class.getName());
 
         this.deployVerticle(MsgStatServiceImpl.class.getName());
-        this.deployVerticle(RestMsgStatVerticle.class.getName());
+        this.deployVerticle(RestStatVerticle.class.getName());
 
         this.deployVerticle(MsgStatResultDaoImpl.class.getName());
         this.deployVerticle(MsgStatResultServiceImpl.class.getName());
