@@ -257,8 +257,9 @@ public class MsgStatResultDto {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MsgStatResultPage{");
-        sb.append("channel=").append(channel);
+        final StringBuilder sb = new StringBuilder("MsgStatResultDto{");
+        sb.append("id=").append(id);
+        sb.append(", channel=").append(channel);
         sb.append(", msgId='").append(msgId).append('\'');
         sb.append(", statTime='").append(statTime).append('\'');
         sb.append(", sendTime='").append(sendTime).append('\'');

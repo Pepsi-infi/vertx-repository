@@ -32,11 +32,33 @@
     }
   },
   "redis": {
-    "host": "10.0.7.57",
-    "port": 26384,
-    "encoding": "UTF-8",
-    "tcpKeepAlive": "true",
-    "tcpNoDelay": "true"
+    "redis.cluster.password": "NQn+&%pq8y&2",
+    "redis.node": [
+      {
+        "host": "10.0.7.47",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.47",
+        "port": 6381
+      },
+      {
+        "host": "10.0.7.48",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.48",
+        "port": 6381
+      },
+      {
+        "host": "10.0.7.49",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.49",
+        "port": 6381
+      }
+    ]
   },
   "service.name": "sy.mc.statistic",
   "service.host": "127.0.0.1",
