@@ -128,6 +128,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Map<String, Object> sendMsgMap = new HashMap<>();
         sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
         sendMsgMap.put("params", params);
+        logger.info("Socket Push ObjectToByte Before [customerId=" + customerId + "], sendMsgMap :" + Json.encode(sendMsgMap));
         return sendMsgMap;
     }
 
@@ -140,7 +141,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
         DatagramSocket client = null;
         try {
-            logger.info("Socket push objectToByte before :" + Json.encode(sendMsgMap));
+
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
             client = new DatagramSocket();
             KeyValue host = getPollHost();
@@ -154,8 +155,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             client.send(sendPacket);
             resultHandler.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
-            logger.error("socket推送消息出错 " + e.getMessage(), e);
             resultHandler.handle(Future.failedFuture(e.getMessage()));
+            //打出错误日志
+            logger.error("socket send error !", e);
+            List<Object> params = (List)sendMsgMap.get("params");
+            logger.error("socket send error customerId=" + params.get(0) + ", msgInfo=" + Json.encode(params.get(3)));
         } finally {
             if (client != null) {
                 client.close();

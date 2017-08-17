@@ -36,9 +36,9 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 //		receiveMsg = testSendControl(receiveMsg);
 
 		logger.info("enter applePushService sendMsg method");
-
+		String deviceToken = receiveMsg.getString("apnsToken");
 		Map<String, String> addQueryParam = new HashMap<>();
-		addQueryParam.put("deviceToken", receiveMsg.getString("apnsToken"));
+		addQueryParam.put("deviceToken", deviceToken);
 		addQueryParam.put("title", receiveMsg.getString("title"));
 		addQueryParam.put("body", receiveMsg.getString("content"));
 		addQueryParam.put("msgbody", receiveMsg.toString());
@@ -54,7 +54,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		webClient.postAbs(appleUrl)
 				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-				.addQueryParam("deviceToken", receiveMsg.getString("apnsToken"))
+				.addQueryParam("deviceToken", deviceToken)
 				.addQueryParam("title", receiveMsg.getString("title"))
 				.addQueryParam("body", receiveMsg.getString("content"))
 				.addQueryParam("msgbody", receiveMsg.toString())
@@ -62,15 +62,17 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 					if (responseHandler.succeeded()) {
 						String result = responseHandler.result().bodyAsString();
-						logger.info("apns推送返回结果：" + result);
+						logger.info("apns推送返回结果deviceToken=" + deviceToken +  ", result=" + result);
 
 						if (StringUtil.isNullOrEmpty(result)) {
+							logger.error("Apple push result is null deviceToken=" + deviceToken);
 							resultHandler.handle(Future.failedFuture("Apple push result is null"));
 						} else {
 							resultHandler.handle(Future.succeededFuture(new BaseResponse()));
 						}
 					} else {
-						resultHandler.handle(Future.failedFuture("Apple push error:" + responseHandler.cause()));
+						logger.error("Apple push error deviceToken=" + deviceToken , responseHandler.cause());
+						resultHandler.handle(Future.failedFuture("Apple push error" + responseHandler.cause()));
 					}
 
 				});

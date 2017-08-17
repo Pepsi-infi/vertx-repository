@@ -45,7 +45,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         logger.info("进入小米推送Verticle");
 
         if (receiveMsg == null) {
-            logger.error("尚无消息");
+            logger.error("进入小米推送消息内容为空");
             return;
         }
 
@@ -74,7 +74,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         logger.info("xiaomi send before :" + Json.encode(message));
         Result sendResult = sender.send(message, regId, 0); // 根据regID，发送消息到指定设备上，不重试。
 
-        logger.info("regId: " + regId + ", 小米推送返回结果：" + Json.encode(sendResult));
+        logger.info("regId=" + regId + ", 小米推送返回结果：" + Json.encode(sendResult));
         return sendResult;
     }
 
