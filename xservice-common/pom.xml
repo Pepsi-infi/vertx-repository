@@ -10,4 +10,12 @@
 	</parent>
 
 	<artifactId>xservice-common</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-redis-client</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+	</dependencies>
 </project>

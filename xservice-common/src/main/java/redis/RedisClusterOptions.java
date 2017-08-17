@@ -6,58 +6,53 @@ import java.util.List;
 import io.vertx.redis.RedisOptions;
 
 public class RedisClusterOptions {
-    private List<HostAndPort> nodes;
-    private RedisOptions redisOptions;
+	private List<HostAndPort> nodes;
+	private RedisOptions redisOptions;
 
-    public RedisClusterOptions() {
-        this.nodes = new ArrayList<>();
-        this.redisOptions = new RedisOptions();
-    }
+	public RedisClusterOptions() {
+		this.nodes = new ArrayList<>();
+		this.redisOptions = new RedisOptions();
+	}
 
-    public RedisClusterOptions addNode(HostAndPort hostAndPort) {
-        nodes.add(hostAndPort);
-        return this;
-    }
+	public RedisClusterOptions addNode(HostAndPort hostAndPort) {
+		nodes.add(hostAndPort);
+		return this;
+	}
 
-    public HostAndPort getNode(int index) {
-        return nodes.get(index);
-    }
+	public HostAndPort getNode(int index) {
+		return nodes.get(index);
+	}
 
-    public RedisOptions getRedisOptions() {
-        return redisOptions;
-    }
+	public RedisOptions getRedisOptions() {
+		return redisOptions;
+	}
 
-    public RedisOptions cloneRedisOptions() {
-        return new RedisOptions().setAddress(redisOptions.getAddress())
-                .setAuth(redisOptions.getAuth())
-                .setEncoding(redisOptions.getEncoding())
-                .setSelect(redisOptions.getSelect())
-                .setBinary(redisOptions.isBinary());
-    }
+	public RedisOptions cloneRedisOptions() {
+		return new RedisOptions().setAddress(redisOptions.getAddress()).setAuth(redisOptions.getAuth())
+				.setEncoding(redisOptions.getEncoding()).setSelect(redisOptions.getSelect())
+				.setBinary(redisOptions.isBinary());
+	}
 
-    public void setRedisOptions(RedisOptions redisOptions) {
-        this.redisOptions = redisOptions;
-    }
+	public void setRedisOptions(RedisOptions redisOptions) {
+		this.redisOptions = redisOptions;
+	}
 
-    public List<HostAndPort> getNodes() {
-        return nodes;
-    }
+	public List<HostAndPort> getNodes() {
+		return nodes;
+	}
 
-    public void setNodes(List<HostAndPort> nodes) {
-        this.nodes = nodes;
-    }
+	public void setNodes(List<HostAndPort> nodes) {
+		this.nodes = nodes;
+	}
 
-    public int size() {
-        return nodes.size();
-    }
+	public int size() {
+		return nodes.size();
+	}
 
-    public RedisOptions getRedisOptions(int index) {
-        return new RedisOptions().setAddress(redisOptions.getAddress())
-                .setAuth(redisOptions.getAuth())
-                .setEncoding(redisOptions.getEncoding())
-                .setSelect(redisOptions.getSelect())
-                .setBinary(redisOptions.isBinary())
-                .setHost(nodes.get(index).getHost())
-                .setPort(nodes.get(index).getPort());
-}
+	public RedisOptions getRedisOptions(int index) {
+		return new RedisOptions().setAddress(redisOptions.getAddress()).setAuth(redisOptions.getAuth())
+				.setEncoding(redisOptions.getEncoding()).setSelect(redisOptions.getSelect())
+				.setBinary(redisOptions.isBinary()).setHost(nodes.get(index).getHost())
+				.setPort(nodes.get(index).getPort());
+	}
 }
