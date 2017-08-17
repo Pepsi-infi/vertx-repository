@@ -88,6 +88,12 @@ public class ResultData<T> implements Serializable {
         this.data = data;
     }
 
+    //重新设值
+    public void reSetResult(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
     @Override
     public String toString() {
         return Json.encode(this);
