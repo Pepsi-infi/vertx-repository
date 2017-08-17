@@ -1,17 +1,15 @@
 package service.impl;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import constant.PushConsts;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.redis.RedisOptions;
+import org.apache.commons.collections.CollectionUtils;
 import redis.HostAndPort;
 import redis.RedisCluster;
 import redis.RedisClusterOptions;
@@ -65,58 +63,28 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 	}
 
 	@Override
-	public void set(String key, String value, Handler<AsyncResult<Void>> result) {
-		redisCluster.set(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
+	public void set(String key, String value, Handler<AsyncResult<Void>> handler) {
+		redisCluster.set(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler);
 	}
 
 	@Override
-	public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
-		redisCluster.expireat(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, expire, handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
+	public void expire(String key, long expire, Handler<AsyncResult<Long>> handler) {
+		redisCluster.expireat(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, expire, handler);
 	}
 
 	@Override
-	public void get(String key, Handler<AsyncResult<String>> result) {
-		redisCluster.get(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
+	public void get(String key, Handler<AsyncResult<String>> handler) {
+		redisCluster.get(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler);
 	}
 
 	@Override
-	public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
+	public void lpush(String queue, String key, Handler<AsyncResult<Long>> handler) {
+		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler);
 	}
 
 	@Override
-	public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
+	public void rpush(String queue, String key, Handler<AsyncResult<Long>> handler) {
+		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler);
 	}
 
 	public static void main(String[] args) {
