@@ -51,6 +51,11 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
         try {
             Result result = sendMessage(receiveMsg);
+            
+            if(result==null){
+            	resultHandler.handle(Future.failedFuture("xiaomi push result is null"));
+            	return;
+            }
 
             if (ErrorCode.Success == result.getErrorCode()) {
                 resultHandler.handle(Future.succeededFuture(new BaseResponse()));
@@ -87,14 +92,26 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
         Integer jumpPage = recieveMsg.getInteger("jumpPage");
         String content = recieveMsg.getString("content");
         Integer isIntoPsnCenter = recieveMsg.getInteger("isIntoPsnCenter");
-        if(isIntoPsnCenter != null && isIntoPsnCenter == 1){
-            jumpPage = JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode();
+        Integer openType=recieveMsg.getInteger("type");
+        String url=recieveMsg.getString("url");
+        String psnCenterImgUrl=recieveMsg.getString("psnCenterImgUrl");
+              
+        String action;
+        if(PushConsts.PUSH_OPEN_TYPE_APP==openType){
+        	action = MsgUtil.getEnumByCode(jumpPage);
+        }else if(PushConsts.PUSH_OPEN_TYPE_HTML==openType){
+        	action=url;
+        }else{
+        	logger.error("type is error,set action");
+        	action=MsgUtil.getEnumByCode(jumpPage);
         }
-        String action = MsgUtil.getEnumByCode(jumpPage);
 
         Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
                 .extra("messageId", msgId).extra("action", action).extra("title", title)
-                .extra("content", content).restrictedPackageName(packageName)
+                .extra("content", content)
+                .extra("isIntoPsnCenter", isIntoPsnCenter+"")
+                .extra("psnCenterImgUrl",psnCenterImgUrl)
+                .restrictedPackageName(packageName)
                 .passThrough(PushConsts.XIAOMI_PASS_THROUGH_TOUCHUAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
                 .notifyType(PushConsts.XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND) // 使用默认提示音提示
                 .build();
