@@ -56,7 +56,7 @@ public class RestStatVerticle extends RestAPIVerticle {
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
-        createHttpServer(router, serverHost, StatRestConstants.Stat.HTTP_PORT).compose(
+        createHttpServer(router, serverHost,config().getInteger("service.port")).compose(
                 serverCreated -> publishHttpEndpoint(StatRestConstants.Stat.SERVICE_NAME, serverHost,
                         StatRestConstants.Stat.HTTP_PORT, StatRestConstants.Stat.SERVICE_ROOT)).setHandler(
                 voidFuture.completer());
