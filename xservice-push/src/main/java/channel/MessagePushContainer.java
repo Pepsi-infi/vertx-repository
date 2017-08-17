@@ -254,6 +254,18 @@ public class MessagePushContainer extends AbstractVerticle {
         }
         // sokit、gcm,小米连接token
         token = (String) receiveMsg.getValue("deviceToken");
+        
+        Integer openType=receiveMsg.getInteger("type");
+        if(openType==null){
+            result.reSetResult(ResultData.FAIL, "type is null");
+            return result;
+        }
+        
+        String url=receiveMsg.getString("url");
+        if(openType==PushConsts.PUSH_OPEN_TYPE_HTML&&StringUtil.isNullOrEmpty(url)){
+        	result.reSetResult(ResultData.FAIL, "select opening html but url is null");
+            return result;
+        }
 
         return result;
     }
