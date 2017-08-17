@@ -11,16 +11,16 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisOptions;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import redis.RedisCluster;
+import redis.RedisClusterOptions;
 import rxjava.BaseServiceVerticle;
+import util.ConfigUtil;
 import utils.BaseResponse;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatService {
     private static final Logger logger = LoggerFactory.getLogger(MsgStatServiceImpl.class);
 
-    private RedisClient redisClient;
+    private RedisCluster redisClient;
 
 
     public MsgStatServiceImpl() {
@@ -49,9 +49,8 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
         XProxyHelper.registerService(MsgStatService.class, vertx.getDelegate(), this, MsgStatService.SERVICE_ADDRESS);
         publishEventBusService(MsgStatService.SERVICE_NAME, MsgStatService.SERVICE_ADDRESS, MsgStatService.class);
 
-        JsonObject jsonObject = config().getJsonObject("redis");
-        redisClient = RedisClient.create(vertx.getDelegate(), jsonObject.mapTo(RedisOptions.class));
-
+        RedisClusterOptions redisClusterOptions = ConfigUtil.getRedisClusterOptions(config().getJsonObject("redis"));
+        redisClient = RedisCluster.create(vertx.getDelegate(), redisClusterOptions);
     }
 
 
@@ -65,44 +64,48 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             logger.warn("the antFingerprint of msgStat:{} is null ", msgStatDto);
             result.handle(Future.failedFuture("the antFingerprint of msgStat is null"));
         } else {
-            try {
-                List<Future> futures = Lists.newArrayList();
-                //设置过期时间 12小时
-                Future<Long> expireFuture = Future.future();
-                futures.add(expireFuture);
-                redisClient.expire(msgSendKey, 43200, expireFuture.completer());
-                expireFuture.setHandler(handler -> {
-                    if (handler.succeeded()) {
-                        logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
-                    } else {
-                        logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
-                    }
-                });
-                for (String field : fields) {
-                    Future<Long> fieldSetFuture = Future.future();
-                    futures.add(fieldSetFuture);
-                    redisClient.hincrby(msgSendKey, field, 1, fieldSetFuture.completer());
-                    fieldSetFuture.setHandler(handler -> {
-                        if (handler.succeeded()) {
-                            logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
-                        } else {
-                            logger.error("stat msgStatDto : {} by filed :{} error.", msgStatDto, field, handler.cause());
-                        }
-                    });
+            List<Future> futures = Lists.newArrayList();
+            //设置过期时间 12小时
+            Future<Long> expireFuture = Future.future();
+            futures.add(expireFuture);
+            redisClient.expire(msgSendKey, 43200, expireFuture.completer());
+            expireFuture.setHandler(handler -> {
+                if (handler.succeeded()) {
+                    logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
+                } else {
+                    logger.error("key : {} for  msgStatDto :{} set expire error : {} .", msgSendKey, msgStatDto, handler.cause());
                 }
-                CompositeFuture compositeFuture = CompositeFuture.all(futures);
-                compositeFuture.setHandler(res -> {
-                    if (res.succeeded()) {
-                        result.handle(Future.succeededFuture());
+            });
+            for (String field : fields) {
+                Future<Long> fieldSetFuture = Future.future();
+                futures.add(fieldSetFuture);
+                redisClient.hincrby(msgSendKey, field, 1, fieldSetFuture.completer());
+                fieldSetFuture.setHandler(handler -> {
+                    if (handler.succeeded()) {
+                        logger.info("stat msgStatDto : {}  by filed :{} success.", msgStatDto, field);
                     } else {
-                        logger.error(res.cause());
-                        result.handle(Future.failedFuture(res.cause()));
+                        logger.error("stat msgStatDto : {} by filed :{} error.", msgStatDto, field, handler.cause());
                     }
                 });
-            } catch (Exception e) {
-                logger.error("stat msgStatDto : {} error.", msgStatDto, e);
-                result.handle(Future.failedFuture(e.getCause()));
             }
+            CompositeFuture compositeFuture = CompositeFuture.all(futures);
+            compositeFuture.setHandler(res -> {
+                if (res.succeeded()) {
+                    result.handle(Future.succeededFuture());
+                } else {
+                    logger.error(res.cause());
+                    result.handle(Future.failedFuture(res.cause()));
+                }
+            });
+
+            redisClient.sadd(CacheConstants.getAllPushMsgKey(), msgSendKey, ar -> {
+                if (ar.succeeded()) {
+                    logger.info("add  pushMsgKey:{} to redis  success.", msgSendKey);
+                } else {
+                    logger.error("add  pushMsgKey:{} to redis  error.", msgSendKey, ar.cause());
+                }
+            });
+
         }
     }
 

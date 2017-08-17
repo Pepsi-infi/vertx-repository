@@ -13,6 +13,12 @@ import java.util.List;
  */
 public class CacheConstants {
 
+    //消息中心前缀
+    public static final String MC_PREFIX = "MC_STAT_";
+
+    //所有消息key
+    public static final String PUSH_MSG_ALL = "PUSH_MSG_ALL";
+
     public static final String PUSH_MSG = "PUSH_MSG_";
     //发送总数
     public static final String PUSH_SEND_SUM = "SEND_SUM";
@@ -38,7 +44,11 @@ public class CacheConstants {
 
 
     public static final String getPushMsgKey(MsgStatDto msgStatDto) {
-        return new StringBuffer().append(PUSH_MSG).append(msgStatDto.getMsgId()).toString();
+        return new StringBuffer().append(MC_PREFIX).append(PUSH_MSG).append(msgStatDto.getMsgId()).toString();
+    }
+
+    public static final String getAllPushMsgKey() {
+        return new StringBuffer().append(MC_PREFIX).append(PUSH_MSG_ALL).toString();
     }
 
     public static String getMsgId(String pushMsgKey) {

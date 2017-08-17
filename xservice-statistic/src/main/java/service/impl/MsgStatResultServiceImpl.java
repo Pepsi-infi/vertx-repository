@@ -7,16 +7,16 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.redis.RedisClient;
-import io.vertx.redis.RedisOptions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import redis.RedisCluster;
+import redis.RedisClusterOptions;
 import rxjava.BaseServiceVerticle;
 import service.MsgStatResultService;
 import service.dto.MsgStatResultDto;
+import util.ConfigUtil;
 import utils.BaseResponse;
 import utils.CalendarUtil;
 
@@ -32,7 +32,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
 
     private static final Logger logger = LoggerFactory.getLogger(MsgStatResultServiceImpl.class);
 
-    private RedisClient redisClient;
+    private RedisCluster redisClient;
 
     private MsgStatResultDao msgStatResultDao;
 
@@ -49,23 +49,23 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
 
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
 
-        JsonObject jsonObject = config().getJsonObject("redis");
-        redisClient = RedisClient.create(vertx.getDelegate(), jsonObject.mapTo(RedisOptions.class));
+        RedisClusterOptions redisClusterOptions = ConfigUtil.getRedisClusterOptions(config().getJsonObject("redis"));
+        redisClient = RedisCluster.create(vertx.getDelegate(), redisClusterOptions);
 
     }
 
 
     @Override
     public void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result) {
-        redisClient.keys(CacheConstants.PUSH_MSG + "*", handler -> {
-            if (handler.succeeded()) {
-                JsonArray jsonArray = handler.result();
+        redisClient.smembers(CacheConstants.getAllPushMsgKey(), ar -> {
+            if (ar.succeeded()) {
+                JsonArray jsonArray = ar.result();
                 List<String> keys = jsonArray.getList();
                 logger.info("date : {} get keys ： {} from redis ", new Date(), keys);
                 processRedisMsgStatResult(jsonArray, result);
             } else {
-                logger.error("get keys from redis error", handler.cause());
-                result.handle(Future.failedFuture(handler.cause()));
+                logger.error("get keys from redis error", ar.cause());
+                result.handle(Future.failedFuture(ar.cause()));
             }
         });
     }
