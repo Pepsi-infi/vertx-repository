@@ -1,7 +1,7 @@
 package result;
 
 import enums.ErrorCodeEnum;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.Json;
 
 import java.io.Serializable;
 
@@ -57,7 +57,7 @@ public class ResultData<T> implements Serializable {
         this.msg = msg;
         this.data = data;
     }
-    
+
     public ResultData(ErrorCodeEnum errorEnum, T data) {
         this.code = errorEnum.getCode();
         this.msg = errorEnum.getMsg();
@@ -87,20 +87,15 @@ public class ResultData<T> implements Serializable {
     public void setData(T data) {
         this.data = data;
     }
-    
-    public ResultData<T> backResult(ErrorCodeEnum errorEnum,T data){
-        this.code = errorEnum.getCode();
-        this.msg = errorEnum.getMsg();
-        this.data = data;
-        return this;
-    }
 
-    public void reSetResult(int code, String msg){
+    //重新设值
+    public void reSetResult(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
+
     @Override
     public String toString() {
-    	return JsonObject.mapFrom(this).toString();
+        return Json.encode(this);
     }
 }

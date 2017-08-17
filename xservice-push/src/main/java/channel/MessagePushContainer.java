@@ -66,7 +66,6 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-		logger.info("conf():" + config());
 		config = config().getJsonObject("push.config");
 
 		// 初始化化服务
@@ -89,7 +88,7 @@ public class MessagePushContainer extends AbstractVerticle {
 		HttpServerResponse resp = context.response();
 		HttpServerRequest request = context.request();
 		String httpMsg = request.getParam("body");
-		logger.info(" 接收到的消息内容：" + httpMsg);
+		logger.info("接收到的消息内容：" + httpMsg);
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
 			responseError(resp, "body is null");
@@ -116,7 +115,7 @@ public class MessagePushContainer extends AbstractVerticle {
 			if (res.succeeded()) {
 				pushMsgToDownStream(receiveMsg, pushFuture.completer());
 			} else {
-				logger.error("消息重复推送：" + res.cause());
+				logger.error("验证重复推送：" + res.cause());
 				responseError(resp, res.cause().getMessage());
 			}
 		});
@@ -183,13 +182,14 @@ public class MessagePushContainer extends AbstractVerticle {
 		msgStatDto.setAction(PushConsts.MsgStat_ACTION_SEND);
 		msgStatDto.setSendTime(DateUtil.getDateTime(System.currentTimeMillis()));
 		msgList.add(msgStatDto);
-		logger.info("已推送消息上报msg：" + Json.encode(msgList));
+		logger.info("已推送消息上报msgId=" + msgId + ",JsonDetail:" + Json.encode(msgStatDto));
 		msgStatService.statPushMsg(msgList, statRes -> {
 			if (statRes.succeeded()) {
+				logger.info("已推送消息上报成功msgId=" + msgId);
 				String result = statRes.result();
 				exeStatPushMsgResult(msgId, result, resultHandler);
 			} else {
-				logger.error("已推送消息上报失败", statRes.cause());
+				logger.error("已推送消息上报调用异常msgId=" + msgId , statRes.cause());
 				resultHandler.handle(Future.failedFuture(statRes.cause()));
 			}
 		});
@@ -204,17 +204,17 @@ public class MessagePushContainer extends AbstractVerticle {
 	 */
 	private void exeStatPushMsgResult(String msgId, String result, Handler<AsyncResult<BaseResponse>> resultHandler) {
 		if (StringUtils.isNotBlank(result)) {
-			logger.info("exeStatPushMsgResult result :" + result);
+			logger.info("exeStatPushMsgResult > result :" + result);
 			JsonObject json = new JsonObject(result);
 			if (json != null) {
 				Object status = json.getValue("status");
 				Integer sts = (status != null) ? (Integer) status : null;
 				if (sts != null && PushConsts.MsgStat_StatPushMsg_SUCCESS == sts) {
-					logger.error("消息上报成功");
+					logger.error("消息上报返回成功msgId=" + msgId);
 					resultHandler.handle(Future.succeededFuture());
 				} else {
-					logger.error("消息上报失败，msgId :" + msgId);
-					resultHandler.handle(Future.failedFuture("消息上报失败，msgId :" + msgId));
+					logger.error("消息上报返回失败msgId=" + msgId);
+					resultHandler.handle(Future.failedFuture("消息上报返回失败msgId=" + msgId));
 				}
 			}
 		} else {
@@ -275,7 +275,7 @@ public class MessagePushContainer extends AbstractVerticle {
 				// 验证redis
 				String redisResult = handler.result();
 				if (StringUtils.isNotBlank(redisResult)) {
-					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送，msgId =" + msgId;
+					String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送msgId=" + msgId;
 					resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
 					return;
 				}
@@ -300,13 +300,13 @@ public class MessagePushContainer extends AbstractVerticle {
 				msg.setStatus(MsgStatusEnum.SUCCESS.getCode());
 				msgRecordService.addMessage(msg, res -> {
 					if (res.succeeded()) {
-						logger.info("保存消息成功：" + res);
+						logger.info("保存消息成功msgId=" + msgId);
 					} else {
-						logger.info("保存消息失败：" + res.cause());
+						logger.info("保存消息失败msgId=" + msgId, res.cause());
 					}
 				});
 			} else {
-				logger.error("数据验证未通过，原因：" + checkFutrue.cause());
+				logger.error("数据验证未通过", checkFutrue.cause());
 			}
 		});
 
