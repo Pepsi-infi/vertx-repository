@@ -69,4 +69,7 @@ public class PushConsts {
 	
 	//消息推送打开类型：打开网页
 	public static final int PUSH_OPEN_TYPE_HTML=2;
+	
+	//消息中心redis前缀
+	public static final String REDIS_PREFIX_MESSAGE_CENTER="mc_push_";
 }
