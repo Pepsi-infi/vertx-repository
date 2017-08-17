@@ -63,4 +63,10 @@ public class PushConsts {
 	
 	//推送跳转标识：信用卡页
 	public static final int JUMP_FLAG_CREDIT_PAGE=4;
+	
+	//消息推送打开类型：打开app
+	public static final int PUSH_OPEN_TYPE_APP=1;
+	
+	//消息推送打开类型：打开网页
+	public static final int PUSH_OPEN_TYPE_HTML=2;
 }
