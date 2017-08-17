@@ -57,7 +57,7 @@ public class MsgStatResultService {
   }
 
   /**
-   * 持久化push message 数据
+   * 鎸佷箙鍖杙ush message 鏁版嵁
    * @param result 
    */
   public void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result) { 
@@ -65,7 +65,7 @@ public class MsgStatResultService {
   }
 
   /**
-   * 持久化push message 数据
+   * 鎸佷箙鍖杙ush message 鏁版嵁
    * @return 
    */
   public Single<BaseResponse> rxStoreMsgStatResult() { 

@@ -1,0 +1,17 @@
+{
+	"redis.cluster.password": "mobilemobile",
+	"redis.slaves": [
+		{
+			"host": "10.112.32.120",
+			"port": 7000
+		},
+		{
+			"host": "10.112.32.120",
+			"port": 7001
+		},
+		{
+			"host": "10.112.32.120",
+			"port": 7002
+		}
+	]
+}
