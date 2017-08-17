@@ -3,7 +3,6 @@ package channel;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
-import enums.JumpFlagEnum;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -95,20 +94,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         String token = receiveMsg.getString("deviceToken");
         //超时时间，秒
         Long expireTime = receiveMsg.getLong("expireTime");
-
-        //判断要跳转到那个url
-        Object isIntoPsnCenter = receiveMsg.getValue("isIntoPsnCenter");
-        Object jumpPage = receiveMsg.getValue("jumpPage");
-        if(isIntoPsnCenter != null){
-            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
-        }
-        if(jumpPage != null){
-            Integer actionCode = (Integer) jumpPage;
-            String action = MsgUtil.getEnumByCode(actionCode);
-            receiveMsg.put("action", action);
-        }else{
-            receiveMsg.put("action", "");
-        }
+        //跳转页逻辑
+        initActionUrl(receiveMsg);
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
@@ -131,6 +118,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         logger.info("Socket Push ObjectToByte Before [customerId=" + customerId + "], sendMsgMap :" + Json.encode(sendMsgMap));
         return sendMsgMap;
     }
+
 
     /**
      * 组装发送soket需要的数据，并且通过socket发送
@@ -288,6 +276,31 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
        return jsonMsg;
     }
 
+    private static void initActionUrl(JsonObject receiveMsg){
+        String action = "";
+        //如果配置了打开网页，则跳转到H5网页
+        //type, 1是打开app,2是打开网页
+        Object type = receiveMsg.getValue("type");
+        Object url = receiveMsg.getValue("url");
+        if(type != null){
+            String actionUrl = (url != null) ? (String)url : "";
+            action = ((Integer) type == 2 ) ? actionUrl : "";
+        }
+        if(StringUtils.isNotBlank(action)){
+            receiveMsg.put("action", action);
+            return;
+        }
+
+        //如果没有配置打开网面，走跳转页
+        Object jumpPage = receiveMsg.getValue("jumpPage");
+        if(jumpPage != null){
+            Integer actionCode = (Integer) jumpPage;
+            action = MsgUtil.getEnumByCode(actionCode);
+            receiveMsg.put("action", action);
+        }else{
+            receiveMsg.put("action", "");
+        }
+    }
     /**
      * 测试示例
      *
@@ -303,20 +316,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 //            mp.send(json);
 //        });
 
-        //2 测试action取值
-//        JsonObject jsonMsg = new JsonObject("{\"jumpPage\":4 ,\"isIntoPsnCenter\":1}");
-//        Object isIntoPsnCenter = jsonMsg.getValue("isIntoPsnCenter");
-//        Object jumpPage = jsonMsg.getValue("jumpPage");
-//        if(isIntoPsnCenter != null){
-//            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
-//        }
-//        if(jumpPage != null){
-//            Integer actionCode = (Integer) jumpPage;
-//            String action = MsgUtil.getEnumByCode(actionCode);
-//            jsonMsg.put("action", action);
-//        }else{
-//            jsonMsg.put("action", "");
-//        }
-//        System.out.println( jsonMsg.toString());
+
+
+          //2、测试跳转页
+//       sonObject json  = new JsonObject("{\"type\":2,\"url\":\"www.baidu.com\",\"jumpPage\":0,\"isIntoPsnCenter\":1}");
+//        initActionUrl(json);
+//        System.out.println(json);
     }
 }
