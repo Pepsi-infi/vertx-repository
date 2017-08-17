@@ -172,9 +172,9 @@ public class MessagePushContainer extends AbstractVerticle {
 		msgStatDto.setChannel(channel);
 		msgStatDto.setMsgId(msgId);
 		// 1 安卓
-		if(PushTypeEnum.APNS.getSrcCode() == channel){
+		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
-		}else {
+		} else {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_ANDROID);
 		}
 
@@ -189,7 +189,7 @@ public class MessagePushContainer extends AbstractVerticle {
 				String result = statRes.result();
 				exeStatPushMsgResult(msgId, result, resultHandler);
 			} else {
-				logger.error("已推送消息上报调用异常msgId=" + msgId , statRes.cause());
+				logger.error("已推送消息上报调用异常msgId=" + msgId, statRes.cause());
 				resultHandler.handle(Future.failedFuture(statRes.cause()));
 			}
 		});
@@ -320,7 +320,7 @@ public class MessagePushContainer extends AbstractVerticle {
 			this.pushByApple(receiveMsg, resultHandler);
 			return;
 		}
-		
+
 		Map<String, String> param = new HashMap<>();
 		param.put("phone", phone);
 		Future<List<DeviceDto>> deviceFuture = Future.future();
@@ -343,7 +343,7 @@ public class MessagePushContainer extends AbstractVerticle {
 					errorMsg = "设备token不存在,推送操作不执行";
 					logger.error(errorMsg);
 					this.pushByAndroid(receiveMsg, resultHandler);
-					//resultHandler.handle(Future.failedFuture(errorMsg));
+					// resultHandler.handle(Future.failedFuture(errorMsg));
 					return;
 				}
 			} else {
@@ -428,46 +428,55 @@ public class MessagePushContainer extends AbstractVerticle {
 
 		String phone = receiveMsg.getString("phone");
 		// 如果设备token为空，从库中查询token出来
-		if (StringUtils.isBlank(token)) {
-			Map<String, String> param = new HashMap<>();
-			param.put("phone", phone);
-			Future<List<DeviceDto>> deviceFuture = Future.future();
-			deviceService.queryDevices(param, deviceFuture.completer());
-			deviceFuture.setHandler(devRes -> {
-				// 错误信息
-				String errorMsg = "";
-				if (devRes.succeeded()) {
-					List<DeviceDto> list = devRes.result();
-					if (CollectionUtils.isNotEmpty(list)) {
-						token = list.get(0).getDeviceToken();
-						receiveMsg.put("regId", token);
-
-						if (StringUtils.isNotBlank(token)) {
-							// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
-							logger.info("开始走小米推送");
-							xiaomiPushService.sendMsg(receiveMsg, resultHandler);
-							channel = PushTypeEnum.XIAOMI.getSrcCode();
-						}
-					} else {
-						errorMsg = "设备token不存在,推送操作不执行";
-						logger.error(errorMsg);
-						resultHandler.handle(Future.failedFuture(errorMsg));
-						return;
-					}
-				} else {
-					errorMsg = "查询设备token失败：" + devRes.cause();
-					logger.error(errorMsg);
-					resultHandler.handle(Future.failedFuture(errorMsg));
-					return;
-				}
-			});
-		} else {
+		if (!StringUtils.isBlank(token)) {
 			// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
 			logger.info("开始走小米推送");
 			receiveMsg.put("regId", token);
 			xiaomiPushService.sendMsg(receiveMsg, resultHandler);
 			channel = PushTypeEnum.XIAOMI.getSrcCode();
+			return;
 		}
+		
+		Map<String, String> param = new HashMap<>();
+		param.put("phone", phone);
+		Future<List<DeviceDto>> deviceFuture = Future.future();
+		deviceService.queryDevices(param, deviceFuture.completer());
+		deviceFuture.setHandler(devRes -> {
+			// 错误信息
+			String errorMsg = "";
+			if (devRes.succeeded()) {
+				List<DeviceDto> list = devRes.result();
+				if (CollectionUtils.isNotEmpty(list)) {
+					token = list.get(0).getDeviceToken();
+					receiveMsg.put("regId", token);
+
+					if (StringUtils.isNotBlank(token)) {
+						// 只用作对安卓手机进行推送,目前没有gcm的推送逻辑
+						logger.info("开始走小米推送");
+						xiaomiPushService.sendMsg(receiveMsg, resultHandler);
+						channel = PushTypeEnum.XIAOMI.getSrcCode();
+					} else {
+						errorMsg = "设备token不存在,推送操作不执行";
+						logger.error(errorMsg);
+						resultHandler.handle(Future.failedFuture(errorMsg));
+					}
+				} else {
+					errorMsg = "设备token不存在,推送操作不执行";
+					logger.error(errorMsg);
+					resultHandler.handle(Future.failedFuture(errorMsg));
+					return;
+				}
+			} else {
+				errorMsg = "查询设备token失败：" + devRes.cause();
+				logger.error(errorMsg);
+				resultHandler.handle(Future.failedFuture(errorMsg));
+				return;
+			}
+		});
+
+	{
+
+	}
 	}
 
 	/**
