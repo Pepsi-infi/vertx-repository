@@ -130,6 +130,14 @@
 		</dependency>
 		<!-- datasource end -->
 
+		<!-- redis start -->
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-redis-client</artifactId>
+			<version>${vertx-version}</version>
+		</dependency>
+		<!-- redis end -->
+
 		<!-- metrices start -->
 		<dependency>
 			<groupId>io.vertx</groupId>
