@@ -3,7 +3,6 @@ package channel;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
-import enums.JumpFlagEnum;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -71,8 +70,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Map<String, Object> sendMsgMap = this.convertMsgToBean(receiveMsg);
 
         //缓存到redis
-        Future<BaseResponse> redisFuture = Future.future();
-        this.setRedisCache(receiveMsg, redisFuture.completer());
+//        Future<BaseResponse> redisFuture = Future.future();
+//        this.setRedisCache(receiveMsg, redisFuture.completer());
 
         //发送数据
         this.socketSend(sendMsgMap, resultHandler);
@@ -93,30 +92,16 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         String msgId = receiveMsg.getValue("msgId") + "";
         String customerId = receiveMsg.getValue("customerId") + "";
         String token = receiveMsg.getString("deviceToken");
-        //消息内容
-        String msgBody = receiveMsg.toString();
         //超时时间，秒
         Long expireTime = receiveMsg.getLong("expireTime");
-
-        //判断要跳转到那个url
-        Object isIntoPsnCenter = receiveMsg.getValue("isIntoPsnCenter");
-        Object jumpPage = receiveMsg.getValue("jumpPage");
-        if(isIntoPsnCenter != null){
-            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
-        }
-        if(jumpPage != null){
-            Integer actionCode = (Integer) jumpPage;
-            String action = MsgUtil.getEnumByCode(actionCode);
-            receiveMsg.put("action", action);
-        }else{
-            receiveMsg.put("action", "");
-        }
+        //跳转页逻辑
+        initActionUrl(receiveMsg);
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
         msgInfo.put("msgId", msgId);
         msgInfo.put("title", messageType.getName());
-        msgInfo.put("body", msgBody);
+        msgInfo.put("body", receiveMsg.toString());
         if (StringUtils.isNotBlank(token) && token.length() > 10) {
             msgInfo.put("token", token);
         }
@@ -130,8 +115,10 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Map<String, Object> sendMsgMap = new HashMap<>();
         sendMsgMap.put("method", PushConsts.SOCKET_SEND_METHOD);
         sendMsgMap.put("params", params);
+        logger.info("Socket Push ObjectToByte Before [customerId=" + customerId + "], sendMsgMap :" + Json.encode(sendMsgMap));
         return sendMsgMap;
     }
+
 
     /**
      * 组装发送soket需要的数据，并且通过socket发送
@@ -142,7 +129,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
         DatagramSocket client = null;
         try {
-            logger.info("Socket push objectToByte before :" + Json.encode(sendMsgMap));
+
             byte[] sendBuf = ByteUtils.objectToByte(sendMsgMap);
             client = new DatagramSocket();
             KeyValue host = getPollHost();
@@ -156,8 +143,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
             client.send(sendPacket);
             resultHandler.handle(Future.succeededFuture(new BaseResponse()));
         } catch (Exception e) {
-            logger.error("socket推送消息出错 " + e.getMessage(), e);
             resultHandler.handle(Future.failedFuture(e.getMessage()));
+            //打出错误日志
+            logger.error("socket send error !", e);
+            List<Object> params = (List)sendMsgMap.get("params");
+            logger.error("socket send error customerId=" + params.get(0) + ", msgInfo=" + Json.encode(params.get(3)));
         } finally {
             if (client != null) {
                 client.close();
@@ -191,7 +181,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         }
     }
 
-
+    /**
+     * 原来socket的逻辑，暂时没用
+     * @param receiveMsg
+     * @param resultHandler
+     */
     private void setRedisCache(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         //广告类的消息
         EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
@@ -216,20 +210,15 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Future<Long> passEngerFuture = Future.future();
         //消息id放入队列
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
-        //把消息保存到redis中
-        Future<Void> msgFuture = Future.future();
-        redisService.set(msgId, Json.encode(chatMsgVO), msgFuture.completer());
-        //设置过期时间
-        Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
-        Future<Long> msgExpireFuture = Future.future();
-        redisService.expire(msgId, cacheExpireTime, msgExpireFuture.completer());
 
-        Future<CompositeFuture> future = CompositeFuture.all(passEngerFuture, msgFuture, msgExpireFuture);
+        //消息放到redis
+        Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
+        Future<String> msgFuture = Future.future();
+        redisService.setEx(msgId, cacheExpireTime, Json.encode(chatMsgVO), msgFuture.completer());
+
+        Future<CompositeFuture> future = CompositeFuture.all(passEngerFuture, msgFuture);
         future.setHandler(res -> {
             if (res.succeeded()) {
-//                Long passEngerRes = res.result().resultAt(0);
-//                Void msgRes = res.result().resultAt(1);
-//                Long expireRes = res.result().resultAt(2);
                 resultHandler.handle(Future.succeededFuture());
             } else {
                 resultHandler.handle(Future.failedFuture(res.cause()));
@@ -286,6 +275,31 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
        return jsonMsg;
     }
 
+    private static void initActionUrl(JsonObject receiveMsg){
+        String action = "";
+        //如果配置了打开网页，则跳转到H5网页
+        //type, 1是打开app,2是打开网页
+        Object type = receiveMsg.getValue("type");
+        Object url = receiveMsg.getValue("url");
+        if(type != null){
+            String actionUrl = (url != null) ? (String)url : "";
+            action = ((Integer) type == 2 ) ? actionUrl : "";
+        }
+        if(StringUtils.isNotBlank(action)){
+            receiveMsg.put("action", action);
+            return;
+        }
+
+        //如果没有配置打开网面，走跳转页
+        Object jumpPage = receiveMsg.getValue("jumpPage");
+        if(jumpPage != null){
+            Integer actionCode = (Integer) jumpPage;
+            action = MsgUtil.getEnumByCode(actionCode);
+            receiveMsg.put("action", action);
+        }else{
+            receiveMsg.put("action", "");
+        }
+    }
     /**
      * 测试示例
      *
@@ -301,20 +315,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 //            mp.send(json);
 //        });
 
-        //2 测试action取值
-//        JsonObject jsonMsg = new JsonObject("{\"jumpPage\":4 ,\"isIntoPsnCenter\":1}");
-//        Object isIntoPsnCenter = jsonMsg.getValue("isIntoPsnCenter");
-//        Object jumpPage = jsonMsg.getValue("jumpPage");
-//        if(isIntoPsnCenter != null){
-//            jumpPage = ((Integer)isIntoPsnCenter == 1) ?  JumpFlagEnum.MESSAGE_CENTER_PAGE.getCode() : jumpPage;
-//        }
-//        if(jumpPage != null){
-//            Integer actionCode = (Integer) jumpPage;
-//            String action = MsgUtil.getEnumByCode(actionCode);
-//            jsonMsg.put("action", action);
-//        }else{
-//            jsonMsg.put("action", "");
-//        }
-//        System.out.println( jsonMsg.toString());
+
+
+          //2、测试跳转页
+//       sonObject json  = new JsonObject("{\"type\":2,\"url\":\"www.baidu.com\",\"jumpPage\":0,\"isIntoPsnCenter\":1}");
+//        initActionUrl(json);
+//        System.out.println(json);
     }
 }

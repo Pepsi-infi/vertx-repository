@@ -8,7 +8,7 @@ public class PushConsts {
 	//配置文件路径, 启动时需要在VM参数配置，默认dev
 	public static String ENV_PATH = System.getProperty("config", "dev");
 
-	public final static String AD_PASSENGER_MSG_PREFIX = "AD_PASSENGER_MSG";
+	public final static String AD_PASSENGER_MSG_PREFIX = "AD_PASSENGER_MSG_";
 	
 	public final static String apnsToken = "apnsToken";
 	
@@ -41,6 +41,7 @@ public class PushConsts {
 
 	//系统类型， 安卓端:1; ISO:2;
 	public static final Integer MsgStat_OSTYPE_ANDROID = 1;
+	public static final Integer MsgStat_OSTYPE_IOS = 2;
 
 	//上报类型 1发送，2接收
 	public static final Integer MsgStat_ACTION_SEND = 1;
@@ -62,4 +63,13 @@ public class PushConsts {
 	
 	//推送跳转标识：信用卡页
 	public static final int JUMP_FLAG_CREDIT_PAGE=4;
+	
+	//消息推送打开类型：打开app
+	public static final int PUSH_OPEN_TYPE_APP=1;
+	
+	//消息推送打开类型：打开网页
+	public static final int PUSH_OPEN_TYPE_HTML=2;
+	
+	//消息中心redis前缀
+	public static final String REDIS_PREFIX_MESSAGE_CENTER="mc_push_";
 }
