@@ -56,7 +56,7 @@ public class RestStatVerticle extends RestAPIVerticle {
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
-        createHttpServer(router, serverHost,config().getInteger("service.port")).compose(
+        createHttpServer(router, serverHost, config().getInteger("service.port")).compose(
                 serverCreated -> publishHttpEndpoint(StatRestConstants.Stat.SERVICE_NAME, serverHost,
                         StatRestConstants.Stat.HTTP_PORT, StatRestConstants.Stat.SERVICE_ROOT)).setHandler(
                 voidFuture.completer());
@@ -166,7 +166,7 @@ public class RestStatVerticle extends RestAPIVerticle {
         String msgList = context.request().formAttributes().get("msgList");
 
         if (StringUtils.isBlank(appCode) || StringUtils.isBlank(osType) || StringUtils.isBlank(msgList)) {
-            logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
+            logger.warn("Required  parameters is empty. params  appCode: {}, osType: {}, antFingerprint: {}, msgList:{}", appCode, osType, antFingerprint, msgList);
             return null;
         }
         List<MsgStatDto> msgStatDtos = Lists.newArrayList();
