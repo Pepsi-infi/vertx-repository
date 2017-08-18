@@ -83,6 +83,7 @@ def transfer(date=None):
         page = page + 1
         result = srccur.fetchall()
         values=[]
+        nowDate = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         for row in result :
             phone=safeGetAttribute(row,4,None)
             device_token=safeGetAttribute(row,5,None)
@@ -90,13 +91,14 @@ def transfer(date=None):
             if(sql1count>0):
                 continue
             data=[phone,device_token]
-            data.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            data.append(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            data.append(nowDate)
+            data.append(nowDate)
             values.append(data)
             insertCount = insertCount + 1
+            print '%s >>>>>>> insert %d records to device >>>>>>> ' % (nowDate,insertCount)
         destcur.executemany(insertSql,values)
         destcon.commit()
-    print '>>>>>>> insert %d records to device >>>>>>> ' % (insertCount)
+    print '>>>>>>>total insert %d records to device >>>>>>> ' % (insertCount)
 
 
     close(srccur, srccon)
