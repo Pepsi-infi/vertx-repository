@@ -105,11 +105,6 @@ public class MessagePushContainer extends AbstractVerticle {
 			return;
 		}
 		
-		String msgId = receiveMsg.getValue("msgId") + "";
-		String customerId = receiveMsg.getValue("customerId") + "";
-		// 推送成功的消息把msgId保存到redis,用来防止重复推送
-		Future<Void> setRedisFuture = Future.future();
-		setMsgToRedis(msgId,customerId,receiveMsg.getLong("expireTime"),setRedisFuture.completer());
 		// 验证消息是否重复推送
 		Future<BaseResponse> repeatFuture = Future.future();
 
