@@ -181,7 +181,11 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         }
     }
 
-
+    /**
+     * 原来socket的逻辑，暂时没用
+     * @param receiveMsg
+     * @param resultHandler
+     */
     private void setRedisCache(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
         //广告类的消息
         EnumPassengerMessageType messageType = EnumPassengerMessageType.ADVERTISEMENT;
@@ -206,20 +210,15 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Future<Long> passEngerFuture = Future.future();
         //消息id放入队列
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
-        //把消息保存到redis中
-        Future<Void> msgFuture = Future.future();
-        redisService.set(msgId, Json.encode(chatMsgVO), msgFuture.completer());
-        //设置过期时间
-        Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
-        Future<Long> msgExpireFuture = Future.future();
-        redisService.expire(msgId, cacheExpireTime, msgExpireFuture.completer());
 
-        Future<CompositeFuture> future = CompositeFuture.all(passEngerFuture, msgFuture, msgExpireFuture);
+        //消息放到redis
+        Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
+        Future<String> msgFuture = Future.future();
+        redisService.setEx(msgId, cacheExpireTime, Json.encode(chatMsgVO), msgFuture.completer());
+
+        Future<CompositeFuture> future = CompositeFuture.all(passEngerFuture, msgFuture);
         future.setHandler(res -> {
             if (res.succeeded()) {
-//                Long passEngerRes = res.result().resultAt(0);
-//                Void msgRes = res.result().resultAt(1);
-//                Long expireRes = res.result().resultAt(2);
                 resultHandler.handle(Future.succeededFuture());
             } else {
                 resultHandler.handle(Future.failedFuture(res.cause()));
