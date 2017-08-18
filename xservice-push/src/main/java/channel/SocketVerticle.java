@@ -70,8 +70,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Map<String, Object> sendMsgMap = this.convertMsgToBean(receiveMsg);
 
         //缓存到redis
-        Future<BaseResponse> redisFuture = Future.future();
-        this.setRedisCache(receiveMsg, redisFuture.completer());
+//        Future<BaseResponse> redisFuture = Future.future();
+//        this.setRedisCache(receiveMsg, redisFuture.completer());
 
         //发送数据
         this.socketSend(sendMsgMap, resultHandler);
