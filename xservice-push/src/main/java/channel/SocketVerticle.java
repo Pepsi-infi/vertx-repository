@@ -70,8 +70,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         Map<String, Object> sendMsgMap = this.convertMsgToBean(receiveMsg);
 
         //缓存到redis
-//        Future<BaseResponse> redisFuture = Future.future();
-//        this.setRedisCache(receiveMsg, redisFuture.completer());
+        Future<BaseResponse> redisFuture = Future.future();
+        this.setRedisCache(receiveMsg, redisFuture.completer());
 
         //发送数据
         this.socketSend(sendMsgMap, resultHandler);
@@ -212,7 +212,9 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
 
         //消息放到redis
-        Long cacheExpireTime = (expireTime != null) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
+        //过期时间,没有过期时间设置为10分钟过期
+        Long cacheExpireTime = (expireTime != null && expireTime > System.currentTimeMillis()) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
+        chatMsgVO.setExpireTime(cacheExpireTime);
         Future<String> msgFuture = Future.future();
         redisService.setEx(msgId, cacheExpireTime, Json.encode(chatMsgVO), msgFuture.completer());
 
@@ -315,11 +317,10 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 //            mp.send(json);
 //        });
 
-
-
           //2、测试跳转页
 //       sonObject json  = new JsonObject("{\"type\":2,\"url\":\"www.baidu.com\",\"jumpPage\":0,\"isIntoPsnCenter\":1}");
 //        initActionUrl(json);
 //        System.out.println(json);
+
     }
 }

@@ -16,7 +16,13 @@ public class ChatMsgVO implements Serializable {
     private String msgBody;
     private Integer type;
     private long sendTime;
-    
+    private Long expireTime;
+    public Long getExpireTime() {
+        return expireTime;
+    }
+    public void setExpireTime(Long expireTime) {
+        this.expireTime = expireTime;
+    }
     public ChatMsgVO(){
     	this.setSendTime(System.currentTimeMillis());
     }

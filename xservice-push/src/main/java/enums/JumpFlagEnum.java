@@ -8,7 +8,7 @@ public enum JumpFlagEnum {
 	MEMBER_COUPON_PAGE(5,"sqyc://01zhuanche.com/coupon","用户优惠券页"),
 	CREDIT_CARD_PAGE(6,"sqyc://01zhuanche.com/creditCard","信用卡页"),
 	MEMBER_LEVEL_PAGE(7,"sqyc://01zhuanche.com/memberLevel","用户等级页"),
-	INVITE_FRIENDS_PAGE(8,"sqyc://01zhuanche.com/inviteFriends","邀请好友页");
+	INVITE_FRIENDS_PAGE(8,"sqyc://01zhuanche.com/messageCenter","消息中心页");
 	
 	
 	
