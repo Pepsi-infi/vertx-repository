@@ -478,16 +478,26 @@ public class MessagePushContainer extends AbstractVerticle {
 	 */
 	private void setMsgToRedis(String msgId, String customerId, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
-		redisService.set(redisMsgKey, msgId, setRes -> {
-			if (setRes.succeeded()) {
-				//为所存储的消息设置失效时间
-				this.setMessageExpire2Redis(redisMsgKey,expireTime,resultHandler);
-			} else {
-				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
-				logger.error(errorMsg, setRes.cause());
-				resultHandler.handle(Future.failedFuture(setRes.cause()));
+		long expire=(expireTime-System.currentTimeMillis())/1000;
+		redisService.setEx(redisMsgKey, expire,msgId, res->{
+			if(res.succeeded()){
+				resultHandler.handle(Future.succeededFuture());
+			}else{
+				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
+				logger.error(errorMsg, res.cause());
+				resultHandler.handle(Future.failedFuture(res.cause()));
 			}
 		});
+		//		redisService.set(redisMsgKey, msgId, setRes -> {
+//			if (setRes.succeeded()) {
+//				//为所存储的消息设置失效时间
+//				this.setMessageExpire2Redis(redisMsgKey,expireTime,resultHandler);
+//			} else {
+//				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
+//				logger.error(errorMsg, setRes.cause());
+//				resultHandler.handle(Future.failedFuture(setRes.cause()));
+//			}
+//		});
 		
 	}
 

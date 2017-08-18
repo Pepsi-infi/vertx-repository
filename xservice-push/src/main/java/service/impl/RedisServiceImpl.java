@@ -40,6 +40,7 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 		// 连接redis
 		this.initRedisClient();
+		
 
 	}
 
@@ -117,38 +118,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 				result.handle(Future.failedFuture(handler.cause()));
 			}
 		});
-	}
-
-	public static void main(String[] args) {
-		// Vertx vertx = Vertx.vertx();
-		// vertx.deployVerticle(RedisServiceImpl.class.getName());
-		//
-		// RedisService service = RedisService.createProxy(vertx);
-
-		// service.set("aa", "111111", res -> {
-		// if(res.succeeded()){
-		// logger.info("----------11--------- :" + res.result());
-		// }else{
-		// logger.info("----------11--------- :" + res.cause());
-		// }
-		// });
-		// service.get("aa", res -> {
-		// if(res.succeeded()){
-		// logger.info("----------22--------- :" + res.result());
-		// }else{
-		// logger.info("----------22--------- :" + res.cause());
-		// }
-		// });
-
-		// JsonObject redisConf = new JsonObject();
-		// redisConf.put("host","aa");
-		// redisConf.put("port",22);
-		// redisConf.put("encoding","utf-8");
-		// redisConf.put("tcpKeepAlive","true");
-		// redisConf.put("tcpNoDelay","true");
-		// RedisOptions redisOptions = redisConf.mapTo(RedisOptions.class);
-		// System.out.println(redisOptions.toString());
-
 	}
 
 	@Override

@@ -67,6 +67,16 @@ public class RedisService {
     }));
   }
 
+  public void setEx(String key, long expire, String value, Handler<AsyncResult<String>> result) { 
+    delegate.setEx(key, expire, value, result);
+  }
+
+  public Single<String> rxSetEx(String key, long expire, String value) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      setEx(key, expire, value, fut);
+    }));
+  }
+
   public void expire(String key, long expire, Handler<AsyncResult<Long>> result) { 
     delegate.expire(key, expire, result);
   }
