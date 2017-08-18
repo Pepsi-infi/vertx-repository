@@ -99,6 +99,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		Integer openType = recieveMsg.getInteger("type");
 		String url = recieveMsg.getString("url");
 		String psnCenterImgUrl = recieveMsg.getString("psnCenterImgUrl");
+		psnCenterImgUrl=StringUtil.isNullOrEmpty(psnCenterImgUrl)?"":psnCenterImgUrl;
 
 		String action;
 		if (PushConsts.PUSH_OPEN_TYPE_APP == openType) {
@@ -112,7 +113,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 		Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
 				.extra("messageId", msgId).extra("action", action).extra("title", title).extra("content", content)
-				.extra("isIntoPsnCenter", isIntoPsnCenter + "").extra("psnCenterImgUrl", psnCenterImgUrl+"")
+				.extra("isIntoPsnCenter", isIntoPsnCenter==null?"":isIntoPsnCenter+"").extra("psnCenterImgUrl", psnCenterImgUrl+"")
 				.restrictedPackageName(packageName).passThrough(PushConsts.XIAOMI_PASS_THROUGH_TOUCHUAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
 				.notifyType(PushConsts.XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND) // 使用默认提示音提示
 				.build();
@@ -137,13 +138,13 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		MiPushVerticle verticle = new MiPushVerticle();
 
 		JsonObject recieveMsg = new JsonObject();
-		
+				
 		recieveMsg.put("devicePushType", "");
 		recieveMsg.put("msgId", new Random().nextInt(1000000));
 		recieveMsg.put("customerId", 13666053);//卫明
 		recieveMsg.put("deviceToken", "");
 		recieveMsg.put("isIntoPsnCenter", 1);
-		recieveMsg.put("title", "socket测试苹果");
+		recieveMsg.put("title", "小米推送測試");
 		recieveMsg.put("content", "好好学习，天天向上");
 
 		recieveMsg.put("phone", "18810616483");//卫明
