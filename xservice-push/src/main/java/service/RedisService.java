@@ -40,6 +40,8 @@ public interface RedisService {
 
 	void set(String key, String value, Handler<AsyncResult<Void>> result);
 
+	void setEx(String key, long expire, String value, Handler<AsyncResult<String>> result);
+
 	void expire(String key, long expire, Handler<AsyncResult<Long>> result);
 
 	void get(String key, Handler<AsyncResult<String>> result);

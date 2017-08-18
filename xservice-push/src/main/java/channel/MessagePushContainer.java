@@ -104,7 +104,12 @@ public class MessagePushContainer extends AbstractVerticle {
 			responseError(resp, checkResult.getMsg());
 			return;
 		}
-
+		
+		String msgId = receiveMsg.getValue("msgId") + "";
+		String customerId = receiveMsg.getValue("customerId") + "";
+		// 推送成功的消息把msgId保存到redis,用来防止重复推送
+		Future<Void> setRedisFuture = Future.future();
+		setMsgToRedis(msgId,customerId,receiveMsg.getLong("expireTime"),setRedisFuture.completer());
 		// 验证消息是否重复推送
 		Future<BaseResponse> repeatFuture = Future.future();
 
@@ -162,7 +167,7 @@ public class MessagePushContainer extends AbstractVerticle {
 		String customerId = receiveMsg.getValue("customerId") + "";
 		// 推送成功的消息把msgId保存到redis,用来防止重复推送
 		Future<Void> setRedisFuture = Future.future();
-		this.setMsgToRedis(msgId, customerId, setRedisFuture.completer());
+		this.setMsgToRedis(msgId, customerId, receiveMsg.getLong("expireTime"),setRedisFuture.completer());
 
 		// 已推送消息上报接口
 		List<MsgStatDto> msgList = new ArrayList<>();
@@ -467,21 +472,47 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	/**
 	 * 推送成功的消息保存到redis中
+	 * @param expireTime 
 	 *
 	 * @param resultHandler
 	 */
-	private void setMsgToRedis(String msgId, String customerId, Handler<AsyncResult<Void>> resultHandler) {
+	private void setMsgToRedis(String msgId, String customerId, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
-		redisService.set(redisMsgKey, msgId, setRes -> {
-			if (setRes.succeeded()) {
+		long expire=(expireTime-System.currentTimeMillis())/1000;
+		redisService.setEx(redisMsgKey, expire,msgId, res->{
+			if(res.succeeded()){
 				resultHandler.handle(Future.succeededFuture());
-			} else {
-				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
-				logger.error(errorMsg, setRes.cause());
-				resultHandler.handle(Future.failedFuture(setRes.cause()));
+			}else{
+				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
+				logger.error(errorMsg, res.cause());
+				resultHandler.handle(Future.failedFuture(res.cause()));
 			}
 		});
+		//		redisService.set(redisMsgKey, msgId, setRes -> {
+//			if (setRes.succeeded()) {
+//				//为所存储的消息设置失效时间
+//				this.setMessageExpire2Redis(redisMsgKey,expireTime,resultHandler);
+//			} else {
+//				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
+//				logger.error(errorMsg, setRes.cause());
+//				resultHandler.handle(Future.failedFuture(setRes.cause()));
+//			}
+//		});
+		
+	}
 
+	private void setMessageExpire2Redis(String redisMsgKey, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
+		long expire=(expireTime-System.currentTimeMillis())/1000;
+		redisService.expire(redisMsgKey, expire, res->{
+			if(res.succeeded()){
+				resultHandler.handle(Future.succeededFuture());
+			}else{
+				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
+				logger.error(errorMsg, res.cause());
+				resultHandler.handle(Future.failedFuture(res.cause()));
+			}
+		});
+		
 	}
 
 	public static void main(String[] args) {

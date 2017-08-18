@@ -8,7 +8,7 @@ public class PushConsts {
 	//配置文件路径, 启动时需要在VM参数配置，默认dev
 	public static String ENV_PATH = System.getProperty("config", "dev");
 
-	public final static String AD_PASSENGER_MSG_PREFIX = "AD_PASSENGER_MSG";
+	public final static String AD_PASSENGER_MSG_PREFIX = "AD_PASSENGER_MSG_";
 	
 	public final static String apnsToken = "apnsToken";
 	
