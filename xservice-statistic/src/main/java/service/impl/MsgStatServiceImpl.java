@@ -65,10 +65,10 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
             result.handle(Future.failedFuture("the antFingerprint of msgStat is null"));
         } else {
             List<Future> futures = Lists.newArrayList();
-            //设置过期时间 12小时
+            //设置过期时间7天
             Future<Long> expireFuture = Future.future();
             futures.add(expireFuture);
-            redisClient.expire(msgSendKey, 43200, expireFuture.completer());
+            redisClient.expire(msgSendKey, 86400*7, expireFuture.completer());
             expireFuture.setHandler(handler -> {
                 if (handler.succeeded()) {
                     logger.info("key : {} for  msgStatDto :{} set expire success : {} .", msgSendKey, msgStatDto, handler.result());
