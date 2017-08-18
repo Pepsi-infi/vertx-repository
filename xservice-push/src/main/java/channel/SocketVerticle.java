@@ -212,8 +212,8 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
         redisService.rpush(PushConsts._MSG_LIST_PASSENGER + customerId, msgId, passEngerFuture.completer());
 
         //消息放到redis
-        //过期时间毫秒值, 没有过期时间设置为10分钟过期
-        Long cacheExpireTime = (expireTime != null) ? expireTime : System.currentTimeMillis() +  600000;
+        //过期时间,没有过期时间设置为10分钟过期
+        Long cacheExpireTime = (expireTime != null && expireTime > System.currentTimeMillis()) ? (expireTime - System.currentTimeMillis()) / 1000 : 600;
         chatMsgVO.setExpireTime(cacheExpireTime);
         Future<String> msgFuture = Future.future();
         redisService.setEx(msgId, cacheExpireTime, Json.encode(chatMsgVO), msgFuture.completer());
