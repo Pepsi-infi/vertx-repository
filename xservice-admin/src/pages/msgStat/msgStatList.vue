@@ -40,29 +40,21 @@
           label="到达总数"
           width="100">
         </el-table-column>
+        <!--
         <el-table-column
           prop="clickSum"
           label="点击总数"
           width="100">
         </el-table-column>
+        -->
         <el-table-column
           prop="sendAndroidSum"
           label="Android发送数"
           width="100">
         </el-table-column>
         <el-table-column
-           prop="sendIosSum"
-           label="IOS发送数"
-           width="100">
-        </el-table-column>
-        <el-table-column
           prop="arriveAndroidSum"
           label="Android到达数"
-          width="100">
-        </el-table-column>
-        <el-table-column
-          prop="arriveIosSum"
-          label="IOS到达数"
           width="100">
         </el-table-column>
         <el-table-column
@@ -71,10 +63,22 @@
           width="100">
         </el-table-column>
         <el-table-column
+           prop="sendIosSum"
+           label="IOS发送数"
+           width="100">
+        </el-table-column>
+        <el-table-column
+          prop="arriveIosSum"
+          label="IOS到达数"
+          width="100">
+        </el-table-column>
+        <!--
+        <el-table-column
           prop="clickIosSum"
           label="IOS点击数"
           width="100">
         </el-table-column>
+        -->
       </el-table>
       <bottom-tool-bar>
         <div slot="page">

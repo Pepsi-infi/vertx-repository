@@ -5,7 +5,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import api.RestDeviceVerticle;
+import api.RestStatVerticle;
 import dao.impl.DeviceDaoImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -34,10 +34,10 @@ public class MsgStatTest {
 
 			vertx.deployVerticle(DeviceDaoImpl.class.getName(), deploymentOptions);
 			vertx.deployVerticle(DeviceServiceImpl.class.getName(), deploymentOptions);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	// private Future<Void> deployVerticle(String name) {
 	// Future<String> future = Future.future();
@@ -51,9 +51,9 @@ public class MsgStatTest {
 		Future<String> future = Future.future();
 		DeploymentOptions deploymentOptions = new DeploymentOptions();
 		deploymentOptions.setConfig(config());
-		// vertx.deployVerticle(RestMsgStatVerticle.class.getName(), deploymentOptions,
+		vertx.deployVerticle(RestStatVerticle.class.getName(), deploymentOptions, future.completer());
+		// vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions,
 		// future.completer());
-		vertx.deployVerticle(RestDeviceVerticle.class.getName(), deploymentOptions, future.completer());
 		// vertx.deployVerticle(CronMsgStatVerticle.class.getName(), deploymentOptions,
 		// future.completer());
 		// vertx.deployVerticle(CronTransferDevcieVerticle.class.getName(),

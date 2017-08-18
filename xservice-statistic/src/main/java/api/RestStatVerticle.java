@@ -11,7 +11,9 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
+import iservice.DeviceService;
 import iservice.MsgStatService;
+import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,28 +32,31 @@ import java.util.Map;
  * Date : 2017/7/25 11:40
  * Description :
  */
-public class RestMsgStatVerticle extends RestAPIVerticle {
-    private static final Logger logger = LoggerFactory.getLogger(RestMsgStatVerticle.class);
+public class RestStatVerticle extends RestAPIVerticle {
+    private static final Logger logger = LoggerFactory.getLogger(RestStatVerticle.class);
 
     private MsgStatService msgStatService;
 
     private MsgStatResultDao msgStatResultDao;
 
+    private DeviceService deviceService;
+
     @Override
     public void start() throws Exception {
         super.start();
 
-        logger.info("Rest message stat verticle: Start...");
+        logger.info("Rest xservice-statistic verticle: Start...");
 
         Router router = Router.router(vertx);
         router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
         router.post(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
         router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
+        router.post(StatRestConstants.Device.DEVICE_REPORT).handler(this::reportUserDevice);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
-        createHttpServer(router, serverHost, StatRestConstants.Stat.HTTP_PORT).compose(
+        createHttpServer(router, serverHost,config().getInteger("service.port")).compose(
                 serverCreated -> publishHttpEndpoint(StatRestConstants.Stat.SERVICE_NAME, serverHost,
                         StatRestConstants.Stat.HTTP_PORT, StatRestConstants.Stat.SERVICE_ROOT)).setHandler(
                 voidFuture.completer());
@@ -62,10 +67,11 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
     private void initMsgStatService() {
         msgStatService = MsgStatService.createProxy(vertx.getDelegate());
         msgStatResultDao = MsgStatResultDao.createProxy(vertx.getDelegate());
+        deviceService = DeviceService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
-        return StringUtils.isNotBlank(IPUtil.getInnerIP()) ? IPUtil.getInnerIP() : config().getString("service.host");
+        return StringUtils.isNotBlank(IPUtil.getInnerIP()) ? IPUtil.getInnerIP() : "127.0.0.1";
     }
 
     private void statPushMsg(RoutingContext context) {
@@ -76,6 +82,67 @@ public class RestMsgStatVerticle extends RestAPIVerticle {
         } else {
             msgStatService.statPushMsg(msgStatDtos, resultStringHandler(context));
         }
+    }
+
+    private void reportUserDevice(RoutingContext context) {
+        DeviceDto userDeviceDto = buildDeviceDto(context);
+        logger.info("the request params : userDeviceDto : {}", userDeviceDto);
+        if (null == userDeviceDto) {
+            paramBadRequest(context, "Required  parameters cannot be empty.");
+        } else {
+            deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
+        }
+    }
+
+    /**
+     * @param context
+     * @return
+     */
+    private DeviceDto buildDeviceDto(RoutingContext context) {
+        DeviceDto userDeviceDto = new DeviceDto();
+        String uid = context.request().formAttributes().get("uid");
+        String phone = context.request().formAttributes().get("phone");
+        String deviceType = context.request().formAttributes().get("deviceType");
+        String channel = context.request().formAttributes().get("channel");
+        String deviceToken = context.request().formAttributes().get("deviceToken");
+        String osType = context.request().formAttributes().get("osType");
+        String osVersion = context.request().formAttributes().get("osVersion");
+        String appCode = context.request().formAttributes().get("appCode");
+        String appVersion = context.request().formAttributes().get("appVersion");
+        String antFingerprint = context.request().formAttributes().get("antFingerprint");
+        String isAcceptPush = context.request().formAttributes().get("isAcceptPush");
+
+        if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
+                || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+            logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
+            return null;
+        }
+
+        userDeviceDto.setDeviceToken(deviceToken);
+        userDeviceDto.setOsVersion(osVersion);
+        userDeviceDto.setPhone(phone);
+        userDeviceDto.setDeviceType(deviceType);
+        userDeviceDto.setAppVersion(appVersion);
+        userDeviceDto.setAntFingerprint(antFingerprint);
+        if (StringUtils.isNotBlank(osType)) {
+            userDeviceDto.setOsType(Integer.valueOf(osType));
+        }
+        if (StringUtils.isNotBlank(uid)) {
+            userDeviceDto.setUid(Long.valueOf(uid));
+        }
+        if (StringUtils.isNotBlank(appCode)) {
+            userDeviceDto.setAppCode(Integer.valueOf(appCode));
+        }
+        if (StringUtils.isNotBlank(appCode)) {
+            userDeviceDto.setAppCode(Integer.valueOf(appCode));
+        }
+        if (StringUtils.isNotBlank(channel)) {
+            userDeviceDto.setChannel(Integer.valueOf(channel));
+        }
+        if (StringUtils.isNotBlank(isAcceptPush)) {
+            userDeviceDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
+        }
+        return userDeviceDto;
     }
 
     private void queryMsgStatResult(RoutingContext context) {

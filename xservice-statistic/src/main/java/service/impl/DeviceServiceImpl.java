@@ -1,5 +1,6 @@
 package service.impl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dao.DeviceDao;
 import helper.XProxyHelper;
@@ -33,20 +34,6 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 		XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
 		publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
 		deviceDao = DeviceDao.createProxy(vertx.getDelegate());
-	}
-
-	@Override
-	public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
-		Future<List<DeviceDto>> resultFuture = Future.future();
-		deviceDao.queryDevices(param, resultFuture.completer());
-		resultFuture.setHandler(handler -> {
-			if (handler.succeeded()) {
-				result.handle(Future.succeededFuture(handler.result()));
-			} else {
-				logger.error("query devices error.", handler.cause());
-				result.handle(Future.failedFuture(handler.cause()));
-			}
-		});
 	}
 
 	@Override
@@ -105,6 +92,24 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 				}
 			});
 		}
+	}
+
+	@Override
+	public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
+		Future<DeviceDto> resultFuture = Future.future();
+		deviceDao.getDevice(param, resultFuture.completer());
+		resultFuture.setHandler(handler -> {
+			if (handler.succeeded()) {
+				List<DeviceDto> list = Lists.newArrayList();
+				if (handler.result() != null) {
+					list.add(handler.result());
+				}
+				result.handle(Future.succeededFuture(list));
+			} else {
+				logger.error("query devices error.", handler.cause());
+				result.handle(Future.failedFuture(handler.cause()));
+			}
+		});
 	}
 
 	private <T extends BaseResponse> void buildErrorBaseResponse(T response, String message) {
