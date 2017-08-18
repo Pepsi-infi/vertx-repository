@@ -41,7 +41,7 @@ public class StartVerticle extends AbstractVerticle{
 
     public static DeploymentOptions readBossOpts() {
         DeploymentOptions options = new DeploymentOptions();
-        options.setInstances(Runtime.getRuntime().availableProcessors());
+//        options.setInstances(Runtime.getRuntime().availableProcessors());
         return options;
     }
 
