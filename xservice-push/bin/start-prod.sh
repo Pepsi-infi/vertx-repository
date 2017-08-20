@@ -7,8 +7,7 @@ then
   kill -9 $pid
 fi
 
-BUILD_ID=
-java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -25,6 +24,6 @@ java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-prod.json \
 -Dconfig=prod \
--jar ${root_path}/xservice-push-fat.jar >/dev/null 2>&1
+-jar ${root_path}/xservice-push-fat.jar >/dev/null 2>&1 &
 
 exit 0

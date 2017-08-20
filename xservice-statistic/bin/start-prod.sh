@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-statistic | grep java | awk '{print $2}')
@@ -8,8 +7,7 @@ then
   kill -9 $pid
 fi
 
-BUILD_ID=
-java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -26,6 +24,6 @@ java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-prod.json \
 -Dconfig=prod \
--jar ${root_path}/xservice-statistic-fat.jar >/dev/null 2>&1
+-jar ${root_path}/xservice-statistic-fat.jar >/dev/null 2>&1 &
 
 exit 0
