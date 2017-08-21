@@ -15,4 +15,8 @@ public class ProtoBufUtil {
 	static {
 		protobufCodec.put(Message.class.getName(), ProtobufProxy.create(Message.class));
 	}
+	
+	public static void main(String[] args) {
+		
+	}
 }

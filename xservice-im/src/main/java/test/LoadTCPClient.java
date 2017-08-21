@@ -2,23 +2,47 @@ package test;
 
 import java.util.Random;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.NetClient;
 import io.vertx.core.net.NetClientOptions;
 import io.vertx.core.net.NetSocket;
-import io.vertx.core.net.PemTrustOptions;
 
-public class TCPClient {
+public class LoadTCPClient {
 
-	public static void main(String[] args) throws InterruptedException {
+	private NetClient client;
+
+	private String ip;
+
+	private int port;
+
+	/**
+	 * 构造函数，传入待压测服务器ip，port
+	 * 
+	 * @param ip
+	 * @param port
+	 */
+	public LoadTCPClient(String ip, int port) {
 		Vertx vertx = Vertx.vertx();
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
-		// options.setSsl(true).setPemTrustOptions(new
-		// PemTrustOptions().addCertPath("server-cert.pem"));
-		NetClient client = vertx.createNetClient(options);
-		client.connect(4321, "10.10.10.193", res -> {
+		client = vertx.createNetClient(options);
+
+		this.ip = ip;
+		this.port = port;
+	}
+
+	/**
+	 * 登录函数，用户id使用System.currentTimeMillis()模拟
+	 * 
+	 * @param resultHandler
+	 */
+	public void login(Handler<AsyncResult<Integer>> resultHandler) {
+		long ts = System.currentTimeMillis();
+		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
 
@@ -27,31 +51,69 @@ public class TCPClient {
 				byte[] clientVersion = intToBytes(10001);
 				byte[] cmdId = intToBytes(1001);
 				byte[] seq = intToBytes(1);
-				JsonObject msgBody = new JsonObject().put("from", "11111");
+				JsonObject msgBody = new JsonObject().put("from", String.valueOf(ts));
 				byte[] bodyLength = intToBytes(msgBody.toString().length());
 				Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
 						.appendBytes(seq).appendBytes(bodyLength).appendString(msgBody.toString()).appendString("\n");
-				// Buffer bf = Buffer.buffer();
-				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
 				socket.write(msg);
 
-				// 1002
-				// byte[] headerLength2 = intToBytes(24);
-				// byte[] clientVersion2 = intToBytes(10001);
-				// byte[] cmdId2 = intToBytes(1002);
-				// byte[] seq2 = intToBytes(1);
-				// JsonObject msgBody2 = new JsonObject().put("from", 11111);
-				// byte[] bodyLength2 = intToBytes(msgBody.toString().length());
-				// Buffer msg2 =
-				// Buffer.buffer().appendBytes(headerLength2).appendBytes(clientVersion2).appendBytes(cmdId2)
-				// .appendBytes(seq2).appendBytes(bodyLength2).appendString(msgBody.toString()).appendString("\n");
-				// Buffer bf = Buffer.buffer();
-				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
-				// socket.write(msg2);
+				resultHandler.handle(Future.succeededFuture(0));
 			} else {
-				System.out.println("Failed to connect: " + res.cause().getMessage());
+				resultHandler.handle(Future.succeededFuture(1));
 			}
 		});
+	}
+
+	/**
+	 * 登录函数，需要传入用户id
+	 * 
+	 * @param phone
+	 *            用户手机号
+	 * @param resultHandler
+	 */
+	public void login(String phone, Handler<AsyncResult<Integer>> resultHandler) {
+		client.connect(port, ip, res -> {
+			if (res.succeeded()) {
+				NetSocket socket = res.result();
+
+				// 1001
+				byte[] headerLength = intToBytes(24);
+				byte[] clientVersion = intToBytes(10001);
+				byte[] cmdId = intToBytes(1001);
+				byte[] seq = intToBytes(1);
+				JsonObject msgBody = new JsonObject().put("from", phone);
+				byte[] bodyLength = intToBytes(msgBody.toString().length());
+				Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
+						.appendBytes(seq).appendBytes(bodyLength).appendString(msgBody.toString()).appendString("\n");
+				socket.write(msg);
+
+				resultHandler.handle(Future.succeededFuture(0));
+			} else {
+				resultHandler.handle(Future.succeededFuture(1));
+			}
+		});
+	}
+
+	public static void main(String[] args) {
+		LoadTCPClient client = new LoadTCPClient("10.10.10.193", 4321);
+
+		Future<Integer> loginFuture = Future.future();
+		loginFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				System.out.println("login " + res.result());
+			} else {
+			}
+		});
+		client.login(loginFuture);
+
+		Future<Integer> loginFuture2 = Future.future();
+		loginFuture2.setHandler(res -> {
+			if (res.succeeded()) {
+				System.out.println("18510252799 login " + res.result());
+			} else {
+			}
+		});
+		client.login("18510252799", loginFuture);
 	}
 
 	/**

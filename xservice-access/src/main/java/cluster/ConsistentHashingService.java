@@ -27,5 +27,5 @@ public interface ConsistentHashingService {
 	 */
 	void getNode(String uid, Handler<AsyncResult<String>> resultHandler);
 	
-	void getNodeWithNodeList();
+//	void getNodeWithNodeList();
 }
