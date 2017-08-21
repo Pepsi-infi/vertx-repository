@@ -26,4 +26,6 @@ public interface ConsistentHashingService {
 	 * @param resultHandler
 	 */
 	void getNode(String uid, Handler<AsyncResult<String>> resultHandler);
+	
+//	void getNodeWithNodeList();
 }
