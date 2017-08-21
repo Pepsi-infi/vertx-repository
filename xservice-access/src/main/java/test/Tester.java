@@ -9,7 +9,7 @@ public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(TCPServerVerticle.class.getName());
+//		vertx.deployVerticle(TCPServerVerticle.class.getName());
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
 	}
 

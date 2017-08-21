@@ -108,7 +108,8 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
 			resultHandler.handle(Future.succeededFuture(virtualNodes.firstEntry().getValue()));
+		} else {
+			resultHandler.handle(Future.succeededFuture(en.getValue()));
 		}
-		resultHandler.handle(Future.succeededFuture(en.getValue()));
 	}
 }

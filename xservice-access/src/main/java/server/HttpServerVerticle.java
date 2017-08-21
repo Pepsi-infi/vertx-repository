@@ -50,9 +50,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private void getOnlineNumber(RoutingContext context) {
 		JsonObject result = new JsonObject();
+		BaseDto base = new BaseDto();
+		base.setCode(0);
+		base.setTime(System.currentTimeMillis());
+		base.setData(result);
 		result.put("sessionMap", sessionMap.size());
 		result.put("sessionReverse", sessionReverse.size());
 
-		context.response().putHeader("content-type", "application/json").end(Json.encodePrettily(result));
+		context.response().putHeader("content-type", "application/json").end(Json.encode(base));
 	}
 }
