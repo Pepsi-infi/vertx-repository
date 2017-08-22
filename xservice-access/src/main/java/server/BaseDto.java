@@ -1,7 +1,11 @@
 package server;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import io.vertx.core.json.JsonObject;
 
+@JsonInclude(Include.NON_NULL)
 public class BaseDto {
 
 	private int code;
