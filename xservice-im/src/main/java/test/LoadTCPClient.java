@@ -14,9 +14,13 @@ import io.vertx.core.net.NetSocket;
 
 public class LoadTCPClient {
 
+	private NetClient client;
+
 	private String ip;
 
 	private int port;
+
+	private NetClientOptions options;
 
 	/**
 	 * 构造函数，传入待压测服务器ip，port
@@ -25,6 +29,10 @@ public class LoadTCPClient {
 	 * @param port
 	 */
 	public LoadTCPClient(String ip, int port) {
+		Vertx vertx = Vertx.vertx();
+		options = new NetClientOptions().setConnectTimeout(10000);
+		client = vertx.createNetClient(options);
+
 		this.ip = ip;
 		this.port = port;
 	}
@@ -35,10 +43,7 @@ public class LoadTCPClient {
 	 * @param resultHandler
 	 */
 	public void login(String clientIP, Handler<AsyncResult<Integer>> resultHandler) {
-		Vertx vertx = Vertx.vertx();
-		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
 		options.setLocalAddress(clientIP);
-		NetClient client = vertx.createNetClient(options);
 		long ts = System.currentTimeMillis();
 		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
@@ -69,11 +74,9 @@ public class LoadTCPClient {
 	 *            用户手机号
 	 * @param resultHandler
 	 */
+
 	public void login(String clientIP, String phone, Handler<AsyncResult<Integer>> resultHandler) {
-		Vertx vertx = Vertx.vertx();
-		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
 		options.setLocalAddress(clientIP);
-		NetClient client = vertx.createNetClient(options);
 		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
@@ -97,7 +100,6 @@ public class LoadTCPClient {
 	}
 
 	public static void main(String[] args) {
-		Vertx vertx = Vertx.vertx();
 		LoadTCPClient client = new LoadTCPClient("10.10.10.193", 4321);
 
 		Future<Integer> loginFuture = Future.future();
