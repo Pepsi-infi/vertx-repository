@@ -40,7 +40,11 @@ public class LoadTCPClient {
 	 * 
 	 * @param resultHandler
 	 */
-	public void login(Handler<AsyncResult<Integer>> resultHandler) {
+	public void login(String clientIP, Handler<AsyncResult<Integer>> resultHandler) {
+		Vertx vertx = Vertx.vertx();
+		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
+		options.setLocalAddress(clientIP);
+		NetClient client = vertx.createNetClient(options);
 		long ts = System.currentTimeMillis();
 		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
@@ -71,7 +75,11 @@ public class LoadTCPClient {
 	 *            用户手机号
 	 * @param resultHandler
 	 */
-	public void login(String phone, Handler<AsyncResult<Integer>> resultHandler) {
+	public void login(String clientIP, String phone, Handler<AsyncResult<Integer>> resultHandler) {
+		Vertx vertx = Vertx.vertx();
+		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
+		options.setLocalAddress(clientIP);
+		NetClient client = vertx.createNetClient(options);
 		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
@@ -104,7 +112,7 @@ public class LoadTCPClient {
 			} else {
 			}
 		});
-		client.login(loginFuture);
+		client.login("", loginFuture);
 
 		Future<Integer> loginFuture2 = Future.future();
 		loginFuture2.setHandler(res -> {
@@ -113,7 +121,7 @@ public class LoadTCPClient {
 			} else {
 			}
 		});
-		client.login("18510252799", loginFuture);
+		client.login("", "18510252799", loginFuture);
 	}
 
 	/**
