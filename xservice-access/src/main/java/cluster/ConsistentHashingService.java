@@ -20,12 +20,12 @@ public interface ConsistentHashingService {
 	}
 
 	/**
-	 * 根据uid获得用户所属机器内网IP
+	 * 根据key获得用户所属机器内网IP
 	 * 
 	 * @param uid
 	 * @param resultHandler
 	 */
-	void getNode(String uid, Handler<AsyncResult<String>> resultHandler);
+	void getNode(String key, Handler<AsyncResult<String>> resultHandler);
 	
 //	void getNodeWithNodeList();
 }

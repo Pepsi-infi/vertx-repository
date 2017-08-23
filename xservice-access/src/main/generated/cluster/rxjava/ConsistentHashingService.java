@@ -48,22 +48,22 @@ public class ConsistentHashingService {
   }
 
   /**
-   * 根据uid获得用户所属机器内网IP
-   * @param uid 
+   * 根据key获得用户所属机器内网IP
+   * @param key 
    * @param resultHandler 
    */
-  public void getNode(String uid, Handler<AsyncResult<String>> resultHandler) { 
-    delegate.getNode(uid, resultHandler);
+  public void getNode(String key, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.getNode(key, resultHandler);
   }
 
   /**
-   * 根据uid获得用户所属机器内网IP
-   * @param uid 
+   * 根据key获得用户所属机器内网IP
+   * @param key 
    * @return 
    */
-  public Single<String> rxGetNode(String uid) { 
+  public Single<String> rxGetNode(String key) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      getNode(uid, fut);
+      getNode(key, fut);
     }));
   }
 

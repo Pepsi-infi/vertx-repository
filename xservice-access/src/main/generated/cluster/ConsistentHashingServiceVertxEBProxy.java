@@ -63,13 +63,13 @@ public class ConsistentHashingServiceVertxEBProxy implements ConsistentHashingSe
     } catch (IllegalStateException ex) {}
   }
 
-  public void getNode(String uid, Handler<AsyncResult<String>> resultHandler) {
+  public void getNode(String key, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("uid", uid);
+    _json.put("key", key);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "getNode");
     _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
