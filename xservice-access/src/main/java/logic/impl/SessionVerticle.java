@@ -32,7 +32,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
 	@Override
-	public void start() throws Exception {
+	public void start(Future<Void> startFuture) throws Exception {
 		// sharedData = vertx.sharedData();
 		// sessionMap = sharedData.getLocalMap("session");
 		// sessionReverse = sharedData.getLocalMap("sessionReverse");
