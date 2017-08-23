@@ -123,7 +123,7 @@ public class ConsistentHashingServiceVertxProxyHandler extends ProxyHandler {
       switch (action) {
 
         case "getNode": {
-          service.getNode((java.lang.String)json.getValue("uid"), createHandler(msg));
+          service.getNode((java.lang.String)json.getValue("key"), createHandler(msg));
           break;
         }
         default: {
