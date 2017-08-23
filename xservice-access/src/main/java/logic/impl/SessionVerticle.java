@@ -47,7 +47,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
 
-		String innerIP = "127.0.0.1";//IPUtil.getInnerIP();
+		String innerIP = IPUtil.getInnerIP();
 		logger.info("innerIP={}", innerIP);
 		EventBus eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + innerIP, res -> {
