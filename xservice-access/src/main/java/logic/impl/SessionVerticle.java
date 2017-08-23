@@ -24,19 +24,11 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionVerticle.class);
 
-	// private SharedData sharedData;
-	// private LocalMap<String, String> sessionMap;// uid -> handlerID
-	// private LocalMap<String, String> sessionReverse; // handlerID -> uid
-
 	private Cache<String, String> sessionMap;// uid -> handlerID
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		// sharedData = vertx.sharedData();
-		// sessionMap = sharedData.getLocalMap("session");
-		// sessionReverse = sharedData.getLocalMap("sessionReverse");
-
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
@@ -83,9 +75,11 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	public int delUserSocket(String uid, String handlerId) {
 		if (StringUtils.isNotEmpty(uid)) {
+			// logout
 			this.sessionMap.remove(uid);
 			this.sessionReverse.remove(handlerId);
 		} else {
+			// socket close
 			sessionReverse.remove(handlerId);
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {

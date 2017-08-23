@@ -103,8 +103,8 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 	 * @param uid
 	 * @return
 	 */
-	public void getNode(String uid, Handler<AsyncResult<String>> resultHandler) {
-		Long hashedKey = hash(uid);
+	public void getNode(String key, Handler<AsyncResult<String>> resultHandler) {
+		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
 			resultHandler.handle(Future.succeededFuture(virtualNodes.firstEntry().getValue()));

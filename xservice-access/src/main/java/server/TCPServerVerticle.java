@@ -13,18 +13,12 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
-import io.vertx.core.shareddata.LocalMap;
-import io.vertx.core.shareddata.SharedData;
 import logic.C2CService;
 import util.ByteUtil;
 
 public class TCPServerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
-
-	// private SharedData sharedData;
-	// private LocalMap<String, String> sessionMap;// uid -> handlerID
-	// private LocalMap<String, String> sessionReverse; // handlerID -> uid
 
 	private C2CService c2cService;
 	private ConsistentHashingService consistentHashingService;
@@ -33,12 +27,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	@Override
 	public void start() throws Exception {
 		logger.info("start ... ");
-
 		eb = vertx.eventBus();
-		// sharedData = vertx.sharedData();
-		// sessionMap = sharedData.getLocalMap("session");
-		// sessionReverse = sharedData.getLocalMap("sessionReverse");
-
 		c2cService = C2CService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
