@@ -17,7 +17,11 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(SessionVerticle.class.getName(), readBossOpts().setConfig(config()));
+
+		/**
+		 * Instance should be 1 because of ehcache.
+		 */
+		vertx.deployVerticle(SessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {

@@ -18,7 +18,7 @@ public class TCPClient {
 		// options.setSsl(true).setPemTrustOptions(new
 		// PemTrustOptions().addCertPath("server-cert.pem"));
 		NetClient client = vertx.createNetClient(options);
-		client.connect(4321, "10.10.10.193", res -> {
+		client.connect(4321, "127.0.0.1", res -> {
 			if (res.succeeded()) {
 				NetSocket socket = res.result();
 
