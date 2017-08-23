@@ -20,7 +20,7 @@ public interface ConsistentHashingService {
 	}
 
 	/**
-	 * 根据key获得用户所属机器内网IP
+	 * 根据key获得key所属机器内网IP
 	 * 
 	 * @param uid
 	 * @param resultHandler
