@@ -56,6 +56,10 @@
           child: [{
             title: "推送消息统计",
             path: "/msgStat/msgStatList"
+          },
+          {
+            title: "乘客消息列表",
+            path: "/msgPassenger"
           }]
         }]
       }

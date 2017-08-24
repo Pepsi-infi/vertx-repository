@@ -30,6 +30,11 @@ import loginComponent from 'pages/user/login'
 //msgStat
 import msgStatRouters from './msgStat';
 
+//乘客消息列表
+import msgPassenger from '../pages/msgPassenger'
+//乘客消息新增
+import msgPassengerAdd from '../pages/msgPassenger/save'
+
 Vue.use(VueRouter)
 
 //使用AMD方式加载
@@ -57,7 +62,22 @@ const routes = [{
       title: "主页",
       auth: true
     }
-  }].concat(msgStatRouters)
+  },
+    {
+      path: '/msgPassenger',
+      name: '乘客端消息',
+      component: msgPassenger
+    },
+    {
+      path: '/msgPassenger/save',
+      name: '乘客消息新增',
+      component: msgPassengerAdd,
+      meta: {
+        title: "乘客端消息 / 新增消息",
+        auth: true
+      }
+    }
+  ].concat(msgStatRouters)
 }]
 
 const router = new VueRouter({
