@@ -5,7 +5,7 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
 
-public class HttpConsumerVerticleTest {
+public class VertxHttpClientTest {
 
     public static void main(String[] args) {
 

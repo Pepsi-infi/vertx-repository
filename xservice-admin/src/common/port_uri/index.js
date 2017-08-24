@@ -13,10 +13,12 @@ import * as port_code from './code'
 import * as port_user from './user'
 import * as port_table from './msgStat'
 import * as port_file from './file'
+import * as passenger_table from './msgPassenger'
 
 export {
   port_code,
   port_user,
   port_table,
-  port_file
+  port_file,
+  passenger_table
 }

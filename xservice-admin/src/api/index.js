@@ -12,11 +12,13 @@
 import * as api_file from './file'
 import * as api_msgStat from './msgStat'
 import * as api_user from './user'
+import * as api_msgPassenger from './msgPassenger'
 
 const apiObj = {
   api_file,
   api_msgStat,
-  api_user
+  api_user,
+  api_msgPassenger
 }
 
 const install = function (Vue) {
@@ -26,6 +28,15 @@ const install = function (Vue) {
   //定义属性到Vue原型中
   Object.defineProperties(Vue.prototype, {
     $fetch: {
+      get() {
+        return apiObj
+      }
+    }
+  })
+
+  //定义属性到Vue原型中
+  Object.defineProperties(Vue.prototype, {
+    $http: {
       get() {
         return apiObj
       }

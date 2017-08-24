@@ -9,31 +9,25 @@
  */
 
 import fetch from 'common/fetch'
-import {port_table} from 'common/port_uri'
+import http from 'common/http'
+import {passenger_table} from 'common/port_uri'
 
 //数据列表
 export function list(params) {
-  return fetch({
-    url: port_table.list,
+  return http({
+    url: passenger_table.list,
     method: 'get',
     params
   })
 }
 
 //根据id查询数据
-export function get(params) {
+export function add(params) {
   return fetch({
-    url: port_table.get,
+    url: passenger_table.get,
     method: 'get',
     params
   })
 }
 
-//根据id删除数据
-export function del(data) {
-  return fetch({
-    url: port_table.del,
-    method: 'post',
-    data
-  })
-}
+
