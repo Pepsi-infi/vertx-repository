@@ -7,6 +7,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -45,68 +46,26 @@ public class TCPServerVerticle extends AbstractVerticle {
 				int seq = ByteUtil.bytesToInt(buffer.getBytes(12, 16));
 				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(16, 20));
 
-				JsonObject msgBody = null;
-				if (bodyLength != 0) {
-					try {
-						msgBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
-								IMMessageConstant.HEADER_LENGTH + bodyLength).toJsonObject();
-					} catch (Exception e) {
-						logger.error("Json parse error." + e.toString());
-					}
-
-				}
+				final JsonObject msgBody = buffer
+						.getBuffer(IMMessageConstant.HEADER_LENGTH, IMMessageConstant.HEADER_LENGTH + bodyLength)
+						.toJsonObject();
 
 				if (msgBody != null) {
 					String from = msgBody.getString("from");// uid
+					String to = msgBody.getString("to");
 					if (from != null) {
-						// 把用户做一致性hash，分散到集群机器上
-						Future<String> nodeFuture = Future.future();
-						consistentHashingService.getNode(socket.writeHandlerID(), nodeFuture.completer());
 						switch (cmd) {
 						case IMCmdConstants.LOGIN:
-							nodeFuture.setHandler(res -> {
-								if (res.succeeded()) {
-									DeliveryOptions option = new DeliveryOptions();
-									option.addHeader("action", "setUserSocket");
-									option.setSendTimeout(3000);
-									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
-											.put("from", from);
-									logger.info("IMCmdConstants.LOGIN from={}cmd={}node={}handlerID={}", from, cmd,
-											res.result(), socket.writeHandlerID());
-									eb.send("session-eb-service" + res.result(), msg, option);
-								} else {
-									// TODO
-								}
-							});
-
+							login(socket.writeHandlerID(), cmd, from);
 							break;
 						case IMCmdConstants.LOGOUT:
-							nodeFuture.setHandler(res -> {
-								if (res.succeeded()) {
-									DeliveryOptions option = new DeliveryOptions();
-									option.addHeader("action", "delUserSocket");
-									option.setSendTimeout(3000);
-									JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID())
-											.put("from", from);
-									eb.send("session-eb-service" + res.result(), msg, option);
-								} else {
-									// TODO
-								}
-							});
-
+							logout(socket.writeHandlerID(), from);
 							break;
 						case IMCmdConstants.MSG_R:
-							JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
-									.put("body", msgBody);
-
-							Future<JsonObject> msgRF = Future.future();
-							c2cService.doWithMsgRequest(rMsg, msgRF.completer());
+							msgRequest(socket.writeHandlerID(), clientVersion, seq, msgBody, to);
 							break;
 						case IMCmdConstants.ACK_R:
-							JsonObject aMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
-									.put("body", msgBody);
-							Future<JsonObject> msgAF = Future.future();
-							c2cService.doWithAckRequest(aMsg, msgAF.completer());
+							ackRequest(socket.writeHandlerID(), clientVersion, seq, msgBody, to);
 							break;
 						default:
 							break;
@@ -116,23 +75,135 @@ public class TCPServerVerticle extends AbstractVerticle {
 			}));
 
 			socket.closeHandler(v -> {
-				logger.info("socket.close handlerID={}", socket.writeHandlerID());
-				Future<String> nodeFuture = Future.future();
-				consistentHashingService.getNode(socket.writeHandlerID(), nodeFuture.completer());
-				nodeFuture.setHandler(res -> {
-					if (res.succeeded()) {
-						DeliveryOptions option = new DeliveryOptions();
-						option.addHeader("action", "delUserSocket");
-						option.setSendTimeout(3000);
-						JsonObject msg = new JsonObject().put("handlerID", socket.writeHandlerID());
-						eb.send("session-eb-service" + res.result(), msg, option);
-					} else {
-						// TODO
-					}
-				});
+				socketClose(socket.writeHandlerID());
 			});
 		});
 
 		server.listen();
+	}
+
+	/**
+	 * 登录
+	 * 
+	 * @param handlerID
+	 * @param cmd
+	 * @param from
+	 *            登录用户id，必传
+	 */
+	private void login(String handlerID, int cmd, String from) {
+		// 把用户做一致性hash，分散到集群机器上
+		Future<String> consistentHashFuture = Future.future();
+		consistentHashingService.getNode(from, consistentHashFuture.completer());
+		consistentHashFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", "setUserSocket");
+				option.setSendTimeout(3000);
+				JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+				logger.info("IMCmdConstants.LOGIN from={}cmd={}node={}handlerID={}", from, cmd, res.result(),
+						handlerID);
+				eb.send("session-eb-service" + res.result(), msg, option);
+			} else {
+				logger.error("Consistent Hash ", res.cause());
+			}
+		});
+	}
+
+	/**
+	 * 登出
+	 * 
+	 * @param handlerID
+	 * @param from
+	 *            用户id，必传
+	 */
+	private void logout(String handlerID, String from) {
+		// 把用户做一致性hash，分散到集群机器上
+		Future<String> consistentHashFuture = Future.future();
+		consistentHashingService.getNode(from, consistentHashFuture.completer());
+		consistentHashFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", "delUserSocket");
+				option.setSendTimeout(3000);
+				JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+				eb.send("session-eb-service" + res.result(), msg, option);
+			} else {
+				logger.error("Consistent Hash ", res.cause());
+			}
+		});
+	}
+
+	private void msgRequest(String handlerID, int clientVersion, int seq, final JsonObject msgBody, String to) {
+		Future<String> consistentHashFuture = Future.future();
+		consistentHashingService.getNode(to, consistentHashFuture.completer());
+		Future<Message<JsonObject>> sessionFuture = Future.future();
+		// 根据to去session查出对应handlerID
+		consistentHashFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", "getHandlerIDByUid");
+				option.setSendTimeout(3000);
+				JsonObject rMsg = new JsonObject().put("to", to);
+				eb.send("session-eb-service" + res.result(), rMsg, option, sessionFuture.completer());
+			} else {
+				logger.error("Consistent Hash ", res.cause());
+			}
+		});
+
+		Future<JsonObject> c2cFuture = Future.future();
+		sessionFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject result = res.result().body();
+				String toHandlerID = result.getString("handlerID");
+
+				JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
+						.put("body", msgBody).put("fromHandlerID", handlerID).put("toHandlerID", toHandlerID);
+				c2cService.doWithMsgRequest(rMsg, c2cFuture.completer());
+			} else {
+				logger.error("Session ", res.cause());
+			}
+		});
+	}
+
+	private void ackRequest(String handlerID, int clientVersion, int seq, final JsonObject msgBody, String to) {
+		Future<String> consistentHashFuture = Future.future();
+		consistentHashingService.getNode(to, consistentHashFuture.completer());
+		Future<Message<JsonObject>> sessionFuture = Future.future();
+		// 根据to去session查出对应handlerID
+		consistentHashFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", "getHandlerIDByUid");
+				option.setSendTimeout(3000);
+				JsonObject rMsg = new JsonObject().put("to", to);
+				eb.send("session-eb-service" + res.result(), rMsg, option, sessionFuture.completer());
+			} else {
+				// TODO
+			}
+		});
+
+		Future<JsonObject> c2cFuture = Future.future();
+		sessionFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject result = res.result().body();
+				String toHandlerID = result.getString("handlerID");
+
+				JsonObject aMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
+						.put("body", msgBody).put("fromHandlerID", handlerID).put("toHandlerID", toHandlerID);
+				c2cService.doWithAckRequest(aMsg, c2cFuture.completer());
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void socketClose(String handlerID) {
+		logger.info("socket.close handlerID={}", handlerID);
+
+		DeliveryOptions option = new DeliveryOptions();
+		option.addHeader("action", "delUserSocket");
+		option.setSendTimeout(3000);
+		JsonObject msg = new JsonObject().put("handlerID", handlerID);
+		eb.publish("session-eb-service", msg, option);
 	}
 }
