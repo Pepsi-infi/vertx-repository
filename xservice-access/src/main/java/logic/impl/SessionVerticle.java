@@ -24,19 +24,12 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionVerticle.class);
 
-	// private SharedData sharedData;
-	// private LocalMap<String, String> sessionMap;// uid -> handlerID
-	// private LocalMap<String, String> sessionReverse; // handlerID -> uid
-
+	private EventBus eb;
 	private Cache<String, String> sessionMap;// uid -> handlerID
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		// sharedData = vertx.sharedData();
-		// sessionMap = sharedData.getLocalMap("session");
-		// sessionReverse = sharedData.getLocalMap("sessionReverse");
-
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
@@ -49,8 +42,34 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("innerIP={}", innerIP);
-		EventBus eb = vertx.eventBus();
+		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + innerIP, res -> {
+			MultiMap headers = res.headers();
+			JsonObject body = res.body();
+			if (headers != null) {
+				String action = headers.get("action");
+				String from = body.getString("from");
+				String handlerID = body.getString("handlerID");
+				String to = body.getString("to");
+				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+				switch (action) {
+				case "setUserSocket":
+					res.reply(setUserSocket(from, handlerID));
+					break;
+				case "delUserSocket":
+					res.reply(delUserSocket(from, handlerID));
+					break;
+				case "getHandlerIDByUid":
+					res.reply(getHandlerIDByUid(to));
+					break;
+				default:
+					res.reply(1);// Fail!
+					break;
+				}
+			}
+		});
+
+		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
@@ -59,9 +78,6 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 				String handlerID = body.getString("handlerID");
 				logger.info("from={}action={}innerIP={}", from, action, innerIP);
 				switch (action) {
-				case "setUserSocket":
-					res.reply(setUserSocket(from, handlerID));
-					break;
 				case "delUserSocket":
 					res.reply(delUserSocket(from, handlerID));
 					break;
@@ -71,7 +87,6 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 				}
 			}
 		});
-
 	}
 
 	public int setUserSocket(String uid, String handlerId) {
@@ -83,9 +98,11 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	public int delUserSocket(String uid, String handlerId) {
 		if (StringUtils.isNotEmpty(uid)) {
+			// logout
 			this.sessionMap.remove(uid);
 			this.sessionReverse.remove(handlerId);
 		} else {
+			// socket close
 			sessionReverse.remove(handlerId);
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {
@@ -104,5 +121,12 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 	@Override
 	public void getUidByHandlerId(String handlerId, Handler<AsyncResult<String>> resultHandler) {
 		resultHandler.handle(Future.succeededFuture(sessionReverse.get(handlerId)));
+	}
+
+	private JsonObject getHandlerIDByUid(String uid) {
+		JsonObject jo = new JsonObject();
+		jo.put("handlerID", sessionMap.get(uid));
+
+		return jo;
 	}
 }
