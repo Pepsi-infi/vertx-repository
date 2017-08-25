@@ -74,7 +74,7 @@ public class RestPushVerticle extends RestAPIVerticle {
         if (StringUtils.isNotBlank(supplierId)) {
             query.put("supplierId", NumberUtils.toInt(supplierId));
         }
-        driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size), resultJsonHandler(context));
+        driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size), resultStringHandler(context));
     }
 
 

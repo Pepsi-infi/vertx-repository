@@ -39,7 +39,6 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import java.util.List;
 import service.DriverService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -129,7 +128,11 @@ public class DriverServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "queryDriver": {
-          service.queryDriver((io.vertx.core.json.JsonObject)json.getValue("query"), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("size") == null ? null : (json.getLong("size").intValue()), createListHandler(msg));
+          service.queryDriver((io.vertx.core.json.JsonObject)json.getValue("query"), json.getValue("page") == null ? null : (json.getLong("page").intValue()), json.getValue("size") == null ? null : (json.getLong("size").intValue()), createHandler(msg));
+          break;
+        }
+        case "queryBatchDriver": {
+          service.queryBatchDriver((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
           break;
         }
         default: {

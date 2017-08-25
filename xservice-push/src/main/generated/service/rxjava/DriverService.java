@@ -19,7 +19,6 @@ package service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import java.util.List;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
@@ -67,13 +66,23 @@ public class DriverService {
     }));
   }
 
-  public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<List<JsonObject>>> result) { 
+  public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<String>> result) { 
     delegate.queryDriver(query, page, size, result);
   }
 
-  public Single<List<JsonObject>> rxQueryDriver(JsonObject query, int page, int size) { 
+  public Single<String> rxQueryDriver(JsonObject query, int page, int size) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       queryDriver(query, page, size, fut);
+    }));
+  }
+
+  public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) { 
+    delegate.queryBatchDriver(query, result);
+  }
+
+  public Single<JsonObject> rxQueryBatchDriver(JsonObject query) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryBatchDriver(query, fut);
     }));
   }
 

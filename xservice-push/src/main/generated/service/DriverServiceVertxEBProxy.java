@@ -32,7 +32,6 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import java.util.List;
 import service.DriverService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -83,7 +82,7 @@ public class DriverServiceVertxEBProxy implements DriverService {
     });
   }
 
-  public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<List<JsonObject>>> result) {
+  public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<String>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -94,11 +93,29 @@ public class DriverServiceVertxEBProxy implements DriverService {
     _json.put("size", size);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "queryDriver");
-    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(convertList(res.result().body().getList())));
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("query", query);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "queryBatchDriver");
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body()));
       }
     });
   }

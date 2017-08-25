@@ -1,7 +1,11 @@
 package service.impl;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import domain.Pager;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
@@ -9,10 +13,15 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
+import model.Result;
 import service.DriverService;
+import utils.JsonUtil;
 import xservice.BaseServiceVerticle;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lufei
@@ -27,7 +36,6 @@ public class DriverServiceImpl extends BaseServiceVerticle implements DriverServ
 
     private MongoClient mongoClient;
 
-    private static final int PAGE_SIEZ = 20;
 
     public DriverServiceImpl() {
     }
@@ -58,23 +66,50 @@ public class DriverServiceImpl extends BaseServiceVerticle implements DriverServ
     }
 
     @Override
-    public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<List<JsonObject>>> result) {
-        if (size < 0) {
-            size = PAGE_SIEZ;
-        }
+    public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<String>> result) {
         FindOptions findOptions = new FindOptions();
         findOptions.setSkip(calcPage(page, size)).setLimit(size);
-        mongoClient.findWithOptions(COLLECTION_DRIVER, query, findOptions, res -> {
-            if (res.succeeded()) {
-                result.handle(Future.succeededFuture(res.result()));
+        List<Future> futures = new ArrayList<>();
+        Future<List<JsonObject>> listFuture = Future.future();
+        futures.add(listFuture);
+        mongoClient.findWithOptions(COLLECTION_DRIVER, query, findOptions, listFuture.completer());
+
+        Future<Long> countFuture = Future.future();
+        mongoClient.count(COLLECTION_DRIVER, query, countFuture.completer());
+        futures.add(countFuture);
+
+        CompositeFuture compositeFuture = CompositeFuture.all(futures);
+        compositeFuture.setHandler(asr1 -> {
+            if (asr1.succeeded()) {
+                List<JsonObject> jsonObjects = asr1.result().resultAt(0);
+                List<Map> lists = Lists.transform(jsonObjects, new Function<JsonObject, Map>() {
+                    @Nullable
+                    @Override
+                    public Map apply(@Nullable JsonObject jsonObject) {
+                        return jsonObject.mapTo(Map.class);
+                    }
+                });
+                long count = asr1.result().resultAt(1);
+                Pager<Map> pager = new Pager(count, page, size, lists);
+                Result res = Result.success(pager);
+                result.handle(Future.succeededFuture(JsonUtil.encodePrettily(res)));
             } else {
-                logger.error("query driver from db error.", res.cause());
-                result.handle(Future.failedFuture(res.cause()));
+                logger.error(asr1.cause());
+                result.handle(Future.failedFuture(asr1.cause()));
+            }
+        });
+    }
+
+
+    public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) {
+        mongoClient.findBatch(COLLECTION_DRIVER, query, res -> {
+            if (res.succeeded()) {
+                logger.info("resutl:" + res.result());
+                result.handle(Future.succeededFuture(res.result()));
             }
         });
 
     }
-
 
 
     protected int calcPage(int page, int limit) {
