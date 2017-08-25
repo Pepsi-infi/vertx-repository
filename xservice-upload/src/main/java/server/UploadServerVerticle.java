@@ -20,6 +20,14 @@ public class UploadServerVerticle extends AbstractVerticle {
 			request.uploadHandler(upload -> {
 				upload.streamToFileSystem("/Users/wanglonghu/temp/" + upload.filename() + System.currentTimeMillis())
 						.endHandler(a -> {
+
+							System.out.println("end absoluteURI" + request.absoluteURI());
+							System.out.println("end formAttributes" + request.formAttributes());
+							System.out.println("end headers" + request.headers());
+							System.out.println("end params" + request.params());
+							System.out.println("end path" + request.path());
+							System.out.println("end uri" + request.uri());
+							
 							request.response().end("3Q");
 						});
 			});
