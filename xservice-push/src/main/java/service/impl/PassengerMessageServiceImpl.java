@@ -38,6 +38,9 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
 
     public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by sendTime limit ?,?";
     public static final String SQL_PASSENGER_MSGLIST_COUNT = "select count(1) from msg_passenger_msg where 1=1 %s";
+    public static final String SQL_PASSENGER_MSGGET = "select * from msg_passenger_msg where id = ? ";
+    public static final String SQL_PASSENGER_MSGADD = "INSERT INTO msg_passenger_msg (`title`, `content`, `action`, `msgCenterImgUrl`, `inMsgCenter`, `openUrl`, `openType`," +
+            " `sendType`, `status`, `expireTime`, `sendTime`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
     public void start(){
         XProxyHelper.registerService(PassengerMessageService.class, vertx, this, PassengerMessageService.class.getName());
@@ -46,6 +49,47 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
     }
 
+    public void add(JsonArray req, Handler<AsyncResult<String>> resultHandler){
+//        JsonArray params = new JsonArray();
+//        params.add(req.getString("title"));
+//        params.add(req.getString("content"));
+//        params.add(req.getString("action"));
+//        params.add(req.getString("msgCenterImgUrl"));
+//        params.add(req.getString("inMsgCenter"));
+//        params.add(req.getString("openUrl"));
+//        params.add(req.getString("openType"));
+//        params.add(req.getString("sendType"));
+//        params.add(req.getString("status"));
+//        params.add(req.getString("expireTime"));
+//        params.add(req.getString("sendTime"));
+        Future<String> future = addOne(req, SQL_PASSENGER_MSGADD);
+        future.setHandler(res -> {
+           if(res.succeeded()){
+               logger.info(" passengerMsg add response successed");
+               resultHandler.handle(Future.succeededFuture(res.result()));
+           }else{
+               logger.error(" passengerMsg add error response : ", res.cause());
+               resultHandler.handle(Future.failedFuture(res.cause()));
+           }
+        });
+    }
+
+    public void get(JsonObject req, Handler<AsyncResult<String>> resultHandler){
+        String id = req.getString("id");
+        JsonArray params = new JsonArray();
+        params.add(id);
+        Future<Optional<JsonObject>> future = queryOne(params, SQL_PASSENGER_MSGGET);
+        future.setHandler(res -> {
+            if(res.succeeded()){
+                Optional<JsonObject> result = res.result();
+                logger.info(" passengerMsg get response : " + result);
+                resultHandler.handle(Future.succeededFuture(result.get().toString()));
+            }else{
+                logger.error(" passengerMsg get error response : ", res.cause());
+                resultHandler.handle(Future.failedFuture(res.cause()));
+            }
+        });
+    }
 
     public void list(JsonObject req, Handler<AsyncResult<PageBean>> resultHandler){
         String title = req.getString("title");
@@ -72,7 +116,7 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         params.add(pageSize);
         String querySql = String.format(SQL_PASSENGER_MSGLIST_PAGE, sb.toString());
         Future<List<JsonObject>> queryFuture = queryForPage(params, querySql);
-        Future countFuture = queryCount(countParams, countSql);
+        Future countFuture = queryOne(countParams, countSql);
         executeList(page, pageSize, queryFuture, countFuture, resultHandler);
     }
 
@@ -104,11 +148,23 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         });
     }
 
-    public void add(JsonObject param, Handler<AsyncResult<String>> resultHandler){
-
+    protected Future<String> addOne(JsonArray params, String sql) {
+        return getConnection().compose(conn -> {
+            Future<String> future = Future.future();
+            conn.updateWithParams(sql, params, res -> {
+                if(res.succeeded()){
+                    future.complete("success");
+                }else{
+                    logger.error(" addOne error, ", res.cause());
+                    future.fail(res.cause());
+                }
+                conn.close();
+            });
+            return future;
+        });
     }
 
-    protected Future<Optional<JsonObject>> queryCount(JsonArray params, String sql) {
+    protected Future<Optional<JsonObject>> queryOne(JsonArray params, String sql) {
         return getConnection().compose(conn -> {
             Future<Optional<JsonObject>> future = Future.future();
             conn.queryWithParams(sql, params, res -> {
@@ -120,7 +176,7 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
                         future.complete(Optional.of(list.get(0)));
                     }
                 }else{
-                    logger.error("passengerMsg select count() error: ", res.cause());
+                    logger.error(" queryOne error, ", res.cause());
                     future.fail(res.cause());
                 }
                 conn.close();

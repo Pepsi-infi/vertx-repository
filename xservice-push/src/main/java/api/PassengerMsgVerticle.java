@@ -1,5 +1,6 @@
 package api;
 
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -11,6 +12,7 @@ import io.vertx.rxjava.ext.web.handler.CorsHandler;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
 import service.PassengerMessageService;
+import util.DateUtil;
 import utils.JsonUtil;
 
 /**
@@ -40,6 +42,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         router.route().handler(BodyHandler.create());
         router.route("/passengerMsg/list").handler(this::list);
         router.route("/passengerMsg/add").handler(this::add);
+        router.route("/passengerMsg/get").handler(this::get);
         logger.info("PassengerMessageServiceImpl starting at 9000 ...");
         vertx.createHttpServer().requestHandler(router::accept).listen(9100);
     }
@@ -50,8 +53,30 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
     }
 
     private void add(RoutingContext context){
-
+        HttpServerRequest request = context.request();
+        JsonArray params = new JsonArray();
+        params.add(request.getParam("title"));
+        params.add(request.getParam("content"));
+        params.add(request.getParam("action"));
+        params.add(request.getParam("msgCenterImgUrl"));
+        params.add(request.getParam("inMsgCenter"));
+        params.add(request.getParam("openUrl"));
+        params.add(request.getParam("openType"));
+        params.add(request.getParam("sendType"));
+        params.add(request.getParam("status"));
+        String expireTime = request.getParam("expireTime");
+        params.add(DateUtil.getLocalDate(expireTime));
+        String sendTime = request.getParam("sendTime");
+        params.add(DateUtil.getLocalDate(sendTime));
+        passengerMessageService.add(params, resultHandler(context));
     }
+
+    private void get(RoutingContext context){
+        String id = context.request().getParam("id");
+        JsonObject param = new JsonObject().put("id", id);
+        passengerMessageService.get(param, resultHandler(context));
+    }
+
 
     private JsonObject buildParams(RoutingContext context){
         JsonObject param = new JsonObject();
