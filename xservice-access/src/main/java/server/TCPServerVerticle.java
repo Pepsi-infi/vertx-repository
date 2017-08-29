@@ -39,7 +39,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {
-			socket.handler(RecordParser.newDelimited("\n", buffer -> {
+			socket.handler(RecordParser.newDelimited("^A", buffer -> {
 				int headerLength = ByteUtil.bytesToInt(buffer.getBytes(0, 4));
 				int clientVersion = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
 				int cmd = ByteUtil.bytesToInt(buffer.getBytes(8, 12));

@@ -30,7 +30,7 @@ public class TCPClient {
 				JsonObject msgBody = new JsonObject().put("from", "11111");
 				byte[] bodyLength = intToBytes(msgBody.toString().length());
 				Buffer msg = Buffer.buffer().appendBytes(headerLength).appendBytes(clientVersion).appendBytes(cmdId)
-						.appendBytes(seq).appendBytes(bodyLength).appendString(msgBody.toString()).appendString("\n");
+						.appendBytes(seq).appendBytes(bodyLength).appendString(msgBody.toString()).appendString("^A");
 				// Buffer bf = Buffer.buffer();
 				// bf.appendString("/connect#" + System.currentTimeMillis() + "\n");
 				socket.write(msg);
