@@ -1,6 +1,5 @@
 package api;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -12,7 +11,6 @@ import io.vertx.rxjava.ext.web.handler.CorsHandler;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
 import service.PassengerMessageService;
-import util.DateUtil;
 import utils.JsonUtil;
 
 /**
@@ -41,10 +39,17 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
         router.route("/passengerMsg/list").handler(this::list);
-        router.route("/passengerMsg/add").handler(this::add);
+        router.route("/passengerMsg/addOrEdit").handler(this::addOrUpdate);
         router.route("/passengerMsg/get").handler(this::get);
+        router.route("/passengerMsg/del").handler(this::del);
         logger.info("PassengerMessageServiceImpl starting at 9000 ...");
         vertx.createHttpServer().requestHandler(router::accept).listen(9100);
+    }
+
+    private void push(RoutingContext context){
+        String id = context.request().getParam("id");
+        JsonObject param = new JsonObject().put("id", id);
+        passengerMessageService.get(param, resultHandler(context));
     }
 
     private void list(RoutingContext context){
@@ -52,23 +57,22 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         passengerMessageService.list(param, resultHandler(context, JsonUtil::encodePrettily));
     }
 
-    private void add(RoutingContext context){
+    private void addOrUpdate(RoutingContext context){
         HttpServerRequest request = context.request();
-        JsonArray params = new JsonArray();
-        params.add(request.getParam("title"));
-        params.add(request.getParam("content"));
-        params.add(request.getParam("action"));
-        params.add(request.getParam("msgCenterImgUrl"));
-        params.add(request.getParam("inMsgCenter"));
-        params.add(request.getParam("openUrl"));
-        params.add(request.getParam("openType"));
-        params.add(request.getParam("sendType"));
-        params.add(request.getParam("status"));
-        String expireTime = request.getParam("expireTime");
-        params.add(DateUtil.getLocalDate(expireTime));
-        String sendTime = request.getParam("sendTime");
-        params.add(DateUtil.getLocalDate(sendTime));
-        passengerMessageService.add(params, resultHandler(context));
+        JsonObject param = new JsonObject();
+        param.put("id", request.getParam("id"));
+        param.put("title", request.getParam("title"));
+        param.put("content", request.getParam("content"));
+        param.put("action", request.getParam("action"));
+        param.put("msgCenterImgUrl", request.getParam("msgCenterImgUrl"));
+        param.put("inMsgCenter", request.getParam("inMsgCenter"));
+        param.put("openUrl", request.getParam("openUrl"));
+        param.put("openType", request.getParam("openType"));
+        param.put("sendType", request.getParam("sendType"));
+        param.put("status", request.getParam("status"));
+        param.put("expireTime", request.getParam("expireTime"));
+        param.put("sendTime", request.getParam("sendTime"));
+        passengerMessageService.addOrUpdate(param, resultHandler(context));
     }
 
     private void get(RoutingContext context){
@@ -77,6 +81,11 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         passengerMessageService.get(param, resultHandler(context));
     }
 
+    private void del(RoutingContext context){
+        String id = context.request().getParam("id");
+        JsonObject param = new JsonObject().put("id", id);
+        passengerMessageService.del(param, resultHandler(context));
+    }
 
     private JsonObject buildParams(RoutingContext context){
         JsonObject param = new JsonObject();

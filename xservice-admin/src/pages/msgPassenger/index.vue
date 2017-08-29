@@ -26,7 +26,7 @@
           <el-table :data="table_data" border
                         style="width: 100%" >
                 <el-table-column label="序号" type="index" ></el-table-column>
-                <el-table-column prop="id" label="ID" > </el-table-column>
+                <el-table-column prop="id" label="ID" width="200"> </el-table-column>
                 <el-table-column prop="title" label="标题" width="200"> </el-table-column>
                 <el-table-column prop="sendTime" label="发送时间" width="170" :formatter="formatTime"> </el-table-column>
                 <el-table-column prop="expireTime" label="过期时间" width="170" :formatter="formatTime"> </el-table-column>
@@ -35,12 +35,18 @@
                 <el-table-column prop="status" label="状态" width="80" :formatter="status"> </el-table-column>
                 <el-table-column label="操作" width="400">
                    <template scope="scope">
-                               <el-button
-                                 size="small"
-                                 @click="handleEdit(scope.$index, scope.row)">消息推送</el-button>
-                               <el-button
-                                size="small"
-                                @click="handleEdit(scope.$index, scope.row)">停止推送</el-button>
+                       <el-button
+                          size="small"
+                          @click="push(scope.$index, scope.row)" type="success" >消息推送</el-button>
+                       <el-button
+                          size="small"
+                          @click="stopPush(scope.$index, scope.row)" type="warning" v-show="showButton(scope.row)">停止推送</el-button>
+                        <el-button
+                          size="small"
+                          @click="editMsg(scope.$index, scope.row)" type="success" v-show="showButton(scope.row)">编 辑</el-button>
+                        <el-button
+                          size="small"
+                          @click="delMsg(scope.$index, scope.row)" type="danger" v-show="showButton(scope.row)">删 除</el-button>
                     </template>
                 </el-table-column>
           </el-table>
@@ -75,7 +81,9 @@
         total : 0,
         load_data : true,
         search_title : '',
-        search_sendtime : ''
+        search_sendtime : '',
+        realId : '',
+        isShow : false
       }
     },
     components: {
@@ -90,7 +98,38 @@
       addMsg : function(){
         this.$router.push('/msgPassenger/save')
       },
-
+      //编辑消息
+      editMsg : function(index,row){
+        this.$router.push({path: '/msgPassenger/save', query: {id: row.realId}});
+      },
+      //删除消息
+      delMsg : function(index,row){
+        var param = { id : row.realId };
+        this.$http.api_msgPassenger.del(param).then(({data}) => {
+                this.$message.success(data)
+                this.load_data = true
+                this.getData();
+             }).catch((error) => {
+                console.log(" load error :" + error);
+                this.load_data = false
+             })
+      },
+      //删除消息
+      stopPush : function(index,row){
+        var param = {
+          id : row.realId,
+          status : 2
+        };
+        this.$http.api_msgPassenger.addOrEdit(param).then(({data}) => {
+              this.$message.success("消息已经设置为无效")
+              this.load_data = true
+              this.getData();
+           }).catch((error) => {
+              console.log(" load error :" + error);
+              this.load_data = false
+           })
+      },
+      //加载列表数据
       getData : function(){
           this.$http.api_msgPassenger.list({
                     page : this.currentPage,
@@ -104,6 +143,9 @@
                   if (ele !== null) {
                       tempList.push(ele);
                   }
+                  ele.realId = ele.id;
+                  ele.id = "ad_passenger_count_" + ele.id;
+                  ele.isShow = new Date(ele.sendTime) < new Date() ? true : false;
               });
               this.table_data = list
               this.currentPage = page
@@ -126,6 +168,10 @@
           this.currentPage = page;
           this.getData();
       },
+      //按钮是否显示
+      showButton : function(row){
+         return row.isShow;
+      },
 
       formatTime : function (row,column,val){
         let time = new Date(val).Format("yyyy-MM-dd hh:mm:ss");
@@ -145,7 +191,7 @@
       },
     }
   }
- Date.prototype.Format = function (fmt) { //author: meizz
+ Date.prototype.Format = function (fmt) {
      var o = {
          "M+": this.getMonth() + 1, //月份
          "d+": this.getDate(), //日

@@ -32,10 +32,7 @@ import msgStatRouters from './msgStat';
 //driverPush
 import driverPushRouters from './driverPush';
 
-//乘客消息列表
-import msgPassenger from '../pages/msgPassenger'
-//乘客消息新增
-import msgPassengerAdd from '../pages/msgPassenger/save'
+import msgPassengerRouters from './msgPassenger';
 
 Vue.use(VueRouter)
 
@@ -64,24 +61,10 @@ const routes = [{
       title: "主页",
       auth: true
     }
-  },
-    {
-      path: '/msgPassenger',
-      name: '乘客端消息',
-      component: msgPassenger
-    },
-    {
-      path: '/msgPassenger/save',
-      name: '乘客消息新增',
-      component: msgPassengerAdd,
-      meta: {
-        title: "乘客端消息 / 新增消息",
-        auth: true
-      }
-    }
-  ].concat(msgStatRouters,
-           driverPushRouters
-  )
+  }].concat(
+    msgStatRouters,
+    driverPushRouters,
+    msgPassengerRouters)
 }]
 
 const router = new VueRouter({

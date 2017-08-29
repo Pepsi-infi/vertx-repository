@@ -20,6 +20,7 @@ import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import service.PassengerMessageService;
+import util.DateUtil;
 import xservice.BaseServiceVerticle;
 
 import javax.annotation.Nullable;
@@ -39,8 +40,14 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
     public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by sendTime limit ?,?";
     public static final String SQL_PASSENGER_MSGLIST_COUNT = "select count(1) from msg_passenger_msg where 1=1 %s";
     public static final String SQL_PASSENGER_MSGGET = "select * from msg_passenger_msg where id = ? ";
-    public static final String SQL_PASSENGER_MSGADD = "INSERT INTO msg_passenger_msg (`title`, `content`, `action`, `msgCenterImgUrl`, `inMsgCenter`, `openUrl`, `openType`," +
-            " `sendType`, `status`, `expireTime`, `sendTime`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+    public static final String SQL_PASSENGER_MSGADD = "insert into msg_passenger_msg (title, content, action, inMsgCenter, openType," +
+            " sendType, status, expireTime, sendTime, msgCenterImgUrl, openUrl) values (?,?,?,?,?,?,?,?,?,?,?)";
+
+    public static final String SQL_PASSENGER_MSGUPDATE = "update msg_passenger_msg set %s  where id= ? ";
+
+    public static final String SQL_PASSENGER_MSGDEL = "delete from msg_passenger_msg where id = ? ";
+    public static final String SQL_PASSENGER_MSGSET_INVALID = "update from msg_passenger_msg set = 2 where id = ? ";
 
     public void start(){
         XProxyHelper.registerService(PassengerMessageService.class, vertx, this, PassengerMessageService.class.getName());
@@ -49,26 +56,107 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
     }
 
-    public void add(JsonArray req, Handler<AsyncResult<String>> resultHandler){
-//        JsonArray params = new JsonArray();
-//        params.add(req.getString("title"));
-//        params.add(req.getString("content"));
-//        params.add(req.getString("action"));
-//        params.add(req.getString("msgCenterImgUrl"));
-//        params.add(req.getString("inMsgCenter"));
-//        params.add(req.getString("openUrl"));
-//        params.add(req.getString("openType"));
-//        params.add(req.getString("sendType"));
-//        params.add(req.getString("status"));
-//        params.add(req.getString("expireTime"));
-//        params.add(req.getString("sendTime"));
-        Future<String> future = addOne(req, SQL_PASSENGER_MSGADD);
+    public void addOrUpdate(JsonObject param, Handler<AsyncResult<String>> resultHandler){
+        JsonArray params = new JsonArray();
+//        params.add(param.getValue("title"));
+//        params.add(param.getValue("content"));
+//        params.add(param.getValue("action"));
+//        params.add(param.getValue("inMsgCenter"));
+//        params.add(param.getValue("openType"));
+//        params.add(param.getValue("sendType"));
+//        params.add(param.getValue("status"));
+//        Object expireTime = param.getValue("expireTime");
+//        params.add(DateUtil.getLocalDate((String)expireTime));
+//        Object sendTime = param.getValue("sendTime");
+//        params.add(DateUtil.getLocalDate((String)sendTime));
+
+        String sql;
+        StringBuilder updateBuilder = new StringBuilder();
+        Optional<String> id = Optional.ofNullable(param.getString("id"));
+        Optional<String> title = Optional.ofNullable(param.getString("title"));
+        Optional<String> content = Optional.ofNullable(param.getString("content"));
+        Optional<String> action = Optional.ofNullable(param.getString("action"));
+        Optional<String> inMsgCenter = Optional.ofNullable(param.getString("inMsgCenter"));
+        Optional<String> openType = Optional.ofNullable(param.getString("openType"));
+        Optional<String> sendType = Optional.ofNullable(param.getString("sendType"));
+        Optional<String> status = Optional.ofNullable(param.getString("status"));
+        Optional<String> expireTime = Optional.ofNullable(param.getString("expireTime"));
+        Optional<String> sendTime = Optional.ofNullable(param.getString("sendTime"));
+        Optional<String> msgCenterImgUrl = Optional.ofNullable(param.getString("msgCenterImgUrl"));
+        Optional<String> openUrl = Optional.ofNullable(param.getString("openUrl"));
+        if(id.isPresent()){
+            if(title.isPresent()){
+                params.add(title.get());
+                updateBuilder.append(", title=?");
+            }
+            if(content.isPresent()){
+                params.add(content.get());
+                updateBuilder.append(", content=?");
+            }
+            if(action.isPresent()){
+                params.add(action.get());
+                updateBuilder.append(", action=?");
+            }
+            if(inMsgCenter.isPresent()){
+                params.add(inMsgCenter.get());
+                updateBuilder.append(", inMsgCenter=?");
+            }
+            if(openType.isPresent()){
+                params.add(openType.get());
+                updateBuilder.append(", openType=?");
+            }
+            if(sendType.isPresent()){
+                params.add(sendType.get());
+                updateBuilder.append(", sendType=?");
+            }
+            if(status.isPresent()){
+                params.add(status.get());
+                updateBuilder.append(", status=?");
+            }
+            if(expireTime.isPresent()){
+                params.add(DateUtil.getLocalDate(expireTime.get()));
+                updateBuilder.append(", expireTime=?");
+            }
+            if(sendTime.isPresent()){
+                params.add(DateUtil.getLocalDate(sendTime.get()));
+                updateBuilder.append(", sendTime=?");
+            }
+            if(msgCenterImgUrl.isPresent()){
+                params.add(msgCenterImgUrl.get());
+                updateBuilder.append(", msgCenterImgUrl=?");
+            }
+            if(openUrl.isPresent()){
+                params.add(openUrl.get());
+                updateBuilder.append(", openUrl=?");
+            }
+            params.add(id.get());
+            //更新
+            sql = SQL_PASSENGER_MSGUPDATE;
+            updateBuilder = updateBuilder.length() > 0 ? updateBuilder.deleteCharAt(0) : updateBuilder;
+            sql = String.format(sql, updateBuilder.toString());
+        }else{
+            params.add(title.orElse(""));
+            params.add(content.orElse(""));
+            params.add(action.orElse(""));
+            params.add(inMsgCenter.orElse(""));
+            params.add(openType.orElse(""));
+            params.add(sendType.orElse(""));
+            params.add(status.orElse(""));
+            params.add(DateUtil.getLocalDate(expireTime.get()));
+            params.add(DateUtil.getLocalDate(sendTime.get()));
+            params.add(msgCenterImgUrl.orElse(""));
+            params.add(openUrl.orElse(""));
+            //新增
+            sql = SQL_PASSENGER_MSGADD;
+        }
+        Future<String> future = executeSQL(params, sql);
+        logger.info("新增乘客消息[sql : " + sql + "],[params : " + params + "]");
         future.setHandler(res -> {
            if(res.succeeded()){
-               logger.info(" passengerMsg add response successed");
-               resultHandler.handle(Future.succeededFuture(res.result()));
+               logger.info("新增乘客消息成功," + res.result());
+               resultHandler.handle(Future.succeededFuture("新增乘客消息成功"));
            }else{
-               logger.error(" passengerMsg add error response : ", res.cause());
+               logger.error("新增乘客消息出错,", res.cause());
                resultHandler.handle(Future.failedFuture(res.cause()));
            }
         });
@@ -78,14 +166,15 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         String id = req.getString("id");
         JsonArray params = new JsonArray();
         params.add(id);
+        logger.info("查询乘客消息[sql : " + SQL_PASSENGER_MSGGET + "],[params : " + params + "]");
         Future<Optional<JsonObject>> future = queryOne(params, SQL_PASSENGER_MSGGET);
         future.setHandler(res -> {
             if(res.succeeded()){
                 Optional<JsonObject> result = res.result();
-                logger.info(" passengerMsg get response : " + result);
+                logger.info("查询乘客消息成功，" + result);
                 resultHandler.handle(Future.succeededFuture(result.get().toString()));
             }else{
-                logger.error(" passengerMsg get error response : ", res.cause());
+                logger.error("查询乘客消息出错，", res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
             }
         });
@@ -114,12 +203,43 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
         String countSql = String.format(SQL_PASSENGER_MSGLIST_COUNT, sb.toString());
         params.add(pageIndex);
         params.add(pageSize);
+
         String querySql = String.format(SQL_PASSENGER_MSGLIST_PAGE, sb.toString());
+        logger.info("查询乘客消息列表[sql : " + querySql + "],[params : " + params + "]");
         Future<List<JsonObject>> queryFuture = queryForPage(params, querySql);
+        logger.info("查询乘客消息列表总数[sql : " + countSql + "],[params : " + countParams + "]");
         Future countFuture = queryOne(countParams, countSql);
         executeList(page, pageSize, queryFuture, countFuture, resultHandler);
     }
 
+    /**
+     * 根据id删除一条乘客消息
+     * @param req
+     * @param resultHandler
+     */
+    public void del(JsonObject req, Handler<AsyncResult<String>> resultHandler){
+        Optional<String> id = Optional.ofNullable(req.getString("id"));
+        if(!id.isPresent()){
+            logger.error("删除乘客消息时，消息id不能为空");
+            resultHandler.handle(Future.failedFuture("删除乘客消息时，消息id不能为空"));
+            return;
+        }
+        JsonArray params = new JsonArray();
+        params.add(id.get());
+        Future<String> future = executeSQL(params, SQL_PASSENGER_MSGDEL);
+        future.setHandler(res -> {
+            if(res.succeeded()){
+                String result = res.result();
+                logger.info("删除乘客消息成功," + result);
+                resultHandler.handle(Future.succeededFuture("删除乘客消息成功"));
+            }else{
+                logger.error("删除乘客消息出错，", res.cause());
+                resultHandler.handle(Future.failedFuture(res.cause()));
+            }
+        });
+    }
+
+    //查询列表
     private void executeList(int page, int pageSize,Future<List<JsonObject>> queryFuture, Future countFuture,
                              Handler<AsyncResult<PageBean>> resultHandler){
         CompositeFuture compositeFuture = CompositeFuture.all(queryFuture, countFuture);
@@ -139,23 +259,23 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
                 Long total = resultCount.orElse(new JsonObject()).getLong("count(1)");
                 PageBean pageBean = new PageBean(page, pageSize, newList, total);
                 String result = Json.encode(pageBean);
-                logger.info(" passengerMsg list response : " + result);
+                logger.info("查询乘客消息列表成功，" + result);
                 resultHandler.handle(Future.succeededFuture(pageBean));
             }else{
-                logger.error(" passengerMsg list response error! " , res.cause());
+                logger.error("查询乘客消息列表出错，" , res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
             }
         });
     }
 
-    protected Future<String> addOne(JsonArray params, String sql) {
+    //执行一条SQL
+    protected Future<String> executeSQL(JsonArray params, String sql) {
         return getConnection().compose(conn -> {
             Future<String> future = Future.future();
             conn.updateWithParams(sql, params, res -> {
                 if(res.succeeded()){
-                    future.complete("success");
+                    future.complete();
                 }else{
-                    logger.error(" addOne error, ", res.cause());
                     future.fail(res.cause());
                 }
                 conn.close();
@@ -176,7 +296,6 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
                         future.complete(Optional.of(list.get(0)));
                     }
                 }else{
-                    logger.error(" queryOne error, ", res.cause());
                     future.fail(res.cause());
                 }
                 conn.close();
@@ -192,14 +311,14 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
                 if(res.succeeded()){
                     List<JsonObject> list  = res.result().getRows();
                     if(CollectionUtils.isEmpty(list)){
-                        logger.info(" passengerMsg list : null ");
+                        logger.info("passengerMsg list : null ");
                         future.complete(Collections.EMPTY_LIST);
                     }else{
-                        logger.info(" passengerMsg list : " + Json.encode(list));
+                        logger.info("passengerMsg list : " + Json.encode(list));
                         future.complete(list);
                     }
                 }else{
-                    logger.error("passengerMsg select * error: ", res.cause());
+                    logger.error("passengerMsg list error: ", res.cause());
                     future.fail(res.cause());
                 }
                 conn.close();

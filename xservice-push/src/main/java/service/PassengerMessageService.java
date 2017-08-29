@@ -6,7 +6,6 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 
@@ -25,5 +24,7 @@ public interface PassengerMessageService {
 
     public void get(JsonObject param, Handler<AsyncResult<String>> resultHandler);
 
-    public void add(JsonArray param, Handler<AsyncResult<String>> resultHandler);
+    public void addOrUpdate(JsonObject param, Handler<AsyncResult<String>> resultHandler);
+
+    public void del(JsonObject param, Handler<AsyncResult<String>> resultHandler);
 }

@@ -8,7 +8,6 @@
  *
  */
 
-import fetch from 'common/fetch'
 import http from 'common/http'
 import {passenger_table} from 'common/port_uri'
 
@@ -22,9 +21,9 @@ export function list(params) {
 }
 
 //根据id查询数据
-export function add(params) {
+export function addOrEdit(params) {
   return http({
-    url: passenger_table.add,
+    url: passenger_table.addOrEdit,
     method: 'post',
     params
   })
@@ -34,6 +33,15 @@ export function add(params) {
 export function get(params) {
   return http({
     url: passenger_table.get,
+    method: 'get',
+    params
+  })
+}
+
+//根据id查询数据
+export function del(params) {
+  return http({
+    url: passenger_table.del,
     method: 'get',
     params
   })
