@@ -29,8 +29,8 @@ import noPageComponent from 'pages/error/404'
 import loginComponent from 'pages/user/login'
 //msgStat
 import msgStatRouters from './msgStat';
-//driverPush
-import driverPushRouters from './driverPush';
+//driverMsg
+import driverMsgRouters from './driverMsg';
 
 import msgPassengerRouters from './msgPassenger';
 
@@ -63,7 +63,7 @@ const routes = [{
     }
   }].concat(
     msgStatRouters,
-    driverPushRouters,
+    driverMsgRouters,
     msgPassengerRouters)
 }]
 

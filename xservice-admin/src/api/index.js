@@ -13,7 +13,7 @@ import * as api_file from './file'
 import * as api_msgStat from './msgStat'
 import * as api_user from './user'
 import * as api_msgPassenger from './msgPassenger'
-import * as api_driverPush from './driverPush'
+import * as api_driverMsg from './driverMsg'  //引入driverMsg.js文件
 
 const apiObj = {
   api_file,

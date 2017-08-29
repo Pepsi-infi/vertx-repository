@@ -14,7 +14,7 @@ import * as port_user from './user'
 import * as port_table from './msgStat'
 import * as port_file from './file'
 import * as passenger_table from './msgPassenger'
-import * as driverPush from './driverPush'
+import * as driverMsg from './driverMsg'
 
 export {
   port_code,
@@ -22,5 +22,5 @@ export {
   port_table,
   port_file,
   passenger_table,
-  driverPush
+  driverMsg
 }
