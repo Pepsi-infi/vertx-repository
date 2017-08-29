@@ -29,6 +29,8 @@ import noPageComponent from 'pages/error/404'
 import loginComponent from 'pages/user/login'
 //msgStat
 import msgStatRouters from './msgStat';
+//driverPush
+import driverPushRouters from './driverPush';
 
 //乘客消息列表
 import msgPassenger from '../pages/msgPassenger'
@@ -77,7 +79,9 @@ const routes = [{
         auth: true
       }
     }
-  ].concat(msgStatRouters)
+  ].concat(msgStatRouters,
+           driverPushRouters
+  )
 }]
 
 const router = new VueRouter({
