@@ -1,5 +1,7 @@
 package server;
 
+import java.time.LocalDate;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -32,5 +34,9 @@ public class UploadServerVerticle extends AbstractVerticle {
 						});
 			});
 		}).listen(9090);
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(LocalDate.now());
 	}
 }
