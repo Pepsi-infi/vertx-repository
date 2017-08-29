@@ -14,3 +14,5 @@ export const list = "/passengerMsg/list"
 //根据id查询数据
 export const get = "/passengerMsg/get"
 
+export const add = "/passengerMsg/add"
+

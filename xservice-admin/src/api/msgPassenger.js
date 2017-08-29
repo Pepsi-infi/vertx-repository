@@ -23,7 +23,16 @@ export function list(params) {
 
 //根据id查询数据
 export function add(params) {
-  return fetch({
+  return http({
+    url: passenger_table.add,
+    method: 'post',
+    params
+  })
+}
+
+//根据id查询数据
+export function get(params) {
+  return http({
     url: passenger_table.get,
     method: 'get',
     params
