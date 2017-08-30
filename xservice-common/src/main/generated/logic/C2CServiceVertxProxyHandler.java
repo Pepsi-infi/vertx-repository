@@ -127,6 +127,10 @@ public class C2CServiceVertxProxyHandler extends ProxyHandler {
           service.doWithLogin((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
           break;
         }
+        case "doWithLogout": {
+          service.doWithLogout((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
+          break;
+        }
         case "doWithMsgRequest": {
           service.doWithMsgRequest((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
           break;
