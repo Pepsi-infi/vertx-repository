@@ -44,7 +44,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 				
 				
 				//Test
-				eb.send(socket.writeHandlerID(), buffer + "\001");
+				eb.send(socket.writeHandlerID(), buffer.appendString("\001"));
 				
 				
 				logger.info("buffer" + buffer.toString());
