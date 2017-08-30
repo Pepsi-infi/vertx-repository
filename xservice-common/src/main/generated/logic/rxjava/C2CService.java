@@ -58,6 +58,16 @@ public class C2CService {
     }));
   }
 
+  public void doWithLogout(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.doWithLogout(msg, resultHandler);
+  }
+
+  public Single<JsonObject> rxDoWithLogout(JsonObject msg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      doWithLogout(msg, fut);
+    }));
+  }
+
   public void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) { 
     delegate.doWithMsgRequest(msg, resultHandler);
   }
