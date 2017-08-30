@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package logic;
+package cluster;
 
-import logic.C2CService;
+import cluster.ConsistentHashingService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,9 +39,8 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import logic.C2CService;
+import cluster.ConsistentHashingService;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -50,25 +49,25 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class C2CServiceVertxProxyHandler extends ProxyHandler {
+public class ConsistentHashingServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final C2CService service;
+  private final ConsistentHashingService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public C2CServiceVertxProxyHandler(Vertx vertx, C2CService service) {
+  public ConsistentHashingServiceVertxProxyHandler(Vertx vertx, ConsistentHashingService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public C2CServiceVertxProxyHandler(Vertx vertx, C2CService service, long timeoutInSecond) {
+  public ConsistentHashingServiceVertxProxyHandler(Vertx vertx, ConsistentHashingService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public C2CServiceVertxProxyHandler(Vertx vertx, C2CService service, boolean topLevel, long timeoutSeconds) {
+  public ConsistentHashingServiceVertxProxyHandler(Vertx vertx, ConsistentHashingService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -123,24 +122,8 @@ public class C2CServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "doWithLogin": {
-          service.doWithLogin((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
-          break;
-        }
-        case "doWithLogout": {
-          service.doWithLogout((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
-          break;
-        }
-        case "doWithMsgRequest": {
-          service.doWithMsgRequest((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
-          break;
-        }
-        case "doWithAckRequest": {
-          service.doWithAckRequest((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
-          break;
-        }
-        case "doWithFileUpload": {
-          service.doWithFileUpload((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
+        case "getNode": {
+          service.getNode((java.lang.String)json.getValue("key"), createHandler(msg));
           break;
         }
         default: {
