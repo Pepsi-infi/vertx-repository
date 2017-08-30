@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package logic;
+package cluster;
 
-import logic.C2CService;
+import cluster.ConsistentHashingService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,9 +32,8 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import logic.C2CService;
+import cluster.ConsistentHashingService;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -43,18 +42,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class C2CServiceVertxEBProxy implements C2CService {
+public class ConsistentHashingServiceVertxEBProxy implements ConsistentHashingService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public C2CServiceVertxEBProxy(Vertx vertx, String address) {
+  public ConsistentHashingServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public C2CServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public ConsistentHashingServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -64,88 +63,16 @@ public class C2CServiceVertxEBProxy implements C2CService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void getNode(String key, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("msg", msg);
+    _json.put("key", key);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "doWithLogin");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void doWithLogout(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("msg", msg);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "doWithLogout");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("msg", msg);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "doWithMsgRequest");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void doWithAckRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("msg", msg);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "doWithAckRequest");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        resultHandler.handle(Future.failedFuture(res.cause()));
-      } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
-    if (closed) {
-      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("msg", msg);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "doWithFileUpload");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _deliveryOptions.addHeader("action", "getNode");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {

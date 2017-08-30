@@ -146,4 +146,9 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			});
 		}
 	}
+
+	@Override
+	public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
+		// gei to fa msg, xiao xi ru ku
+	}
 }
