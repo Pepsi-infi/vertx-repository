@@ -9,6 +9,9 @@ public class UUidTest {
 		System.out.println(UUID.randomUUID().toString());
 		
 		System.out.println(id(10));
+		
+		String a = "abcd" + "\001";
+		System.out.println(a.length());
 	}
 
 	final static char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
