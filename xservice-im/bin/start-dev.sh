@@ -11,10 +11,10 @@ nohup java \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
 -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
--Xloggc:/letv/logs/mobile/channel/gc.log \
--Dlog.path=/letv/logs/mobile/channel \
+-Xloggc:${root_path}/gc.log \
+-Dlog.path=${root_path}/log \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
--Dconfig=mobile \
+-Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
