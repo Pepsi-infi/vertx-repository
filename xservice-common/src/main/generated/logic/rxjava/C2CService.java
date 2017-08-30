@@ -88,6 +88,16 @@ public class C2CService {
     }));
   }
 
+  public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.doWithFileUpload(msg, resultHandler);
+  }
+
+  public Single<JsonObject> rxDoWithFileUpload(JsonObject msg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      doWithFileUpload(msg, fut);
+    }));
+  }
+
 
   public static  C2CService newInstance(logic.C2CService arg) {
     return arg != null ? new C2CService(arg) : null;
