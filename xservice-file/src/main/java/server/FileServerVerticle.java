@@ -7,7 +7,6 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 import api.RestConstant;
 import cluster.ConsistentHashingService;
-import constant.UploadConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -34,6 +33,7 @@ public class FileServerVerticle extends AbstractVerticle {
 	private ConsistentHashingService consistentHashingService;
 	private C2CService c2cService;
 	private EventBus eb;
+	private String uploadFilePathPrefix;
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
@@ -44,12 +44,15 @@ public class FileServerVerticle extends AbstractVerticle {
 		c2cService = C2CService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
+		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
+		logger.info("config uploadFilePathPrefix " + uploadFilePathPrefix);
+
 		httpServer.requestHandler(request -> {
 			if (request.method() == HttpMethod.GET) {
 				String file = request.getParam("file");
 				switch (request.path()) {
 				case RestConstant.Uri.DOWNLOAD_FILE_PATH:
-					String sysFile = UploadConstant.UPLOAD_FILE_PATH_PREFIX + file;
+					String sysFile = uploadFilePathPrefix + file;
 					fs.exists(sysFile, res -> {
 						if (!res.result()) {
 							sendNotFound(request);
@@ -78,7 +81,7 @@ public class FileServerVerticle extends AbstractVerticle {
 					request.setExpectMultipart(true);
 					LocalDate date = LocalDate.now();
 					String content = date + "/" + uuid;
-					String uploadPath = UploadConstant.UPLOAD_FILE_PATH_PREFIX + date + "/";
+					String uploadPath = uploadFilePathPrefix + date + "/";
 
 					if ((StringUtils.isEmpty(lastCreated) || !lastCreated.equalsIgnoreCase(date.toString()))
 							&& !fs.existsBlocking(uploadPath)) {
