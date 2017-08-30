@@ -39,20 +39,20 @@ public class TCPServerVerticle extends AbstractVerticle {
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {
-			socket.handler(RecordParser.newDelimited("\n", buffer -> {
-				int headerLength = ByteUtil.bytesToInt(buffer.getBytes(0, 4));
-				int clientVersion = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
-				int cmd = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
-				int seq = ByteUtil.bytesToInt(buffer.getBytes(12, 16));
-				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(16, 20));
+			socket.handler(RecordParser.newDelimited("\001", buffer -> {
+				int headerLength = ByteUtil.bytesToInt(buffer.getBytes(0, 2));
+				int clientVersion = ByteUtil.bytesToInt(buffer.getBytes(2, 4));
+				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 6));
+				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(6, 10));
 
 				final JsonObject msgBody = buffer
 						.getBuffer(IMMessageConstant.HEADER_LENGTH, IMMessageConstant.HEADER_LENGTH + bodyLength)
 						.toJsonObject();
 
 				if (msgBody != null) {
-					String from = msgBody.getString("from");// uid
+					String from = msgBody.getString("from");
 					String to = msgBody.getString("to");
+					long seq = msgBody.getLong("id");
 					if (from != null) {
 						switch (cmd) {
 						case IMCmdConstants.LOGIN:
@@ -133,7 +133,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void msgRequest(String handlerID, int clientVersion, int seq, final JsonObject msgBody, String to) {
+	private void msgRequest(String handlerID, int clientVersion, long seq, final JsonObject msgBody, String to) {
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(to, consistentHashFuture.completer());
 		Future<Message<JsonObject>> sessionFuture = Future.future();
@@ -165,7 +165,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void ackRequest(String handlerID, int clientVersion, int seq, final JsonObject msgBody, String to) {
+	private void ackRequest(String handlerID, int clientVersion, long seq, final JsonObject msgBody, String to) {
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(to, consistentHashFuture.completer());
 		Future<Message<JsonObject>> sessionFuture = Future.future();
