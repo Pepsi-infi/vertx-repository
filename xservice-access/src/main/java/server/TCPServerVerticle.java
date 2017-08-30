@@ -5,6 +5,7 @@ import constants.IMCmdConstants;
 import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
@@ -56,10 +57,10 @@ public class TCPServerVerticle extends AbstractVerticle {
 					if (from != null) {
 						switch (cmd) {
 						case IMCmdConstants.LOGIN:
-							login(socket.writeHandlerID(), cmd, from);
+							login(socket.writeHandlerID(), clientVersion, cmd, from);
 							break;
 						case IMCmdConstants.LOGOUT:
-							logout(socket.writeHandlerID(), from);
+							logout(socket.writeHandlerID(), clientVersion, cmd, from);
 							break;
 						case IMCmdConstants.MSG_R:
 							msgRequest(socket.writeHandlerID(), clientVersion, seq, msgBody, to);
@@ -90,7 +91,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	 * @param from
 	 *            登录用户id，必传
 	 */
-	private void login(String handlerID, int cmd, String from) {
+	private void login(String handlerID, int clientVersion, int cmd, String from) {
 		// 把用户做一致性hash，分散到集群机器上
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(from, consistentHashFuture.completer());
@@ -107,6 +108,11 @@ public class TCPServerVerticle extends AbstractVerticle {
 				logger.error("Consistent Hash ", res.cause());
 			}
 		});
+
+		Future<JsonObject> c2cFuture = Future.future();
+		JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("cmd", cmd).put("fromHandlerID",
+				handlerID);
+		c2cService.doWithLogin(rMsg, c2cFuture.completer());
 	}
 
 	/**
@@ -116,7 +122,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	 * @param from
 	 *            用户id，必传
 	 */
-	private void logout(String handlerID, String from) {
+	private void logout(String handlerID, int clientVersion, int cmd, String from) {
 		// 把用户做一致性hash，分散到集群机器上
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(from, consistentHashFuture.completer());
@@ -131,6 +137,11 @@ public class TCPServerVerticle extends AbstractVerticle {
 				logger.error("Consistent Hash ", res.cause());
 			}
 		});
+
+		Future<JsonObject> c2cFuture = Future.future();
+		JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("cmd", cmd).put("fromHandlerID",
+				handlerID);
+		c2cService.doWithLogout(rMsg, c2cFuture.completer());
 	}
 
 	private void msgRequest(String handlerID, int clientVersion, long seq, final JsonObject msgBody, String to) {

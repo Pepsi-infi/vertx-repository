@@ -21,6 +21,8 @@ public interface C2CService {
 	}
 
 	void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
+	
+	void doWithLogout(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
 
 	void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
 
