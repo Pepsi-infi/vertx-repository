@@ -2,6 +2,7 @@ package api;
 
 import channel.ApplePushVerticle;
 import channel.MessagePushContainer;
+import channel.MessagePushNonAdver;
 import channel.MiPushVerticle;
 import channel.SocketVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -30,6 +31,7 @@ public class StartVerticle extends AbstractVerticle{
 
         this.deployVerticle(MessagePushContainer.class.getName());
         this.deployVerticle(HttpClientVerticle.class.getName());
+        this.deployVerticle(MessagePushNonAdver.class.getName());
         // 提供其他非EventBus服务
     }
 
