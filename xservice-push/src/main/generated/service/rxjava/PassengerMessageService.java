@@ -19,6 +19,7 @@ package service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import java.util.List;
 import domain.PageBean;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -65,13 +66,73 @@ public class PassengerMessageService {
     }));
   }
 
-  public void add(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
-    delegate.add(param, resultHandler);
+  public void get(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.get(param, resultHandler);
   }
 
-  public Single<String> rxAdd(JsonObject param) { 
+  public Single<String> rxGet(JsonObject param) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      add(param, fut);
+      get(param, fut);
+    }));
+  }
+
+  public void addOrUpdate(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.addOrUpdate(param, resultHandler);
+  }
+
+  public Single<String> rxAddOrUpdate(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      addOrUpdate(param, fut);
+    }));
+  }
+
+  public void del(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.del(param, resultHandler);
+  }
+
+  public Single<String> rxDel(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      del(param, fut);
+    }));
+  }
+
+  public void getPushMsg(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.getPushMsg(param, resultHandler);
+  }
+
+  public Single<String> rxGetPushMsg(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getPushMsg(param, fut);
+    }));
+  }
+
+  public void addImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.addImportFile(param, resultHandler);
+  }
+
+  public Single<String> rxAddImportFile(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      addImportFile(param, fut);
+    }));
+  }
+
+  public void getImportFileList(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler) { 
+    delegate.getImportFileList(param, resultHandler);
+  }
+
+  public Single<List<JsonObject>> rxGetImportFileList(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getImportFileList(param, fut);
+    }));
+  }
+
+  public void getImportPhone(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.getImportPhone(param, resultHandler);
+  }
+
+  public Single<String> rxGetImportPhone(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getImportPhone(param, fut);
     }));
   }
 

@@ -37,7 +37,7 @@
                    <template scope="scope">
                        <el-button
                           size="small"
-                          @click="push(scope.$index, scope.row)" type="success" >消息推送</el-button>
+                          @click="pushMsg(scope.$index, scope.row)" type="success" >消息推送</el-button>
                        <el-button
                           size="small"
                           @click="stopPush(scope.$index, scope.row)" type="warning" v-show="showButton(scope.row)">停止推送</el-button>
@@ -129,6 +129,19 @@
               this.load_data = false
            })
       },
+      //删除消息
+      pushMsg : function(index,row){
+        var param = { id : row.realId };
+        this.$http.api_msgPassenger.push(param).then(({data}) => {
+                this.$message.success(data)
+                this.load_data = true
+                this.getData();
+             }).catch((error) => {
+                console.log(" load error :" + error);
+                this.load_data = false
+             })
+      },
+
       //加载列表数据
       getData : function(){
           this.$http.api_msgPassenger.list({
@@ -145,7 +158,10 @@
                   }
                   ele.realId = ele.id;
                   ele.id = "ad_passenger_count_" + ele.id;
-                  ele.isShow = new Date(ele.sendTime) < new Date() ? true : false;
+                  if(ele.sendTime){
+                    ele.isShow = new Date(ele.sendTime) > new Date() ? true : false;
+                  }
+                  //console.log (new Date(ele.sendTime));
               });
               this.table_data = list
               this.currentPage = page

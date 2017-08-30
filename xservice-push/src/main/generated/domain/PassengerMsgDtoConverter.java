@@ -30,6 +30,9 @@ public class PassengerMsgDtoConverter {
     if (json.getValue("action") instanceof Number) {
       obj.setAction(((Number)json.getValue("action")).intValue());
     }
+    if (json.getValue("cityIds") instanceof String) {
+      obj.setCityIds((String)json.getValue("cityIds"));
+    }
     if (json.getValue("content") instanceof String) {
       obj.setContent((String)json.getValue("content"));
     }
@@ -38,6 +41,9 @@ public class PassengerMsgDtoConverter {
     }
     if (json.getValue("id") instanceof Number) {
       obj.setId(((Number)json.getValue("id")).intValue());
+    }
+    if (json.getValue("importFile") instanceof String) {
+      obj.setImportFile((String)json.getValue("importFile"));
     }
     if (json.getValue("inMsgCenter") instanceof Number) {
       obj.setInMsgCenter(((Number)json.getValue("inMsgCenter")).intValue());
@@ -69,6 +75,9 @@ public class PassengerMsgDtoConverter {
     if (obj.getAction() != null) {
       json.put("action", obj.getAction());
     }
+    if (obj.getCityIds() != null) {
+      json.put("cityIds", obj.getCityIds());
+    }
     if (obj.getContent() != null) {
       json.put("content", obj.getContent());
     }
@@ -77,6 +86,9 @@ public class PassengerMsgDtoConverter {
     }
     if (obj.getId() != null) {
       json.put("id", obj.getId());
+    }
+    if (obj.getImportFile() != null) {
+      json.put("importFile", obj.getImportFile());
     }
     if (obj.getInMsgCenter() != null) {
       json.put("inMsgCenter", obj.getInMsgCenter());

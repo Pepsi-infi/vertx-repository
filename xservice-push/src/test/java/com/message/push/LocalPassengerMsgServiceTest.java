@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.impl.PassengerMessageServiceImpl;
+import util.HttpUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -23,6 +24,7 @@ public class LocalPassengerMsgServiceTest extends AbstractVerticle{
 		DeploymentOptions options = new DeploymentOptions();
 		vertx.deployVerticle(PassengerMsgVerticle.class.getName());
 		vertx.deployVerticle(PassengerMessageServiceImpl.class.getName(), options.setConfig(getJsonConf("config.json")));
+		vertx.deployVerticle(HttpUtil.class.getName());
 	}
 
 

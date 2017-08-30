@@ -56,10 +56,6 @@
           child: [{
             title: "推送消息统计",
             path: "/msgStat/msgStatList"
-          },
-          {
-            title: "乘客消息列表",
-            path: "/msgPassenger"
           }]
         },{
           title: "推送中心",
@@ -68,7 +64,11 @@
           child: [{
             title: "司机消息推送",
             path: "/driverPush/driverPushList"
-          }]
+          },
+           {
+             title: "乘客消息列表",
+             path: "/msgPassenger"
+           }]
         }]
       }
     }

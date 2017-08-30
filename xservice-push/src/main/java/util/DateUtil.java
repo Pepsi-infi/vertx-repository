@@ -56,6 +56,24 @@ public class DateUtil {
         return srcDate;
     }
 
+    /**
+     * 标准时间转成北京时间
+     * @param srcDate
+     * @return
+     */
+    public static Long getTimeMillis(String srcDate){
+        Date date = null;
+        if(StringUtils.isNotBlank(srcDate)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                date = sdf.parse(srcDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return date == null ? null : date.getTime();
+    }
+
 //    public static String _getLocalDate(String srcDate){
 //        ZonedDateTime zonedDateTime = ZonedDateTime.parse(srcDate, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
 //        ZonedDateTime localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC+08:00"));

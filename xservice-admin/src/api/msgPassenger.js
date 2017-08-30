@@ -9,12 +9,12 @@
  */
 
 import http from 'common/http'
-import {passenger_table} from 'common/port_uri'
+import {passengerMsg} from 'common/port_uri'
 
 //数据列表
 export function list(params) {
   return http({
-    url: passenger_table.list,
+    url: passengerMsg.list,
     method: 'get',
     params
   })
@@ -23,7 +23,7 @@ export function list(params) {
 //根据id查询数据
 export function addOrEdit(params) {
   return http({
-    url: passenger_table.addOrEdit,
+    url: passengerMsg.addOrEdit,
     method: 'post',
     params
   })
@@ -32,7 +32,7 @@ export function addOrEdit(params) {
 //根据id查询数据
 export function get(params) {
   return http({
-    url: passenger_table.get,
+    url: passengerMsg.get,
     method: 'get',
     params
   })
@@ -41,10 +41,36 @@ export function get(params) {
 //根据id查询数据
 export function del(params) {
   return http({
-    url: passenger_table.del,
+    url: passengerMsg.del,
     method: 'get',
     params
   })
 }
 
+//根据id查询数据
+export function push(params) {
+  return http({
+    url: passengerMsg.push,
+    method: 'get',
+    params
+  })
+}
+
+//根据id查询数据
+export function getImportFileList(params) {
+  return http({
+    url: passengerMsg.getImportFileList,
+    method: 'get',
+    params
+  })
+}
+
+//根据id查询数据
+export function getCityList(params) {
+  return http({
+    url: passengerMsg.getCityList,
+    method: 'get',
+    params
+  })
+}
 

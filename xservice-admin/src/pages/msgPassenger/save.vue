@@ -80,7 +80,7 @@
         <el-row>
           <el-col :span="10">
              <el-form-item label="发送对象:" prop="sendType">
-               <el-radio-group v-model="form.sendType">
+               <el-radio-group v-model="form.sendType" @change="sendTypeChange">
                  <el-radio label="1" value="1">所有用户</el-radio>
                  <el-radio label="2" value="2">指定用户</el-radio>
                  <el-radio label="3" value="3">指定城市</el-radio>
@@ -89,7 +89,7 @@
           </el-col>
           <el-col :span="10">
              <el-form-item label="跳转类型:" prop="action" >
-                <el-select v-model="form.action" v-bind:disabled="actionShow" placeholder="请选择" >
+                <el-select v-model="form.action" v-bind:disabled="showAction" placeholder="请选择" >
                     <el-option label="我的行程页" value="3"></el-option>
                     <el-option label="充值页" value="4"></el-option>
                     <el-option label="优惠券页" value="5"></el-option>
@@ -99,6 +99,39 @@
                 </el-select>
              </el-form-item>
           </el-col>
+        </el-row>
+        <el-row >
+              <el-col :span="20">
+                 <el-form-item label="指定用户:" v-show="showImportFile">
+                     <el-select v-model="form.importFile" placeholder="请选择">
+                       <el-option
+                         v-for="item in importOptions"
+                         :key="item.value"
+                         :label="item.label"
+                         :value="item.value">
+                       </el-option>
+                     </el-select>
+                 </el-form-item>
+              </el-col>
+        </el-row>
+        <el-row >
+              <el-col :span="20">
+                 <el-form-item label="选择城市:" v-show="showCity">
+                     <el-select v-model="form.cityIds" multiple filterable placeholder="请选择">
+                       <el-option-group
+                         v-for="group in cityOptions"
+                         :key="group.label"
+                         :label="group.label">
+                         <el-option
+                           v-for="item in group.options"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                         </el-option>
+                       </el-option-group>
+                     </el-select>
+                 </el-form-item>
+              </el-col>
         </el-row>
         <el-row  type="flex" justify="center">
             <el-col :span="12" >
@@ -129,23 +162,31 @@
           action : '',
           title : '',
           content : '',
-          id : ''
+          id : '',
+          importFile : '',
+          cityIds : ''
         },
-        load_data: false,
-        on_submit_loading: false,
         rules: {
           title: [{required: true, message: '标题不能为空', trigger: 'blur'}],
           content: [{required: true, message: '消息内容不能为空', trigger: 'blur'}],
           sendType: [{required: true, message: '请选择发送对象', trigger: 'change'}],
           sendTime: [{ type: 'date', required: true, message: '请选择发送时间', trigger: 'change' }],
-          expireTime: [{ type: 'date', required: true, message: '请选择过期时间', trigger: 'change' }],
-          action: [{required: true, message: '请选择跳转类型', trigger: 'change'}]
+          expireTime: [{ type: 'date', required: true, message: '请选择过期时间', trigger: 'change' }]
+          //action: [{required: true, message: '请选择跳转类型', trigger: 'change'}]
         },
-         //是否禁用跳转
-         actionShow : false
+        load_data: false,
+        on_submit_loading: false,
+        //是否禁用跳转
+        showAction : false,
+        showImportFile : false,
+        showCity : false,
+        importOptions : [],
+        cityOptions : []
       }
     },
     created(){
+       this.get_importFile();
+       this.get_city();
        this.form.id = this.$route.query.id
        if(this.form.id){
          this.get_form_data(this.form.id);
@@ -164,8 +205,9 @@
             data.sendTime = new Date(data.sendTime);
             data.expireTime = new Date(data.expireTime);
             //vue的类型对不上，不会自动匹配（后台数字类型，页面上字符串）
-            data.action = data.action + "";
+            data.action = data.action ? data.action + "" : "";
             data.sendType = data.sendType + "";
+            data.cityIds = data.cityIds.split(",");
             this.form = data
             this.load_data = false
           })
@@ -177,7 +219,22 @@
       on_submit_form(){
         this.$refs.form.validate((valid) => {
           if(!valid){ return false }
-          //console.log(JSON.stringify(this.form));
+          console.log(JSON.stringify(this.form));
+
+          //后台框架接收不了数组
+          var citys = this.form.cityIds;
+          var cityIdsStr = '';
+          if(citys){
+            for(var i in citys){
+              cityIdsStr +=  ',' + citys[i];
+            }
+            if(cityIdsStr){
+               cityIdsStr = cityIdsStr.substring(1);
+            }
+            this.form.cityIds = cityIdsStr;
+          }
+          console.log(JSON.stringify(this.form));
+
           this.on_submit_loading = true
           this.$http.api_msgPassenger.addOrEdit(this.form)
             .then(({data}) => {
@@ -190,6 +247,49 @@
             })
         })
       },
+      //查询指定人员的文件
+      get_importFile(){
+        this.$http.api_msgPassenger.getImportFileList()
+          .then(({data}) => {
+            data.forEach((element, index) => {
+                if (element !== null) {
+                    let e = {};
+                    e.label = element.fileName;
+                    e.value = element.id + "";
+                    this.importOptions.push(e);
+                }
+            });
+          })
+          .catch((error) => {
+            console.log(error);
+            this.load_data = false
+          })
+      },
+
+      //查询城市
+      get_city(){
+        this.$http.api_msgPassenger.getCityList()
+          .then(({data : {code,msg,time,data}}) => {
+            for(var i in data){
+               var gp = {};
+               gp.label = i;
+               gp.options = [];
+               var subE = data[i]
+               for(var j in subE){
+                 var option = {};
+                 option.label = subE[j].name;
+                 option.value = subE[j].id + "";
+                 gp.options.push(option);
+               }
+               this.cityOptions.push(gp);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            this.load_data = false
+          })
+      },
+
       getLocalDate : function(val){
         return moment(val).format('YYYY-MM-DD HH:mm:ss');
       },
@@ -197,9 +297,21 @@
       //打开类型为打开网页时，跳转类型不可选
       openTypeChange : function(val){
         if(val == 2){
-          this.actionShow = true;
+          this.showAction = true;
         }else{
-          this.actionShow = false;
+          this.showAction = false;
+        }
+      },
+      sendTypeChange : function(val){
+        if(val == 2){
+          this.showImportFile = true;
+          this.showCity = false;
+        }else if(val == 3){
+          this.showImportFile = false;
+          this.showCity = true;
+        }else{
+          this.showImportFile = false;
+          this.showCity = false;
         }
       }
     },
