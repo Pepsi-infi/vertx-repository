@@ -99,7 +99,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
 
         Map<String, Object> msgInfo = new HashMap<>();
         msgInfo.put("nick", null);
-        msgInfo.put("msgId", msgId);
+        msgInfo.put("msgId", MsgUtil.getUUID());
         msgInfo.put("title", messageType.getName());
         msgInfo.put("body", receiveMsg.toString());
         if (StringUtils.isNotBlank(token) && token.length() > 10) {
