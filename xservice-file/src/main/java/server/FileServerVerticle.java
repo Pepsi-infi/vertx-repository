@@ -23,9 +23,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
 
-public class UploadServerVerticle extends AbstractVerticle {
+public class FileServerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(UploadServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(FileServerVerticle.class);
 
 	private FileSystem fs;
 
