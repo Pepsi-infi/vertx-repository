@@ -41,6 +41,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 		server.connectHandler(socket -> {
 			socket.handler(RecordParser.newDelimited("\001", buffer -> {
+				logger.info("buffer" + buffer.toString());
 				int headerLength = ByteUtil.bytesToInt(buffer.getBytes(0, 2));
 				int clientVersion = ByteUtil.bytesToInt(buffer.getBytes(2, 4));
 				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 6));
