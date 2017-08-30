@@ -4,7 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import server.UploadServerVerticle;
+import server.FileServerVerticle;
 
 public class StartVerticle extends AbstractVerticle {
 
@@ -14,7 +14,7 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		vertx.deployVerticle(UploadServerVerticle.class.getName(), readBossOpts());
+		vertx.deployVerticle(FileServerVerticle.class.getName(), readBossOpts());
 	}
 
 	public static DeploymentOptions readBossOpts() {

@@ -13,7 +13,7 @@
 		<module>xservice-push</module>
 		<module>xservice-im</module>
 		<module>xservice-access</module>
-		<module>xservice-upload</module>
+		<module>xservice-file</module>
 	</modules>
 
 	<!-- 配置变量 -->
