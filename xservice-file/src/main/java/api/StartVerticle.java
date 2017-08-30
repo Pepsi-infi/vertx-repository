@@ -14,7 +14,8 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		vertx.deployVerticle(FileServerVerticle.class.getName(), readBossOpts());
+		logger.info("config " + config().encode());
+		vertx.deployVerticle(FileServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 	}
 
 	public static DeploymentOptions readBossOpts() {
