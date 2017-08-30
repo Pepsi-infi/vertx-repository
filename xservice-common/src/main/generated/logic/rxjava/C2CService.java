@@ -48,6 +48,16 @@ public class C2CService {
     return ret;
   }
 
+  public void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.doWithLogin(msg, resultHandler);
+  }
+
+  public Single<JsonObject> rxDoWithLogin(JsonObject msg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      doWithLogin(msg, fut);
+    }));
+  }
+
   public void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) { 
     delegate.doWithMsgRequest(msg, resultHandler);
   }

@@ -48,7 +48,7 @@ public class ConsistentHashingService {
   }
 
   /**
-   * 根据key获得用户所属机器内网IP
+   * 根据key获得key所属机器内网IP
    * @param key 
    * @param resultHandler 
    */
@@ -57,7 +57,7 @@ public class ConsistentHashingService {
   }
 
   /**
-   * 根据key获得用户所属机器内网IP
+   * 根据key获得key所属机器内网IP
    * @param key 
    * @return 
    */

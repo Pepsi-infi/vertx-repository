@@ -60,7 +60,8 @@ public class UploadServerVerticle extends AbstractVerticle {
 					String uuid = UUID.randomUUID().toString();
 					request.setExpectMultipart(true);
 					LocalDate date = LocalDate.now();
-					String uploadPath = UploadConstant.UPLOAD_FILE_PATH_PREFIX + date + "/";
+					String content = date + "/" + uuid;
+					String uploadPath = UploadConstant.UPLOAD_FILE_PATH_PREFIX + content;
 
 					if ((StringUtils.isEmpty(lastCreated) || !lastCreated.equalsIgnoreCase(date.toString()))
 							&& !fs.existsBlocking(uploadPath)) {
@@ -71,7 +72,12 @@ public class UploadServerVerticle extends AbstractVerticle {
 					request.uploadHandler(upload -> {
 						upload.streamToFileSystem(uploadPath + uuid).endHandler(a -> {
 
-							System.out.println("end formAttributes" + request.formAttributes());
+							String from = request.getFormAttribute("from");
+							String to = request.getFormAttribute("to");
+							String id = request.getFormAttribute("id");
+							String orderId = request.getFormAttribute("orderId");
+							String type = request.getFormAttribute("type");
+							//content 文件地址 + ts 服务器时间戳 发给 to 的handler
 
 							JsonObject response = new JsonObject();
 							response.put("code", 0);

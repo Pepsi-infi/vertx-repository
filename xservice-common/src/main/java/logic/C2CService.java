@@ -20,6 +20,8 @@ public interface C2CService {
 		return ProxyHelper.createProxy(C2CService.class, vertx, SERVICE_ADDRESS);
 	}
 
+	void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
+
 	void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
 
 	void doWithAckRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);

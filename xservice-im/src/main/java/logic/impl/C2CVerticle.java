@@ -38,6 +38,12 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 		eb = vertx.eventBus();
 	}
+	
+	@Override
+	public void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
+		// TODO Auto-generated method stub
+
+	}
 
 	public void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
 		String fromHandlerID = msg.getString("fromHandlerID");
