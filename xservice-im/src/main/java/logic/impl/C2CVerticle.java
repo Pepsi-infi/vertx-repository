@@ -10,11 +10,15 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
 import persistence.MongoService;
 import protocol.MessageBuilder;
 
 public class C2CVerticle extends AbstractVerticle implements C2CService {
+
+	private static final Logger logger = LoggerFactory.getLogger(C2CVerticle.class);
 
 	private EventBus eb;
 
@@ -46,6 +50,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 				msg.getInteger("clientVersion"), IMCmdConstants.LOGIN + 100, 0);
+		logger.info("DoWithLogin " + aMsgHeader);
 		eb.send(fromHandlerID, aMsgHeader.appendString("\001"));
 	}
 
