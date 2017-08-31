@@ -80,9 +80,19 @@ public class TCPServerVerticle extends AbstractVerticle {
 						if (from != null && to != null) {
 							switch (cmd) {
 							case IMCmdConstants.LOGIN:
+								try {
+									from = jsonBody.getString("userTel");
+								} catch (Exception e) {
+									logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+								}
 								login(socket.writeHandlerID(), clientVersion, cmd, from);
 								break;
 							case IMCmdConstants.LOGOUT:
+								try {
+									from = jsonBody.getString("userTel");
+								} catch (Exception e) {
+									logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+								}
 								logout(socket.writeHandlerID(), clientVersion, cmd, from);
 								break;
 							case IMCmdConstants.MSG_R:
