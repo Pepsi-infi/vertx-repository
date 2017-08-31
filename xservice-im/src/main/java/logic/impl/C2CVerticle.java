@@ -46,12 +46,14 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	@Override
 	public void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
 		String fromHandlerID = msg.getString("fromHandlerID");
-
+		JsonObject test = new JsonObject().put("testkey", "diff");
+		int bodyLength = test.toString().length();
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-				msg.getInteger("clientVersion"), IMCmdConstants.LOGIN + 100, 0);
+				msg.getInteger("clientVersion"), IMCmdConstants.LOGIN + 100, bodyLength);
+
 		logger.info("DoWithLogin, handlerId={}msgHeader={}", fromHandlerID, aMsgHeader.toString());
-		eb.send(fromHandlerID, aMsgHeader.appendString("\001"));
+		eb.send(fromHandlerID, aMsgHeader.appendString(test.toString()).appendString("\001"));
 	}
 
 	@Override
