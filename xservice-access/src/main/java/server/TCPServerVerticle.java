@@ -105,7 +105,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 							if (from != null && to != null) {
 								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
 							}
-							
+
 							break;
 						case IMCmdConstants.ACK_R:
 							try {
@@ -141,7 +141,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private void heartBeat(String writeHandlerID, int clientVersion) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
 				IMCmdConstants.HEART_BEAT + 100, 0);
-		logger.info("Msg Ack HeartBeat, header={}", aMsgHeader);
+		logger.info("Msg Ack HeartBeat, handlerId={}msgHeader={}", writeHandlerID, aMsgHeader);
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
 
