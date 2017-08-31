@@ -146,23 +146,23 @@ public class TCPServerVerticle extends AbstractVerticle {
 		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
-	
-	
+
 	/**
 	 * Test
+	 * 
 	 * @param msg
 	 * @param resultHandler
 	 */
 	public void doWithLogin(String writeHandlerID, int clientVersion) {
 		// 给FROM发A
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-				clientVersion, IMCmdConstants.LOGIN + 100, 0);
+
+		JsonObject test = new JsonObject().put("testkey", "same");
+		int bodyLength = test.toString().length();
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
+				IMCmdConstants.LOGIN + 100, bodyLength);
 		logger.info("DoWithLogin, handlerId={}msgHeader={}", writeHandlerID, aMsgHeader.toString());
-		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
+		eb.send(writeHandlerID, aMsgHeader.appendString(test.toString()).appendString("\001"));
 	}
-	
-	
-	
 
 	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
 		// TODO Auto-generated method stub
