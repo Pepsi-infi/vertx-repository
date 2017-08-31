@@ -29,6 +29,8 @@ import noPageComponent from 'pages/error/404'
 import loginComponent from 'pages/user/login'
 //msgStat
 import msgStatRouters from './msgStat';
+//imCommonLanguage
+import imCommonLanguageRouters from './imCommonLanguage';
 
 Vue.use(VueRouter)
 
@@ -57,7 +59,8 @@ const routes = [{
       title: "主页",
       auth: true
     }
-  }].concat(msgStatRouters)
+  }].concat(msgStatRouters,
+    imCommonLanguageRouters)
 }]
 
 const router = new VueRouter({

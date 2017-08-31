@@ -11,7 +11,9 @@ import io.vertx.rxjava.ext.web.handler.CookieHandler;
 import io.vertx.rxjava.ext.web.handler.SessionHandler;
 import io.vertx.rxjava.ext.web.sstore.ClusteredSessionStore;
 import io.vertx.rxjava.ext.web.sstore.LocalSessionStore;
+import model.Result;
 import utils.BaseResponse;
+import utils.JsonUtil;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -156,6 +158,28 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                     serviceUnavailable(context, "invalid_result");
                 } else {
                     context.response().putHeader("content-type", "application/json").end(res.toString(), ENCODE);
+                }
+            } else {
+                internalError(context, ar.cause());
+                ar.cause().printStackTrace();
+            }
+        };
+    }
+
+    protected <T> Handler<AsyncResult<T>> resultJsonHandler(RoutingContext context) {
+        return ar -> {
+            if (ar.succeeded()) {
+                T res = ar.result();
+                if (res == null) {
+                    serviceUnavailable(context, "invalid_result");
+                } else {
+                    Result result = null;
+                    if (res instanceof JsonObject) {
+                        result = Result.success(((JsonObject) res).getMap());
+                    } else {
+                        result = Result.success(res);
+                    }
+                    context.response().putHeader("content-type", "application/json").end(JsonUtil.encodePrettily(result), ENCODE);
                 }
             } else {
                 internalError(context, ar.cause());

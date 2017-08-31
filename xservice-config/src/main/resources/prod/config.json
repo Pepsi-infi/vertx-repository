@@ -1,0 +1,64 @@
+{
+  "mysql": {
+    "mc-device": {
+      "host": "10.0.10.211",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
+      "database": "device",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    },
+    "rentcar": {
+      "host": "10.0.10.82",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "stat_query",
+      "password": "pggXNBviboEfl@hk",
+      "database": "rentcar",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    },
+    "mc-statistic": {
+      "host": "10.0.10.211",
+      "port": 5310,
+      "maxPoolSize": 100,
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
+      "database": "statistic",
+      "charset": "UTF-8",
+      "queryTimeout": 3000
+    }
+  },
+  "redis": {
+    "redis.cluster.password": "NQn+&%pq8y&2",
+    "redis.node": [
+      {
+        "host": "10.0.7.47",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.47",
+        "port": 6381
+      },
+      {
+        "host": "10.0.7.48",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.48",
+        "port": 6381
+      },
+      {
+        "host": "10.0.7.49",
+        "port": 6380
+      },
+      {
+        "host": "10.0.7.49",
+        "port": 6381
+      }
+    ]
+  },
+  "service.port":8081
+}

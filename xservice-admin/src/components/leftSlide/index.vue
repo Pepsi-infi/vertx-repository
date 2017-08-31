@@ -57,6 +57,14 @@
             title: "推送消息统计",
             path: "/msgStat/msgStatList"
           }]
+        },{
+          title: "IM",
+          path: "/mc-im",
+          icon: "fa-table",
+          child: [{
+            title: "IM常用语配置",
+            path: "/imCommonLanguage/list"
+          }]
         }]
       }
     }

@@ -31,20 +31,68 @@ export default function fetch(options) {
       //设置默认根地址
       baseURL: process.env.server_base_url,
       //设置请求超时设置
-      timeout: 2000
-      //设置请求时的header
-      // headers: {
-      //   'Github-url': 'https://github.com/zzmhot/vue-admin',
-      //   'X-Powered-By': 'zzmhot'
-      // }
+      timeout: 2000,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
     })
+
     //请求处理
     instance(options)
-      .then(({data: {status, msg, data}}) => {
+      .then(({data: {code, msg, data}}) => {
         //请求成功时,根据业务判断状态
-        if (status === port_code.success) {
-          resolve({status, msg, data})
-          console.log("======"+data)
+        if (code === 0) {
+          resolve({code, msg, data})
+          return false
+        } else if (status === port_code.unlogin) {
+          setUserInfo(null)
+          router.replace({name: "login"})
+        }
+        Message.warning(msg)
+        reject({status, msg, data})
+      })
+      .catch((error) => {
+        //请求失败时,根据业务判断状态
+        if (error.response) {
+          let resError = error.response
+          let resCode = resError.status
+          let resMsg = error.message
+          Message.error('操作失败！错误原因 ' + resMsg)
+          reject({code: resCode, msg: resMsg})
+        }
+      })
+  })
+}
+
+export function httpPost(options) {
+  return new Promise((resolve, reject) => {
+    // https://github.com/mzabriskie/axios
+
+    //创建一个axios实例
+    const instance = axios.create({
+      //设置默认根地址
+      baseURL: process.env.server_base_url,
+      //设置请求超时设置
+      timeout: 2000,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      transformRequest: [function (data) {
+        // Do whatever you want to transform the data
+        let ret = ''
+        for (let it in data) {
+          ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+        }
+        return ret
+      }],
+    })
+
+    //请求处理
+    instance(options)
+      .then(({data: {code, msg, data}}) => {
+        //请求成功时,根据业务判断状态
+        if (code === 0) {
+          resolve({code, msg, data})
           return false
         } else if (status === port_code.unlogin) {
           setUserInfo(null)
