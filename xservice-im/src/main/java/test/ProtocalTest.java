@@ -26,15 +26,14 @@ public class ProtocalTest {
 				.valueOf(ByteUtil.hexStringToBytes("00 00 00 18 00 00 27 11 00 00 07 D3 00 00 00 01 00 00 00 57")));
 
 		// 1、login user 111 action 1001 clientVersion 100
-		byte[] headerLength1 = ByteUtil.intToBytes(20);
-		byte[] clientVersion1 = ByteUtil.intToBytes(100);
+		byte[] headerLength1 = ByteUtil.unsignedShortToByte2(12);
+		byte[] clientVersion1 = ByteUtil.unsignedShortToByte2(999);
 		byte[] cmdId1 = ByteUtil.intToBytes(1001);
-		byte[] seq1 = ByteUtil.intToBytes(1);
-		JsonObject msgBody1 = new JsonObject().put("from", "111");
+		JsonObject msgBody1 = new JsonObject().put("userTel", "123456");
 		byte[] body1 = ByteUtil.intToBytes(msgBody1.toString().length());
-		System.out.println("login user 111 action 1001 clientVersion 100 " + ByteUtil.bytesToHexString(Buffer.buffer()
-				.appendBytes(headerLength1).appendBytes(clientVersion1).appendBytes(cmdId1).appendBytes(seq1)
-				.appendBytes(body1).appendString(msgBody1.toString()).appendString("\n").getBytes()));
+		System.out.println("1 " + ByteUtil.bytesToHexString(
+				Buffer.buffer().appendBytes(headerLength1).appendBytes(clientVersion1).appendBytes(cmdId1)
+						.appendBytes(body1).appendString(msgBody1.toString()).appendString("\001").getBytes()));
 		// 2、login user 222 action 1001
 		byte[] headerLength2 = ByteUtil.intToBytes(20);
 		byte[] clientVersion2 = ByteUtil.intToBytes(100);
