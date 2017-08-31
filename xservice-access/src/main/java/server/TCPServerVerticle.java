@@ -50,51 +50,58 @@ public class TCPServerVerticle extends AbstractVerticle {
 				logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
 						clientVersion, cmd, bodyLength);
 
-				JsonObject jsonBody = null;
-				Buffer bufferBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
-						IMMessageConstant.HEADER_LENGTH + bodyLength);
-				logger.info("Msg body, buffer={}", bufferBody);
-				if (bufferBody != null && bufferBody.length() != 0) {
-					jsonBody = bufferBody.toJsonObject();
-				}
-
-				if (jsonBody != null) {
-					String from = null;
-					String to = null;
-					String msgId = null;
-					try {
-						from = jsonBody.getString("fromTel");
-						to = jsonBody.getString("toTel");
-						msgId = jsonBody.getString("msgId");
-					} catch (Exception e) {
-						logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+				if (IMCmdConstants.HEART_BEAT == cmd) {
+					heartBeat(socket.writeHandlerID(), clientVersion);
+				} else {
+					JsonObject jsonBody = null;
+					Buffer bufferBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
+							IMMessageConstant.HEADER_LENGTH + bodyLength);
+					logger.info("Msg body, buffer={}", bufferBody);
+					if (bufferBody != null && bufferBody.length() != 0) {
+						try {
+							jsonBody = bufferBody.toJsonObject();
+						} catch (Exception e) {
+							logger.error("Msg Json parse error, buffer={}", bufferBody);
+						}
 					}
 
-					if (from != null && to != null) {
-						switch (cmd) {
-						case IMCmdConstants.LOGIN:
-							login(socket.writeHandlerID(), clientVersion, cmd, from);
-							break;
-						case IMCmdConstants.LOGOUT:
-							logout(socket.writeHandlerID(), clientVersion, cmd, from);
-							break;
-						case IMCmdConstants.MSG_R:
-							msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							break;
-						case IMCmdConstants.ACK_R:
-							ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							break;
-						case IMCmdConstants.ACK_N:
-							ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							break;
-						case IMCmdConstants.HEART_BEAT:
-							heartBeat(socket.writeHandlerID(), clientVersion);
-						default:
-							break;
+					if (jsonBody != null) {
+						String from = null;
+						String to = null;
+						String msgId = null;
+						try {
+							from = jsonBody.getString("fromTel");
+							to = jsonBody.getString("toTel");
+							msgId = jsonBody.getString("msgId");
+						} catch (Exception e) {
+							logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+						}
+
+						if (from != null && to != null) {
+							switch (cmd) {
+							case IMCmdConstants.LOGIN:
+								login(socket.writeHandlerID(), clientVersion, cmd, from);
+								break;
+							case IMCmdConstants.LOGOUT:
+								logout(socket.writeHandlerID(), clientVersion, cmd, from);
+								break;
+							case IMCmdConstants.MSG_R:
+								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							case IMCmdConstants.ACK_R:
+								ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							case IMCmdConstants.ACK_N:
+								ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							case IMCmdConstants.HEART_BEAT:
+								heartBeat(socket.writeHandlerID(), clientVersion);
+							default:
+								break;
+							}
 						}
 					}
 				}
-
 			}));
 
 			socket.closeHandler(v -> {
@@ -108,6 +115,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private void heartBeat(String writeHandlerID, int clientVersion) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
 				IMCmdConstants.HEART_BEAT + 100, 0);
+		logger.info("Msg Ack HeartBeat, header={}", aMsgHeader);
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
 
