@@ -63,14 +63,15 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		String fromHandlerID = msg.getString("fromHandlerID");
 		String toHandlerID = msg.getString("toHandlerID");
 		JsonObject body = msg.getJsonObject("body");
-		String from = body.getString("from");
-		String to = body.getString("to");
+		String from = body.getString("fromTel");// 接入层校验
+		String to = body.getString("toTel");// 接入层校验
+		String content = body.getString("content", null);
 
 		long ts = System.currentTimeMillis();
 
 		JsonObject mongoMsg = new JsonObject();
 		mongoMsg.put("collection", MONGO_COLLECTION);
-		body.put("ts", ts);
+		body.put("timeStamp", ts);
 		mongoMsg.put("data", body);
 
 		if (from != null && to != null) {
@@ -81,17 +82,17 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 				if (res.succeeded()) {
 					// 给FROM发A
 					JsonObject aMsgBody = new JsonObject();
-					aMsgBody.put("ts", ts);
-					aMsgBody.put("id", msg.getInteger("seq"));
+					aMsgBody.put("timeStamp", ts);
+					aMsgBody.put("msgId", msg.getInteger("seq"));
 					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-							msg.getInteger("clientVersion"), IMCmdConstants.MSG_A, aMsgBody.toString().length());
+							msg.getInteger("clientVersion"), IMCmdConstants.MSG_R + 100, aMsgBody.toString().length());
 					eb.send(fromHandlerID, aMsgHeader.appendString(aMsgBody.toString()));
 
 					// 给TO发N {ts: 时间戳}
 					// TODO 消息格式有点问题
 					JsonObject nMsgBody = new JsonObject();
-					nMsgBody.put("from", from).put("content", body).put("ts", System.currentTimeMillis()).put("id",
-							msg.getInteger("seq"));
+					nMsgBody.put("fromTel", from).put("content", content).put("timeStamp", System.currentTimeMillis())
+							.put("msgId", msg.getInteger("seq"));
 					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 							msg.getInteger("clientVersion"), IMCmdConstants.MSG_N, nMsgBody.toString().length());
 
@@ -149,6 +150,6 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 	@Override
 	public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
-		// gei to fa msg, xiao xi ru ku
+		//  gei to fa msg, xiao xi ru ku
 	}
 }

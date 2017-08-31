@@ -1,25 +1,25 @@
 package test;
 
-import cluster.impl.ConsistentHashingVerticle;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import logic.impl.SessionVerticle;
-import server.HttpServerVerticle;
-import server.TCPServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(TCPServerVerticle.class.getName());
-//		vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
-//		vertx.deployVerticle(HttpServerVerticle.class.getName());
+		// vertx.deployVerticle(TCPServerVerticle.class.getName());
+		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
+		// vertx.deployVerticle(HttpServerVerticle.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.
 		 */
-		vertx.deployVerticle(SessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		// vertx.deployVerticle(SessionVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(config()));
+
+		LoginMsgData t = new LoginMsgData();
+		System.out.println(Json.encodePrettily(t));
 	}
 
 	private static JsonObject config() {
