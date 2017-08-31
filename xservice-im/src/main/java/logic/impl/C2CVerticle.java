@@ -46,7 +46,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 				msg.getInteger("clientVersion"), IMCmdConstants.LOGIN + 100, 0);
-		eb.send(fromHandlerID, aMsgHeader);
+		eb.send(fromHandlerID, aMsgHeader.appendString("\001"));
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 				msg.getInteger("clientVersion"), IMCmdConstants.LOGOUT + 100, 0);
-		eb.send(fromHandlerID, aMsgHeader);
+		eb.send(fromHandlerID, aMsgHeader.appendString("\001"));
 	}
 
 	public void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
@@ -86,7 +86,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					aMsgBody.put("msgId", msg.getInteger("seq"));
 					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 							msg.getInteger("clientVersion"), IMCmdConstants.MSG_R + 100, aMsgBody.toString().length());
-					eb.send(fromHandlerID, aMsgHeader.appendString(aMsgBody.toString()));
+					eb.send(fromHandlerID, aMsgHeader.appendString(aMsgBody.toString()).appendString("\001"));
 
 					// 给TO发N {ts: 时间戳}
 					// TODO 消息格式有点问题
@@ -96,7 +96,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 							msg.getInteger("clientVersion"), IMCmdConstants.MSG_N, nMsgBody.toString().length());
 
-					eb.send(toHandlerID, nMsgHeader.appendString(nMsgBody.toString()));
+					eb.send(toHandlerID, nMsgHeader.appendString(nMsgBody.toString()).appendString("\001"));
 				} else {
 
 				}
@@ -128,7 +128,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					aMsgBody.put("id", msg.getInteger("seq"));
 					Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 							msg.getInteger("clientVersion"), IMCmdConstants.ACK_A, aMsgBody.toString().length());
-					eb.send(fromHandlerID, aMsgHeader.appendString(aMsgBody.toString()));
+					eb.send(fromHandlerID, aMsgHeader.appendString(aMsgBody.toString()).appendString("\001"));
 
 					// ack 给TO发 N {ts: 时间戳}
 					// String toHandlerId = sessionMap.get(to);
@@ -138,7 +138,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					Buffer nMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 							msg.getInteger("clientVersion"), IMCmdConstants.ACK_N, nMsgBody.toString().length());
 
-					eb.send(toHandlerID, nMsgHeader.appendString(nMsgBody.toString()));
+					eb.send(toHandlerID, nMsgHeader.appendString(nMsgBody.toString()).appendString("\001"));
 
 					resultHandler.handle(Future.succeededFuture());
 				} else {

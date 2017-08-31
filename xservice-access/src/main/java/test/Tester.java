@@ -3,6 +3,7 @@ package test;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import util.ByteUtil;
 
 public class Tester {
 
@@ -20,6 +21,11 @@ public class Tester {
 
 		LoginMsgData t = new LoginMsgData();
 		System.out.println(Json.encodePrettily(t));
+
+		byte[] s = ByteUtil.unsignedShortToByte2(44);
+		for (byte b : s) {
+			System.out.print(b);
+		}
 	}
 
 	private static JsonObject config() {
