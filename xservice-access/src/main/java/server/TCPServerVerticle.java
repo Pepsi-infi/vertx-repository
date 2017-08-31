@@ -4,7 +4,9 @@ import cluster.ConsistentHashingService;
 import constants.IMCmdConstants;
 import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -81,7 +83,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 							if (from != null) {
 								login(socket.writeHandlerID(), clientVersion, cmd, from);
 							}
-
+							doWithLogin(socket.writeHandlerID(), clientVersion);
 							break;
 						case IMCmdConstants.LOGOUT:
 							try {
@@ -141,9 +143,26 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private void heartBeat(String writeHandlerID, int clientVersion) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
 				IMCmdConstants.HEART_BEAT + 100, 0);
-		logger.info("Msg Ack HeartBeat, handlerId={}msgHeader={}", writeHandlerID, aMsgHeader);
+		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
+	
+	
+	/**
+	 * Test
+	 * @param msg
+	 * @param resultHandler
+	 */
+	public void doWithLogin(String writeHandlerID, int clientVersion) {
+		// 给FROM发A
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+				clientVersion, IMCmdConstants.LOGIN + 100, 0);
+		logger.info("DoWithLogin, handlerId={}msgHeader={}", writeHandlerID, aMsgHeader.toString());
+		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
+	}
+	
+	
+	
 
 	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
 		// TODO Auto-generated method stub
