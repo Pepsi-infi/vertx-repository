@@ -69,47 +69,63 @@ public class TCPServerVerticle extends AbstractVerticle {
 						String from = null;
 						String to = null;
 						String msgId = null;
-						try {
-							from = jsonBody.getString("fromTel");
-							to = jsonBody.getString("toTel");
-							msgId = jsonBody.getString("msgId");
-						} catch (Exception e) {
-							logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-						}
 
-						if (from != null && to != null) {
-							switch (cmd) {
-							case IMCmdConstants.LOGIN:
-								try {
-									from = jsonBody.getString("userTel");
-								} catch (Exception e) {
-									logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-								}
-								login(socket.writeHandlerID(), clientVersion, cmd, from);
-								break;
-							case IMCmdConstants.LOGOUT:
-								try {
-									from = jsonBody.getString("userTel");
-								} catch (Exception e) {
-									logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-								}
-								logout(socket.writeHandlerID(), clientVersion, cmd, from);
-								break;
-							case IMCmdConstants.MSG_R:
-								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-								break;
-							case IMCmdConstants.ACK_R:
-								ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-								break;
-							case IMCmdConstants.ACK_N:
-								ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-								break;
-							case IMCmdConstants.HEART_BEAT:
-								heartBeat(socket.writeHandlerID(), clientVersion);
-							default:
-								break;
+						// if (from != null && to != null) {
+						switch (cmd) {
+						case IMCmdConstants.LOGIN:
+							try {
+								from = jsonBody.getString("userTel");
+							} catch (Exception e) {
+								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
 							}
+							if (from != null) {
+								login(socket.writeHandlerID(), clientVersion, cmd, from);
+							}
+
+							break;
+						case IMCmdConstants.LOGOUT:
+							try {
+								from = jsonBody.getString("userTel");
+							} catch (Exception e) {
+								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+							}
+							if (from != null) {
+								logout(socket.writeHandlerID(), clientVersion, cmd, from);
+							}
+
+							break;
+						case IMCmdConstants.MSG_R:
+							try {
+								from = jsonBody.getString("fromTel");
+								to = jsonBody.getString("toTel");
+								msgId = jsonBody.getString("msgId");
+							} catch (Exception e) {
+								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+							}
+							if (from != null && to != null) {
+								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+							}
+							
+							break;
+						case IMCmdConstants.ACK_R:
+							try {
+								from = jsonBody.getString("fromTel");
+								to = jsonBody.getString("toTel");
+								msgId = jsonBody.getString("msgId");
+							} catch (Exception e) {
+								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+							}
+							ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+							break;
+						case IMCmdConstants.ACK_N:
+							ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+							break;
+						case IMCmdConstants.HEART_BEAT:
+							heartBeat(socket.writeHandlerID(), clientVersion);
+						default:
+							break;
 						}
+						// }
 					}
 				}
 			}));
