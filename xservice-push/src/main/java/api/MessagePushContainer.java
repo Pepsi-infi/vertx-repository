@@ -1,5 +1,8 @@
-package channel;
+package api;
 
+import channel.ApplePushService;
+import channel.SocketPushService;
+import channel.XiaoMiPushService;
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -89,16 +92,17 @@ public class MessagePushContainer extends AbstractVerticle {
 		HttpServerRequest request = context.request();
 		String httpMsg = request.getParam("body");
 		logger.info("接收到的消息内容：" + httpMsg);
-		if (StringUtil.isNullOrEmpty(httpMsg)) {
-			logger.error("body is null");
-			responseError(resp, "body is null");
-		} else {
-			this.dealHttpMessage(new JsonObject(httpMsg), resp);
-		}
+		this.dealHttpMessage(httpMsg, resp);
 	}
 
-	private void dealHttpMessage(JsonObject receiveMsg, HttpServerResponse resp) {
+	private void dealHttpMessage(String request, HttpServerResponse resp) {
+		if (StringUtils.isBlank(request)) {
+			logger.error("body is null");
+			responseError(resp, "body is null");
+			return;
+		}
 		// 验证必填项
+		JsonObject receiveMsg = new JsonObject(request);
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
 		if (ResultData.FAIL == checkResult.getCode()) {
 			responseError(resp, checkResult.getMsg());

@@ -1,5 +1,6 @@
 package api;
 
+import constant.RestConstants;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -34,13 +35,13 @@ public class RestPushVerticle extends RestAPIVerticle {
         Router router = Router.router(vertx);
         router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
-        router.route(RestConstants.Push.DRIVER_QUERY).handler(this::queryDriver);
+        router.route(RestConstants.DRIVER_QUERY).handler(this::queryDriver);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
-        createHttpServer(router, serverHost, RestConstants.Push.HTTP_PORT).compose(
-                serverCreated -> publishHttpEndpoint(RestConstants.Push.SERVICE_NAME, serverHost,
-                        RestConstants.Push.HTTP_PORT, RestConstants.Push.SERVICE_ROOT)).setHandler(
+        createHttpServer(router, serverHost, RestConstants.HTTP_PORT).compose(
+                serverCreated -> publishHttpEndpoint(RestConstants.SERVICE_NAME, serverHost,
+                        RestConstants.HTTP_PORT, RestConstants.SERVICE_ROOT)).setHandler(
                 voidFuture.completer());
 
         this.initService();

@@ -16,10 +16,10 @@ import java.util.List;
  */
 @ProxyGen
 @VertxGen
-public interface PassengerMessageService {
+public interface PassengerService {
 
-    static PassengerMessageService createProxy(Vertx vertx){
-        return ProxyHelper.createProxy(PassengerMessageService.class, vertx, PassengerMessageService.class.getName());
+    static PassengerService createProxy(Vertx vertx){
+        return ProxyHelper.createProxy(PassengerService.class, vertx, PassengerService.class.getName());
     }
 
     public void list(JsonObject param, Handler<AsyncResult<PageBean>> resultHandler);

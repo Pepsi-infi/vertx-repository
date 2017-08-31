@@ -1,4 +1,5 @@
 {
+  "city.list.url":"http://10.10.10.177:8085/api/v1/region/list",
   "push.config": {
     "xiaomi.appid": "2882303761517343895",
     "xiaomi.appkey": "5171734310895",

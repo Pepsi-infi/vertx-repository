@@ -1,5 +1,6 @@
-package channel;
+package channel.impl;
 
+import channel.ApplePushService;
 import constant.PushConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
@@ -10,7 +11,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.serviceproxy.ProxyHelper;
-import service.ApplePushService;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
 

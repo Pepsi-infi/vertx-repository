@@ -1,4 +1,4 @@
-package service;
+package channel;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
@@ -13,26 +13,26 @@ import utils.IPUtil;
 
 @ProxyGen
 @VertxGen
-public interface SocketPushService {
+public interface XiaoMiPushService {
 
-	/**
+    /**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-socket-service";
+	String SERVICE_NAME = "x-push-xiaomi-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
-	String SERVICE_ADDRESS = "push.socket.service";
+	String SERVICE_ADDRESS = "push.xiaomi.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-socket-service";
+	String LOCAL_SERVICE_NAME = "local-x-push-xiaomi-service";
 
-	static SocketPushService createProxy(Vertx vertx){
-		return ProxyHelper.createProxy(SocketPushService.class, vertx, SocketPushService.class.getName());
+	static XiaoMiPushService createProxy(Vertx vertx){
+		return ProxyHelper.createProxy(XiaoMiPushService.class, vertx, XiaoMiPushService.class.getName());
 	}
 
-	static SocketPushService createLocalProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(SocketPushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
+	static XiaoMiPushService createLocalProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(XiaoMiPushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
 				new DeliveryOptions().setSendTimeout(3000));
 	}
 
@@ -40,7 +40,6 @@ public interface SocketPushService {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
 
-
-	void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler);
+	void sendMsg(JsonObject recieveMsg,Handler<AsyncResult<BaseResponse>> resultHandler);
 
 }

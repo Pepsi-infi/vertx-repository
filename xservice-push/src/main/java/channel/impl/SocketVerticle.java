@@ -1,4 +1,4 @@
-package channel;
+package channel.impl;
 
 import constant.PushConsts;
 import domain.ChatMsgVO;
@@ -18,7 +18,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
-import service.SocketPushService;
+import channel.SocketPushService;
 import util.MsgUtil;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;

@@ -19,7 +19,7 @@ import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import service.PassengerMessageService;
+import service.PassengerService;
 import util.DateUtil;
 import xservice.BaseServiceVerticle;
 
@@ -31,9 +31,9 @@ import java.util.Optional;
 /**
  * Created by weim on 2017/8/22.
  */
-public class PassengerMessageServiceImpl extends BaseServiceVerticle implements PassengerMessageService{
+public class PassengerServiceImpl extends BaseServiceVerticle implements PassengerService {
 
-    private static Logger logger = LoggerFactory.getLogger(PassengerMessageServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(PassengerServiceImpl.class);
 
     private SQLClient sqlClient;
 
@@ -57,7 +57,7 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
     public static final String SQL_IMPORT_FILElIST = "select * from msg_passenger_importfile";
 
     public void start(){
-        XProxyHelper.registerService(PassengerMessageService.class, vertx, this, PassengerMessageService.class.getName());
+        XProxyHelper.registerService(PassengerService.class, vertx, this, PassengerService.class.getName());
 
         JsonObject mysqlOptions = config().getJsonObject("mysql.config");
         sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
@@ -127,11 +127,11 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
                 updateSb.append(", openUrl=?");
             }
             //发送类型，1是全部， 2是指定用户，3是指定城市
-            if("2".equals(sendType.get())){
-                params.add(importFile.get());
+            if("2".equals(sendType.orElse(""))){
+                params.add(importFile.orElse(""));
                 updateSb.append(", importFile=?");
-            }else if("3".equals(sendType.get())){
-                params.add(cityIds.get());
+            }else if("3".equals(sendType.orElse(""))){
+                params.add(cityIds.orElse(""));
                 updateSb.append(", cityIds=?");
             }
             params.add(id.get());
@@ -160,11 +160,11 @@ public class PassengerMessageServiceImpl extends BaseServiceVerticle implements 
             }
 
             //发送类型，1是全部， 2是指定用户，3是指定城市
-            if("2".equals(sendType.get())){
+            if("2".equals(sendType.orElse(""))){
                 insertCol.append(" , importFile");
                 insertParam.append(" , ?");
                 params.add(importFile.get());
-            }else if("3".equals(sendType.get())){
+            }else if("3".equals(sendType.orElse(""))){
                 insertCol.append(" , cityIds");
                 insertParam.append(" , ?");
                 params.add(cityIds.get());

@@ -1,5 +1,6 @@
 package api;
 
+import constant.MsgHttpConsts;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -11,7 +12,8 @@ import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
-import service.PassengerMessageService;
+import service.MessagePushService;
+import service.PassengerService;
 import util.HttpUtil;
 import utils.JsonUtil;
 
@@ -26,7 +28,9 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
 
     private static Logger logger = LoggerFactory.getLogger(PassengerMsgVerticle.class);
 
-    private PassengerMessageService passengerMessageService;
+    PassengerService passengerMessageService;
+
+    MessagePushService pushMessageService;
 
     public void start() throws Exception {
         super.start();
@@ -37,22 +41,23 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
     }
 
     private void initService(){
-        passengerMessageService = PassengerMessageService.createProxy(vertx.getDelegate());
+        passengerMessageService = PassengerService.createProxy(vertx.getDelegate());
+        pushMessageService = MessagePushService.createProxy(vertx.getDelegate());
     }
 
     private void initServiceListening(){
         Router router = Router.router(vertx);
         router.route().handler(CorsHandler.create("*"));
         router.route().handler(BodyHandler.create());
-        router.route("/passengerMsg/list").handler(this::list);
-        router.route("/passengerMsg/addOrEdit").handler(this::addOrUpdate);
-        router.route("/passengerMsg/get").handler(this::get);
-        router.route("/passengerMsg/del").handler(this::del);
-        router.route("/passengerMsg/push").handler(this::pushMsg);
-        router.route("/passengerMsg/getImportFileList").handler(this::getImportFileList);
-        router.route("/passengerMsg/getCityList").handler(this::getCityList);
-        logger.info("PassengerMessageServiceImpl starting at 9000 ...");
-        vertx.createHttpServer().requestHandler(router::accept).listen(9100);
+        router.route(MsgHttpConsts.PASSENGERMSG_LIST).handler(this::list);
+        router.route(MsgHttpConsts.PASSENGERMSG_ADDOREDIT).handler(this::addOrUpdate);
+        router.route(MsgHttpConsts.PASSENGERMSG_GET).handler(this::get);
+        router.route(MsgHttpConsts.PASSENGERMSG_DEL).handler(this::del);
+        router.route(MsgHttpConsts.PASSENGERMSG_PUSH).handler(this::pushMsg);
+        router.route(MsgHttpConsts.PASSENGERMSG_GET_IMPORTFILELIST).handler(this::getImportFileList);
+        router.route(MsgHttpConsts.PASSENGERMSG_GET_CITYLIST).handler(this::getCityList);
+        logger.info("PassengerServiceImpl starting at 8989 ...");
+        vertx.createHttpServer().requestHandler(router::accept).listen(8989);
     }
 
     //推送消息
@@ -137,6 +142,11 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
             JsonObject message = new JsonObject(jsonMsg);
             message.put("phone", "13621241006");
             message.put("customerId", 13666050);
+
+            String sendType = message.getString("sendType");
+            if(StringUtils.isNotBlank(sendType) && "1".equals(sendType)){
+
+            }
             message.put("msgId", message.getValue("id"));
             message.put("jumpPage", message.getValue("action"));
             message.put("isIntoPsnCenter", message.getValue("inMsgCenter"));
@@ -147,11 +157,12 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
             message.put("url", message.getValue("openUrl"));
             message.put("type", message.getValue("openType"));
 
-            Map<String, String> params = new HashMap<>();
-            params.put("body", message.toString());
-            Future<JsonObject> future1 = Future.future();
-            HttpUtil.doPost(params, "http://10.10.10.177:8989/mc-push/message/push.json", future1);
-            future1.setHandler(resPush -> {
+            JsonObject buildMessage = new JsonObject();
+            buildMessage.put("body", message.toString());
+            Future<String> future = Future.future();
+            //调用发送消息
+            pushMessageService.bisnessMessage(buildMessage.toString(), future);
+            future.setHandler(resPush -> {
                 if (resPush.succeeded()) {
                     logger.info(resPush.result());
                 } else {
@@ -159,7 +170,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
                 }
             });
         }else {
-            logger.error("无消息数据，推送不执行");
+            logger.error("无符合条件的消息数据，推送不执行");
         }
     }
 
@@ -171,6 +182,6 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
 
     private void getCityList(RoutingContext context){
         Map params = new HashMap();
-        HttpUtil.doGet(params, "http://10.10.10.177:8085/api/v1/region/list", resultHandler(context));
+        HttpUtil.doGet(params, config().getString("city.list.url"), resultHandler(context));
     }
 }

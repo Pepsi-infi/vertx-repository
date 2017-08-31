@@ -1,12 +1,9 @@
-package channel;
-
-import java.util.Random;
+package channel.impl;
 
 import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
-
 import constant.PushConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
@@ -18,9 +15,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
-import service.XiaoMiPushService;
+import channel.XiaoMiPushService;
 import util.MsgUtil;
 import utils.BaseResponse;
+
+import java.util.Random;
 
 /**
  * @author yanglf
