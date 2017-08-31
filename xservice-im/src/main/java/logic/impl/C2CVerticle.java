@@ -50,7 +50,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 				msg.getInteger("clientVersion"), IMCmdConstants.LOGIN + 100, 0);
-		logger.info("DoWithLogin " + aMsgHeader);
+		logger.info("DoWithLogin, handlerId={}msgHeader={}", fromHandlerID, aMsgHeader.toString());
 		eb.send(fromHandlerID, aMsgHeader.appendString("\001"));
 	}
 
