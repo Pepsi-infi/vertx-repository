@@ -9,8 +9,8 @@ public class MessageBuilder {
 		Buffer buffer = Buffer.buffer();
 		buffer.appendBytes(ByteUtil.unsignedShortToByte2(headerLength));
 		buffer.appendBytes(ByteUtil.unsignedShortToByte2(clientVersion));
-		buffer.appendBytes(ByteUtil.unsignedShortToByte2(cmdId));
-		buffer.appendBytes(ByteUtil.unsignedShortToByte2(bodyLength));
+		buffer.appendBytes(ByteUtil.intToBytes(cmdId));
+		buffer.appendBytes(ByteUtil.intToBytes(bodyLength));
 
 		return buffer;
 	}

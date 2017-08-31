@@ -41,42 +41,54 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 		server.connectHandler(socket -> {
 			socket.handler(RecordParser.newDelimited("\001", buffer -> {
-				
-				
-				//Test
-				eb.send(socket.writeHandlerID(), buffer.appendString("\001"));
-				
-				
-				logger.info("buffer" + buffer.toString());
-				int headerLength = ByteUtil.bytesToInt(buffer.getBytes(0, 2));
-				int clientVersion = ByteUtil.bytesToInt(buffer.getBytes(2, 4));
-				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 6));
-				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(6, 10));
+				int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
+				int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
+				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
+				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
 
-				final JsonObject msgBody = buffer
-						.getBuffer(IMMessageConstant.HEADER_LENGTH, IMMessageConstant.HEADER_LENGTH + bodyLength)
-						.toJsonObject();
+				if (cmd != 0) {
+					logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
+							clientVersion, cmd, bodyLength);
 
-				if (msgBody != null) {
-					String from = msgBody.getString("from");
-					String to = msgBody.getString("to");
-					long seq = msgBody.getLong("id");
-					if (from != null) {
-						switch (cmd) {
-						case IMCmdConstants.LOGIN:
-							login(socket.writeHandlerID(), clientVersion, cmd, from);
-							break;
-						case IMCmdConstants.LOGOUT:
-							logout(socket.writeHandlerID(), clientVersion, cmd, from);
-							break;
-						case IMCmdConstants.MSG_R:
-							msgRequest(socket.writeHandlerID(), clientVersion, seq, msgBody, to);
-							break;
-						case IMCmdConstants.ACK_R:
-							ackRequest(socket.writeHandlerID(), clientVersion, seq, msgBody, to);
-							break;
-						default:
-							break;
+					JsonObject jsonBody = null;
+					Buffer bufferBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
+							IMMessageConstant.HEADER_LENGTH + bodyLength);
+					if (bufferBody != null) {
+						jsonBody = bufferBody.toJsonObject();
+					}
+
+					if (jsonBody != null) {
+						String from = null;
+						String to = null;
+						String msgId = null;
+						try {
+							from = jsonBody.getString("fromTel");
+							to = jsonBody.getString("toTel");
+							msgId = jsonBody.getString("msgId");
+						} catch (Exception e) {
+							logger.error("Json parse error. Msg body buffer " + bufferBody, e);
+						}
+
+						if (from != null && to != null) {
+							switch (cmd) {
+							case IMCmdConstants.LOGIN:
+								login(socket.writeHandlerID(), clientVersion, cmd, from);
+								break;
+							case IMCmdConstants.LOGOUT:
+								logout(socket.writeHandlerID(), clientVersion, cmd, from);
+								break;
+							case IMCmdConstants.MSG_R:
+								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							case IMCmdConstants.ACK_R:
+								ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							case IMCmdConstants.ACK_N:
+								ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
+								break;
+							default:
+								break;
+							}
 						}
 					}
 				}
@@ -88,6 +100,11 @@ public class TCPServerVerticle extends AbstractVerticle {
 		});
 
 		server.listen();
+	}
+
+	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -151,7 +168,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		c2cService.doWithLogout(rMsg, c2cFuture.completer());
 	}
 
-	private void msgRequest(String handlerID, int clientVersion, long seq, final JsonObject msgBody, String to) {
+	private void msgRequest(String handlerID, int clientVersion, String seq, final JsonObject msgBody, String to) {
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(to, consistentHashFuture.completer());
 		Future<Message<JsonObject>> sessionFuture = Future.future();
@@ -183,7 +200,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void ackRequest(String handlerID, int clientVersion, long seq, final JsonObject msgBody, String to) {
+	private void ackRequest(String handlerID, int clientVersion, String seq, final JsonObject msgBody, String to) {
 		Future<String> consistentHashFuture = Future.future();
 		consistentHashingService.getNode(to, consistentHashFuture.completer());
 		Future<Message<JsonObject>> sessionFuture = Future.future();
