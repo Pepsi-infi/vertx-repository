@@ -53,7 +53,8 @@ public class TCPServerVerticle extends AbstractVerticle {
 				JsonObject jsonBody = null;
 				Buffer bufferBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
 						IMMessageConstant.HEADER_LENGTH + bodyLength);
-				if (bufferBody != null) {
+				logger.info("Msg body, buffer={}", bufferBody);
+				if (bufferBody != null && bufferBody.length() != 0) {
 					jsonBody = bufferBody.toJsonObject();
 				}
 
