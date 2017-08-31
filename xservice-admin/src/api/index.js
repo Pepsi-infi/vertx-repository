@@ -20,7 +20,7 @@ const apiObj = {
   api_msgStat,
   api_user,
   api_msgPassenger,
-  api_driverPush
+  api_driverMsg
 }
 
 const install = function (Vue) {

@@ -8,9 +8,32 @@
         <el-input v-model="title" placeholder="消息标题"  style="margin-left: 18px;">
         </el-input>
       </el-col>
-      <el-col :span="4" style="margin-left: 30px;">
-        <el-button icon="search" class=""  @click="search">搜索</el-button>
+      <el-col :span="6" >
+      	<div class="block">
+      		<el-select v-model="msgType" placeholder="消息类型" >
+      			<el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+      			</el-option>
+      		</el-select>
+      	</div>
       </el-col>
+      <el-col :span="6">
+      	<div class="block">
+      		<el-date-picker v-model="startTime" type="datetime" placeholder="开始时间" :picker-options="pickerOption">
+      		</el-date-picker>
+      	</div>
+      </el-col>
+      <el-col :span="6">
+      	<div class="block">
+      		<el-date-picker v-model="endTime" type="datetime" placeholder="结束时间" :picker-options="pickerOption">
+      		</el-date-picker>
+      	</div>
+      </el-col>
+    </el-row>
+    <el-row>
+    	<el-col :span="8" style="margin-left: 30px;">
+       		<el-button icon="search" class=""  @click="search">搜索</el-button>
+          	<el-button type="primary" icon="plus"  @click="addDriverMsg">新增消息</el-button>
+       	</el-col>
     </el-row>
     <div class="panel-body">
       <el-table
@@ -85,7 +108,42 @@
         load_data: true,
         //批量选择数组
         batch_select: [],
-        title:""
+        title:"",
+        options:[
+        	{
+        	value:'1',
+        	label:'系统消息'
+        	}
+        ],
+        msgType:'',
+        pickerOption:{
+          shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              picker.$emit('pick', new Date());
+            }
+          }, 
+          {
+            text: '昨天',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit('pick', date);
+            }
+          }, 
+          {
+            text: '一周前',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', date);
+           }
+          }]
+        },
+        startTime: '',
+        endTime: ''
+            
       }
     },
     components: {
@@ -102,19 +160,18 @@
       },
       //获取数据
       get_table_data(page = this.currentPage){
-        this.load_data = true
-//        var msgId = this.queryMsgId;
-//        var searchMsgId;
-//        if(msgId !== undefined){
-//          let pos = msgId.lastIndexOf('_');
-//          searchMsgId = msgId.substring(pos+1, msgId.length);
-//        }
+       	this.load_data = true;
+       	          
         this.$fetch.api_driverMsg.list({
           page: page,
           size: this.length,
-          msgId: this.title
+          title: this.title,
+          msgType: this.msgType,
+       	  startTime: this.startTime,
+       	  endTime: this.endTime
         })
           .then(({data: {list, pageNumber, total}}) => {
+          	alert(data);
             let tempList = [];
             list.forEach((ele, index) => {
               if (ele !== null) {

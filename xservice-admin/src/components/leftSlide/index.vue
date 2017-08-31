@@ -63,7 +63,7 @@
           icon: "fa-table",
           child: [{
             title: "司机消息推送",
-            path: "/driverPush/driverPushList"
+            path: "/driverMsg/driverMsgList"
           },
            {
              title: "乘客消息列表",

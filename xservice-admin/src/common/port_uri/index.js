@@ -15,7 +15,6 @@ import * as port_table from './msgStat'
 import * as port_file from './file'
 import * as driverMsg from './driverMsg'
 import * as passengerMsg from './msgPassenger'
-import * as driverPush from './driverPush'
 
 
 export {
@@ -24,7 +23,6 @@ export {
   port_table,
   port_file,
   driverMsg,
-  passengerMsg,
-  driverPush
+  passengerMsg
 
 }
