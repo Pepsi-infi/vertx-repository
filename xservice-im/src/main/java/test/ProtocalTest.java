@@ -58,5 +58,13 @@ public class ProtocalTest {
 				.buffer().appendBytes(headerLength4).appendBytes(clientVersion4).appendBytes(cmdId4).appendBytes(seq4)
 				.appendBytes(body4).appendString(msgBody4.toString()).appendString("\n").getBytes()));
 
+		// 5、Heart Beat
+		byte[] headerLength5 = ByteUtil.unsignedShortToByte2(12);
+		byte[] clientVersion5 = ByteUtil.unsignedShortToByte2(44);
+		byte[] cmdId5 = ByteUtil.intToBytes(0);
+		byte[] bodyLength5 = ByteUtil.intToBytes(0);
+		System.out.println(
+				"5 " + ByteUtil.bytesToHexString(Buffer.buffer().appendBytes(headerLength5).appendBytes(clientVersion5)
+						.appendBytes(cmdId5).appendBytes(bodyLength5).appendString("\001").getBytes()));
 	}
 }
