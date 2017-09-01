@@ -3,6 +3,7 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import persistence.MongoService;
 import persistence.impl.MongoVerticle;
 
 public class Tester {
@@ -10,6 +11,11 @@ public class Tester {
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
 		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+
+		MongoService service = MongoService.createProxy(vertx);
+		JsonObject test = new JsonObject().put("collection", "message").put("data", new JsonObject().put("test", 1111));
+		service.saveData(test, res -> {
+		});
 	}
 
 	private static JsonObject config() {
