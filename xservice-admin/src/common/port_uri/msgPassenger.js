@@ -17,3 +17,5 @@ export const push = "/passengerMsg/push"
 export const getImportFileList = "/passengerMsg/getImportFileList"
 
 export const getCityList = "/passengerMsg/getCityList"
+
+export const importFilePage = "/passengerMsg/importFilePage"

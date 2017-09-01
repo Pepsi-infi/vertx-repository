@@ -38,7 +38,7 @@ public class DateUtil {
      * @param srcDate
      * @return
      */
-    public static String getLocalDate(String srcDate){
+    public static String dateTimeGmt2Local(String srcDate){
         if(StringUtils.isNotBlank(srcDate) && srcDate.indexOf("Z") != -1) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.CHINA);
             sdf.setTimeZone(TimeZone.getTimeZone("GMT")); // 设置时区为GMT
@@ -61,17 +61,30 @@ public class DateUtil {
      * @param srcDate
      * @return
      */
-    public static Long getTimeMillis(String srcDate){
-        Date date = null;
+    public static String dateGmt2Local(String srcDate){
         if(StringUtils.isNotBlank(srcDate)) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            try {
-                date = sdf.parse(srcDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
+            Date date = null;
+            if(srcDate.indexOf("Z") != -1) {
+                //传入的是标准时间，所以比北京时间少8个小时， 指定Locale.US
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.US);
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT")); // 设置时区为GMT
+                try {
+                    date = sdf.parse(srcDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+            }else{
+                try {
+                    date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(srcDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
+            SimpleDateFormat chinaFormat = new SimpleDateFormat("yyyy-MM-dd");
+            srcDate = chinaFormat.format(date);
         }
-        return date == null ? null : date.getTime();
+        return srcDate;
     }
 
 //    public static String _getLocalDate(String srcDate){
@@ -82,6 +95,8 @@ public class DateUtil {
 //    }
 
     public static void main(String[] args) {
-        System.out.println(getLocalDate("2017-08-28T06:03:07.162Z"));
+
+        System.out.println(dateGmt2Local("2017-08-28T22:03:07.162Z"));
+        System.out.println(dateGmt2Local("2017-08-28 22:03:07"));
     }
 }

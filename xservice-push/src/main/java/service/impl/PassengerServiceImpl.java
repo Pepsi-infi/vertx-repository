@@ -2,8 +2,7 @@ package service.impl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import domain.PageBean;
-import domain.PassengerMsgDto;
+import domain.Pager;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -24,9 +23,7 @@ import util.DateUtil;
 import xservice.BaseServiceVerticle;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by weim on 2017/8/22.
@@ -38,12 +35,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
     private SQLClient sqlClient;
 
     //乘客消息列表
-    public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by sendTime limit ?,?";
+    public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by sendTime desc limit ?,?";
     public static final String SQL_PASSENGER_MSGLIST_COUNT = "select count(1) from msg_passenger_msg where 1=1 %s";
     public static final String SQL_PASSENGER_MSGGET = "select * from msg_passenger_msg where id = ? ";
     //乘客消息新增
-    public static final String SQL_PASSENGER_MSGADD = "insert into msg_passenger_msg (title, content, inMsgCenter, openType," +
-            " sendType, status, expireTime, sendTime, msgCenterImgUrl, openUrl %s) values (?,?,?,?,?,?,?,?,?,? %s)";
+    public static final String SQL_PASSENGER_MSGADD = "insert into msg_passenger_msg (%s) values (%s)";
     //乘客消息更新
     public static final String SQL_PASSENGER_MSGUPDATE = "update msg_passenger_msg set %s  where id= ? ";
 
@@ -55,6 +51,10 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
 
     //导入的手机号文件
     public static final String SQL_IMPORT_FILElIST = "select * from msg_passenger_importfile";
+    public static final String SQL_IMPORT_FILEPAGE = "select * from msg_passenger_importfile where 1=1 %s order by createTime desc limit ?,?";
+    public static final String SQL_IMPORT_FILECOUNT = "select count(1) from msg_passenger_importfile where 1=1 %s ";
+
+    public static final String SQL_IMPORT_PHONElIST = "select * from msg_passenger_importphone where importFileId=?";
 
     public void start(){
         XProxyHelper.registerService(PassengerService.class, vertx, this, PassengerService.class.getName());
@@ -66,112 +66,35 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
     public void addOrUpdate(JsonObject param, Handler<AsyncResult<String>> resultHandler){
         JsonArray params = new JsonArray();
         String sql;
-        StringBuilder updateSb = new StringBuilder();
-        Optional<String> id = Optional.ofNullable(param.getString("id"));
-        Optional<String> title = Optional.ofNullable(param.getString("title"));
-        Optional<String> content = Optional.ofNullable(param.getString("content"));
-        Optional<String> action = Optional.ofNullable(param.getString("action"));
-        Optional<String> inMsgCenter = Optional.ofNullable(param.getString("inMsgCenter"));
-        Optional<String> openType = Optional.ofNullable(param.getString("openType"));
-        Optional<String> sendType = Optional.ofNullable(param.getString("sendType"));
-        Optional<String> status = Optional.ofNullable(param.getString("status"));
-        Optional<String> expireTime = Optional.ofNullable(param.getString("expireTime"));
-        Optional<String> sendTime = Optional.ofNullable(param.getString("sendTime"));
-        Optional<String> msgCenterImgUrl = Optional.ofNullable(param.getString("msgCenterImgUrl"));
-        Optional<String> openUrl = Optional.ofNullable(param.getString("openUrl"));
-        Optional<String> importFile = Optional.ofNullable(param.getString("importFile"));
-        Optional<String> cityIds = Optional.ofNullable(param.getString("cityIds"));
-        if(id.isPresent()){
-            if(title.isPresent()){
-                params.add(title.get());
-                updateSb.append(", title=?");
-            }
-            if(content.isPresent()){
-                params.add(content.get());
-                updateSb.append(", content=?");
-            }
-            if(action.isPresent()){
-                params.add(action.get());
-                updateSb.append(", action=?");
-            }
-            if(inMsgCenter.isPresent()){
-                params.add(inMsgCenter.get());
-                updateSb.append(", inMsgCenter=?");
-            }
-            if(openType.isPresent()){
-                params.add(openType.get());
-                updateSb.append(", openType=?");
-            }
-            if(sendType.isPresent()){
-                params.add(sendType.get());
-                updateSb.append(", sendType=?");
-            }
-            if(status.isPresent()){
-                params.add(status.get());
-                updateSb.append(", status=?");
-            }
-            if(expireTime.isPresent()){
-                params.add(DateUtil.getLocalDate(expireTime.get()));
-                updateSb.append(", expireTime=?");
-            }
-            if(sendTime.isPresent()){
-                params.add(DateUtil.getLocalDate(sendTime.get()));
-                updateSb.append(", sendTime=?");
-            }
-            if(msgCenterImgUrl.isPresent()){
-                params.add(msgCenterImgUrl.get());
-                updateSb.append(", msgCenterImgUrl=?");
-            }
-            if(openUrl.isPresent()){
-                params.add(openUrl.get());
-                updateSb.append(", openUrl=?");
-            }
-            //发送类型，1是全部， 2是指定用户，3是指定城市
-            if("2".equals(sendType.orElse(""))){
-                params.add(importFile.orElse(""));
-                updateSb.append(", importFile=?");
-            }else if("3".equals(sendType.orElse(""))){
-                params.add(cityIds.orElse(""));
-                updateSb.append(", cityIds=?");
-            }
-            params.add(id.get());
+
+        String id = param.getString("id");
+        if(StringUtils.isNotBlank(id)){
+            //拼字段
+            StringBuilder columnSb = new StringBuilder();
             //更新
             sql = SQL_PASSENGER_MSGUPDATE;
-            updateSb = updateSb.length() > 0 ? updateSb.deleteCharAt(0) : updateSb;
-            sql = String.format(sql, updateSb.toString());
+            updatePassengerMsg(param, columnSb, params);
+            //更新时间
+            columnSb.append(", updateTime=?");
+            params.add(DateUtil.getDateTime(System.currentTimeMillis()));
+
+            params.add(id);
+            sql = String.format(sql, columnSb.toString());
         }else{
-            StringBuilder insertCol = new StringBuilder();
-            StringBuilder insertParam = new StringBuilder();
-
-            params.add(title.orElse(""));
-            params.add(content.orElse(""));
-            params.add(inMsgCenter.get());
-            params.add(openType.get());
-            params.add(sendType.get());
-            params.add(status.get());
-            params.add(DateUtil.getLocalDate(expireTime.get()));
-            params.add(DateUtil.getLocalDate(sendTime.get()));
-            params.add(msgCenterImgUrl.orElse(""));
-            params.add(openUrl.orElse(""));
-            if(action.isPresent()){
-                insertCol.append(" , action");
-                insertParam.append(" , ?");
-                params.add(action.get());
-            }
-
-            //发送类型，1是全部， 2是指定用户，3是指定城市
-            if("2".equals(sendType.orElse(""))){
-                insertCol.append(" , importFile");
-                insertParam.append(" , ?");
-                params.add(importFile.get());
-            }else if("3".equals(sendType.orElse(""))){
-                insertCol.append(" , cityIds");
-                insertParam.append(" , ?");
-                params.add(cityIds.get());
-            }
+            //拼字段
+            StringBuilder columnSb = new StringBuilder();
+            //拼占位符
+            StringBuilder positionSb = new StringBuilder();
             //新增
             sql = SQL_PASSENGER_MSGADD;
-            sql = String.format(sql, insertCol.toString(), insertParam.toString());
+            //处理参数
+            insertPassengerMsg(param, columnSb, positionSb, params);
+            //创建时间
+            columnSb.append(", createTime");
+            positionSb.append(",?");
+            params.add(DateUtil.getDateTime(System.currentTimeMillis()));
+
+            sql = String.format(sql, columnSb.toString(), positionSb.toString());
         }
         Future<String> future = executeSQL(params, sql);
         logger.info("新增乘客消息[sql : " + sql + "],[params : " + params + "]");
@@ -184,6 +107,47 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
                resultHandler.handle(Future.failedFuture(res.cause()));
            }
         });
+    }
+    //处理新增字段组装
+    private void insertPassengerMsg(JsonObject param, StringBuilder colStr, StringBuilder positionStr, JsonArray positionValue){
+        Set<String> fieldNames = param.fieldNames();
+        for(String fieldName : fieldNames){
+            String field = param.getString(fieldName);
+            if(StringUtils.isNotBlank(field)){
+                colStr.append("," + fieldName);
+                positionStr.append(",?");
+                if(field.endsWith("Z")){
+                    positionValue.add(DateUtil.dateTimeGmt2Local(field));
+                }else{
+                    positionValue.add(field);
+                }
+
+            }
+        }
+        if(colStr.indexOf(",") != -1){
+            colStr = colStr.deleteCharAt(0);
+        }
+        if(positionStr.indexOf(",") != -1){
+            positionStr = positionStr.deleteCharAt(0);
+        }
+    }
+    //处理更新字段组装
+    private void updatePassengerMsg(JsonObject param, StringBuilder colStr, JsonArray positionValue){
+        Set<String> fieldNames = param.fieldNames();
+        for(String fieldName : fieldNames){
+            String field = param.getString(fieldName);
+            if(StringUtils.isNotBlank(field)){
+                colStr.append("," + fieldName + "=? ");
+                if(field.endsWith("Z")){
+                    positionValue.add(DateUtil.dateTimeGmt2Local(field));
+                }else{
+                    positionValue.add(field);
+                }
+            }
+        }
+        if(colStr.indexOf(",") != -1){
+            colStr = colStr.deleteCharAt(0);
+        }
     }
 
     public void get(JsonObject req, Handler<AsyncResult<String>> resultHandler){
@@ -222,9 +186,9 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
-    public void list(JsonObject req, Handler<AsyncResult<PageBean>> resultHandler){
+    public void list(JsonObject req, Handler<AsyncResult<String>> resultHandler){
         String title = req.getString("title");
-        String sendTime = req.getString("sendTime");
+        String createTime = req.getString("createTime");
         Integer page = req.getInteger("page");
         Integer pageIndex = req.getInteger("pageIndex");
         Integer pageSize = req.getInteger("pageSize");
@@ -236,10 +200,10 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
             countParams.add(title);
             sb.append(" and title = ? ");
         }
-        if(StringUtils.isNotBlank(sendTime)){
-            params.add(sendTime);
-            countParams.add(sendTime);
-            sb.append(" and sendTime = ? ");
+        if(StringUtils.isNotBlank(createTime)){
+            params.add(DateUtil.dateTimeGmt2Local(createTime));
+            countParams.add(DateUtil.dateTimeGmt2Local(createTime));
+            sb.append(" and createTime = ? ");
         }
         //查总数
         String countSql = String.format(SQL_PASSENGER_MSGLIST_COUNT, sb.toString());
@@ -248,10 +212,10 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
 
         String querySql = String.format(SQL_PASSENGER_MSGLIST_PAGE, sb.toString());
         logger.info("查询乘客消息列表[sql : " + querySql + "],[params : " + params + "]");
-        Future<List<JsonObject>> queryFuture = queryForPage(params, querySql);
+        Future<List<JsonObject>> queryFuture = queryForList(params, querySql);
         logger.info("查询乘客消息列表总数[sql : " + countSql + "],[params : " + countParams + "]");
         Future countFuture = queryOne(countParams, countSql);
-        executeList(page, pageSize, queryFuture, countFuture, resultHandler);
+        makePageResponse(page, pageSize, queryFuture, countFuture, resultHandler);
     }
 
     /**
@@ -282,27 +246,27 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
     }
 
     //查询列表
-    private void executeList(int page, int pageSize,Future<List<JsonObject>> queryFuture, Future countFuture,
-                             Handler<AsyncResult<PageBean>> resultHandler){
+    private void makePageResponse(int page, int pageSize, Future<List<JsonObject>> queryFuture, Future countFuture,
+                                  Handler<AsyncResult<String>> resultHandler){
         CompositeFuture compositeFuture = CompositeFuture.all(queryFuture, countFuture);
         compositeFuture.setHandler(res -> {
             if(res.succeeded()){
                 //列表
                 List<JsonObject> list = res.result().resultAt(0);
-                List<PassengerMsgDto> newList = Lists.transform(list, new Function<JsonObject, PassengerMsgDto>() {
+                List<Map> newList = Lists.transform(list, new Function<JsonObject, Map>() {
                     @Nullable
                     @Override
-                    public PassengerMsgDto apply(@Nullable JsonObject jsonObject) {
-                        return jsonObject.mapTo(PassengerMsgDto.class);
+                    public Map apply(@Nullable JsonObject jsonObject) {
+                        return jsonObject.mapTo(Map.class);
                     }
                 });
                 //总条数
                 Optional<JsonObject> resultCount = res.result().resultAt(1);
                 Long total = resultCount.orElse(new JsonObject()).getLong("count(1)");
-                PageBean pageBean = new PageBean(page, pageSize, newList, total);
-                String result = Json.encode(pageBean);
+                Pager pager = new Pager(total, page, pageSize, list);
+                String result = Json.encode(pager);
                 logger.info("查询乘客消息列表成功，" + result);
-                resultHandler.handle(Future.succeededFuture(pageBean));
+                resultHandler.handle(Future.succeededFuture(result));
             }else{
                 logger.error("查询乘客消息列表出错，" , res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
@@ -346,21 +310,21 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
-    protected Future<List<JsonObject>> queryForPage(JsonArray params, String sql) {
+    protected Future<List<JsonObject>> queryForList(JsonArray params, String sql) {
         return getConnection().compose(conn -> {
             Future<List<JsonObject>> future = Future.future();
             conn.queryWithParams(sql, params, res -> {
                 if(res.succeeded()){
                     List<JsonObject> list  = res.result().getRows();
                     if(CollectionUtils.isEmpty(list)){
-                        logger.info("passengerMsg list : null ");
+                        logger.info("query list : null ");
                         future.complete(Collections.EMPTY_LIST);
                     }else{
-                        logger.info("passengerMsg list : " + Json.encode(list));
+                        logger.info("query list : " + Json.encode(list));
                         future.complete(list);
                     }
                 }else{
-                    logger.error("passengerMsg list error: ", res.cause());
+                    logger.error("query list error: ", res.cause());
                     future.fail(res.cause());
                 }
                 conn.close();
@@ -415,7 +379,99 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
-    public void getImportPhone(JsonObject param, Handler<AsyncResult<String>> resultHandler){
+    public void getImportPhoneList(String param, Handler<AsyncResult<List<JsonObject>>> resultHandler){
+        Future<List<JsonObject>> future = queryImportPhoneList(param);
+//        future.setHandler(res ->{
+//            if(res.succeeded()){
+//                List<JsonObject> list = res.result();
+//                logger.info("查询导入的手机号列表成功" + list);
+//                resultHandler.handle(Future.succeededFuture(list));
+//            } else {
+//                logger.error("查询导入的手机号列表失败",res.cause());
+//                resultHandler.handle(Future.failedFuture(res.cause()));
+//            }
+//        });
+        future.setHandler(resultHandler);
+    }
+
+    public Future<List<JsonObject>> queryImportPhoneList(String param){
+        String sql = SQL_IMPORT_PHONElIST;
+        JsonArray params = new JsonArray().add(param);
+        return getConnection().compose(conn -> {
+            Future<List<JsonObject>> future = Future.future();
+            conn.queryWithParams(sql, params, res -> {
+                if(res.succeeded()){
+                    List<JsonObject> list  = res.result().getRows();
+                    if(CollectionUtils.isEmpty(list)){
+                        future.complete(Collections.EMPTY_LIST);
+                    }else{
+                        future.complete(list);
+                    }
+                }else{
+                    future.fail(res.cause());
+                }
+                conn.close();
+            });
+            return future;
+        });
+    }
+
+    public void getImportFilePage(JsonObject param, Handler<AsyncResult<String>> resultHandler){
+        String createTime = param.getString("createTime");
+        Integer pageIndex = param.getInteger("pageIndex");
+        Integer page = param.getInteger("page");
+        Integer pageSize = param.getInteger("pageSize");
+
+        StringBuilder sb = new StringBuilder("");
+        JsonArray listParams = new JsonArray();
+        JsonArray countParams = new JsonArray();
+        if(StringUtils.isNotBlank(createTime)){
+            sb.append(" and DATE_FORMAT(createTime,'%Y-%m-%d')=?");
+            listParams.add(DateUtil.dateGmt2Local(createTime));
+            countParams.add(DateUtil.dateGmt2Local(createTime));
+        }
+
+        //总数
+        String countSql = SQL_IMPORT_FILECOUNT;
+        countSql = String.format(countSql, sb);
+        Future<Optional<JsonObject>> countFature = queryOne(countParams, countSql);
+        //列表
+        listParams.add(pageIndex).add(pageSize);
+        String listSql = SQL_IMPORT_FILEPAGE;
+        listSql = String.format(listSql, sb);
+        Future<List<JsonObject>>  listFature = queryForList(listParams, listSql);
+        makePageJsonResponse(page, pageSize, listFature, countFature, resultHandler);
+    }
+    //查询列表
+    private void makePageJsonResponse(int page, int pageSize, Future<List<JsonObject>> queryFuture, Future countFuture,
+                              Handler<AsyncResult<String>> resultHandler){
+        CompositeFuture compositeFuture = CompositeFuture.all(queryFuture, countFuture);
+        compositeFuture.setHandler(res -> {
+            if(res.succeeded()){
+                //列表
+                List<JsonObject> list = res.result().resultAt(0);
+                List<Map> newList = Lists.transform(list, new Function<JsonObject, Map>() {
+                    @Nullable
+                    @Override
+                    public Map apply(@Nullable JsonObject jsonObject) {
+                        return jsonObject.mapTo(Map.class);
+                    }
+                });
+                //总条数
+                Optional<JsonObject> resultCount = res.result().resultAt(1);
+                Integer total = resultCount.orElse(new JsonObject()).getInteger("count(1)");
+                Pager pager = new Pager(total, page, pageSize, list);
+                String result = Json.encode(pager);
+                logger.info("查询乘客消息列表成功，" + result);
+                resultHandler.handle(Future.succeededFuture(result));
+            }else{
+                logger.error("查询乘客消息列表出错，" , res.cause());
+                resultHandler.handle(Future.failedFuture(res.cause()));
+            }
+        });
+    }
+
+    public void delImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler){
 
     }
 }

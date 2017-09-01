@@ -68,7 +68,11 @@
            {
              title: "乘客消息列表",
              path: "/msgPassenger"
-           }]
+           },
+           {
+              title: "推送名单导入列表",
+              path: "/msgPassenger/importList"
+            }]
         }]
       }
     }

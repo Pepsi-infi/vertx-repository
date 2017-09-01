@@ -50,7 +50,7 @@ export default function http(options) {
           let resError = error.response
           let resCode = resError.status
           let resMsg = error.message
-          Message.error('操作失败！错误原因 ' + resMsg)
+          //Message.error('操作失败！错误原因 ' + resMsg)
           reject({code: resCode, msg: resMsg})
         }
       })

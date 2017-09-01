@@ -26,10 +26,10 @@
           <el-table :data="table_data" border
                         style="width: 100%" >
                 <el-table-column prop="rowIndex" label="序号" ></el-table-column>
-                <el-table-column prop="id" label="消息id" width="100"> </el-table-column>
+                <el-table-column prop="id" label="消息id" width="200"> </el-table-column>
                 <el-table-column prop="title" label="标题" width="200"> </el-table-column>
-                <el-table-column prop="createTime" label="创建时间" width="170" :formatter="formatTime"> </el-table-column>
-                <el-table-column prop="updateTime" label="更新时间" width="170" :formatter="formatTime"> </el-table-column>
+                <el-table-column prop="sendTime" label="发送时间" width="170" :formatter="formatTime"> </el-table-column>
+                <el-table-column prop="expireTime" label="过期时间" width="170" :formatter="formatTime"> </el-table-column>
                 <el-table-column prop="openType" label="动作" width="200" :formatter="openType"> </el-table-column>
                 <el-table-column prop="inMsgCenter" label="是否进入个人中心消息" width="200" :formatter="inCenter"> </el-table-column>
                 <el-table-column prop="status" label="状态" width="80" :formatter="status"> </el-table-column>
@@ -160,13 +160,11 @@
                   ele.realId = ele.id;
                   //ele.id = "ad_passenger_count_" + ele.id;
                   if(ele.sendTime){
-                    //console.log (new Date(ele.sendTime));
                     ele.isShow = new Date(ele.sendTime) > new Date() ? true : false;
                   }
-                  ele.updateTime = ele.updateTime ? ele.updateTime : '';
                   //序号
                   ele.rowIndex = (page - 1) * this.pageSize + index + 1;
-
+                  //console.log (new Date(ele.sendTime));
               });
               this.table_data = list
               this.currentPage = page
@@ -194,12 +192,8 @@
          return row.isShow;
       },
 
-      //格式化日期
       formatTime : function (row,column,val){
-        let time;
-        if(val){
-          time = new Date(val).Format("yyyy-MM-dd hh:mm:ss");
-        }
+        let time = new Date(val).Format("yyyy-MM-dd hh:mm:ss");
         return time;
       },
       inCenter : function(row,column,val){

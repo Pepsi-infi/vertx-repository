@@ -15,7 +15,7 @@
               <el-form-item label="状  态:">
                 <el-radio-group v-model="form.status">
                   <el-radio :label="1">有效</el-radio>
-                  <el-radio :label="2">无效</el-radio>
+                  <el-radio :label="0">无效</el-radio>
                 </el-radio-group>
               </el-form-item>
             </el-col>
@@ -103,7 +103,7 @@
         <el-row >
               <el-col :span="20">
                  <el-form-item label="指定用户:" v-show="showImportFile">
-                     <el-select v-model="form.importFile" placeholder="请选择">
+                     <el-select v-model="form.importFileId" placeholder="请选择">
                        <el-option
                          v-for="item in importOptions"
                          :key="item.value"
@@ -163,8 +163,8 @@
           title : '',
           content : '',
           id : '',
-          importFile : '',
-          cityIds : ''
+          importFileId : '',
+          cityIds : []
         },
         rules: {
           title: [{required: true, message: '标题不能为空', trigger: 'blur'}],
@@ -207,7 +207,11 @@
             //vue的类型对不上，不会自动匹配（后台数字类型，页面上字符串）
             data.action = data.action ? data.action + "" : "";
             data.sendType = data.sendType + "";
-            data.cityIds = data.cityIds.split(",");
+            if(data.cityIds){
+              data.cityIds = data.cityIds.split(",");
+            }else{
+              data.cityIds = [];
+            }
             this.form = data
             this.load_data = false
           })
@@ -219,8 +223,7 @@
       on_submit_form(){
         this.$refs.form.validate((valid) => {
           if(!valid){ return false }
-          console.log(JSON.stringify(this.form));
-
+          //console.log(JSON.stringify(this.form));
           //后台框架接收不了数组
           var citys = this.form.cityIds;
           var cityIdsStr = '';
@@ -233,7 +236,6 @@
             }
             this.form.cityIds = cityIdsStr;
           }
-          console.log(JSON.stringify(this.form));
 
           this.on_submit_loading = true
           this.$http.api_msgPassenger.addOrEdit(this.form)
@@ -283,10 +285,11 @@
                }
                this.cityOptions.push(gp);
             }
+            //console.log(this.cityOptions);
           })
           .catch((error) => {
             console.log(error);
-            this.load_data = false
+            //this.load_data = false
           })
       },
 

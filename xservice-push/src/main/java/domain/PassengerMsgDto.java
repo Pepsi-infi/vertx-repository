@@ -25,18 +25,18 @@ public class PassengerMsgDto implements Serializable {
     private String expireTime;
     private String sendTime;
 
-    private String importFile;
+    private String importFileId;
     private String cityIds;
 
     public PassengerMsgDto() {
     }
 
-    public String getImportFile() {
-        return importFile;
+    public String getImportFileId() {
+        return importFileId;
     }
 
-    public void setImportFile(String importFile) {
-        this.importFile = importFile;
+    public void setImportFileId(String importFileId) {
+        this.importFileId = importFileId;
     }
 
     public String getCityIds() {

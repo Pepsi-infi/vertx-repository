@@ -74,3 +74,11 @@ export function getCityList(params) {
   })
 }
 
+//根据id查询数据
+export function importFilePage(params) {
+  return http({
+    url: passengerMsg.importFilePage,
+    method: 'get',
+    params
+  })
+}

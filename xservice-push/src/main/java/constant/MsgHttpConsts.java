@@ -13,4 +13,6 @@ public class MsgHttpConsts {
     public static final  String PASSENGERMSG_GET_IMPORTFILELIST = "/passengerMsg/getImportFileList";
     public static final  String PASSENGERMSG_GET_CITYLIST = "/passengerMsg/getCityList";
 
+    public static final  String PASSENGERMSG_GET_FILEPAGE = "/passengerMsg/importFilePage";
+
 }

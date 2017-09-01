@@ -5,19 +5,21 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.http.HttpServerRequest;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
 import service.MessagePushService;
 import service.PassengerService;
 import util.HttpUtil;
-import utils.JsonUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,9 +30,9 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
 
     private static Logger logger = LoggerFactory.getLogger(PassengerMsgVerticle.class);
 
-    PassengerService passengerMessageService;
+    PassengerService passengerService;
 
-    MessagePushService pushMessageService;
+    MessagePushService messagePushService;
 
     public void start() throws Exception {
         super.start();
@@ -41,8 +43,8 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
     }
 
     private void initService(){
-        passengerMessageService = PassengerService.createProxy(vertx.getDelegate());
-        pushMessageService = MessagePushService.createProxy(vertx.getDelegate());
+        passengerService = PassengerService.createProxy(vertx.getDelegate());
+        messagePushService = MessagePushService.createProxy(vertx.getDelegate());
     }
 
     private void initServiceListening(){
@@ -56,6 +58,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         router.route(MsgHttpConsts.PASSENGERMSG_PUSH).handler(this::pushMsg);
         router.route(MsgHttpConsts.PASSENGERMSG_GET_IMPORTFILELIST).handler(this::getImportFileList);
         router.route(MsgHttpConsts.PASSENGERMSG_GET_CITYLIST).handler(this::getCityList);
+        router.route(MsgHttpConsts.PASSENGERMSG_GET_FILEPAGE).handler(this::getImportFilePage);
         logger.info("PassengerServiceImpl starting at 8989 ...");
         vertx.createHttpServer().requestHandler(router::accept).listen(8989);
     }
@@ -65,7 +68,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         String id = context.request().getParam("id");
         JsonObject param = new JsonObject().put("id", id);
         Future<String> future = Future.future();
-        passengerMessageService.getPushMsg(param, future);
+        passengerService.getPushMsg(param, future);
         future.setHandler(res -> {
            if(res.succeeded()){
                String result = res.result();
@@ -78,7 +81,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
 
     private void list(RoutingContext context){
         JsonObject param = buildParams(context);
-        passengerMessageService.list(param, resultHandler(context, JsonUtil::encodePrettily));
+        passengerService.list(param, resultHandler(context));
     }
 
     private void addOrUpdate(RoutingContext context){
@@ -96,57 +99,49 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         param.put("status", request.getParam("status"));
         param.put("expireTime", request.getParam("expireTime"));
         param.put("sendTime", request.getParam("sendTime"));
-        param.put("importFile", request.getParam("importFile"));
+        param.put("importFileId", request.getParam("importFileId"));
         param.put("cityIds", request.getParam("cityIds"));
-        passengerMessageService.addOrUpdate(param, resultHandler(context));
+        passengerService.addOrUpdate(param, resultHandler(context));
     }
 
     private void get(RoutingContext context){
         String id = context.request().getParam("id");
         JsonObject param = new JsonObject().put("id", id);
-        passengerMessageService.get(param, resultHandler(context));
+        passengerService.get(param, resultHandler(context));
     }
 
     private void del(RoutingContext context){
         String id = context.request().getParam("id");
         JsonObject param = new JsonObject().put("id", id);
-        passengerMessageService.del(param, resultHandler(context));
+        passengerService.del(param, resultHandler(context));
     }
 
     private JsonObject buildParams(RoutingContext context){
         JsonObject param = new JsonObject();
         HttpServerRequest request = context.request();
-        String title = request.getParam("title");
-        String sendTime = request.getParam("sendTime");
+        MultiMap map = request.params();
+        for(String name : map.names()){
+            param.put(name ,map.get(name));
+        }
+        setPageParams(request, param);
+        return param;
+    }
+
+    private void setPageParams(HttpServerRequest request, JsonObject param){
+        //查分页数据
         String pageS = request.getParam("page");
         String pageSizeS = request.getParam("pageSize");
-        if(StringUtils.isNotBlank(title)){
-            param.put("title",title);
-        }
-        if(StringUtils.isNotBlank(sendTime)){
-            param.put("sendTime",sendTime);
-        }
-        //查分页数据
         int page = Integer.parseInt(pageS);
         int pageSize = Integer.parseInt(pageSizeS);
         int pageIndex = (page - 1) * pageSize;
         param.put("page",page);
         param.put("pageIndex",pageIndex);
         param.put("pageSize",pageSize);
-        return param;
     }
-
 
     private void pushPassengerMsg(String jsonMsg){
         if(StringUtils.isNotBlank(jsonMsg)) {
             JsonObject message = new JsonObject(jsonMsg);
-            message.put("phone", "13621241006");
-            message.put("customerId", 13666050);
-
-            String sendType = message.getString("sendType");
-            if(StringUtils.isNotBlank(sendType) && "1".equals(sendType)){
-
-            }
             message.put("msgId", message.getValue("id"));
             message.put("jumpPage", message.getValue("action"));
             message.put("isIntoPsnCenter", message.getValue("inMsgCenter"));
@@ -156,32 +151,94 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
             message.put("expireTime", expireTime.get());
             message.put("url", message.getValue("openUrl"));
             message.put("type", message.getValue("openType"));
-
-            JsonObject buildMessage = new JsonObject();
-            buildMessage.put("body", message.toString());
-            Future<String> future = Future.future();
-            //调用发送消息
-            pushMessageService.bisnessMessage(buildMessage.toString(), future);
-            future.setHandler(resPush -> {
-                if (resPush.succeeded()) {
-                    logger.info(resPush.result());
-                } else {
-                    logger.error(resPush.cause());
-                }
-            });
+            String sendType = message.getString("sendType");
+            if(StringUtils.isNotBlank(sendType) && "1".equals(sendType)){
+                logger.info("全部用户推送消息");
+                sendForAllUser(message);
+            }else if(StringUtils.isNotBlank(sendType) && "2".equals(sendType)){
+                logger.info("指定用户推送消息");
+                sendByOnlyUser(message);
+            }else if(StringUtils.isNotBlank(sendType) && "3".equals(sendType)){
+                logger.info("指定城市推送消息");
+                sendForCityUser(message);
+            }else{
+                logger.error("发送类型未指定，推送不执行");
+            }
         }else {
             logger.error("无符合条件的消息数据，推送不执行");
         }
     }
 
+    //1、推送所有用户
+    private void sendForAllUser(JsonObject message){
+        message.put("phone", "13621241006");
+        message.put("customerId", 13666050);
+    }
+
+    //2、按指定用户推送
+    private void sendByOnlyUser(JsonObject message){
+        String importFileId = message.getString("importFileId");
+        Future<List<JsonObject>> future = Future.future();
+        passengerService.getImportPhoneList(importFileId, future);
+        future.setHandler(res -> {
+            if (res.succeeded()) {
+                List<JsonObject> phoneList = res.result();
+                if (CollectionUtils.isNotEmpty(phoneList)) {
+                    for (JsonObject phone : phoneList) {
+                        message.put("phone", phone.getString("telephone"));
+                        message.put("customerId", 13666050);
+                        sendMessage(message);
+                    }
+                } else {
+                    logger.info("查询指定手机号列表为空，importFileId：" + importFileId);
+                }
+            } else {
+                logger.info("查询指定手机号列表为空失败，importFileId：" + importFileId);
+            }
+        });
+    }
+
+    //3、按城市推送
+    private void sendForCityUser(JsonObject message){
+        message.put("phone", "13621241006");
+        message.put("customerId", 13666050);
+    }
+
+    private void sendMessage(JsonObject message){
+        JsonObject buildMessage = new JsonObject();
+        buildMessage.put("body", message.toString());
+        Future<String> future = Future.future();
+        //调用发送消息
+        messagePushService.bisnessMessage(buildMessage.toString(), future);
+        future.setHandler(resPush -> {
+            if (resPush.succeeded()) {
+                logger.info(resPush.result());
+            } else {
+                logger.error(resPush.cause());
+            }
+        });
+    }
     //查询导入的手机号文件列表
     private void getImportFileList(RoutingContext context){
         JsonObject param = new JsonObject();
-        passengerMessageService.getImportFileList(param, resultHandler(context));
+        HttpServerRequest request = context.request();
+        String createTime = request.getParam("createTime");
+        param.put("createTime", createTime);
+        passengerService.getImportFileList(param, resultHandler(context));
     }
 
     private void getCityList(RoutingContext context){
         Map params = new HashMap();
+        logger.info("调用城市列表接口");
         HttpUtil.doGet(params, config().getString("city.list.url"), resultHandler(context));
+    }
+
+    private void getImportFilePage(RoutingContext context){
+        JsonObject param = new JsonObject();
+        HttpServerRequest request = context.request();
+        String createTime = request.getParam("createTime");
+        param.put("createTime", createTime);
+        setPageParams(request, param);
+        passengerService.getImportFilePage(param, resultHandler(context));
     }
 }

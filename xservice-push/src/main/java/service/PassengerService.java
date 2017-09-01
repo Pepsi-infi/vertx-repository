@@ -1,6 +1,5 @@
 package service;
 
-import domain.PageBean;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -22,7 +21,7 @@ public interface PassengerService {
         return ProxyHelper.createProxy(PassengerService.class, vertx, PassengerService.class.getName());
     }
 
-    public void list(JsonObject param, Handler<AsyncResult<PageBean>> resultHandler);
+    public void list(JsonObject param, Handler<AsyncResult<String>> resultHandler);
 
     public void get(JsonObject param, Handler<AsyncResult<String>> resultHandler);
 
@@ -34,7 +33,11 @@ public interface PassengerService {
 
     public void addImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler);
 
+    public void delImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler);
+
+    public void getImportFilePage(JsonObject param, Handler<AsyncResult<String>> resultHandler);
+
     public void getImportFileList(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler);
 
-    public void getImportPhone(JsonObject param, Handler<AsyncResult<String>> resultHandler);
+    public void getImportPhoneList(String param, Handler<AsyncResult<List<JsonObject>>> resultHandler);
 }
