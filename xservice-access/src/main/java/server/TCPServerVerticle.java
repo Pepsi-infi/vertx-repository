@@ -1,16 +1,15 @@
 package server;
 
+import org.apache.commons.lang.StringUtils;
+
 import cluster.ConsistentHashingService;
 import constants.IMCmdConstants;
 import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -18,6 +17,8 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
+import logic.SessionService;
+import logic.impl.C2CVerticle;
 import protocol.MessageBuilder;
 import util.ByteUtil;
 
@@ -26,13 +27,14 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
 
 	private C2CService c2cService;
-	private ConsistentHashingService consistentHashingService;
 	private EventBus eb;
+	private ConsistentHashingService consistentHashingService;
 
 	@Override
 	public void start() throws Exception {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
+
 		c2cService = C2CService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
@@ -52,83 +54,28 @@ public class TCPServerVerticle extends AbstractVerticle {
 				logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
 						clientVersion, cmd, bodyLength);
 
-				if (IMCmdConstants.HEART_BEAT == cmd) {
-					heartBeat(socket.writeHandlerID(), clientVersion);
-				} else {
-					JsonObject jsonBody = null;
-					Buffer bufferBody = buffer.getBuffer(IMMessageConstant.HEADER_LENGTH,
-							IMMessageConstant.HEADER_LENGTH + bodyLength);
-					logger.info("Msg body, buffer={}", bufferBody);
-					if (bufferBody != null && bufferBody.length() != 0) {
-						try {
-							jsonBody = bufferBody.toJsonObject();
-						} catch (Exception e) {
-							logger.error("Msg Json parse error, buffer={}", bufferBody);
-						}
-					}
+				Buffer bufferBody = null;
+				switch (cmd) {
+				case IMCmdConstants.HEART_BEAT:
+					heartBeat(socket.writeHandlerID(), clientVersion, cmd);
 
-					if (jsonBody != null) {
-						String from = null;
-						String to = null;
-						String msgId = null;
+					break;
+				case IMCmdConstants.LOGIN:
+					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
+					login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
 
-						// if (from != null && to != null) {
-						switch (cmd) {
-						case IMCmdConstants.LOGIN:
-							try {
-								from = jsonBody.getString("userTel");
-							} catch (Exception e) {
-								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-							}
-							if (from != null) {
-								login(socket.writeHandlerID(), clientVersion, cmd, from);
-							}
-							doWithLogin(socket.writeHandlerID(), clientVersion);
-							break;
-						case IMCmdConstants.LOGOUT:
-							try {
-								from = jsonBody.getString("userTel");
-							} catch (Exception e) {
-								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-							}
-							if (from != null) {
-								logout(socket.writeHandlerID(), clientVersion, cmd, from);
-							}
+					break;
+				case IMCmdConstants.LOGOUT:
+					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
+					logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
 
-							break;
-						case IMCmdConstants.MSG_R:
-							try {
-								from = jsonBody.getString("fromTel");
-								to = jsonBody.getString("toTel");
-								msgId = jsonBody.getString("msgId");
-							} catch (Exception e) {
-								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-							}
-							if (from != null && to != null) {
-								msgRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							}
-
-							break;
-						case IMCmdConstants.ACK_R:
-							try {
-								from = jsonBody.getString("fromTel");
-								to = jsonBody.getString("toTel");
-								msgId = jsonBody.getString("msgId");
-							} catch (Exception e) {
-								logger.error("Json parse error. Msg body buffer " + bufferBody, e);
-							}
-							ackRequest(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							break;
-						case IMCmdConstants.ACK_N:
-							ackNotify(socket.writeHandlerID(), clientVersion, msgId, jsonBody, to);
-							break;
-						case IMCmdConstants.HEART_BEAT:
-							heartBeat(socket.writeHandlerID(), clientVersion);
-						default:
-							break;
-						}
-						// }
-					}
+					break;
+				case IMCmdConstants.MSG_R:
+					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
+					msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
+					break;
+				default:
+					break;
 				}
 			}));
 
@@ -140,28 +87,10 @@ public class TCPServerVerticle extends AbstractVerticle {
 		server.listen();
 	}
 
-	private void heartBeat(String writeHandlerID, int clientVersion) {
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
-				IMCmdConstants.HEART_BEAT + 100, 0);
+	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
 		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
-	}
-
-	/**
-	 * Test
-	 * 
-	 * @param msg
-	 * @param resultHandler
-	 */
-	public void doWithLogin(String writeHandlerID, int clientVersion) {
-		// 给FROM发A
-
-		JsonObject test = new JsonObject().put("testkey", "same");
-		int bodyLength = test.toString().length();
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
-				IMCmdConstants.LOGIN + 100, bodyLength);
-		logger.info("DoWithLogin, handlerId={}msgHeader={}", writeHandlerID, aMsgHeader.toString());
-		eb.send(writeHandlerID, aMsgHeader.appendString(test.toString()).appendString("\001"));
 	}
 
 	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
@@ -169,129 +98,123 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 	}
 
-	/**
-	 * 登录
-	 * 
-	 * @param handlerID
-	 * @param cmd
-	 * @param from
-	 *            登录用户id，必传
-	 */
-	private void login(String handlerID, int clientVersion, int cmd, String from) {
-		// 把用户做一致性hash，分散到集群机器上
-		Future<String> consistentHashFuture = Future.future();
-		consistentHashingService.getNode(from, consistentHashFuture.completer());
-		consistentHashFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", "setUserSocket");
-				option.setSendTimeout(3000);
-				JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-				logger.info("IMCmdConstants.LOGIN from={}cmd={}node={}handlerID={}", from, cmd, res.result(),
-						handlerID);
-				eb.send("session-eb-service" + res.result(), msg, option);
-			} else {
-				logger.error("Consistent Hash ", res.cause());
-			}
-		});
+	private void login(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
+		if (bufferBody != null && bufferBody.length() != 0) {
+			JsonObject jsonBody = null;
+			String from = null;
+			try {
+				jsonBody = bufferBody.toJsonObject();
+				if (jsonBody != null) {
+					from = jsonBody.getString("userTel");
+					if (StringUtils.isNotEmpty(from)) {
+						DeliveryOptions option = new DeliveryOptions();
+						option.addHeader("action", "setUserSocket");
+						option.setSendTimeout(3000);
+						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
+						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
 
-		Future<JsonObject> c2cFuture = Future.future();
-		JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("cmd", cmd).put("fromHandlerID",
-				handlerID);
-		c2cService.doWithLogin(rMsg, c2cFuture.completer());
+						// 给FROM发A
+						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+								msg.getInteger("clientVersion"), cmd + 100, 0);
+
+						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
+								clientVersion, cmd, bodyLength);
+						eb.send(handlerID, aMsgHeader.appendString("\001"));
+					}
+				}
+			} catch (Exception e) {
+				logger.error("Msg body parse error, buffer={}", bufferBody);
+			}
+		} else {
+			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
+		}
 	}
 
-	/**
-	 * 登出
-	 * 
-	 * @param handlerID
-	 * @param from
-	 *            用户id，必传
-	 */
-	private void logout(String handlerID, int clientVersion, int cmd, String from) {
-		// 把用户做一致性hash，分散到集群机器上
-		Future<String> consistentHashFuture = Future.future();
-		consistentHashingService.getNode(from, consistentHashFuture.completer());
-		consistentHashFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", "delUserSocket");
-				option.setSendTimeout(3000);
-				JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-				eb.send("session-eb-service" + res.result(), msg, option);
-			} else {
-				logger.error("Consistent Hash ", res.cause());
-			}
-		});
+	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
+		if (bufferBody != null && bufferBody.length() != 0) {
+			JsonObject jsonBody = null;
+			String from = null;
+			try {
+				jsonBody = bufferBody.toJsonObject();
+				if (jsonBody != null) {
+					from = jsonBody.getString("userTel");
+					if (StringUtils.isNotEmpty(from)) {
+						DeliveryOptions option = new DeliveryOptions();
+						option.addHeader("action", "delUserSocket");
+						option.setSendTimeout(3000);
+						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
 
-		Future<JsonObject> c2cFuture = Future.future();
-		JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("cmd", cmd).put("fromHandlerID",
-				handlerID);
-		c2cService.doWithLogout(rMsg, c2cFuture.completer());
+						// 给FROM发A
+						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+								msg.getInteger("clientVersion"), cmd + 100, 0);
+						eb.send(handlerID, aMsgHeader.appendString("\001"));
+					}
+				}
+			} catch (Exception e) {
+				logger.error("Msg body parse error, buffer={}", bufferBody);
+			}
+		} else {
+			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
+		}
 	}
 
-	private void msgRequest(String handlerID, int clientVersion, String seq, final JsonObject msgBody, String to) {
-		Future<String> consistentHashFuture = Future.future();
-		consistentHashingService.getNode(to, consistentHashFuture.completer());
-		Future<Message<JsonObject>> sessionFuture = Future.future();
-		// 根据to去session查出对应handlerID
-		consistentHashFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", "getHandlerIDByUid");
-				option.setSendTimeout(3000);
-				JsonObject rMsg = new JsonObject().put("to", to);
-				eb.send("session-eb-service" + res.result(), rMsg, option, sessionFuture.completer());
-			} else {
-				logger.error("Consistent Hash ", res.cause());
+	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
+		if (bufferBody != null && bufferBody.length() != 0) {
+			JsonObject jsonBody = null;
+			try {
+				jsonBody = bufferBody.toJsonObject();
+				if (jsonBody != null) {
+					String from = jsonBody.getString("fromTel");
+					String to = jsonBody.getString("toTel");
+					if (StringUtils.isNotEmpty(from) && StringUtils.isNotEmpty(to)) {
+						String msgId = jsonBody.getString("msgId");
+						String sceneId = jsonBody.getString("sceneId");
+						int sceneType = jsonBody.getInteger("sceneType");
+						int msgType = jsonBody.getInteger("msgType");
+						String content = jsonBody.getString("content");
+
+						//
+						Future<String> hashFuture = Future.future();
+						consistentHashingService.getNode(to, hashFuture.completer());
+						hashFuture.setHandler(res -> {
+							if (res.succeeded()) {
+								DeliveryOptions option = new DeliveryOptions();
+								option.addHeader("action", "sendMessage");
+								option.setSendTimeout(1000);
+
+								JsonObject param = new JsonObject();
+
+								JsonObject header = new JsonObject();
+								header.put("clientVersion", clientVersion);
+								header.put("cmd", cmd);
+
+								JsonObject body = new JsonObject().put("from", from).put("to", to)
+										.put("sceneId", sceneId).put("sceneType", sceneType).put("msgType", msgType)
+										.put("content", content);
+
+								param.put("header", header);
+								param.put("body", body);
+								eb.send(C2CVerticle.SERVICE_ADDRESS, param, option);
+							}
+						});
+
+						// 给FROM发A
+						JsonObject msgBody = new JsonObject();
+						msgBody.put("msgId", msgId);
+						msgBody.put("timeStamp", System.currentTimeMillis());
+						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+								clientVersion, cmd + 100, msgBody.toString().length());
+						eb.send(handlerID, aMsgHeader.appendString(msgBody.toString()).appendString("\001"));
+					}
+				}
+			} catch (Exception e) {
+				logger.error("Msg body parse error, buffer={}", bufferBody);
 			}
-		});
-
-		Future<JsonObject> c2cFuture = Future.future();
-		sessionFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				JsonObject result = res.result().body();
-				String toHandlerID = result.getString("handlerID");
-
-				JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
-						.put("body", msgBody).put("fromHandlerID", handlerID).put("toHandlerID", toHandlerID);
-				c2cService.doWithMsgRequest(rMsg, c2cFuture.completer());
-			} else {
-				logger.error("Session ", res.cause());
-			}
-		});
-	}
-
-	private void ackRequest(String handlerID, int clientVersion, String seq, final JsonObject msgBody, String to) {
-		Future<String> consistentHashFuture = Future.future();
-		consistentHashingService.getNode(to, consistentHashFuture.completer());
-		Future<Message<JsonObject>> sessionFuture = Future.future();
-		// 根据to去session查出对应handlerID
-		consistentHashFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", "getHandlerIDByUid");
-				option.setSendTimeout(3000);
-				JsonObject rMsg = new JsonObject().put("to", to);
-				eb.send("session-eb-service" + res.result(), rMsg, option, sessionFuture.completer());
-			} else {
-				// TODO
-			}
-		});
-
-		Future<JsonObject> c2cFuture = Future.future();
-		sessionFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				JsonObject result = res.result().body();
-				String toHandlerID = result.getString("handlerID");
-
-				JsonObject aMsg = new JsonObject().put("clientVersion", clientVersion).put("seq", seq)
-						.put("body", msgBody).put("fromHandlerID", handlerID).put("toHandlerID", toHandlerID);
-				c2cService.doWithAckRequest(aMsg, c2cFuture.completer());
-			} else {
-				// TODO
-			}
-		});
+		} else {
+			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
+		}
 	}
 
 	private void socketClose(String handlerID) {

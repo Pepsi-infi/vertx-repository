@@ -3,7 +3,6 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import logic.impl.C2CVerticle;
 import persistence.impl.MongoVerticle;
 
 public class Tester {
@@ -11,7 +10,6 @@ public class Tester {
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
 		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
-		vertx.deployVerticle(C2CVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	}
 
 	private static JsonObject config() {
