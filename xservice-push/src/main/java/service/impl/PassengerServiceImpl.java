@@ -35,7 +35,7 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
     private SQLClient sqlClient;
 
     //乘客消息列表
-    public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by sendTime desc limit ?,?";
+    public static final String SQL_PASSENGER_MSGLIST_PAGE = "select * from msg_passenger_msg where 1=1 %s order by createTime desc limit ?,?";
     public static final String SQL_PASSENGER_MSGLIST_COUNT = "select count(1) from msg_passenger_msg where 1=1 %s";
     public static final String SQL_PASSENGER_MSGGET = "select * from msg_passenger_msg where id = ? ";
     //乘客消息新增

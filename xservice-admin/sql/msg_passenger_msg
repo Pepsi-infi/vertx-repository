@@ -1,7 +1,7 @@
 --乘客消息表
 CREATE TABLE `msg_passenger_msg` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf32 DEFAULT NULL,
   `content` varchar(2000) DEFAULT NULL,
   `action` int(2) DEFAULT NULL COMMENT '跳转类型',
   `msgCenterImgUrl` varchar(255) DEFAULT NULL,
@@ -12,5 +12,13 @@ CREATE TABLE `msg_passenger_msg` (
   `status` int(1) NOT NULL DEFAULT '1' COMMENT '1，是；0，否；',
   `expireTime` datetime DEFAULT NULL,
   `sendTime` datetime DEFAULT NULL,
+  `importFileId` varchar(20) DEFAULT NULL,
+  `cityIds` varchar(1000) DEFAULT NULL,
+  `createTime` datetime DEFAULT NULL,
+  `updateTime` datetime DEFAULT NULL,
+  `createUser` varchar(20) DEFAULT NULL,
+  `updateUser` varchar(20) CHARACTER SET utf8 COLLATE utf8_icelandic_ci DEFAULT NULL,
   UNIQUE KEY `id_pk` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8;
+
+

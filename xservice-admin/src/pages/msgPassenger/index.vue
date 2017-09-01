@@ -38,12 +38,16 @@
                        <el-button
                           size="small"
                           @click="pushMsg(scope.$index, scope.row)" type="success" >消息推送</el-button>
+
                        <el-button
                           size="small"
                           @click="stopPush(scope.$index, scope.row)" type="warning" v-show="showButton(scope.row)">停止推送</el-button>
                         <el-button
                           size="small"
                           @click="editMsg(scope.$index, scope.row)" type="success" v-show="showButton(scope.row)">编 辑</el-button>
+                        <el-button
+                          size="small"
+                          @click="copyMsg(scope.$index, scope.row)" type="success" v-show="showButton(scope.row)">复 制</el-button>
                         <el-button
                           size="small"
                           @click="delMsg(scope.$index, scope.row)" type="danger" v-show="showButton(scope.row)">删 除</el-button>
@@ -101,7 +105,12 @@
       },
       //编辑消息
       editMsg : function(index,row){
-        this.$router.push({path: '/msgPassenger/msgPassengerAdd', query: {id: row.realId}});
+        this.$router.push({path: '/msgPassenger/msgPassengerAdd', query: {id: row.realId, flag : 1}});
+      },
+
+      //复制消息
+      copyMsg : function(index,row){
+        this.$router.push({path: '/msgPassenger/msgPassengerAdd', query: {id: row.realId, flag : 2}});
       },
       //删除消息
       delMsg : function(index,row){
@@ -158,6 +167,7 @@
                       tempList.push(ele);
                   }
                   ele.realId = ele.id;
+                  //前缀+id
                   //ele.id = "ad_passenger_count_" + ele.id;
                   if(ele.sendTime){
                     //console.log (new Date(ele.sendTime));
@@ -191,7 +201,8 @@
       },
       //按钮是否显示
       showButton : function(row){
-         return row.isShow;
+         //return row.isShow;
+         return true;
       },
 
       //格式化日期

@@ -1,6 +1,13 @@
 <template>
   <div class="panel">
-    <panel-title :title="$route.meta.title"></panel-title>
+    <template>
+      <div class="panel-title">
+        <span v-if="panelTitle" v-text="panelTitle"></span>
+        <div class="fr">
+          <slot></slot>
+        </div>
+      </div>
+    </template>
     <div class="panel-body"
          v-loading="load_data"
          element-loading-text="拼命加载中">
@@ -181,17 +188,26 @@
         showImportFile : false,
         showCity : false,
         importOptions : [],
-        cityOptions : []
+        cityOptions : [],
+        pageFlag : 0,
+        panelTitle : ''
       }
     },
     created(){
        this.get_importFile();
        this.get_city();
-       this.form.id = this.$route.query.id
-       if(this.form.id){
-         this.get_form_data(this.form.id);
+       if(this.$route.query.id){
+         this.pageFlag = this.$route.query.flag;
+         this.get_form_data(this.$route.query.id);
        }
 
+       if(this.pageFlag == 1){
+         this.panelTitle = "乘客端消息/编辑消息";
+       }else if(this.pageFlag == 2){
+         this.panelTitle = "乘客端消息/复制消息";
+       }else{
+         this.panelTitle = "乘客端消息/新增消息";
+       }
     },
     methods: {
       //获取数据
@@ -223,7 +239,6 @@
       on_submit_form(){
         this.$refs.form.validate((valid) => {
           if(!valid){ return false }
-          //console.log(JSON.stringify(this.form));
           //后台框架接收不了数组
           var citys = this.form.cityIds;
           var cityIdsStr = '';
@@ -237,10 +252,15 @@
             this.form.cityIds = cityIdsStr;
           }
 
+          //页面标志， 2是复制成新消息
+          if(this.pageFlag == 2){
+              this.form.id = '';
+          }
+
           this.on_submit_loading = true
           this.$http.api_msgPassenger.addOrEdit(this.form)
             .then(({data}) => {
-              var msg = this.form.id ? "编辑乘客消息成功":"新增乘客消息成功";
+              var msg = "保存成功";
               this.$message.success(msg)
               setTimeout(this.$router.back(), 1000)
             })
