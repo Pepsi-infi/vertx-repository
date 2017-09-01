@@ -12,9 +12,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 @VertxGen
 public interface MongoService {
 
-	public static final String SERVICE_NAME = "mongo.eb.service";
+	public static final String SERVICE_NAME = "persistence.MongoService";
 
-	public static final String SERVICE_ADDRESS = "mongo-eb-service";
+	public static final String SERVICE_ADDRESS = "persistence.MongoService";
 
 	static MongoService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(MongoService.class, vertx, SERVICE_ADDRESS);
@@ -35,4 +35,6 @@ public interface MongoService {
 	 * @param resultHandler
 	 */
 	void updateData(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler);
+
+	void saveDataBatch(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler);
 }

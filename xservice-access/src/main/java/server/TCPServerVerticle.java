@@ -192,7 +192,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 								param.put("header", header);
 								param.put("body", body);
-								
+
 								DeliveryOptions option = new DeliveryOptions();
 								option.addHeader("action", "sendMessage");
 								option.setSendTimeout(1000);
