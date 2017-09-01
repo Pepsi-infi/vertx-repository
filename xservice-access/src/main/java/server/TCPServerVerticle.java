@@ -116,7 +116,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 						// 给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-								msg.getInteger("clientVersion"), cmd + 100, 0);
+								clientVersion, cmd + 100, 0);
 
 						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
 								clientVersion, cmd, bodyLength);
@@ -124,7 +124,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 					}
 				}
 			} catch (Exception e) {
-				logger.error("Msg body parse error, buffer={}", bufferBody);
+				logger.error("Msg body parse error, buffer={}", bufferBody, e);
 			}
 		} else {
 			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
