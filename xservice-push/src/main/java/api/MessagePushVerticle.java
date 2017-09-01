@@ -11,6 +11,9 @@ import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import rxjava.RestAPIVerticle;
 import service.MessagePushService;
 
+/**
+ * 接收乘客端消息， http方式
+ */
 public class MessagePushVerticle extends RestAPIVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessagePushVerticle.class);

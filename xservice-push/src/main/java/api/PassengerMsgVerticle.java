@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * 乘客消息相关功能
  * Created by weim on 2017/8/24.
  */
 public class PassengerMsgVerticle extends RestAPIVerticle {
