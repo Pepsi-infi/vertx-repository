@@ -4,6 +4,9 @@ const routers = [
     name: 'list',
     component(resolve) {
       require(['../../pages/imCommonLanguage/list.vue'], resolve);
+    },
+    meta: {
+      title: "IM常用语库"
     }
   },
   {
@@ -11,6 +14,9 @@ const routers = [
     name: 'commonLanguageList',
     component(resolve) {
       require(['../../pages/imCommonLanguage/commonLanguageList.vue'], resolve);
+    },
+    meta: {
+      title: 'IM常用语库'
     }
   },
   {
@@ -18,6 +24,9 @@ const routers = [
     name: 'commonLanguage',
     component(resolve) {
       require(['../../pages/imCommonLanguage/commonLanguage.vue'], resolve);
+    },
+    meta: {
+      title: "IM常用语库"
     }
   }
 ];
