@@ -1,7 +1,15 @@
 package service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import constants.CacheConstants;
 import constants.OsTypeEnum;
 import constants.PushActionEnum;
@@ -15,17 +23,11 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import iservice.MsgStatService;
 import iservice.dto.MsgStatDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import redis.RedisCluster;
 import redis.RedisClusterOptions;
 import rxjava.BaseServiceVerticle;
 import util.ConfigUtil;
 import utils.BaseResponse;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei Date : 2017/7/25 14:54 Description :

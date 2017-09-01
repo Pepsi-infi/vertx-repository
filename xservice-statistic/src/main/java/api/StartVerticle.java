@@ -45,8 +45,8 @@ public class StartVerticle extends BaseServiceVerticle {
 		this.deployVerticle(CarBizEuroDaoImpl.class.getName());
 		this.deployVerticle(TransferDeviceServiceImpl.class.getName());
 
-		vertx.deployVerticle(CarBizEuroVerticle.class.getName(), new DeploymentOptions().setWorker(true).setConfig(config()));
-
+		vertx.deployVerticle(CarBizEuroVerticle.class.getName(),
+				new DeploymentOptions().setWorker(true).setConfig(config()));
 	}
 
 	private void deployEventBusService() {
@@ -68,7 +68,7 @@ public class StartVerticle extends BaseServiceVerticle {
 
 	public static DeploymentOptions readBossOpts() {
 		DeploymentOptions options = new DeploymentOptions();
-//		options.setInstances(Runtime.getRuntime().availableProcessors());
+		// options.setInstances(Runtime.getRuntime().availableProcessors());
 		return options;
 	}
 

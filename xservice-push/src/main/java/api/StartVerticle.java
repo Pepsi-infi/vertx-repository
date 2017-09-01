@@ -40,6 +40,7 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(HttpServerVerticle.class.getName());
 		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
+
 		// 提供其他非EventBus服务
 	}
 

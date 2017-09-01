@@ -1,7 +1,18 @@
 package dao.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import dao.BaseDaoVerticle;
 import dao.DeviceDao;
 import helper.XProxyHelper;
@@ -14,16 +25,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import iservice.dto.DeviceDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import utils.BaseResponse;
 import utils.CalendarUtil;
-
-import javax.annotation.Nullable;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei Date : 2017/7/26 10:32 Description :

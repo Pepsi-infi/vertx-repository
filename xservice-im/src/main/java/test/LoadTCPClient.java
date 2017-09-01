@@ -20,6 +20,8 @@ public class LoadTCPClient {
 
 	private int port;
 
+	private NetClientOptions options;
+
 	/**
 	 * 构造函数，传入待压测服务器ip，port
 	 * 
@@ -45,6 +47,7 @@ public class LoadTCPClient {
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
 		options.setLocalAddress(clientIP);
 		NetClient client = vertx.createNetClient(options);
+		options.setLocalAddress(clientIP);
 		long ts = System.currentTimeMillis();
 		client.connect(port, ip, res -> {
 			if (res.succeeded()) {
@@ -75,6 +78,7 @@ public class LoadTCPClient {
 	 *            用户手机号
 	 * @param resultHandler
 	 */
+
 	public void login(String clientIP, String phone, Handler<AsyncResult<Integer>> resultHandler) {
 		Vertx vertx = Vertx.vertx();
 		NetClientOptions options = new NetClientOptions().setConnectTimeout(10000);
