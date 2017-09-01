@@ -48,7 +48,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 		String innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + innerIP, res -> {
+		eb.<JsonObject>consumer(C2CVerticle.SERVICE_ADDRESS + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {
