@@ -33,9 +33,9 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(1, MemoryUnit.GB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
 				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(1, MemoryUnit.GB)))
+						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);

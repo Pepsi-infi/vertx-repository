@@ -12,21 +12,13 @@ import io.vertx.serviceproxy.ProxyHelper;
 @VertxGen
 public interface C2CService {
 
-	public static final String SERVICE_NAME = "c2c.eb.service";
+	public static final String SERVICE_NAME = "logic.C2CService";
 
-	public static final String SERVICE_ADDRESS = "c2c-eb-service";
+	public static final String SERVICE_ADDRESS = "logic.C2CService";
 
 	static C2CService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(C2CService.class, vertx, SERVICE_ADDRESS);
 	}
-
-	void doWithLogin(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
-
-	void doWithLogout(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
-
-	void doWithMsgRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
-
-	void doWithAckRequest(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
 
 	void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler);
 }

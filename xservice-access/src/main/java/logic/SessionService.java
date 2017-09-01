@@ -11,9 +11,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 @VertxGen
 public interface SessionService {
 
-	static final String SERVICE_NAME = "session.eb.service";
+	static final String SERVICE_NAME = "logic.SessionService";
 
-	static final String SERVICE_ADDRESS = "session-eb-service";
+	static final String SERVICE_ADDRESS = "logic.SessionService";
 
 	static SessionService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(SessionService.class, vertx, SERVICE_ADDRESS);

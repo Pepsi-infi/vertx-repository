@@ -3,6 +3,11 @@ package constants;
 public class IMCmdConstants {
 
 	/**
+	 * heart beat
+	 */
+	public static final int HEART_BEAT = 0;
+
+	/**
 	 * user login
 	 */
 	public static final int LOGIN = 1001;

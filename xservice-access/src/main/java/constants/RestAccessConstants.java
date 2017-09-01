@@ -9,4 +9,6 @@ public class RestAccessConstants {
 	public static final int HTTP_PORT = 1100;
 
 	public static final String ONLINE_NUMBER = "/mc-access/online/number.json";
+
+	public static final String DISPATCH = "/mc-access/user/dispatch.json";
 }
