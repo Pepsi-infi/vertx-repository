@@ -180,10 +180,6 @@ public class TCPServerVerticle extends AbstractVerticle {
 						consistentHashingService.getNode(to, hashFuture.completer());
 						hashFuture.setHandler(res -> {
 							if (res.succeeded()) {
-								DeliveryOptions option = new DeliveryOptions();
-								option.addHeader("action", "sendMessage");
-								option.setSendTimeout(1000);
-
 								JsonObject param = new JsonObject();
 
 								JsonObject header = new JsonObject();
@@ -196,7 +192,11 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 								param.put("header", header);
 								param.put("body", body);
-								eb.send(C2CVerticle.SERVICE_ADDRESS, param, option);
+								
+								DeliveryOptions option = new DeliveryOptions();
+								option.addHeader("action", "sendMessage");
+								option.setSendTimeout(1000);
+								eb.send(C2CVerticle.SERVICE_ADDRESS + res.result(), param, option);
 							}
 						});
 
