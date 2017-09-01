@@ -1,5 +1,11 @@
 package api;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import domain.DriverMsg;
 import domain.Page;
 import enums.ErrorCodeEnum;
@@ -16,10 +22,9 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import service.DriverMsgService;
 import util.HttpUtil;
-
-import java.util.*;
 
 public class DriverMsgManageVerticle extends AbstractVerticle {
 
@@ -49,7 +54,8 @@ public class DriverMsgManageVerticle extends AbstractVerticle {
 	private void initWebServer() {
 		httpServer = vertx.createHttpServer();
 		router = Router.router(vertx);
-		router.route().handler(BodyHandler.create());
+		router.route().handler(CorsHandler.create("*"));
+		router.route().handler(BodyHandler.create());    
 		// 保存发送司机端消息
 		router.route("/mc-push/message/saveAndSendMsg2Driver.json").handler(this::saveAndSendMsg2Driver);
 		// 获取司机端消息记录
@@ -239,6 +245,15 @@ public class DriverMsgManageVerticle extends AbstractVerticle {
 			return;
 		}
 		Long id = Long.valueOf(msgId);
+		
+		DriverMsg msg=new DriverMsg();
+		msg.setTitle("好好学习");
+		msg.setContent("天天向上");
+		msg.setMsgType(1);
+		if(msg!=null){
+			HttpUtil.writeSuccessResponse2Client(response, msg);
+			return;
+		}
 
 		Future<DriverMsg> detailFuture = Future.future();
 		driverMsgService.getDriverMsgDetail(id, detailFuture.completer());

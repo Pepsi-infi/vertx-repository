@@ -18,13 +18,13 @@
       </el-col>
       <el-col :span="6">
       	<div class="block">
-      		<el-date-picker v-model="startTime" type="datetime" placeholder="开始时间" :picker-options="pickerOption">
+      		<el-date-picker v-model="startTime" format="yyyy-MM-dd" type="datetime" placeholder="开始时间" :picker-options="pickerOption">
       		</el-date-picker>
       	</div>
       </el-col>
       <el-col :span="6">
       	<div class="block">
-      		<el-date-picker v-model="endTime" type="datetime" placeholder="结束时间" :picker-options="pickerOption">
+      		<el-date-picker v-model="endTime" format="yyyy-MM-dd" type="datetime" placeholder="结束时间" :picker-options="pickerOption">
       		</el-date-picker>
       	</div>
       </el-col>
@@ -48,13 +48,13 @@
           label="id"
           width="200">
         </el-table-column>
-        <el-table-column
-          prop="title"
-          label="消息标题"
-          width="190">
+        <el-table-column prop="title"  label="消息标题" width="190">
+        	<template scope="scope">
+        		<el-button type="text">$scope.row.title</el-button>
+        	</template>
         </el-table-column>
         <el-table-column
-          prop=""
+          prop="msgType"
           label="消息类型"
           width="100">
         </el-table-column>
@@ -69,10 +69,17 @@
           width="100">
         </el-table-column>
         <el-table-column
-          prop=""
+          prop="createdTime"
           label="创建时间"
           width="100">
         </el-table-column>
+        <el-table-column prop="id" label="操作" width="100">
+        	<template scope="scope">
+        		 <el-button
+                          size="small"
+                          @click="editMsg(scope.$index, scope.row)" type="text" icon="edit">再次编辑</el-button>
+     		 </template>	
+        </el-table-column> 
       </el-table>
       <bottom-tool-bar>
         <div slot="page">
@@ -158,6 +165,17 @@
       on_refresh(){
         this.get_table_data(1)
       },
+      //新增消息
+      addDriverMsg :function(){
+      	this.$router.push('/driverMsg/add');
+      },
+      //再次编辑消息
+      editMsg :function(index,row){
+        this.$router.push({path: '/driverMsg/add', query: {id: row.id}});      
+      },
+      //查看消息详情
+     // getDriverMsgDetail :function()
+      
       //获取数据
       get_table_data(page = this.currentPage){
        	this.load_data = true;
@@ -170,18 +188,17 @@
        	  startTime: this.startTime,
        	  endTime: this.endTime
         })
-          .then(({data: {list, pageNumber, total}}) => {
-          	alert(data);
+          .then(({code, msg, data}) => {
             let tempList = [];
-            list.forEach((ele, index) => {
+            data.list.forEach((ele, index) => {
               if (ele !== null) {
                 tempList.push(ele);
               }
               ele.msgId = 'AD_PASSENGER_COUNT_'+ele.msgId;
             });
-            this.table_data = list
-            this.currentPage = page
-            this.total = total
+            this.table_data = data.list
+            this.currentPage = data.pageNumber
+            this.total = data.total
             this.load_data = false
 
           })
