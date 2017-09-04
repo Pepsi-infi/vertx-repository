@@ -88,6 +88,16 @@ public class MongoService {
     }));
   }
 
+  public void saveDataBatch(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.saveDataBatch(json, resultHandler);
+  }
+
+  public Single<JsonObject> rxSaveDataBatch(JsonObject json) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      saveDataBatch(json, fut);
+    }));
+  }
+
 
   public static  MongoService newInstance(persistence.MongoService arg) {
     return arg != null ? new MongoService(arg) : null;
