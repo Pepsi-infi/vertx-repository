@@ -14,7 +14,7 @@ import {httpPost} from 'common/fetch'
 //数据列表
 export function list(params) {
   return fetch({
-    url: '/mc-config/v1/commonLanguages.json',
+    url: '/mc-config/v1/sensitiveWords.json',
     method: 'get',
     params
   })
@@ -23,7 +23,7 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return fetch({
-    url: '/mc-config/v1/commonLanguages/get.json',
+    url: '/mc-config/v1/sensitiveWords/get.json',
     method: 'get',
     params
   })
@@ -32,7 +32,7 @@ export function get(params) {
 //根据id删除数据
 export function del(params) {
   return fetch({
-    url: '/mc-config/v1/commonLanguages/del.json',
+    url: '/mc-config/v1/sensitiveWords/del.json',
     method: 'get',
     params
   })
@@ -40,7 +40,7 @@ export function del(params) {
 //添加或修改数据
 export function save(data) {
   return httpPost({
-    url: '/mc-config/v1/commonLanguages.json',
+    url: '/mc-config/v1/sensitiveWords.json',
     method: 'post',
     data
   })

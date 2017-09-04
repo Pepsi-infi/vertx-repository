@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
 import service.impl.ImCommonLanguageServiceImpl;
+import service.impl.SensitiveWordServiceImpl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -29,6 +30,7 @@ public class ConfigTest {
             deploymentOptions.setConfig(config());
 
             vertx.deployVerticle(ImCommonLanguageServiceImpl.class.getName(), deploymentOptions);
+            vertx.deployVerticle(SensitiveWordServiceImpl.class.getName(), deploymentOptions);
 
         } catch (Exception e) {
             e.printStackTrace();

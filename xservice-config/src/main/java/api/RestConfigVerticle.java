@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
 import service.ImCommonLanguageService;
+import service.SensitiveWordService;
 import utils.IPUtil;
 import utils.JsonUtil;
 
@@ -32,6 +33,7 @@ public class RestConfigVerticle extends RestAPIVerticle {
 
     private ImCommonLanguageService imCommonLanguageService;
 
+    private SensitiveWordService sensitiveWordService;
 
     @Override
     public void start() throws Exception {
@@ -46,8 +48,13 @@ public class RestConfigVerticle extends RestAPIVerticle {
         router.get(RestConstants.Config.GET_IM_COMMON_LANGUAGE).handler(this::getImCommonLanguage);
         router.post(RestConstants.Config.QUERY_IM_COMMON_LANGUAGE).handler(this::saveImCommonLanguage);
         router.get(RestConstants.Config.DELETE_IM_COMMON_LANGUAGE).handler(this::deleteImCommonLanguage);
-        Future<Void> voidFuture = Future.future();
 
+        router.get(RestConstants.Config.QUERY_SENSITIVE_WORD).handler(this::querySensitiveWord);
+        router.get(RestConstants.Config.GET_SENSITIVE_WORD).handler(this::getSensitiveWord);
+        router.post(RestConstants.Config.QUERY_SENSITIVE_WORD).handler(this::saveSensitiveWord);
+        router.get(RestConstants.Config.DELETE_SENSITIVE_WORD).handler(this::deleteSensitiveWord);
+
+        Future<Void> voidFuture = Future.future();
         String serverHost = this.getServerHost();
         createHttpServer(router, serverHost, config().getInteger("service.port")).compose(
                 serverCreated -> publishHttpEndpoint(RestConstants.Config.SERVICE_NAME, serverHost,
@@ -59,6 +66,7 @@ public class RestConfigVerticle extends RestAPIVerticle {
 
     private void initMsgStatService() {
         imCommonLanguageService = ImCommonLanguageService.createProxy(vertx.getDelegate());
+        sensitiveWordService = SensitiveWordService.createProxy(vertx.getDelegate());
     }
 
     private String getServerHost() {
@@ -106,6 +114,43 @@ public class RestConfigVerticle extends RestAPIVerticle {
     private void deleteImCommonLanguage(RoutingContext context) {
         String id = context.request().params().get("id");
         imCommonLanguageService.deleteImCommonLanguage(NumberUtils.toInt(id), resultJsonHandler(context));
+    }
+
+
+    private void querySensitiveWord(RoutingContext context) {
+        String page = context.request().params().get("page");
+        String size = context.request().params().get("size");
+        String word = context.request().params().get("word");
+        JsonObject jsonObject = new JsonObject();
+        if (StringUtils.isNotBlank(word)) {
+            jsonObject.put("word", word);
+        }
+        sensitiveWordService.querySensitiveWord(jsonObject, NumberUtils.toInt(page), NumberUtils.toInt(size), resultStringHandler(context));
+    }
+
+    private void getSensitiveWord(RoutingContext context) {
+        String id = context.request().params().get("id");
+        sensitiveWordService.getSensitiveWord(NumberUtils.toInt(id), resultJsonHandler(context));
+    }
+
+    private void saveSensitiveWord(RoutingContext context) {
+        String id = context.request().formAttributes().get("id");
+        String word = context.request().formAttributes().get("word");
+        String status = context.request().formAttributes().get("status");
+        JsonObject jsonObject = new JsonObject().put("word", word);
+        if (NumberUtils.toInt(id) > 0) {
+            jsonObject.put("id", NumberUtils.toInt(id));
+            jsonObject.put("status", NumberUtils.toInt(status));
+            sensitiveWordService.updateSensitiveWord(jsonObject, resultJsonHandler(context));
+        } else {
+            sensitiveWordService.addSensitiveWord(jsonObject, resultJsonHandler(context));
+        }
+    }
+
+
+    private void deleteSensitiveWord(RoutingContext context) {
+        String id = context.request().params().get("id");
+        sensitiveWordService.deleteSensitiveWord(NumberUtils.toInt(id), resultJsonHandler(context));
     }
 
 

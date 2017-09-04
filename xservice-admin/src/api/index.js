@@ -12,13 +12,15 @@
 import * as api_file from './file'
 import * as api_msgStat from './msgStat'
 import * as api_imCommonLanguage from './imCommonLanguage'
+import * as api_sensitiveWord from './sensitiveWord'
 import * as api_user from './user'
 
 const apiObj = {
   api_file,
   api_msgStat,
   api_user,
-  api_imCommonLanguage
+  api_imCommonLanguage,
+  api_sensitiveWord
 }
 
 const install = function (Vue) {

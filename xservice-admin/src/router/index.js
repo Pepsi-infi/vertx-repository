@@ -32,6 +32,8 @@ import msgStatRouters from './msgStat';
 //imCommonLanguage
 import imCommonLanguageRouters from './imCommonLanguage';
 
+import sensitiveWordRouters from './sensitiveWord';
+
 Vue.use(VueRouter)
 
 //使用AMD方式加载
@@ -60,7 +62,8 @@ const routes = [{
       auth: true
     }
   }].concat(msgStatRouters,
-    imCommonLanguageRouters)
+    imCommonLanguageRouters,
+    sensitiveWordRouters)
 }]
 
 const router = new VueRouter({

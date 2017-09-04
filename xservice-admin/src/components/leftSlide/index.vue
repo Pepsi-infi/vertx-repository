@@ -64,7 +64,12 @@
           child: [{
             title: "IM常用语配置",
             path: "/imCommonLanguage/list"
-          }]
+          },
+            {
+              title: "敏感词管理",
+              path: "/sensitiveWord/list"
+            }
+          ]
         }]
       }
     }
