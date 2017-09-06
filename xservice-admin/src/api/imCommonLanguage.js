@@ -14,6 +14,7 @@ import {httpPost} from 'common/fetch'
 //数据列表
 export function list(params) {
   return fetch({
+    baseURL: process.env.mc_config_baseURL,
     url: '/mc-config/v1/commonLanguages.json',
     method: 'get',
     params
@@ -23,6 +24,7 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return fetch({
+    baseURL: process.env.mc_config_baseURL,
     url: '/mc-config/v1/commonLanguages/get.json',
     method: 'get',
     params
@@ -32,6 +34,7 @@ export function get(params) {
 //根据id删除数据
 export function del(params) {
   return fetch({
+    baseURL: process.env.mc_config_baseURL,
     url: '/mc-config/v1/commonLanguages/del.json',
     method: 'get',
     params
@@ -40,6 +43,7 @@ export function del(params) {
 //添加或修改数据
 export function save(data) {
   return httpPost({
+    baseURL: process.env.mc_config_baseURL,
     url: '/mc-config/v1/commonLanguages.json',
     method: 'post',
     data

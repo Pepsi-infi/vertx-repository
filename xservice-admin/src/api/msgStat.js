@@ -14,7 +14,8 @@ import {port_table} from 'common/port_uri'
 //数据列表
 export function list(params) {
   return fetch({
-    url: port_table.list,
+    baseURL: process.env.mc_statistic_baseURL,
+    url: '/mc-statistic/v1/msgStats.json?caller=1001',
     method: 'get',
     params
   })
