@@ -27,14 +27,28 @@ import io.vertx.core.json.JsonArray;
 public class MsgStatResultPageWrapperConverter {
 
   public static void fromJson(JsonObject json, MsgStatResultPageWrapper obj) {
+    if (json.getValue("code") instanceof Number) {
+      obj.setCode(((Number)json.getValue("code")).intValue());
+    }
     if (json.getValue("data") instanceof JsonObject) {
       obj.setData(new service.dto.MsgStatResultPage((JsonObject)json.getValue("data")));
+    }
+    if (json.getValue("msg") instanceof String) {
+      obj.setMsg((String)json.getValue("msg"));
+    }
+    if (json.getValue("time") instanceof Number) {
+      obj.setTime(((Number)json.getValue("time")).longValue());
     }
   }
 
   public static void toJson(MsgStatResultPageWrapper obj, JsonObject json) {
+    json.put("code", obj.getCode());
     if (obj.getData() != null) {
       json.put("data", obj.getData().toJson());
     }
+    if (obj.getMsg() != null) {
+      json.put("msg", obj.getMsg());
+    }
+    json.put("time", obj.getTime());
   }
 }

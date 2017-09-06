@@ -14,6 +14,7 @@
 		<module>xservice-im</module>
 		<module>xservice-access</module>
 		<module>xservice-file</module>
+		<module>xservice-config</module>
 	</modules>
 
 	<!-- 配置变量 -->
