@@ -67,11 +67,11 @@
           },
            {
              title: "乘客消息列表",
-             path: "/msgPassenger"
+             path: "/passengerMsg"
            },
            {
               title: "推送名单导入列表",
-              path: "/msgPassenger/importList"
+              path: "/passengerMsg/importList"
             }]
         }]
       }

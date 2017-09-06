@@ -79,7 +79,7 @@
       },
       //加载列表数据
       getData : function(){
-          this.$http.api_msgPassenger.importFilePage({
+          this.$http.api_passengerMsg.importFilePage({
                     page : this.currentPage,
                     pageSize : this.pageSize,
                     createTime : this.createTime

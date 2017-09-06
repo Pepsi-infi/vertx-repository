@@ -101,21 +101,21 @@
     methods:{
       //新增消息
       addMsg : function(){
-        this.$router.push('/msgPassenger/msgPassengerAdd')
+        this.$router.push('/passengerMsg/addPassengerMsg')
       },
       //编辑消息
       editMsg : function(index,row){
-        this.$router.push({path: '/msgPassenger/msgPassengerAdd', query: {id: row.realId, flag : 1}});
+        this.$router.push({path: '/passengerMsg/addPassengerMsg', query: {id: row.realId, flag : 1}});
       },
 
       //复制消息
       copyMsg : function(index,row){
-        this.$router.push({path: '/msgPassenger/msgPassengerAdd', query: {id: row.realId, flag : 2}});
+        this.$router.push({path: '/passengerMsg/addPassengerMsg', query: {id: row.realId, flag : 2}});
       },
       //删除消息
       delMsg : function(index,row){
         var param = { id : row.realId };
-        this.$http.api_msgPassenger.del(param).then(({data}) => {
+        this.$http.api_passengerMsg.del(param).then(({data}) => {
                 this.$message.success(data)
                 this.load_data = true
                 this.getData();
@@ -124,13 +124,13 @@
                 this.load_data = false
              })
       },
-      //删除消息
+      //停止推送
       stopPush : function(index,row){
         var param = {
           id : row.realId,
           status : 2
         };
-        this.$http.api_msgPassenger.addOrEdit(param).then(({data}) => {
+        this.$http.api_passengerMsg.addOrEdit(param).then(({data}) => {
               this.$message.success("消息已经设置为无效")
               this.load_data = true
               this.getData();
@@ -139,10 +139,10 @@
               this.load_data = false
            })
       },
-      //删除消息
+      //推送消息
       pushMsg : function(index,row){
         var param = { id : row.realId };
-        this.$http.api_msgPassenger.push(param).then(({data}) => {
+        this.$http.api_passengerMsg.push(param).then(({data}) => {
                 this.$message.success(data)
                 this.load_data = true
                 this.getData();
@@ -154,7 +154,7 @@
 
       //加载列表数据
       getData : function(){
-          this.$http.api_msgPassenger.list({
+          this.$http.api_passengerMsg.list({
                     page : this.currentPage,
                     pageSize : this.pageSize,
                     title : this.search_title,

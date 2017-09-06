@@ -11,7 +11,6 @@
     <div class="panel-body"
          v-loading="load_data"
          element-loading-text="拼命加载中">
-      <el-form :model="form" :rules="rules" ref="form" label-width="150px" class="demo-form-inline">
         <el-row>
             <el-col :span="10">
               <el-form-item label="标  题:" prop="title">
@@ -110,14 +109,15 @@
         <el-row >
               <el-col :span="20">
                  <el-form-item label="指定用户:" v-show="showImportFile">
-                     <el-select v-model="form.importFileId" placeholder="请选择">
+                     <!--<el-select v-model="form.importFileId" placeholder="请选择">
                        <el-option
                          v-for="item in importOptions"
                          :key="item.value"
                          :label="item.label"
                          :value="item.value">
                        </el-option>
-                     </el-select>
+                     </el-select>-->
+                     <el-input type="textarea" v-model="form.content" style="width: 650px;" placeholder="指定多手机号，以逗号隔开，如13111110001，13111110002"></el-input>
                  </el-form-item>
               </el-col>
         </el-row>
@@ -143,12 +143,10 @@
         <el-row  type="flex" justify="center">
             <el-col :span="12" >
               <el-form-item>
-                <el-button type="primary" @click="on_submit_form" :loading="on_submit_loading">保 存</el-button>
                 <el-button @click="$router.back()">返 回</el-button>
               </el-form-item>
             </el-col>
         </el-row>
-      </el-form>
     </div>
   </div>
 </template>

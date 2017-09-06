@@ -32,7 +32,7 @@ import msgStatRouters from './msgStat';
 //driverMsg
 import driverMsgRouters from './driverMsg';
 
-import msgPassengerRouters from './msgPassenger';
+import passengerMsgRouters from './passengerMsg';
 
 Vue.use(VueRouter)
 
@@ -64,7 +64,7 @@ const routes = [{
   }].concat(
     msgStatRouters,
     driverMsgRouters,
-    msgPassengerRouters)
+    passengerMsgRouters)
 }]
 
 const router = new VueRouter({

@@ -102,6 +102,7 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         param.put("sendTime", request.getParam("sendTime"));
         param.put("importFileId", request.getParam("importFileId"));
         param.put("cityIds", request.getParam("cityIds"));
+        param.put("inputPhones", request.getParam("inputPhones"));
         passengerService.addOrUpdate(param, resultHandler(context));
     }
 
