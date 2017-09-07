@@ -11,7 +11,6 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import rxjava.RestAPIVerticle;
 import service.MessagePushService;
@@ -19,7 +18,6 @@ import service.PassengerService;
 import util.HttpUtil;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -177,29 +175,45 @@ public class PassengerMsgVerticle extends RestAPIVerticle {
         message.put("customerId", 13666050);
     }
 
+//    2、按指定用户推送
+//    private void sendByOnlyUser(JsonObject message){
+//        String importFileId = message.getString("importFileId");
+//        Future<List<JsonObject>> future = Future.future();
+//        passengerService.getImportPhoneList(importFileId, future);
+//        future.setHandler(res -> {
+//            if (res.succeeded()) {
+//                List<JsonObject> phoneList = res.result();
+//                if (CollectionUtils.isNotEmpty(phoneList)) {
+//                    for (JsonObject phone : phoneList) {
+//                        message.put("phone", phone.getString("telephone"));
+//                        message.put("customerId", 13666050);
+//                        sendMessage(message);
+//                    }
+//                } else {
+//                    logger.info("查询指定手机号列表为空，importFileId：" + importFileId);
+//                }
+//            } else {
+//                logger.info("查询指定手机号列表为空失败，importFileId：" + importFileId);
+//            }
+//        });
+//    }
+
     //2、按指定用户推送
     private void sendByOnlyUser(JsonObject message){
-        String importFileId = message.getString("importFileId");
-        Future<List<JsonObject>> future = Future.future();
-        passengerService.getImportPhoneList(importFileId, future);
-        future.setHandler(res -> {
-            if (res.succeeded()) {
-                List<JsonObject> phoneList = res.result();
-                if (CollectionUtils.isNotEmpty(phoneList)) {
-                    for (JsonObject phone : phoneList) {
-                        message.put("phone", phone.getString("telephone"));
-                        message.put("customerId", 13666050);
-                        sendMessage(message);
-                    }
-                } else {
-                    logger.info("查询指定手机号列表为空，importFileId：" + importFileId);
+        try {
+            //新的指定用户，是把手机号以字符串的形式存到了数据库中
+            String inputPhones = message.getString("inputPhones");
+            String[] phones = inputPhones.split(",");
+            if (phones != null && phones.length > 0) {
+                for (String phone : phones) {
+                    message.put("phone", phone);
+                    sendMessage(message);
                 }
-            } else {
-                logger.info("查询指定手机号列表为空失败，importFileId：" + importFileId);
             }
-        });
+        }catch (Exception e){
+            logger.error("指定用户推送出错：" + e.getMessage());
+        }
     }
-
     //3、按城市推送
     private void sendForCityUser(JsonObject message){
         message.put("phone", "13621241006");

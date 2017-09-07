@@ -13,12 +13,12 @@ CREATE TABLE `msg_passenger_msg` (
   `expireTime` datetime DEFAULT NULL,
   `sendTime` datetime DEFAULT NULL,
   `importFileId` varchar(20) DEFAULT NULL,
+  `inputPhones` varchar(1200) DEFAULT NULL,
   `cityIds` varchar(1000) DEFAULT NULL,
   `createTime` datetime DEFAULT NULL,
   `updateTime` datetime DEFAULT NULL,
   `createUser` varchar(20) DEFAULT NULL,
   `updateUser` varchar(20) CHARACTER SET utf8 COLLATE utf8_icelandic_ci DEFAULT NULL,
   UNIQUE KEY `id_pk` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8;
-
+) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8;
 
