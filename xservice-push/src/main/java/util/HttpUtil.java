@@ -1,8 +1,6 @@
 package util;
 
-import java.util.Map;
-import java.util.Set;
-
+import api.RestPushVerticle;
 import enums.ErrorCodeEnum;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -10,13 +8,21 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
 import result.ResultData;
 
+import java.util.Map;
+import java.util.Set;
+
 public class HttpUtil extends AbstractVerticle{
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(RestPushVerticle.class);
+
 	private static WebClient webClient;
 	
 	@Override
@@ -34,7 +40,7 @@ public class HttpUtil extends AbstractVerticle{
 		}
 		
 		Set<String> keySet=params.keySet();
-		
+		logger.info("开始调用接口地址：" + url + ", 参数：" + Json.encode(params));
 		HttpRequest<Buffer> request= webClient.postAbs(url).putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 		
 		if(keySet!=null&&keySet.size()!=0){
@@ -47,8 +53,10 @@ public class HttpUtil extends AbstractVerticle{
 		
 		request.send(handler->{
 			if(handler.succeeded()){
+				logger.info("调用接口地址：" + url + ", 参数：" + Json.encode(params) + ", 返回结果：" + handler.result());
 				future.handle(Future.succeededFuture(handler.result().bodyAsJsonObject()));
 			}else{
+				logger.error("调用接口地址：" + url + ", 参数：" + Json.encode(params) + ", 调用失败：" + handler.cause());
 				future.handle(Future.failedFuture(handler.cause()));
 			}
 	    	 
@@ -65,7 +73,7 @@ public class HttpUtil extends AbstractVerticle{
 		}
 		
 		Set<String> keySet=params.keySet();
-		
+		logger.info("开始调用接口地址：" + url + ", 参数：" + Json.encode(params));
 		HttpRequest<Buffer> request= webClient.getAbs(url).putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 		
 		if(keySet!=null&&keySet.size()!=0){
@@ -78,8 +86,10 @@ public class HttpUtil extends AbstractVerticle{
 		
 		request.send(handler->{
 			if(handler.succeeded()){
+				logger.info("调用接口地址：" + url + ", 参数：" + Json.encode(params) + ", 返回结果：" + handler.result());
 				future.handle(Future.succeededFuture(handler.result().bodyAsJsonObject()));
 			}else{
+				logger.error("调用接口地址：" + url + ", 参数：" + Json.encode(params) + ", 调用失败：" + handler.cause());
 				future.handle(Future.failedFuture(handler.cause()));
 			}
 	    	 

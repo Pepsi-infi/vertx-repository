@@ -63,6 +63,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
     }
 
+    /**
+     * 新增或者更新乘客消息
+     * @param param
+     * @param resultHandler
+     */
     public void addOrUpdate(JsonObject param, Handler<AsyncResult<String>> resultHandler){
         JsonArray params = new JsonArray();
         String sql;
@@ -150,6 +155,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         }
     }
 
+    /**
+     * 查询一条乘客消息
+     * @param req
+     * @param resultHandler
+     */
     public void get(JsonObject req, Handler<AsyncResult<String>> resultHandler){
         String id = req.getString("id");
         JsonArray params = new JsonArray();
@@ -168,6 +178,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     *  查询该消息是否允许推送
+     * @param req
+     * @param resultHandler
+     */
     public void getPushMsg(JsonObject req, Handler<AsyncResult<String>> resultHandler){
         String id = req.getString("id");
         JsonArray params = new JsonArray();
@@ -186,6 +201,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     * 查询乘客消息列表，带分页参数
+     * @param req
+     * @param resultHandler
+     */
     public void list(JsonObject req, Handler<AsyncResult<String>> resultHandler){
         String title = req.getString("title");
         String createTime = req.getString("createTime");
@@ -198,7 +218,7 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         if(StringUtils.isNotBlank(title)){
             params.add(title);
             countParams.add(title);
-            sb.append(" and title = ? ");
+            sb.append(" and instr(title,?) > 0 ");
         }
         if(StringUtils.isNotBlank(createTime)){
             params.add(DateUtil.dateTimeGmt2Local(createTime));
@@ -245,7 +265,7 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
-    //查询列表
+    //组装分页数据
     private void makePageResponse(int page, int pageSize, Future<List<JsonObject>> queryFuture, Future countFuture,
                                   Handler<AsyncResult<String>> resultHandler){
         CompositeFuture compositeFuture = CompositeFuture.all(queryFuture, countFuture);
@@ -290,6 +310,12 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     *  查询一条结果
+     * @param params
+     * @param sql
+     * @return
+     */
     protected Future<Optional<JsonObject>> queryOne(JsonArray params, String sql) {
         return getConnection().compose(conn -> {
             Future<Optional<JsonObject>> future = Future.future();
@@ -310,6 +336,12 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     * 查询结果列表
+     * @param params
+     * @param sql
+     * @return
+     */
     protected Future<List<JsonObject>> queryForList(JsonArray params, String sql) {
         return getConnection().compose(conn -> {
             Future<List<JsonObject>> future = Future.future();
@@ -333,17 +365,30 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     * 获取数据库连接
+     * @return
+     */
     protected Future<SQLConnection> getConnection(){
         Future<SQLConnection> future = Future.future();
         sqlClient.getConnection(future.completer());
         return future;
     }
 
-
+    /**
+     * 导入文件
+     * @param param
+     * @param resultHandler
+     */
     public void addImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler){
 
     }
 
+    /**
+     * 查询导入文件（乘客手机号文件）列表
+     * @param param
+     * @param resultHandler
+     */
     public void getImportFileList(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler){
         Future<List<JsonObject>> future = queryImportFileList();
         future.setHandler(res ->{
@@ -358,6 +403,10 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     * 查询导入文件（乘客手机号文件）列表
+     * @return
+     */
     private Future<List<JsonObject>> queryImportFileList(){
         String sql = SQL_IMPORT_FILElIST;
         return getConnection().compose(conn -> {
@@ -471,6 +520,11 @@ public class PassengerServiceImpl extends BaseServiceVerticle implements Passeng
         });
     }
 
+    /**
+     * 删除导入文件
+     * @param param
+     * @param resultHandler
+     */
     public void delImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler){
 
     }

@@ -11,15 +11,16 @@
     <div class="panel-body"
          v-loading="load_data"
          element-loading-text="拼命加载中">
+      <el-form :model="form" :rules="rules" ref="form" label-width="150px" class="demo-form-inline">
         <el-row>
             <el-col :span="10">
               <el-form-item label="标  题:" prop="title">
-                <el-input v-model="form.title" placeholder="请输入标题" style="width: 250px;" ></el-input>
+                <el-input v-model="form.title" placeholder="请输入标题" style="width: 250px;" readonly></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="10">
               <el-form-item label="状  态:">
-                <el-radio-group v-model="form.status">
+                <el-radio-group v-model="form.status" disabled>
                   <el-radio :label="1">有效</el-radio>
                   <el-radio :label="0">无效</el-radio>
                 </el-radio-group>
@@ -29,14 +30,14 @@
         <el-row>
           <el-col :span="20">
               <el-form-item label="消息内容" prop="content">
-                 <el-input type="textarea" v-model="form.content" style="width: 650px;"></el-input>
+                 <el-input type="textarea" v-model="form.content" style="width: 650px;" readonly></el-input>
               </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="10">
              <el-form-item label="动  作:">
-               <el-radio-group v-model="form.openType" @change="openTypeChange">
+               <el-radio-group v-model="form.openType" @change="openTypeChange" disabled>
                  <el-radio :label="1">打开APP</el-radio>
                  <el-radio :label="2">打开网页</el-radio>
                </el-radio-group>
@@ -44,14 +45,14 @@
           </el-col>
           <el-col :span="10">
              <el-form-item label="网页地址:" >
-               <el-input v-model="form.openUrl" placeholder="" style="width: 250px;"></el-input>
+               <el-input v-model="form.openUrl" placeholder="" style="width: 250px;" readonly></el-input>
              </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="10">
              <el-form-item label="是否进入消息中心:">
-               <el-radio-group v-model="form.inMsgCenter" >
+               <el-radio-group v-model="form.inMsgCenter" disabled>
                  <el-radio :label="1">是</el-radio>
                  <el-radio :label="2">否</el-radio>
                </el-radio-group>
@@ -59,7 +60,7 @@
           </el-col>
           <el-col :span="10">
              <el-form-item label="消息中心图片URL:">
-               <el-input v-model="form.msgCenterImgUrl" placeholder="700*250(高*宽)，格式jpg或png" style="width: 250px;"></el-input>
+               <el-input v-model="form.msgCenterImgUrl" placeholder="700*250(高*宽)，格式jpg或png" style="width: 250px;" readonly></el-input>
              </el-form-item>
           </el-col>
         </el-row>
@@ -69,7 +70,7 @@
                 <el-date-picker
                    type="datetime"
                    v-model="form.sendTime"
-                   placeholder="发送时间">
+                   placeholder="发送时间" disabled>
                  </el-date-picker>
               </el-form-item>
             </el-col>
@@ -78,7 +79,7 @@
                 <el-date-picker
                    v-model="form.expireTime"
                    type="datetime"
-                   placeholder="过期时间">
+                   placeholder="过期时间" disabled>
                  </el-date-picker>
               </el-form-item>
             </el-col>
@@ -86,7 +87,7 @@
         <el-row>
           <el-col :span="10">
              <el-form-item label="发送对象:" prop="sendType">
-               <el-radio-group v-model="form.sendType" @change="sendTypeChange">
+               <el-radio-group v-model="form.sendType" @change="sendTypeChange" disabled>
                  <el-radio label="1" value="1">所有用户</el-radio>
                  <el-radio label="2" value="2">指定用户</el-radio>
                  <el-radio label="3" value="3">指定城市</el-radio>
@@ -95,7 +96,7 @@
           </el-col>
           <el-col :span="10">
              <el-form-item label="跳转类型:" prop="action" >
-                <el-select v-model="form.action" v-bind:disabled="showAction" placeholder="请选择" >
+                <el-select v-model="form.action" v-bind:disabled="showAction" placeholder="请选择" disabled>
                     <el-option label="我的行程页" value="3"></el-option>
                     <el-option label="充值页" value="4"></el-option>
                     <el-option label="优惠券页" value="5"></el-option>
@@ -117,14 +118,14 @@
                          :value="item.value">
                        </el-option>
                      </el-select>-->
-                     <el-input type="textarea" v-model="form.content" style="width: 650px;" placeholder="指定多手机号，以逗号隔开，如13111110001，13111110002"></el-input>
+                     <el-input type="textarea" v-model="form.inputPhones" style="width: 650px;" placeholder="指定多手机号，以逗号隔开，如13111110001，13111110002" disabled></el-input>
                  </el-form-item>
               </el-col>
         </el-row>
         <el-row >
               <el-col :span="20">
                  <el-form-item label="选择城市:" v-show="showCity">
-                     <el-select v-model="form.cityIds" multiple filterable placeholder="请选择">
+                     <el-select v-model="form.cityIds" multiple filterable placeholder="请选择" disabled>
                        <el-option-group
                          v-for="group in cityOptions"
                          :key="group.label"
@@ -147,6 +148,7 @@
               </el-form-item>
             </el-col>
         </el-row>
+      </el-form>
     </div>
   </div>
 </template>
@@ -169,6 +171,7 @@
           content : '',
           id : '',
           importFileId : '',
+          inputPhones : '',
           cityIds : []
         },
         rules: {
@@ -188,7 +191,7 @@
         importOptions : [],
         cityOptions : [],
         pageFlag : 0,
-        panelTitle : ''
+        panelTitle : '乘客端消息/查看消息'
       }
     },
     created(){
@@ -198,20 +201,12 @@
          this.pageFlag = this.$route.query.flag;
          this.get_form_data(this.$route.query.id);
        }
-
-       if(this.pageFlag == 1){
-         this.panelTitle = "乘客端消息/编辑消息";
-       }else if(this.pageFlag == 2){
-         this.panelTitle = "乘客端消息/复制消息";
-       }else{
-         this.panelTitle = "乘客端消息/新增消息";
-       }
     },
     methods: {
       //获取数据
       get_form_data(val){
         this.load_data = true
-        this.$http.api_msgPassenger.get({
+        this.$http.api_passengerMsg.get({
           id: val
         })
           .then(({data}) => {
@@ -256,7 +251,7 @@
           }
 
           this.on_submit_loading = true
-          this.$http.api_msgPassenger.addOrEdit(this.form)
+          this.$http.api_passengerMsg.addOrEdit(this.form)
             .then(({data}) => {
               var msg = "保存成功";
               this.$message.success(msg)
@@ -269,7 +264,7 @@
       },
       //查询指定人员的文件
       get_importFile(){
-        this.$http.api_msgPassenger.getImportFileList()
+        this.$http.api_passengerMsg.getImportFileList()
           .then(({data}) => {
             data.forEach((element, index) => {
                 if (element !== null) {
@@ -288,7 +283,7 @@
 
       //查询城市
       get_city(){
-        this.$http.api_msgPassenger.getCityList()
+        this.$http.api_passengerMsg.getCityList()
           .then(({data : {code,msg,time,data}}) => {
             for(var i in data){
                var gp = {};
@@ -349,5 +344,4 @@
           7 : '用户等级页',
           8 : '消息中心页'
   }
-
 </script>

@@ -27,21 +27,23 @@
                         style="width: 100%" >
                 <el-table-column prop="rowIndex" label="序号" ></el-table-column>
                 <el-table-column prop="id" label="消息id" width="100"> </el-table-column>
-                <el-table-column prop="title" label="标题" width="200"> </el-table-column>
+                <el-table-column label="标题" width="200" prop="title"></el-table-column>
                 <el-table-column prop="createTime" label="创建时间" width="170" :formatter="formatTime"> </el-table-column>
                 <el-table-column prop="updateTime" label="更新时间" width="170" :formatter="formatTime"> </el-table-column>
                 <el-table-column prop="openType" label="动作" width="200" :formatter="openType"> </el-table-column>
                 <el-table-column prop="inMsgCenter" label="是否进入个人中心消息" width="200" :formatter="inCenter"> </el-table-column>
                 <el-table-column prop="status" label="状态" width="80" :formatter="status"> </el-table-column>
-                <el-table-column label="操作" width="400">
+                <el-table-column label="操作" width="500">
                    <template scope="scope">
                        <el-button
                           size="small"
                           @click="pushMsg(scope.$index, scope.row)" type="success" >消息推送</el-button>
-
                        <el-button
                           size="small"
                           @click="stopPush(scope.$index, scope.row)" type="warning" v-show="showButton(scope.row)">停止推送</el-button>
+                        <el-button
+                          size="small"
+                          @click="showMsg(scope.$index, scope.row)" type="success" v-show="showButton(scope.row)">查 看</el-button>
                         <el-button
                           size="small"
                           @click="editMsg(scope.$index, scope.row)" type="success" v-show="showButton(scope.row)">编 辑</el-button>
@@ -99,6 +101,10 @@
       this.getData()
     },
     methods:{
+      //查看消息
+      showMsg : function(index,row){
+        this.$router.push({path: '/passengerMsg/getPassengerMsg', query: {id: row.realId}});
+      },
       //新增消息
       addMsg : function(){
         this.$router.push('/passengerMsg/addPassengerMsg')
@@ -224,7 +230,7 @@
       openType : function(row,column,val){
         let re = (val === 1) ? "打开APP":"打开网页";
         return re;
-      },
+      }
     }
   }
  Date.prototype.Format = function (fmt) {
