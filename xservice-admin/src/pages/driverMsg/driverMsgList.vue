@@ -18,7 +18,7 @@
       </el-col>
       <el-col :span="6">
       	<div class="block">
-      		<el-date-picker v-model="startTime" format="yyyy-MM-dd" type="datetime" placeholder="开始时间" :picker-options="pickerOption">
+      		<el-date-picker v-model="startTime" format="yyyy-MM-dd" type="date" placeholder="开始时间" :picker-options="pickerOption">
       		</el-date-picker>
       	</div>
       </el-col>
@@ -46,12 +46,9 @@
         <el-table-column
           prop="id"
           label="id"
-          width="200">
+          width="100">
         </el-table-column>
-        <el-table-column prop="title"  label="消息标题" width="190">
-        	<template scope="scope">
-        		<el-button type="text">$scope.row.title</el-button>
-        	</template>
+        <el-table-column prop="title"  label="消息标题" width="150">
         </el-table-column>
         <el-table-column
           prop="msgType"
@@ -68,10 +65,7 @@
           label="未读人数"
           width="100">
         </el-table-column>
-        <el-table-column
-          prop="createdTime"
-          label="创建时间"
-          width="100">
+        <el-table-column prop="createTime" label="创建时间" :formatter="formatTime" width="180">
         </el-table-column>
         <el-table-column prop="id" label="操作" width="100">
         	<template scope="scope">
@@ -83,13 +77,15 @@
       </el-table>
       <bottom-tool-bar>
         <div slot="page">
-          <el-pagination
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-size="15"
-            layout="total, prev, pager, next"
-            :total="total">
-          </el-pagination>
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[10, 20, 50, 100]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
         </div>
       </bottom-tool-bar>
     </div>
@@ -110,7 +106,7 @@
         //数据总条目
         total: 0,
         //每页显示多少条数据
-        length: 15,
+        length: 10,
         //请求时的loading效果
         load_data: true,
         //批量选择数组
@@ -158,12 +154,17 @@
       bottomToolBar
     },
     created(){
-      this.get_table_data(1)
+      this.get_table_data(1,10)
     },
     methods: {
+      //时间格式化
+      formatTime:function (row,column,val){
+        let time = new Date(val).Format("yyyy-MM-dd hh:mm:ss");
+        return time;
+      },    	
       //刷新
       on_refresh(){
-        this.get_table_data(1)
+        this.get_table_data(1,10)
       },
       //新增消息
       addDriverMsg :function(){
@@ -173,33 +174,34 @@
       editMsg :function(index,row){
         this.$router.push({path: '/driverMsg/add', query: {id: row.id}});      
       },
-      //查看消息详情
-     // getDriverMsgDetail :function()
       
       //获取数据
-      get_table_data(page = this.currentPage){
+      get_table_data(page,size){
        	this.load_data = true;
-       	          
-        this.$fetch.api_driverMsg.list({
+        this.$http.api_driverMsg.list({
           page: page,
-          size: this.length,
+          size: size,
           title: this.title,
           msgType: this.msgType,
-       	  startTime: this.startTime,
-       	  endTime: this.endTime
+       	  startTime: this.startTime==""?"":this.startTime.Format("yyyy-MM-dd hh:mm:ss"),
+       	  endTime: this.endTime==""?"":this.endTime.Format("yyyy-MM-dd hh:mm:ss")
         })
-          .then(({code, msg, data}) => {
+          .then(({data: {code, msg, data}}) => {
             let tempList = [];
             data.list.forEach((ele, index) => {
               if (ele !== null) {
+                if(ele.msgType==1){
+                 ele.msgType="系统消息";
+                }
+                ele.createTime=new Date(ele.createTime).Format("yyyy-MM-dd hh:mm:ss");
                 tempList.push(ele);
               }
-              ele.msgId = 'AD_PASSENGER_COUNT_'+ele.msgId;
             });
-            this.table_data = data.list
-            this.currentPage = data.pageNumber
-            this.total = data.total
-            this.load_data = false
+            this.table_data = tempList;
+            this.currentPage = data.pageNumber;
+            this.length=data.size;
+            this.total = data.total;
+            this.load_data = false;
 
           })
           .catch(() => {
@@ -207,7 +209,7 @@
           })
       },
       search() {
-        this.get_table_data(1);
+        this.get_table_data(1,this.length);
       },
       //单个删除
       delete_data(item){
@@ -218,9 +220,9 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_msgStat.del(item)
+            this.$http.api_msgStat.del(item)
               .then(({msg}) => {
-                this.get_table_data(1)
+                this.get_table_data(1,10)
                 this.$message.success(msg)
               })
               .catch(() => {
@@ -229,10 +231,18 @@
           .catch(() => {
           })
       },
+      //分页大小选择
+      handleSizeChange : function(pageSize){
+          this.pageSize = pageSize;
+          this.get_table_data(this.currentPage,this.pageSize);
+      },
       //页码选择
-      handleCurrentChange(val) {
-        this.currentPage = val
-        this.get_table_data(val)
+      handleCurrentChange : function(page){
+          this.currentPage = page;
+          if(isNaN(this.pageSize)){
+          	this.pageSize=10;
+          }
+          this.get_table_data(page,this.pageSize);
       },
       //批量选择
       on_batch_select(val){
@@ -247,7 +257,7 @@
         })
           .then(() => {
             this.load_data = true
-            this.$fetch.api_msgStat.batch_del(this.batch_select)
+            this.$http.api_msgStat.batch_del(this.batch_select)
               .then(({msg}) => {
                 this.get_table_data(1)
                 this.$message.success(msg)
@@ -260,5 +270,20 @@
       }
     }
   }
+  Date.prototype.Format = function (fmt) {
+     var o = {
+         "M+": this.getMonth() + 1, //月份
+         "d+": this.getDate(), //日
+         "h+": this.getHours(), //小时
+         "m+": this.getMinutes(), //分
+         "s+": this.getSeconds(), //秒
+         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+         "S": this.getMilliseconds() //毫秒
+     };
+     if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+     for (var k in o)
+     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+     return fmt;
+ }
 </script>
 
