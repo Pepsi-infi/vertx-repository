@@ -3,16 +3,12 @@
 
 
 const routers = [{
-	path: '/driverMsg/driverMsgList',
-	name: 'driverMsgList',
-	component(resolve) {
-		require(['../../pages/driverMsg/driverMsgList.vue'], resolve);
-	}
+		path: '/driverMsg/driverMsgList',
+		name: 'driverMsgList',
+		component(resolve) {
+			require(['../../pages/driverMsg/driverMsgList.vue'], resolve);
+		}
 	},
-//	path: '/driverMsg/driverMsgList',
-//	name: 'driverMsgList',
-//	component:driverMsgList
-//	},
 	{
 		path:'/driverMsg/add',
 		name:'driverMsgAdd',
@@ -23,6 +19,17 @@ const routers = [{
 	            title: "公司消息 / 新建消息",
 	            auth: true
 	     }
+	},
+	{
+		path:'/driverMsg/driverList',
+		name:'driverList',
+		component(resolve) {
+			require(['../../pages/driverMsg/driverList.vue'], resolve);
+		},
+		meta: {
+			title: "司机列表",
+			auth: true
+		}
 	}
 
 ];

@@ -1,5 +1,6 @@
 package service.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -9,7 +10,7 @@ import com.google.common.collect.Lists;
 
 import domain.DriverMsg;
 import domain.Page;
-import dto.DriverMsgDto;
+import enums.ErrorCodeEnum;
 import helper.XProxyHelper;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
@@ -23,6 +24,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
+import result.ResultData;
 import service.DriverMsgService;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -35,50 +37,67 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 	@Override
 	public void start() throws Exception {
 		super.start();
-		XProxyHelper.registerService(DriverMsgService.class, vertx, this, DriverMsgService.SERVICE_ADDRESS);
-		publishEventBusService(DriverMsgService.SERVICE_NAME, DriverMsgService.SERVICE_ADDRESS, DriverMsgService.class);
+		XProxyHelper.registerService(DriverMsgService.class, vertx, this, DriverMsgService.class.getName());
+//		publishEventBusService(DriverMsgService.SERVICE_NAME, DriverMsgService.SERVICE_ADDRESS, DriverMsgService.class);
 
-		String ip = IPUtil.getInnerIP();
-		XProxyHelper.registerService(DriverMsgService.class, vertx, this, DriverMsgService.getLocalAddress(ip));
-		publishEventBusService(DriverMsgService.LOCAL_SERVICE_NAME, DriverMsgService.getLocalAddress(ip),
-				DriverMsgService.class);
+//		String ip = IPUtil.getInnerIP();
+//		XProxyHelper.registerService(DriverMsgService.class, vertx, this, DriverMsgService.getLocalAddress(ip));
+//		publishEventBusService(DriverMsgService.LOCAL_SERVICE_NAME, DriverMsgService.getLocalAddress(ip),
+//				DriverMsgService.class);
 		JsonObject mysqlOptions = config().getJsonObject("mysql.config");
 		sqlClient = MySQLClient.createNonShared(vertx, mysqlOptions);
-		//MySQLClient.create
-
 	}
 
 	public interface Sql {
-		
+
 		String ADD = "insert into driver_msg "
-				+ "(title,synopsis,content,is_shells_screen,status,msg_type,jump_url,is_important,enabled,create_user,update_user,create_time,update_time) "
-				+ "values " + ("?,?,?,?,?,?,?,?,?,'admin','admin','now()','now()'");
-		
+				+ "(title,synopsis,content,is_shells_screen,msg_type,jump_url,is_important,create_user,update_user,create_time,update_time) "
+				+ "values " + "(?,?,?,?,?,?,?,'admin','admin',now(),now())";
+
 		String SELECT_PAGE = "select "
-				+ "(title,synopsis,content,is_shells_screen as isShellsScreen,status,msg_type as msgType,jump_url as jumpUrl,is_important as isImportant,enabled,create_user as createUser,update_user as updateUser,create_time as createTime,update_time as updateTime) "
-				+ "from driver_msg where 1=1 %s ";
-		
+				+ "id,title,synopsis,content,is_shells_screen as isShellsScreen,`status`,msg_type as msgType,jump_url as jumpUrl,is_important as isImportant,enabled,create_user as createUser,update_user as updateUser,create_time as createTime,update_time as updateTime "
+				+ "from driver_msg where 1=1 %s";
+
 		String SELECT_COUNT = "select count(1) from driver_msg where 1=1 %s";
-		
+
 		String SELECT_ONE = "select "
-				+ "(id,title,synopsis,content,is_shells_screen as isShellsScreen,status,msg_type as msgType,jump_url as jumpUrl,is_important as isImportant,enabled,create_user as createUser,update_user as updateUser,create_time as createTime,update_time as updateTime) "
+				+ "id,title,synopsis,content,is_shells_screen as isShellsScreen,`status`,msg_type as msgType,jump_url as jumpUrl,is_important as isImportant,enabled,create_user as createUser,update_user as updateUser,create_time as createTime,update_time as updateTime "
 				+ "from driver_msg where 1=1 and id=? ";
 
 	}
 
 	@Override
-	public void addDriverMsg(JsonObject dto, Handler<AsyncResult<Integer>> resultHandler) {
+	public void addDriverMsg(JsonObject dto,Handler<AsyncResult<Integer>> resultHandler) {
 
 		JsonArray params = new JsonArray();
-		params.add(dto.getString("title")).add(dto.getString("synopsis")).add(dto.getString("content"))
-				.add(dto.getInteger("isShellsScreen")).add(dto.getInstant("status")).add(dto.getInteger("msgType"))
-				.add(dto.getString("jumpUrl")).add(dto.getInteger("isImportant"));
+		params.add(dto.getString("title"))
+		      .add(dto.getString("synopsis"))
+		      .add(dto.getString("content"))
+			  .add(Integer.valueOf(dto.getString("isShellsScreen")))
+			  .add(Integer.valueOf(dto.getString("msgType")))
+			  .add(StringUtil.isNullOrEmpty(dto.getString("jumpUrl"))?"":dto.getString("jumpUrl"))
+			  .add(Integer.valueOf(dto.getString("isImportant")));
 
-		resultHandler = this.add(Sql.ADD, params);
+		Future<Integer> addFuture = this.add(Sql.ADD, params);
+//		if(addFuture.succeeded()){
+//			resultHandler.handle(Future.succeededFuture(addFuture.result()));
+//		}else{
+//			logger.error("数据新增/更新失败", addFuture.cause());
+//			resultHandler.handle(Future.failedFuture(addFuture.cause()));
+//		}
+		addFuture.setHandler(handler->{
+			if(handler.succeeded()){							
+				resultHandler.handle(Future.succeededFuture(handler.result()));
+			}else{
+				logger.error("数据新增/更新失败", handler.cause());
+				resultHandler.handle(Future.failedFuture(handler.cause()));
+
+			}
+		});
 
 	}
 
-	private Handler<AsyncResult<Integer>> add(String sql, JsonArray params) {
+	private Future<Integer> add(String sql, JsonArray params) {
 		return getConnection().compose(conn -> {
 			Future<Integer> future = Future.future();
 			conn.updateWithParams(sql, params, res -> {
@@ -98,27 +117,32 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		return null;
 	}
 
-	public void selectByPage(JsonObject dto, Handler<AsyncResult<Page>> resultHandler) {
+	public void selectByPage(JsonObject dto, Handler<AsyncResult<String>> resultHandler) {
 
 		JsonArray params = new JsonArray();
+		Integer pageNumber = (StringUtil.isNullOrEmpty(dto.getString("page")) || "0".equals(dto.getString("page"))) ? 1
+				: Integer.valueOf(dto.getString("page"));// 页码有问题默认传第一页
+		Integer pageSize = (StringUtil.isNullOrEmpty(dto.getString("size")) || "0".equals(dto.getString("size"))) ? 10
+				: Integer.valueOf(dto.getString("size"));// 页码有问题默认传第一页
 
-		String countSql = buildSql(Sql.SELECT_COUNT, dto);
-		String pageSql = buildPageSql(Sql.SELECT_PAGE, dto);
-		
+		String countSql = buildSql(Sql.SELECT_COUNT, dto, params);
 		Future<Long> countFuture = this.queryTotalCount(countSql, params);
+
+		String pageSql = buildPageSql(Sql.SELECT_PAGE, dto, params);
 		Future<List<JsonObject>> listFuture = this.queryList(pageSql, params);
 
-		this.buildPageResult(new DriverMsgDto(), countFuture, listFuture, resultHandler);
+		this.buildPageResult(pageNumber, pageSize, countFuture, listFuture, resultHandler);
 
 	}
 
-	private void buildPageResult(DriverMsgDto dto, Future<Long> countFuture, Future<List<JsonObject>> listFuture,
-			Handler<AsyncResult<Page>> resultHandler) {
+	private void buildPageResult(Integer pageNumber,Integer pageSize, Future<Long> countFuture, Future<List<JsonObject>> listFuture,
+			Handler<AsyncResult<String>> resultHandler) {
 		CompositeFuture comFuture = CompositeFuture.all(countFuture, listFuture);
 		comFuture.setHandler(handler -> {
 			if (handler.succeeded()) {
+				Long totalCount = handler.result().resultAt(0);
 
-				List<JsonObject> jsonList = handler.result().resultAt(0);
+				List<JsonObject> jsonList = handler.result().resultAt(1);
 				List<DriverMsg> dtoList = Lists.transform(jsonList, new Function<JsonObject, DriverMsg>() {
 					@Nullable
 					@Override
@@ -126,13 +150,12 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 						return jsonObject.mapTo(DriverMsg.class);
 					}
 				});
+				Page page = new Page(pageNumber, pageSize, dtoList, totalCount);
 
-				Long totalCount = handler.result().resultAt(1);
-				Page page = new Page(dto.getPageNumber(), dto.getPageSize(), dtoList, totalCount);
-
-				resultHandler.handle(Future.succeededFuture(page));
+				resultHandler.handle(Future.succeededFuture(new ResultData<>(ErrorCodeEnum.SUCCESS, page).toString()));
 
 			} else {
+				logger.error("司机消息分页失败", handler.cause());
 				resultHandler.handle(Future.failedFuture(handler.cause()));
 			}
 		});
@@ -148,8 +171,10 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 					List<JsonObject> list = res.result().getRows();
 					future.complete(list);
 				} else {
+					logger.error("queryList is error:", res.cause());
 					future.fail(res.cause());
 				}
+				conn.close();
 			});
 			return future;
 		});
@@ -173,7 +198,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		});
 	}
 
-	private String buildPageSql(String sql, JsonObject dto) {
+	private String buildPageSql(String sql, JsonObject dto, JsonArray params) {
 
 		if (dto == null) {
 			return String.format(sql, "");
@@ -181,39 +206,59 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 
 		StringBuffer sb = new StringBuffer();
 		String title = dto.getString("title");
-		Integer msgType = dto.getInteger("msgType");
+		Integer msgType = StringUtil.isNullOrEmpty(dto.getString("msgType")) ? null
+				: Integer.valueOf(dto.getString("msgType"));
+		String startTime = dto.getString("startTime");
+		String endTime = dto.getString("endTime");
 		if (!StringUtil.isNullOrEmpty(title)) {
-			sb.append("and title= ").append("'" + title + "' ");
+			sb.append("and title=? ");
 		}
 		if (null != msgType) {
-			sb.append("and msg_type= ").append("'" + title + "' ");
+			sb.append("and msg_type=? ");
 		}
-
-		Integer pageNumber = (dto.getInteger("pageNumber") == null || dto.getInteger("pageNumber") == 0) ? 1
-				: dto.getInteger("pageNumber");// 页码有问题默认传第一页
-		Integer pageSize = (dto.getInteger("pageSize") == null || dto.getInteger("pageSize") == 0) ? 10
-				: dto.getInteger("pageSize");// 默认用10条每页
-
+		if (!StringUtil.isNullOrEmpty(startTime)) {
+			sb.append("and create_time >=? ");
+		}
+		if (!StringUtil.isNullOrEmpty(endTime)) {
+			sb.append("and create_time <=? ");
+		}		
+		Integer pageNumber = (StringUtil.isNullOrEmpty(dto.getString("page")) || "0".equals(dto.getString("page"))) ? 1
+				: Integer.valueOf(dto.getString("page"));// 页码有问题默认传第一页
+		Integer pageSize = (StringUtil.isNullOrEmpty(dto.getString("size")) || "0".equals(dto.getString("size"))) ? 10
+				: Integer.valueOf(dto.getString("size"));// 页码有问题默认传第一页
 		int pageBegin = (pageNumber - 1) * pageSize;
 		int offset = pageSize;
-
-		sb.append("limit ").append("'" + pageBegin + ",' ").append("'").append(offset).append("'");
+		sb.append("order by update_time desc ")
+		  .append("limit ").append(pageBegin).append(",").append(offset);
 
 		return String.format(sql, sb.toString());
 	}
 
-	private String buildSql(String sql, JsonObject dto) {
+	private String buildSql(String sql, JsonObject dto, JsonArray params) {
 		if (dto == null) {
 			return String.format(sql, "");
 		}
 		StringBuffer sb = new StringBuffer();
 		String title = dto.getString("title");
-		Integer msgType = dto.getInteger("msgType");
+		Integer msgType = StringUtil.isNullOrEmpty(dto.getString("msgType")) ? null
+				: Integer.valueOf(dto.getString("msgType"));
+		String startTime = dto.getString("startTime");
+		String endTime = dto.getString("endTime");
 		if (!StringUtil.isNullOrEmpty(title)) {
-			sb.append("and title= ").append("'" + title + "' ");
+			sb.append("and title=? ");
+			params.add(title);
 		}
 		if (null != msgType) {
-			sb.append("and msg_type= ").append("'" + msgType + "' ");
+			sb.append("and msg_type=? ");
+			params.add(msgType);
+		}
+		if (!StringUtil.isNullOrEmpty(startTime)) {
+			sb.append("and create_time >=? ");
+			params.add(startTime);
+		}
+		if (!StringUtil.isNullOrEmpty(endTime)) {
+			sb.append("and create_time <=?");
+			params.add(endTime);
 		}
 		return String.format(sql, sb.toString());
 	}
@@ -225,37 +270,38 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 	}
 
 	@Override
-	public void getDriverMsgDetail(Long id, Handler<AsyncResult<DriverMsg>> resultHandler) {					
-		JsonArray params=new JsonArray();
+	public void getDriverMsgDetail(Long id, Handler<AsyncResult<JsonObject>> resultHandler) {
+		JsonArray params = new JsonArray();
 		params.add(id);
-		Future<DriverMsg> future=this.getOne(Sql.SELECT_ONE,params);
-		future.setHandler(handler->{
-			if(handler.succeeded()){
+		Future<JsonObject> future = this.getOne(Sql.SELECT_ONE, params);
+		future.setHandler(handler -> {
+			if (handler.succeeded()) {
 				resultHandler.handle(Future.succeededFuture(handler.result()));
-			}else{
+			} else {
 				resultHandler.handle(Future.failedFuture(handler.cause()));
 			}
 		});
 	}
 
-	private Future<DriverMsg> getOne(String sql, JsonArray params) {
-		return getConnection().compose(conn->{
-			Future<DriverMsg> future=Future.future();
-			conn.queryWithParams(sql, params, res->{
-				if(res.succeeded()){
-					List<JsonObject> list= res.result().getRows();
-					if(list!=null&&list.size()>0){
-						future.complete(new DriverMsg(list.get(0)));
-					}else{
+	private Future<JsonObject> getOne(String sql, JsonArray params) {
+		return getConnection().compose(conn -> {
+			Future<JsonObject> future = Future.future();
+			conn.queryWithParams(sql, params, res -> {
+				if (res.succeeded()) {
+					List<JsonObject> list = res.result().getRows();
+					if (list != null && list.size() > 0) {
+						future.complete(list.get(0));
+					} else {
 						future.complete(null);
 					}
-				}else{
+				} else {
 					future.fail(res.cause());
 				}
-				
+				conn.close();
 			});
 			return future;
 		});
 	}
+
 
 }

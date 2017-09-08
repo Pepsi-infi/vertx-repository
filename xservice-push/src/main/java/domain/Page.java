@@ -3,7 +3,6 @@ package domain;
 import java.io.Serializable;
 import java.util.List;
 
-import converter.PageConverter;
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 

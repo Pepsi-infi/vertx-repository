@@ -1,11 +1,17 @@
 package util;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import api.RestPushVerticle;
 import enums.ErrorCodeEnum;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
@@ -15,9 +21,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
 import result.ResultData;
-
-import java.util.Map;
-import java.util.Set;
 
 public class HttpUtil extends AbstractVerticle{
 
@@ -103,6 +106,24 @@ public class HttpUtil extends AbstractVerticle{
 	public static void writeSuccessResponse2Client(HttpServerResponse response,Object data){
 		response.putHeader("content-type", "text/plain;charset=UTF-8").end(new ResultData<>(ErrorCodeEnum.SUCCESS, data).toString());
 	}
+	
+	public static JsonObject converteParams2JsonObject(MultiMap params) {
+		if (params == null) {
+			return null;
+		}
+		List<Entry<String, String>> list = params.entries();
+
+		if (list == null || list.size() == 0) {
+			return null;
+		}
+
+		JsonObject dto = new JsonObject();
+		for (Entry<String, String> entry : list) {
+			dto.put(entry.getKey(), entry.getValue());
+		}
+		return dto;
+	}
+	
 	
 	
 }

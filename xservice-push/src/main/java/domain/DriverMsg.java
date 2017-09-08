@@ -1,27 +1,31 @@
 package domain;
 
-import converter.DriverMsgConverter;
+import java.util.Date;
+
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject(generateConverter = true)
-public class DriverMsg extends BaseModel {
+public class DriverMsg{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1938352322313410619L;
+	private long id;
 	private String title;// 标题
 	private String content;// 内容
 	private String synopsis;// 内容梗概
 	private int isShellsScreen;// 是否弹屏 0-不弹屏 1-弹屏
 	private int status;// 推送状态 0-未推送 1-已推送
 	private int msgType;// 消息类型 扩展用
-	private String createdUser;// 创建人
-	private String updatedUser;// 修改人
 	private String jumpUrl;// 跳转地址
 	private int isImportant;// 是否重要
 	private int enabled;// 是否可用 0-不可用 1-可用
+	private String createUser;// 创建人
+	private String updateUser;// 修改人
+	private String createTime;
+    private String updateTime;
 
 	public String getTitle() {
 		return title;
@@ -54,21 +58,21 @@ public class DriverMsg extends BaseModel {
 	public void setMsgType(int msgType) {
 		this.msgType = msgType;
 	}
-
-	public String getCreatedUser() {
-		return createdUser;
+	
+	public String getCreateUser() {
+		return createUser;
 	}
 
-	public void setCreatedUser(String createdUser) {
-		this.createdUser = createdUser;
+	public void setCreateUser(String createUser) {
+		this.createUser = createUser;
 	}
 
-	public String getUpdatedUser() {
-		return updatedUser;
+	public String getUpdateUser() {
+		return updateUser;
 	}
 
-	public void setUpdatedUser(String updatedUser) {
-		this.updatedUser = updatedUser;
+	public void setUpdateUser(String updateUser) {
+		this.updateUser = updateUser;
 	}
 
 	public String getJumpUrl() {
@@ -111,6 +115,32 @@ public class DriverMsg extends BaseModel {
 		this.isShellsScreen = isShellsScreen;
 	}
 	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	
+
+	public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(String updateTime) {
+		this.updateTime = updateTime;
+	}
+
 	public DriverMsg() {
 		super();
 	}

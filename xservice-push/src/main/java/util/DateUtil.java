@@ -87,16 +87,46 @@ public class DateUtil {
         return srcDate;
     }
 
-//    public static String _getLocalDate(String srcDate){
-//        ZonedDateTime zonedDateTime = ZonedDateTime.parse(srcDate, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
-//        ZonedDateTime localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC+08:00"));
-//        String localDateTime = zonedDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
-//        return localDateTime.toString();
-//    }
+    /**
+     * 字符串转日期
+     * 
+     * @param str
+     *            时间
+     * @param pattern
+     *            格式
+     * @return
+     */
+    public static Date strToDate(String str, String pattern) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        Date date = null;
+        try {
+            date = format.parse(str);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+    
+    /**
+     * 日期格式化
+     * 
+     * @param date
+     *            日期
+     * @param pattern
+     *            格式
+     * @return
+     */
+    public static String format(Date date, String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+
+        return sdf.format(date);
+    }
+
 
     public static void main(String[] args) {
 
         System.out.println(dateGmt2Local("2017-08-28T22:03:07.162Z"));
+        System.out.println(dateTimeGmt2Local("2017-08-28T22:03:07.162Z"));
         System.out.println(dateGmt2Local("2017-08-28 22:03:07"));
     }
 }

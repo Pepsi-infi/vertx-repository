@@ -8,6 +8,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -102,10 +103,16 @@ public class DriverServiceImpl extends BaseServiceVerticle implements DriverServ
 
 
     public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) {
-        mongoClient.findBatch(COLLECTION_DRIVER, query, res -> {
+    	List<JsonObject> driverList=new ArrayList<>();
+    	JsonObject jsonObject=new JsonObject();
+    	mongoClient.findBatch(COLLECTION_DRIVER, query, res -> {     	
             if (res.succeeded()) {
-                logger.info("resutl:" + res.result());
-                result.handle(Future.succeededFuture(res.result()));
+            	if(res.result()!=null){
+            		driverList.add(res.result());
+            	}else{
+            		result.handle(Future.succeededFuture(jsonObject.put("driverList", driverList)));
+            	}                             
+                logger.info("result size"+driverList.size());
             }
         });
 

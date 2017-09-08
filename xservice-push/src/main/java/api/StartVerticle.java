@@ -8,6 +8,8 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
+import service.impl.DriverMsgServiceImpl;
+import service.impl.DriverServiceImpl;
 import service.impl.MessagePushServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.PassengerServiceImpl;
@@ -30,15 +32,16 @@ public class StartVerticle extends AbstractVerticle{
 
 //        this.deployVerticle(MessagePushContainer.class.getName());
 //        this.deployVerticle(HttpClientVerticle.class.getName());
-//        this.deployVerticle(DriverMsgManageVerticle.class.getName());
+        this.deployVerticle(DriverMsgManageVerticle.class.getName());
         this.deployVerticle(HttpUtil.class.getName());
-//        this.deployVerticle(DriverMsgServiceImpl.class.getName());
+        this.deployVerticle(DriverMsgServiceImpl.class.getName());
 
         this.deployVerticle(MessagePushServiceImpl.class.getName());
 //        this.deployVerticle(MessagePushVerticle.class.getName());
 
         this.deployVerticle(PassengerServiceImpl.class.getName());
         this.deployVerticle(PassengerMsgVerticle.class.getName());
+        this.deployVerticle(DriverServiceImpl.class.getName());
         // 提供其他非EventBus服务
     }
 
