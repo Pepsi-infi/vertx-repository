@@ -78,7 +78,7 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 		// 获取司机列表
 		router.route(RestConstants.DRIVER_QUERY).handler(this::queryDriver);
 		// 监听8080端口
-		httpServer.requestHandler(router::accept).listen(8080);
+		httpServer.requestHandler(router::accept).listen(8989);
 	}
 
 	private void initService() {
