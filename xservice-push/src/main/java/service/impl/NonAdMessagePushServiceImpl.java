@@ -1,6 +1,7 @@
 package service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		try {
 			if (StringUtil.isNullOrEmpty(httpMsg)) {
 				logger.error("body is null");
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", null).toString()));
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP).toString()));
 			} else {
 				JsonObject receiveMsg = new JsonObject(httpMsg);
 				receiveMsg.put("senderId", senderId);
@@ -98,7 +99,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			}
 		} catch (Exception e) {
 			logger.error("消息推送异常", e);
-			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), e.getMessage(), null).toString()));
+			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), e.getMessage(), Collections.EMPTY_MAP).toString()));
 		}
 	}
 
@@ -106,7 +107,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
 		if (ResultData.FAIL == checkResult.getCode()) {
-			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), null).toString()));			
+			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP).toString()));			
 			return;
 		}
 
@@ -120,7 +121,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 				pushMsgToDownStream(receiveMsg, pushFuture.completer());
 			} else {
 				logger.error("发送方签名校验未通过" + res.cause());
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
 			}
 		});
 
@@ -132,16 +133,16 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
 			}
 		});
 
 		// 根据推送结果返回结果数据给http调用方
 		statFuture.setHandler(res -> {
 			if (res.succeeded()) {
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));			
 			} else {
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
 			}
 		});
 

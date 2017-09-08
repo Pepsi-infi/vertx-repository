@@ -1,6 +1,5 @@
 package service;
 
-import io.vertx.codegen.annotations.Nullable;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;

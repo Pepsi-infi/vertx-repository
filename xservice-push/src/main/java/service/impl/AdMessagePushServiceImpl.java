@@ -1,6 +1,7 @@
 package service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +88,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", null).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP).toString()));
 		} else {
 			JsonObject recieveMsg = null;
 			try {
@@ -95,7 +96,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} catch (Exception e) {
 				logger.error("大后台广告消息推送异常", e);
 				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "data format is error", null).toString()));
+						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "data format is error", Collections.EMPTY_MAP).toString()));
 			}
 			this.dealHttpMessage(recieveMsg, resultHandler);
 		}
@@ -104,9 +105,9 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private void dealHttpMessage(JsonObject receiveMsg, Handler<AsyncResult<String>> resultHandler) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
-		if (ResultData.FAIL == checkResult.getCode()) {
+		if (ResultData.FAIL == checkResult.getCode()) {			
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), null).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP).toString()));
 			return;
 		}
 
@@ -122,7 +123,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} else {
 				logger.error("验证重复推送：" + res.cause());
 				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null)
+						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
 								.toString()));
 			}
 		});
@@ -136,7 +137,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
 				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null)
+						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
 								.toString()));
 			}
 		});
@@ -145,10 +146,10 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		statFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				resultHandler
-						.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, null).toString()));
+						.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
 			} else {
 				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), null)
+						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
 								.toString()));
 			}
 		});
