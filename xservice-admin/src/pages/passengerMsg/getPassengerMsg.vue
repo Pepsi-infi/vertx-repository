@@ -154,7 +154,6 @@
 </template>
 <script type="text/javascript">
   import {panelTitle} from 'components'
-  import moment from 'moment'
 
   export default{
     data(){
@@ -305,11 +304,6 @@
             //this.load_data = false
           })
       },
-
-      getLocalDate : function(val){
-        return moment(val).format('YYYY-MM-DD HH:mm:ss');
-      },
-
       //打开类型为打开网页时，跳转类型不可选
       openTypeChange : function(val){
         if(val == 2){
