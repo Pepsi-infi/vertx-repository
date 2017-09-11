@@ -1,7 +1,14 @@
 package service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 import domain.Pager;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -18,11 +25,6 @@ import model.Result;
 import service.DriverService;
 import utils.JsonUtil;
 import xservice.BaseServiceVerticle;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei
@@ -103,16 +105,16 @@ public class DriverServiceImpl extends BaseServiceVerticle implements DriverServ
 
 
     public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) {
-    	List<JsonObject> driverList=new ArrayList<>();
+    	JsonArray driverArray=new JsonArray();
     	JsonObject jsonObject=new JsonObject();
     	mongoClient.findBatch(COLLECTION_DRIVER, query, res -> {     	
             if (res.succeeded()) {
             	if(res.result()!=null){
-            		driverList.add(res.result());
+            		driverArray.add(res.result());
             	}else{
-            		result.handle(Future.succeededFuture(jsonObject.put("driverList", driverList)));
+            		result.handle(Future.succeededFuture(jsonObject.put("driverList", driverArray)));
             	}                             
-                logger.info("result size"+driverList.size());
+                logger.info("result size"+driverArray.size());
             }
         });
 

@@ -2,6 +2,7 @@ package service.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -79,12 +80,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			  .add(Integer.valueOf(dto.getString("isImportant")));
 
 		Future<Integer> addFuture = this.add(Sql.ADD, params);
-//		if(addFuture.succeeded()){
-//			resultHandler.handle(Future.succeededFuture(addFuture.result()));
-//		}else{
-//			logger.error("数据新增/更新失败", addFuture.cause());
-//			resultHandler.handle(Future.failedFuture(addFuture.cause()));
-//		}
 		addFuture.setHandler(handler->{
 			if(handler.succeeded()){							
 				resultHandler.handle(Future.succeededFuture(handler.result()));
@@ -301,6 +296,14 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			});
 			return future;
 		});
+	}
+	
+	
+	@Override
+	public void sendDriverMsg(Map<String, String> driverMsg, Handler<AsyncResult<String>> resultHandler) {
+		
+		resultHandler.handle(Future.succeededFuture("成功"));
+		
 	}
 
 
