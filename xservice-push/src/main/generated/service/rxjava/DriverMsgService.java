@@ -19,12 +19,11 @@ package service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
+import java.util.Map;
 import io.vertx.rxjava.core.Vertx;
-import domain.DriverMsg;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import domain.Page;
 
 
 @io.vertx.lang.rxjava.RxGen(service.DriverMsgService.class)
@@ -50,43 +49,83 @@ public class DriverMsgService {
     return ret;
   }
 
-  public static DriverMsgService createLocalProxy(Vertx vertx) { 
-    DriverMsgService ret = DriverMsgService.newInstance(service.DriverMsgService.createLocalProxy(vertx.getDelegate()));
-    return ret;
-  }
-
-  public static String getLocalAddress(String ip) { 
-    String ret = service.DriverMsgService.getLocalAddress(ip);
-    return ret;
-  }
-
+  /**
+   * 新建司机端消息
+   * @param msg 
+   * @param resultHandler 
+   */
   public void addDriverMsg(JsonObject msg, Handler<AsyncResult<Integer>> resultHandler) { 
     delegate.addDriverMsg(msg, resultHandler);
   }
 
+  /**
+   * 新建司机端消息
+   * @param msg 
+   * @return 
+   */
   public Single<Integer> rxAddDriverMsg(JsonObject msg) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       addDriverMsg(msg, fut);
     }));
   }
 
-  public void selectByPage(JsonObject dto, Handler<AsyncResult<Page>> resultHandler) { 
+  /**
+   * 分页查询司机端消息
+   * @param dto 
+   * @param resultHandler 
+   */
+  public void selectByPage(JsonObject dto, Handler<AsyncResult<String>> resultHandler) { 
     delegate.selectByPage(dto, resultHandler);
   }
 
-  public Single<Page> rxSelectByPage(JsonObject dto) { 
+  /**
+   * 分页查询司机端消息
+   * @param dto 
+   * @return 
+   */
+  public Single<String> rxSelectByPage(JsonObject dto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       selectByPage(dto, fut);
     }));
   }
 
-  public void getDriverMsgDetail(Long id, Handler<AsyncResult<DriverMsg>> completer) { 
+  /**
+   * 司机端消息详情查询
+   * @param id 
+   * @param completer 
+   */
+  public void getDriverMsgDetail(Long id, Handler<AsyncResult<JsonObject>> completer) { 
     delegate.getDriverMsgDetail(id, completer);
   }
 
-  public Single<DriverMsg> rxGetDriverMsgDetail(Long id) { 
+  /**
+   * 司机端消息详情查询
+   * @param id 
+   * @return 
+   */
+  public Single<JsonObject> rxGetDriverMsgDetail(Long id) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       getDriverMsgDetail(id, fut);
+    }));
+  }
+
+  /**
+   * 司机端消息发送
+   * @param driverMsg 
+   * @param completer 
+   */
+  public void sendDriverMsg(Map<String,String> driverMsg, Handler<AsyncResult<String>> completer) { 
+    delegate.sendDriverMsg(driverMsg, completer);
+  }
+
+  /**
+   * 司机端消息发送
+   * @param driverMsg 
+   * @return 
+   */
+  public Single<String> rxSendDriverMsg(Map<String,String> driverMsg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      sendDriverMsg(driverMsg, fut);
     }));
   }
 
