@@ -221,7 +221,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		// 首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 		msgStatDto.setChannel(channel);
-		msgStatDto.setMsgId(receiveMsg.getString("senderId") + msgId);
+		msgStatDto.setMsgId(receiveMsg.getString("senderId") +"_"+ msgId);//msgId上报规则
 		// 1 安卓
 		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);

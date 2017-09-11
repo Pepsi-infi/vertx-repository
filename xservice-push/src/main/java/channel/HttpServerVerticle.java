@@ -55,12 +55,16 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	}
 
 	private void pushAdMsg(RoutingContext context) {
+		logger.info("###pushAdMsg method start###");
 		HttpServerRequest request = context.request();
 		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context, JsonUtil::encodePrettily));
+		logger.info("###pushAdMsg method end###");
 	}
 
 	private void pushNonAdMsg(RoutingContext context) {
+		logger.info("###pushNonAdMsg method start###");
 		HttpServerRequest request = context.request();
 		nonAdMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),request.getParam("body"), resultHandler(context, JsonUtil::encodePrettily));
+		logger.info("###pushNonAdMsg method end###");
 	}
 }
