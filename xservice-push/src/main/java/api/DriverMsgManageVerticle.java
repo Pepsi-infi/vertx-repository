@@ -78,7 +78,7 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 		// 获取司机列表
 		router.route(RestConstants.DRIVER_QUERY).handler(this::queryDriver);
 		// 监听8080端口
-		httpServer.requestHandler(router::accept).listen(8989);
+		httpServer.requestHandler(router::accept).listen(8080);
 	}
 
 	private void initService() {
@@ -155,13 +155,14 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 		
 		Future<JsonObject> driverFuture=Future.future();
 		driverService.queryBatchDriver(query, driverFuture.completer());
-		
+			
 		driverFuture.setHandler(res->{
 			if(res.succeeded()){
 				JsonObject result=res.result();
 				List<JsonObject> driverList=(List<JsonObject>) result.getValue("driverList");
 				for(JsonObject driver:driverList){
 					JsonObject news=buildAnAdverNew(driver,dto);
+					
 				}
 			}else{
 				
