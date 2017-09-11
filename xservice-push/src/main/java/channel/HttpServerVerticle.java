@@ -1,5 +1,10 @@
 package channel;
 
+
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
+
+import enums.ErrorCodeEnum;
+import io.vertx.core.Future;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
@@ -9,6 +14,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import result.ResultData;
 import service.AdMessagePushService;
 import service.NonAdMessagePushService;
 import utils.JsonUtil;
@@ -55,12 +61,16 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	}
 
 	private void pushAdMsg(RoutingContext context) {
+		logger.info("###pushAdMsg method start###");
 		HttpServerRequest request = context.request();
-		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context, JsonUtil::encodePrettily));
+		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
+		logger.info("###pushAdMsg method end###");
 	}
 
 	private void pushNonAdMsg(RoutingContext context) {
+		logger.info("###pushNonAdMsg method start###");
 		HttpServerRequest request = context.request();
-		nonAdMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),request.getParam("body"), resultHandler(context, JsonUtil::encodePrettily));
+		nonAdMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),request.getParam("body"), resultHandler(context));
+		logger.info("###pushNonAdMsg method end###");
 	}
 }
