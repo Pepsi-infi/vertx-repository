@@ -30,8 +30,11 @@ public class DriverMsgConverter {
     if (json.getValue("content") instanceof String) {
       obj.setContent((String)json.getValue("content"));
     }
-    if (json.getValue("createdUser") instanceof String) {
-      obj.setCreatedUser((String)json.getValue("createdUser"));
+    if (json.getValue("createTime") instanceof String) {
+      obj.setCreateTime((String)json.getValue("createTime"));
+    }
+    if (json.getValue("createUser") instanceof String) {
+      obj.setCreateUser((String)json.getValue("createUser"));
     }
     if (json.getValue("enabled") instanceof Number) {
       obj.setEnabled(((Number)json.getValue("enabled")).intValue());
@@ -60,8 +63,11 @@ public class DriverMsgConverter {
     if (json.getValue("title") instanceof String) {
       obj.setTitle((String)json.getValue("title"));
     }
-    if (json.getValue("updatedUser") instanceof String) {
-      obj.setUpdatedUser((String)json.getValue("updatedUser"));
+    if (json.getValue("updateTime") instanceof String) {
+      obj.setUpdateTime((String)json.getValue("updateTime"));
+    }
+    if (json.getValue("updateUser") instanceof String) {
+      obj.setUpdateUser((String)json.getValue("updateUser"));
     }
   }
 
@@ -69,8 +75,11 @@ public class DriverMsgConverter {
     if (obj.getContent() != null) {
       json.put("content", obj.getContent());
     }
-    if (obj.getCreatedUser() != null) {
-      json.put("createdUser", obj.getCreatedUser());
+    if (obj.getCreateTime() != null) {
+      json.put("createTime", obj.getCreateTime());
+    }
+    if (obj.getCreateUser() != null) {
+      json.put("createUser", obj.getCreateUser());
     }
     json.put("enabled", obj.getEnabled());
     json.put("id", obj.getId());
@@ -87,8 +96,11 @@ public class DriverMsgConverter {
     if (obj.getTitle() != null) {
       json.put("title", obj.getTitle());
     }
-    if (obj.getUpdatedUser() != null) {
-      json.put("updatedUser", obj.getUpdatedUser());
+    if (obj.getUpdateTime() != null) {
+      json.put("updateTime", obj.getUpdateTime());
+    }
+    if (obj.getUpdateUser() != null) {
+      json.put("updateUser", obj.getUpdateUser());
     }
   }
 }

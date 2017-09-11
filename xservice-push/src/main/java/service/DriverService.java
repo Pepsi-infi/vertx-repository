@@ -1,5 +1,7 @@
 package service;
 
+import java.util.Map;
+
 import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
@@ -30,4 +32,5 @@ public interface DriverService {
     void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<String>> result);
 
     void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result);
+
 }

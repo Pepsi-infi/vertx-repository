@@ -3,6 +3,7 @@ package api;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -89,36 +90,87 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 
 	private void saveAndSendMsg2Driver(RoutingContext context) {
 		HttpServerRequest request = context.request();
+		// 1.请求参数json处理
 		JsonObject dto = HttpUtil.converteParams2JsonObject(request.params());
+
+		// 2.新增消息入库
 		Future<Integer> addFuture = Future.future();
 		driverMsgService.addDriverMsg(dto, addFuture.completer());
-		addFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				Integer updateNum = res.result();
 
-				if (updateNum != 1) {
-					HttpUtil.writeFailResponse2Client(context.response(), res.cause().getMessage());
+		// 3.查询司机列表
+		Future<JsonObject> driversFuture = this.queryDriverList(context, dto, addFuture);
+
+		// 4.发送消息
+		this.sendMsg(dto, driversFuture);
+	}
+
+	private void sendMsg(JsonObject dto, Future<JsonObject> driversFuture) {
+		driversFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject result = res.result();
+
+				if (result == null) {
+					logger.error("司机列表数据为空,司机消息推送不执行");
 					return;
 				}
-				//返回成功到前端页面
-				HttpUtil.writeSuccessResponse2Client(context.response(), updateNum);
-				//发送push
-				this.sendDriverMsg(dto);
+
+				JsonArray drivers = result.getJsonArray("driverList");
+
+				if (drivers == null || drivers.size() == 0) {
+					logger.error("司机列表数据为空,司机消息推送不执行");
+					return;
+				}
+
+				Iterator<Object> iter = drivers.iterator();
+
+				while (iter.hasNext()) {
+					// 逐条发送
+					Map<String, String> driverMsg = composeMsg((JsonObject) iter.next(), dto);
+					Future<String> sendFuture = Future.future();
+					driverMsgService.sendDriverMsg(driverMsg, sendFuture.completer());
+				}
 
 			} else {
-				HttpUtil.writeFailResponse2Client(context.response(), res.cause().getMessage());
+				logger.error("司机列表获取失败", res.cause());
 			}
 		});
 
 	}
 
-	/**
-	 * 发送消息
-	 * 
-	 * @param dto
-	 */
-	private void sendDriverMsg(JsonObject dto) {
+	private Map<String, String> composeMsg(JsonObject driver, JsonObject dto) {
+		Map<String, String> news = new HashMap<>();
+		news.put("newId", dto.getString("id"));
+		news.put("isScreen", dto.getString("isShellsScreen"));
+		news.put("title", dto.getString("title"));
+		news.put("detil", dto.getString("content"));
+		news.put("linkAdd", dto.getString("jumpUrl"));
+		news.put("msgTime", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+		news.put("ifImport", dto.getString("isImportant"));
+		news.put("userId", driver.getInteger("driverId") + "");
+		news.put("userType", "1");// 0：乘客 1：司机
+		return news;
+	}
 
+	private Future<JsonObject> queryDriverList(RoutingContext context, JsonObject dto, Future<Integer> addFuture) {
+
+		return addFuture.compose(addMapper -> {
+			Future<JsonObject> queryFuture = Future.future();
+			int updateNum = addMapper.intValue();
+			if (updateNum == 1) {
+				// 消息新增成功, 1-返回成功到前端页面; 2-查询司机列表信息
+				HttpUtil.writeSuccessResponse2Client(context.response(), updateNum);
+				queryFuture = this.drvierList(dto);
+
+			} else {
+				HttpUtil.writeFailResponse2Client(context.response(), "server is error");
+				queryFuture.fail("add message fail");
+			}
+			return queryFuture;
+		});
+
+	}
+
+	private Future<JsonObject> drvierList(JsonObject dto) {
 		String sendAll = dto.getString("sendAll");
 		String driverIds = dto.getString("driverIds");
 		// supplierId=0 查询全部供应商
@@ -129,60 +181,30 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 		if ("1".equals(sendAll) || "2".equals(sendAll) || "4".equals(sendAll)) {
 			JsonObject driversJson = new JsonObject();
 			driversJson.put("driverIds", driverIds);
-			//this.sendDriverMsgByQueryDriverList(driversJson);
-			return;
+			// this.sendDriverMsgByQueryDriverList(driversJson);
+			// return;
+			return null;
 		}
 
 		if ("3".equals(sendAll) && !StringUtil.isNullOrEmpty(driverIds) && driverIds.length() > 0) {
-			this.sendDriverMsgByQueryDriverList(driverIds,dto);
+			return this.queryDriverListByDriverIds(driverIds, dto);
 		}
 
-		Future<JsonObject> driverListFuture = Future.future();
-
-		// driverService.queryBatchDriver(dto, driverListFuture.completer());
-		// driverListFuture.setHandler(handler)
-
-	}
-
-	private void sendDriverMsgByQueryDriverList(String driverIdsStr, JsonObject dto) {
-		JsonObject query = new JsonObject();
-		JsonArray jsonArray=new JsonArray();
-		String[] driverIds=driverIdsStr.split("\\,");
-		for(String driverId:driverIds){
-			jsonArray.add(Integer.valueOf(driverId));
-		}	
-		query.put("driverId", new JsonObject().put("$in", jsonArray));
-		
-		Future<JsonObject> driverFuture=Future.future();
-		driverService.queryBatchDriver(query, driverFuture.completer());
-			
-		driverFuture.setHandler(res->{
-			if(res.succeeded()){
-				JsonObject result=res.result();
-				List<JsonObject> driverList=(List<JsonObject>) result.getValue("driverList");
-				for(JsonObject driver:driverList){
-					JsonObject news=buildAnAdverNew(driver,dto);
-					
-				}
-			}else{
-				
-			}
-		});
-		
-	}
-
-	private JsonObject buildAnAdverNew(JsonObject driver, JsonObject dto) {
-		JsonObject news=new JsonObject();
-		news.put("newId", dto.getString("id"));
-		news.put("isScreen", dto.getString("isShellsScreen"));
-		news.put("title", dto.getString("title"));
-		news.put("detil", dto.getString("content"));
-		news.put("linkAdd", dto.getString("jumpUrl"));
-		news.put("msgTime", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
-		news.put("ifImport", dto.getString("isImportant"));
-		news.put("userId", driver.getString("driverId"));
-		news.put("userType", "1");//0：乘客  1：司机
 		return null;
+	}
+
+	private Future<JsonObject> queryDriverListByDriverIds(String driverIdsStr, JsonObject dto) {
+		JsonObject query = new JsonObject();
+		JsonArray jsonArray = new JsonArray();
+		String[] driverIds = driverIdsStr.split("\\,");
+		for (String driverId : driverIds) {
+			jsonArray.add(Integer.valueOf(driverId));
+		}
+		query.put("driverId", new JsonObject().put("$in", jsonArray));
+
+		Future<JsonObject> driverFuture = Future.future();
+		driverService.queryBatchDriver(query, driverFuture.completer());
+		return driverFuture;
 	}
 
 	private void getDriverMsgList(RoutingContext context) {
@@ -199,17 +221,17 @@ public class DriverMsgManageVerticle extends RestAPIVerticle {
 		Future<JsonObject> resultFuture = Future.future();
 		Map<String, String> params = new HashMap<>();
 
-//		if (1 == 1) {
-//			List<Map<String, Object>> list = new ArrayList<>();
-//			for (int i = 0; i < 5; i++) {
-//				Map<String, Object> map = new HashMap<>();
-//				map.put("providerId", i + 1);
-//				map.put("providerName", "provider" + (i + 1));
-//				list.add(map);
-//			}
-//			HttpUtil.writeSuccessResponse2Client(response, list);
-//			return;
-//		}
+		// if (1 == 1) {
+		// List<Map<String, Object>> list = new ArrayList<>();
+		// for (int i = 0; i < 5; i++) {
+		// Map<String, Object> map = new HashMap<>();
+		// map.put("providerId", i + 1);
+		// map.put("providerName", "provider" + (i + 1));
+		// list.add(map);
+		// }
+		// HttpUtil.writeSuccessResponse2Client(response, list);
+		// return;
+		// }
 
 		HttpUtil.doGet(params, config.getString("provider.url"), resultFuture.completer());
 

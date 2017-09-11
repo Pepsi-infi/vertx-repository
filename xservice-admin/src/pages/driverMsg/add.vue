@@ -65,7 +65,7 @@
   	</el-checkbox-group>
   	</el-row>
   </el-form-item>
-  <el-form-item label="已选择推送司机" v-show="showDriver">
+  <el-form-item label="已选择推送司机" v-show="showDriver" prop="valDriverNames">
   	<el-button type="text" @click="dialogTableVisible = true">[选择]
 	</el-button>
   	<el-button type="text" @click="clearDrivers">[清空]</el-button>
@@ -168,13 +168,15 @@
           cooperationTypeArr:['5','6','7'],
           cityIds:[],
           driverIds:[],
-          driverNames:[]       
+          driverNames:[],
+          valDriverNames:[]     
         },
         rules: {
           title: [{required: true, message: '标题不能为空', trigger: 'blur'}],
           content: [{required: true, message: '消息内容不能为空', trigger: 'blur'}],
           synopsis: [{required: true, message: '内容梗概不能为空', trigger: 'blur'}],
-          msgType: [{required: true, message: '请选择消息类型', trigger: 'change'}]
+          msgType: [{required: true, message: '请选择消息类型', trigger: 'change'}],
+          valDriverNames:[]
         },
         providerOptions:[],
         cities:[],
@@ -217,7 +219,22 @@
       //创建消息
       onSubmit(formName) {
       	this.$refs[formName].validate((valid) => {
-        	if(!valid){ return false }
+      		 	
+        	
+        	
+        	if(this.form.sendAll==3&&this.form.driverIds==""){
+        		this.rules.valDriverNames=[{required: true, message: '请选择司机', trigger: 'change'}];
+        		this.form.valDriverNames=this.form.driverIds;
+        		if(!valid){ 
+        	    	alert(123);
+        			return false 
+        		}
+        	}
+        	
+        	if(!valid){ 
+        		return false 
+        	}
+        	         	
         	var citys = this.form.cityIds;
           	var cityIdsStr = '';
           	if(citys){

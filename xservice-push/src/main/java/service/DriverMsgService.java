@@ -1,5 +1,7 @@
 package service;
 
+import java.util.Map;
+
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -37,4 +39,12 @@ public interface DriverMsgService {
 	 * @param completer
 	 */
 	void getDriverMsgDetail(Long id, Handler<AsyncResult<JsonObject>> completer);
+	
+	/**
+	 * 司机端消息发送
+	 * @param driverMsg
+	 * @param completer
+	 */
+	void sendDriverMsg(Map<String, String> driverMsg, Handler<AsyncResult<String>> completer);
+	
 }

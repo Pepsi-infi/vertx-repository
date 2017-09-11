@@ -38,8 +38,8 @@ public class PageConverter {
       });
       obj.setList(list);
     }
-    if (json.getValue("page") instanceof Number) {
-      obj.setPage(((Number)json.getValue("page")).intValue());
+    if (json.getValue("pageNumber") instanceof Number) {
+      obj.setPageNumber(((Number)json.getValue("pageNumber")).intValue());
     }
     if (json.getValue("pageSize") instanceof Number) {
       obj.setPageSize(((Number)json.getValue("pageSize")).intValue());
@@ -56,7 +56,7 @@ public class PageConverter {
       obj.getList().forEach(item -> array.add(item.toJson()));
       json.put("list", array);
     }
-    json.put("page", obj.getPage());
+    json.put("pageNumber", obj.getPageNumber());
     json.put("pageSize", obj.getPageSize());
     if (obj.getTotal() != null) {
       json.put("total", obj.getTotal());

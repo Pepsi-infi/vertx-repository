@@ -42,8 +42,8 @@ public class PassengerMsgDtoConverter {
     if (json.getValue("id") instanceof Number) {
       obj.setId(((Number)json.getValue("id")).intValue());
     }
-    if (json.getValue("importFile") instanceof String) {
-      obj.setImportFile((String)json.getValue("importFile"));
+    if (json.getValue("importFileId") instanceof String) {
+      obj.setImportFileId((String)json.getValue("importFileId"));
     }
     if (json.getValue("inMsgCenter") instanceof Number) {
       obj.setInMsgCenter(((Number)json.getValue("inMsgCenter")).intValue());
@@ -87,8 +87,8 @@ public class PassengerMsgDtoConverter {
     if (obj.getId() != null) {
       json.put("id", obj.getId());
     }
-    if (obj.getImportFile() != null) {
-      json.put("importFile", obj.getImportFile());
+    if (obj.getImportFileId() != null) {
+      json.put("importFileId", obj.getImportFileId());
     }
     if (obj.getInMsgCenter() != null) {
       json.put("inMsgCenter", obj.getInMsgCenter());
