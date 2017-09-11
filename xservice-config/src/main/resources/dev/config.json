@@ -6,7 +6,7 @@
       "maxPoolSize": 100,
       "username": "sqyc_message",
       "password": "sqyc_message@01zhuanche.com",
-      "database": "mc-admin",
+      "database": "mc_admin",
       "charset": "UTF-8",
       "queryTimeout": 3000
     }
