@@ -2,8 +2,6 @@ package api;
 
 import channel.ApplePushVerticle;
 import channel.HttpServerVerticle;
-import channel.MessagePushContainer;
-import channel.MessagePushNonAdver;
 import channel.MiPushVerticle;
 import channel.SocketVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -11,7 +9,6 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
-import service.AdMessagePushService;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
