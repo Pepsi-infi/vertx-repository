@@ -1,16 +1,14 @@
 package test;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import server.TCPServerVerticle;
-import util.ByteUtil;
+import server.SocketServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(TCPServerVerticle.class.getName());
+		vertx.deployVerticle(SocketServerVerticle.class.getName());
 		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
 		// vertx.deployVerticle(HttpServerVerticle.class.getName());
 
@@ -20,13 +18,13 @@ public class Tester {
 		// vertx.deployVerticle(SessionVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(config()));
 
-//		LoginMsgData t = new LoginMsgData();
-//		System.out.println(Json.encodePrettily(t));
+		// LoginMsgData t = new LoginMsgData();
+		// System.out.println(Json.encodePrettily(t));
 
-//		byte[] s = ByteUtil.unsignedShortToByte2(44);
-//		for (byte b : s) {
-//			System.out.print(b);
-//		}
+		// byte[] s = ByteUtil.unsignedShortToByte2(44);
+		// for (byte b : s) {
+		// System.out.print(b);
+		// }
 	}
 
 	private static JsonObject config() {

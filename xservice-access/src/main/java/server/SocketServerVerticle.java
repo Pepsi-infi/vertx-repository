@@ -3,27 +3,22 @@ package server;
 import org.apache.commons.lang.StringUtils;
 
 import cluster.ConsistentHashingService;
-import constants.IMCmdConstants;
 import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.impl.MessageImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
 import logic.SessionService;
 import logic.impl.C2CVerticle;
 import protocol.MessageBuilder;
-import util.ByteUtil;
 
 public class SocketServerVerticle extends AbstractVerticle {
 
@@ -32,116 +27,39 @@ public class SocketServerVerticle extends AbstractVerticle {
 	private C2CService c2cService;
 	private EventBus eb;
 	private ConsistentHashingService consistentHashingService;
+	private RecordParser parser;
+	private int header = -1;
 
 	@Override
 	public void start() throws Exception {
-		logger.info("start ... ");
-		eb = vertx.eventBus();
-
-		c2cService = C2CService.createProxy(vertx);
-		consistentHashingService = ConsistentHashingService.createProxy(vertx);
-
-		NetServerOptions options = new NetServerOptions().setPort(8888);
-		// options.setSsl(true).setPemKeyCertOptions(
-		// new
-		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
+		NetServerOptions options = new NetServerOptions().setPort(4321);
 		NetServer server = vertx.createNetServer(options);
 
-		server.connectHandler(new Handler<NetSocket>() {
-			@Override
-			public void handle(NetSocket socket) {
-				final RecordParser parser = RecordParser.newFixed(4, null);
-				Handler<Buffer> handler = new Handler<Buffer>() {
-					int size = -1;
+		server.connectHandler(socket -> {
+			parser = RecordParser.newFixed(4, buffer -> {
+				switch (header) {
+				case -1:
+					int bodyLength = buffer.getByte(0);
+					parser.fixedSizeMode(bodyLength);
+					logger.info("msg header " + bodyLength);
+					System.out.println("msg header " + bodyLength);
+					header = 0;
+					break;
+				case 0:
+					JsonObject msg = buffer.toJsonObject();
+					logger.info("msg body " + msg);
+					System.out.println("msg body " + msg);
 
-					public void handle(Buffer buff) {
-						if (size == -1) {
-							size = buff.getInt(0);
-							parser.fixedSizeMode(size);
-						} else {
-							String msg = buff.getString(0, size);
-							if (msg.startsWith("get /mobile?")) {
-								//
-							}
+					int cmd = msg.getInteger("cmd");
 
-							int cmd = buff.toJsonObject().getInteger("cmd");
-							switch (cmd) {
-							case 14:// heart beat
-								heartBeat(socket.writeHandlerID());
-								break;
-							case 5001:// 当前位置附近司机
-								break;
-							case 5002:// 当前行程司机位置
-								break;
-							case 5003:// 下单成功
-								break;
-							case 5004:// 已通知附近的司机数
-								break;
-							case 5005:// 取消订单
-								break;
-							case 5010:// 订单状态推送
-								break;
-							case 5007:// 被踢下线
-							case 5008:// 自定义推送消息
-
-							default:
-								break;
-							}
-							if (1 == 1) {
-
-								socket.write("");
-							} else {
-							}
-							parser.fixedSizeMode(4);
-							size = -1;
-						}
-					}
-				};
-				parser.setOutput(handler);
-
-				socket.closeHandler(v -> {
-					socketClose(socket.writeHandlerID());
-				});
-			}
+					break;
+				default:
+					break;
+				}
+			});
 		});
 
-		// socket.handler(RecordParser.newDelimited("\001", buffer -> {
-		// int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
-		// int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
-		// int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
-		// int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
-		//
-		// logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}",
-		// headerLength,
-		// clientVersion, cmd, bodyLength);
-		//
-		// Buffer bufferBody = null;
-		// switch (cmd) {
-		// case IMCmdConstants.HEART_BEAT:
-		// heartBeat(socket.writeHandlerID(), clientVersion, cmd);
-		//
-		// break;
-		// case IMCmdConstants.LOGIN:
-		// bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-		// login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
-		//
-		// break;
-		// case IMCmdConstants.LOGOUT:
-		// bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-		// logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
-		//
-		// break;
-		// case IMCmdConstants.MSG_R:
-		// bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-		// msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength,
-		// bufferBody);
-		// break;
-		// default:
-		// break;
-		// }
-		// }));
 		server.listen();
-
 	}
 
 	private void heartBeat(String writeHandlerID) {
