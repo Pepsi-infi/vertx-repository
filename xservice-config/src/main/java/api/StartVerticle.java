@@ -5,6 +5,7 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.impl.ImCommonLanguageServiceImpl;
+import service.impl.SensitiveWordServiceImpl;
 import xservice.BaseServiceVerticle;
 
 /**
@@ -28,6 +29,7 @@ public class StartVerticle extends BaseServiceVerticle {
 
     private void deployRestService() {
         this.deployVerticle(ImCommonLanguageServiceImpl.class.getName());
+        this.deployVerticle(SensitiveWordServiceImpl.class.getName());
         this.deployVerticle(RestConfigVerticle.class.getName());
     }
 
