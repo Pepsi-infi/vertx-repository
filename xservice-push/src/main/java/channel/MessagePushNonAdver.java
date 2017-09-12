@@ -40,9 +40,10 @@ import service.RedisService;
 import service.SocketPushService;
 import service.XiaoMiPushService;
 import util.DateUtil;
+import util.Md5Util;
 import utils.BaseResponse;
 
-public class MessagePushContainer extends AbstractVerticle {
+public class MessagePushNonAdver extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessagePushContainer.class);
 
@@ -85,7 +86,7 @@ public class MessagePushContainer extends AbstractVerticle {
 		httpServer = vertx.createHttpServer();
 		router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
-		router.route(config.getString("PUSH_MSG_URL")).handler(this::pushMsg);
+		router.route(config.getString("PUSH_MSG_NO_ADVER_URL")).handler(this::pushMsg);
 		httpServer.requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 	}
 
@@ -98,32 +99,47 @@ public class MessagePushContainer extends AbstractVerticle {
 			logger.error("body is null");
 			responseError(resp, "body is null");
 		} else {
-			this.dealHttpMessage(new JsonObject(httpMsg), resp);
+			JsonObject receiveMsg = new JsonObject(httpMsg);
+			receiveMsg.put("senderId", request.getParam("senderId"));
+			receiveMsg.put("senderKey", request.getParam("senderKey"));
+			this.dealHttpMessage(receiveMsg, request.getParam("senderId"), request.getParam("senderKey"), resp);
 		}
 	}
 
-	private void dealHttpMessage(JsonObject receiveMsg, HttpServerResponse resp) {
+	private void dealHttpMessage(JsonObject receiveMsg, String senderId, String senderKey, HttpServerResponse resp) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
 		if (ResultData.FAIL == checkResult.getCode()) {
 			responseError(resp, checkResult.getMsg());
 			return;
 		}
-		
-		// 验证消息是否重复推送
-		Future<BaseResponse> repeatFuture = Future.future();
 
-		// 推送给下游
+		// 验证发送方身份是否合法
+		Future<Void> leaglFuture = Future.future();
 		Future<BaseResponse> pushFuture = Future.future();
-		checkRepeatMsg(receiveMsg, repeatFuture.completer());
-		repeatFuture.setHandler(res -> {
+		this.checkSender(receiveMsg.getString("senderId"), receiveMsg.getString("senderKey"), leaglFuture.completer());
+		leaglFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				pushMsgToDownStream(receiveMsg, pushFuture.completer());
 			} else {
-				logger.error("验证重复推送：" + res.cause());
+				logger.error("发送方签名校验未通过" + res.cause());
 				responseError(resp, res.cause().getMessage());
 			}
 		});
+
+		// 验证消息是否重复推送
+		// Future<BaseResponse> repeatFuture = Future.future();
+		// Future<BaseResponse> pushFuture = Future.future();
+		// checkRepeatMsg(receiveMsg, repeatFuture.completer());
+		// repeatFuture.setHandler(res -> {
+		// if (res.succeeded()) {
+		// // 推送给下游
+		// pushMsgToDownStream(receiveMsg, pushFuture.completer());
+		// } else {
+		// logger.error("验证重复推送：" + res.cause());
+		// responseError(resp, res.cause().getMessage());
+		// }
+		// });
 
 		// 消息推送成功后，调用上报消息接口
 		Future<BaseResponse> statFuture = Future.future();
@@ -148,6 +164,36 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	}
 
+	private void checkSender(String senderId, String senderKey, Handler<AsyncResult<Void>> handler) {
+		String key = PushConsts.MESSAGE_SENDER_PREFIX + senderId;
+
+		redisService.get(key, result -> {
+			String senderSign;
+			try {
+				senderSign = Md5Util.encodeByMd5AndSalt(key);
+			} catch (Exception e) {
+				logger.error("md5 compute error", e);
+				handler.handle(Future.failedFuture("server is error"));
+				return;
+			}
+			if (StringUtil.isNullOrEmpty(senderSign)) {
+				handler.handle(Future.failedFuture("sender sign is null"));
+				return;
+			}
+			if (result.succeeded()) {
+				String serverSign = result.result();
+				if (senderSign.equals(serverSign)) {
+					handler.handle(Future.succeededFuture());
+				} else {
+					handler.handle(Future.failedFuture("sender is ileagl"));
+				}
+			} else {
+				handler.handle(Future.failedFuture(result.cause()));
+			}
+		});
+
+	}
+
 	public void responseSuccess(HttpServerResponse resp, String msg) {
 		resp.putHeader("content-type", "text/plain;charset=UTF-8").end(msg);
 	}
@@ -164,10 +210,11 @@ public class MessagePushContainer extends AbstractVerticle {
 	 */
 	private void callStatPushMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
 		String msgId = receiveMsg.getValue("msgId") + "";
-		String customerId = receiveMsg.getValue("customerId") + "";
-		// 推送成功的消息把msgId保存到redis,用来防止重复推送
-		Future<Void> setRedisFuture = Future.future();
-		this.setMsgToRedis(msgId, customerId, receiveMsg.getLong("expireTime"),setRedisFuture.completer());
+		// String customerId = receiveMsg.getValue("customerId") + "";
+		// // 推送成功的消息把msgId保存到redis,用来防止重复推送
+		// Future<Void> setRedisFuture = Future.future();
+		// this.setMsgToRedis(msgId, customerId,
+		// receiveMsg.getLong("expireTime"), setRedisFuture.completer());
 
 		// 已推送消息上报接口
 		List<MsgStatDto> msgList = new ArrayList<>();
@@ -175,7 +222,7 @@ public class MessagePushContainer extends AbstractVerticle {
 		// 首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 		msgStatDto.setChannel(channel);
-		msgStatDto.setMsgId(msgId);
+		msgStatDto.setMsgId(receiveMsg.getString("senderId") + msgId);
 		// 1 安卓
 		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
@@ -240,20 +287,35 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {
 		ResultData result = new ResultData();
+		String senderId = receiveMsg.getString("senderId");
+		if (StringUtil.isNullOrEmpty(senderId)) {
+			result.reSetResult(ResultData.FAIL, "senderId is null");
+			return result;
+		}
+
+		String senderKey = receiveMsg.getString("senderKey");
+		if (StringUtil.isNullOrEmpty(senderKey)) {
+			result.reSetResult(ResultData.FAIL, "senderKey is null");
+			return result;
+		}
+
 		// 校验必填项
 		String msgId = receiveMsg.getValue("msgId") + "";
 		if (StringUtils.isBlank(msgId)) {
 			result.reSetResult(ResultData.FAIL, "msgId不能为空");
+			return result;
 		}
 		// 用户id
 		Object customerId = receiveMsg.getValue("customerId");
 		if (null == customerId) {
 			result.reSetResult(ResultData.FAIL, "customerId不能为空");
+			return result;
 		}
 
 		String phone = (String) receiveMsg.getValue("phone");
 		if (StringUtils.isBlank(phone)) {
 			result.reSetResult(ResultData.FAIL, "上送手机号不能为空");
+			return result;
 		}
 		// sokit、gcm,小米连接token
 		token = (String) receiveMsg.getValue("deviceToken");
@@ -329,6 +391,7 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	}
 
+	// 推送给下游
 	private void pushMsgToDownStream(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
 		String apnsToken = receiveMsg.getString("apnsToken");
 		String phone = receiveMsg.getString("phone");
@@ -472,47 +535,49 @@ public class MessagePushContainer extends AbstractVerticle {
 
 	/**
 	 * 推送成功的消息保存到redis中
-	 * @param expireTime 
+	 * 
+	 * @param expireTime
 	 *
 	 * @param resultHandler
 	 */
-	private void setMsgToRedis(String msgId, String customerId, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
+	private void setMsgToRedis(String msgId, String customerId, Long expireTime,
+			Handler<AsyncResult<Void>> resultHandler) {
 		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
-		long expire=(expireTime-System.currentTimeMillis())/1000;
-		redisService.setEx(redisMsgKey, expire,msgId, res->{
-			if(res.succeeded()){
+		long expire = (expireTime - System.currentTimeMillis()) / 1000;
+		redisService.setEx(redisMsgKey, expire, msgId, res -> {
+			if (res.succeeded()) {
 				resultHandler.handle(Future.succeededFuture());
-			}else{
+			} else {
 				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
 				logger.error(errorMsg, res.cause());
 				resultHandler.handle(Future.failedFuture(res.cause()));
 			}
 		});
-		//		redisService.set(redisMsgKey, msgId, setRes -> {
-//			if (setRes.succeeded()) {
-//				//为所存储的消息设置失效时间
-//				this.setMessageExpire2Redis(redisMsgKey,expireTime,resultHandler);
-//			} else {
-//				String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
-//				logger.error(errorMsg, setRes.cause());
-//				resultHandler.handle(Future.failedFuture(setRes.cause()));
-//			}
-//		});
-		
+		// redisService.set(redisMsgKey, msgId, setRes -> {
+		// if (setRes.succeeded()) {
+		// //为所存储的消息设置失效时间
+		// this.setMessageExpire2Redis(redisMsgKey,expireTime,resultHandler);
+		// } else {
+		// String errorMsg = "exec save to redis fail : key = " + redisMsgKey;
+		// logger.error(errorMsg, setRes.cause());
+		// resultHandler.handle(Future.failedFuture(setRes.cause()));
+		// }
+		// });
+
 	}
 
 	private void setMessageExpire2Redis(String redisMsgKey, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
-		long expire=(expireTime-System.currentTimeMillis())/1000;
-		redisService.expire(redisMsgKey, expire, res->{
-			if(res.succeeded()){
+		long expire = (expireTime - System.currentTimeMillis()) / 1000;
+		redisService.expire(redisMsgKey, expire, res -> {
+			if (res.succeeded()) {
 				resultHandler.handle(Future.succeededFuture());
-			}else{
+			} else {
 				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
 				logger.error(errorMsg, res.cause());
 				resultHandler.handle(Future.failedFuture(res.cause()));
 			}
 		});
-		
+
 	}
 
 	public static void main(String[] args) {

@@ -72,4 +72,7 @@ public class PushConsts {
 	
 	//消息中心redis前缀
 	public static final String REDIS_PREFIX_MESSAGE_CENTER="mc_push_";
+	
+	//消息发送方身份前缀
+	public static final String MESSAGE_SENDER_PREFIX="sender_";
 }
