@@ -11,26 +11,26 @@ import utils.IPUtil;
 
 @ProxyGen
 @VertxGen
-public interface NonAdMessagePushService {
+public interface ConfigService {
 
 	/**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-NonAdMessage-service";
+	String SERVICE_NAME = "push-config-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
-	String SERVICE_ADDRESS = "push.NonAdMessage.service";
+	String SERVICE_ADDRESS = "push.config.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-NonAdMessage-service";
+	String LOCAL_SERVICE_NAME = "local-push-config-service";
 
-	static NonAdMessagePushService createProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(NonAdMessagePushService.class, vertx, NonAdMessagePushService.SERVICE_ADDRESS);
+	static ConfigService createProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(ConfigService.class, vertx, ConfigService.SERVICE_ADDRESS);
 	}
 
-	static NonAdMessagePushService createLocalProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(NonAdMessagePushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
+	static ConfigService createLocalProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(ConfigService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
 				new DeliveryOptions().setSendTimeout(3000));
 	}
 
@@ -38,6 +38,9 @@ public interface NonAdMessagePushService {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
 
-	void pushMsg(String senderId, String senderKey, String httpMsg,
+	void getVerifyFromMsgCenter(String senderId, String senderKey,
 			Handler<AsyncResult<String>> resultHandler);
+
+	
+
 }
