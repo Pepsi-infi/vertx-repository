@@ -37,7 +37,13 @@ public interface ConfigService {
 	static String getLocalAddress(String ip) {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
-
+	
+	/**
+	 * 消息发送方身份注册
+	 * @param senderId 
+	 * @param senderKey
+	 * @param resultHandler
+	 */
 	void getVerifyFromMsgCenter(String senderId, String senderKey,
 			Handler<AsyncResult<String>> resultHandler);
 
