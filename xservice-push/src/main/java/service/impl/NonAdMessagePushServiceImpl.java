@@ -42,7 +42,7 @@ import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.RestAPIVerticle;
 
-public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService{
+public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService {
 
 	private static final Logger logger = LoggerFactory.getLogger(NonAdMessagePushServiceImpl.class);
 
@@ -67,15 +67,17 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	@Override
 	public void start() throws Exception {
-		
+
 		super.start();
 
-		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this, NonAdMessagePushService.SERVICE_ADDRESS);
+		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this,
+				NonAdMessagePushService.SERVICE_ADDRESS);
 		publishEventBusService(NonAdMessagePushService.SERVICE_NAME, NonAdMessagePushService.SERVICE_ADDRESS,
 				NonAdMessagePushService.class);
 
 		String ip = IPUtil.getInnerIP();
-		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this, NonAdMessagePushService.getLocalAddress(ip));
+		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this,
+				NonAdMessagePushService.getLocalAddress(ip));
 		publishEventBusService(NonAdMessagePushService.LOCAL_SERVICE_NAME, NonAdMessagePushService.getLocalAddress(ip),
 				NonAdMessagePushService.class);
 
@@ -84,13 +86,14 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	}
 
-	public void pushMsg(String senderId, String senderKey, String httpMsg,
-			Handler<AsyncResult<String>> resultHandler) {
+	public void pushMsg(String senderId, String senderKey, String httpMsg, Handler<AsyncResult<String>> resultHandler) {
 		logger.info("接收到的消息内容：" + httpMsg);
 		try {
 			if (StringUtil.isNullOrEmpty(httpMsg)) {
 				logger.error("body is null");
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP).toString()));
+				resultHandler.handle(Future.succeededFuture(
+						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP)
+								.toString()));
 			} else {
 				JsonObject receiveMsg = new JsonObject(httpMsg);
 				receiveMsg.put("senderId", senderId);
@@ -99,15 +102,20 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			}
 		} catch (Exception e) {
 			logger.error("消息推送异常", e);
-			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), e.getMessage(), Collections.EMPTY_MAP).toString()));
+			resultHandler.handle(Future.succeededFuture(
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), e.getMessage(), Collections.EMPTY_MAP)
+							.toString()));
 		}
 	}
 
-	private void dealHttpMessage(JsonObject receiveMsg, String senderId, String senderKey, Handler<AsyncResult<String>> resultHandler) {
+	private void dealHttpMessage(JsonObject receiveMsg, String senderId, String senderKey,
+			Handler<AsyncResult<String>> resultHandler) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
 		if (ResultData.FAIL == checkResult.getCode()) {
-			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP).toString()));			
+			resultHandler.handle(Future.succeededFuture(
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP)
+							.toString()));
 			return;
 		}
 
@@ -121,7 +129,8 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 				pushMsgToDownStream(receiveMsg, pushFuture.completer());
 			} else {
 				logger.error("发送方签名校验未通过" + res.cause());
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
@@ -133,16 +142,19 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
 		// 根据推送结果返回结果数据给http调用方
 		statFuture.setHandler(res -> {
 			if (res.succeeded()) {
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));			
+				resultHandler.handle(Future.succeededFuture(
+						new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
 			} else {
-				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP).toString()));			
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
@@ -150,25 +162,12 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	private void checkSender(String senderId, String senderKey, Handler<AsyncResult<Void>> handler) {
 		String key = PushConsts.MESSAGE_SENDER_PREFIX + senderId;
-		
-//		try {
-//			redisService.setEx(key, 3600*24*365*100l, Md5Util.encodeByMd5AndSalt(senderId), res->{
-//				if(res.succeeded()){
-//					handler.handle(Future.succeededFuture());
-//				}else{
-//					handler.handle(Future.failedFuture(res.cause()));
-//				}
-//			});
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	
+
 		redisService.get(key, result -> {
 			String senderSign;
 			try {
 				senderSign = Md5Util.encodeByMd5AndSalt(senderId);
-				logger.info("senderSign="+senderSign);
+				logger.info("senderSign=" + senderSign);
 			} catch (Exception e) {
 				logger.error("md5 compute error", e);
 				handler.handle(Future.failedFuture("server is error"));
@@ -180,7 +179,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			}
 			if (result.succeeded()) {
 				String serverSign = result.result();
-				logger.info("serverSign="+serverSign);
+				logger.info("serverSign=" + serverSign);
 				if (senderSign.equals(serverSign)) {
 					handler.handle(Future.succeededFuture());
 				} else {
@@ -221,7 +220,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		// 首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 		msgStatDto.setChannel(channel);
-		msgStatDto.setMsgId(receiveMsg.getString("senderId") +"_"+ msgId);//msgId上报规则
+		msgStatDto.setMsgId(receiveMsg.getString("senderId") + "_" + msgId);// msgId上报规则
 		// 1 安卓
 		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
