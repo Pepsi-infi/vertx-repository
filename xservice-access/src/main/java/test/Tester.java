@@ -2,13 +2,11 @@ package test;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import server.SocketServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(SocketServerVerticle.class.getName());
 		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
 		// vertx.deployVerticle(HttpServerVerticle.class.getName());
 

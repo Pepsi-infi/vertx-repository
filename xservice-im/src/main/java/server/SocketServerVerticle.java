@@ -38,19 +38,31 @@ public class SocketServerVerticle extends AbstractVerticle {
 		server.connectHandler(socket -> {
 			parser = RecordParser.newFixed(4, buffer -> {
 				switch (header) {
-				case -1:
+				case -1:// parse header
 					int bodyLength = buffer.getByte(0);
 					parser.fixedSizeMode(bodyLength);
 					logger.info("msg header " + bodyLength);
 					System.out.println("msg header " + bodyLength);
 					header = 0;
 					break;
-				case 0:
-					JsonObject msg = buffer.toJsonObject();
-					logger.info("msg body " + msg);
-					System.out.println("msg body " + msg);
+				case 0:// message body
+					String msg = buffer.toString();
+					if (msg.startsWith("/mobile")) {
+						logger.info("msg body " + msg);
+					} else {
+						JsonObject jsonMsg = buffer.toJsonObject();
+						logger.info("json msg body " + jsonMsg);
+						System.out.println("msg body " + jsonMsg);
 
-					int cmd = msg.getInteger("cmd");
+						int cmd = jsonMsg.getInteger("cmd");
+						switch (cmd) {
+						case 14:// heart beat
+							heartBeat(socket.writeHandlerID());
+							break;
+						default:
+							break;
+						}
+					}
 
 					break;
 				default:
@@ -67,12 +79,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 		jo.put("ping", "ok").put("speed", 3000);
 
 		eb.send(writeHandlerID, jo.encode());
-	}
-
-	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
-		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
-		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
 
 	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
