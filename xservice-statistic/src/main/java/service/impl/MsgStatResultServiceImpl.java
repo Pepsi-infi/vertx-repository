@@ -52,6 +52,10 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         RedisClusterOptions redisClusterOptions = ConfigUtil.getRedisClusterOptions(config().getJsonObject("redis"));
         redisClient = RedisCluster.create(vertx.getDelegate(), redisClusterOptions);
 
+        //启动时自动清除之前的错误数据
+        vertx.setTimer(10000, id -> {
+            repireData(Future.future());
+        });
     }
 
 
@@ -174,4 +178,22 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
         return msgStatResultDto;
     }
 
+    public void repireData(Handler<AsyncResult<BaseResponse>> result){
+        redisClient.del(CacheConstants.getAllPushMsgKey(), ar ->{
+            if(ar.succeeded()){
+                logger.info("========= 已清空 MC_STAT_PUSH_MSG_ALL ========");
+                Future<BaseResponse> future = Future.future();
+                msgStatResultDao.delErrorData(future.completer());
+                future.setHandler(res ->{
+                   if(res.succeeded()){
+                       logger.info("清除错误消息数据成功");
+                   } else {
+                       logger.info("清除错误消息数据失败");
+                   }
+                });
+            }else {
+                logger.info("========= 清空 MC_STAT_PUSH_MSG_ALL 失败 ========");
+            }
+        });
+    }
 }
