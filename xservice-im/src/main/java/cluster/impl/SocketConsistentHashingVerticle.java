@@ -1,4 +1,4 @@
-package cluster;
+package cluster.impl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -27,6 +27,7 @@ public class ValidateServerVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		NetServerOptions options = new NetServerOptions().setPort(4321);
 		NetServer server = vertx.createNetServer(options);
+		eb = vertx.eventBus();
 
 		server.connectHandler(socket -> {
 			socket.handler(RecordParser.newDelimited("\n\n", buffer -> {
@@ -50,6 +51,10 @@ public class ValidateServerVerticle extends AbstractVerticle {
 		eb.send(writeHandlerID, response);
 	}
 
+	/**
+	 * 
+	 * @param writeHandlerID
+	 */
 	private void sendRedirect(String writeHandlerID) {
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
