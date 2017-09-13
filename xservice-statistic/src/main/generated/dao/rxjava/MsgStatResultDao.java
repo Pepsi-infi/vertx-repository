@@ -99,6 +99,16 @@ public class MsgStatResultDao {
     }));
   }
 
+  public void delErrorData(Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.delErrorData(resultHandler);
+  }
+
+  public Single<BaseResponse> rxDelErrorData() { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      delErrorData(fut);
+    }));
+  }
+
 
   public static  MsgStatResultDao newInstance(dao.MsgStatResultDao arg) {
     return arg != null ? new MsgStatResultDao(arg) : null;

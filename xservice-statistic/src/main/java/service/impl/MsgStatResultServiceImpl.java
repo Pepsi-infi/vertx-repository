@@ -65,7 +65,7 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
             if (ar.succeeded()) {
                 JsonArray jsonArray = ar.result();
                 List<String> keys = jsonArray.getList();
-                logger.info("date : {} get keys ： {} from redis ", new Date(), keys);
+                logger.info("date : " + new Date() + " get keys ： " + keys + " from redis ");
                 processRedisMsgStatResult(jsonArray, result);
             } else {
                 logger.error("get keys from redis error", ar.cause());
@@ -90,9 +90,9 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
                         List<String> valueList = fieldsValues.getList();
                         saveOrUpdateMsgStatResultToDb(key, valueList, resultHandler -> {
                             if (resultHandler.succeeded()) {
-                                logger.info("save or update msgStatResult for : {} to db success. result:{}", key, resultHandler.result());
+                                logger.info("save or update msgStatResult for : " + key + " to db success. result : " + resultHandler.result());
                             } else {
-                                logger.error("save or update msgStatResult for :{} to db error.", resultHandler.cause());
+                                logger.error("save or update msgStatResult happend error :" + resultHandler.cause());
                             }
                         });
                     } else {
@@ -181,18 +181,18 @@ public class MsgStatResultServiceImpl extends BaseServiceVerticle implements Msg
     public void repireData(Handler<AsyncResult<BaseResponse>> result){
         redisClient.del(CacheConstants.getAllPushMsgKey(), ar ->{
             if(ar.succeeded()){
-                logger.info("========= 已清空 MC_STAT_PUSH_MSG_ALL ========");
+                logger.info("========= 已清空MC_STAT_PUSH_MSG_ALL ========");
                 Future<BaseResponse> future = Future.future();
                 msgStatResultDao.delErrorData(future.completer());
                 future.setHandler(res ->{
                    if(res.succeeded()){
                        logger.info("清除错误消息数据成功");
                    } else {
-                       logger.info("清除错误消息数据失败");
+                       logger.info("清除错误消息数据失败" + res.cause());
                    }
                 });
             }else {
-                logger.info("========= 清空 MC_STAT_PUSH_MSG_ALL 失败 ========");
+                logger.info("清空MC_STAT_PUSH_MSG_ALL失败 :" + ar.cause());
             }
         });
     }
