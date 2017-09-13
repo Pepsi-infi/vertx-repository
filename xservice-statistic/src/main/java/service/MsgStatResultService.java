@@ -33,5 +33,5 @@ public interface MsgStatResultService {
      */
     void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result);
 
-
+    void repireData(Handler<AsyncResult<BaseResponse>> result);
 }

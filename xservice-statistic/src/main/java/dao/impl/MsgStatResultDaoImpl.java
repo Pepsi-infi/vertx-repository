@@ -170,4 +170,17 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
         });
 
     }
+
+    public void delErrorData(Handler<AsyncResult<BaseResponse>> resultHandler){
+        String sql = "delete from msg_stat where LENGTH(msgId) > 10";
+        Future<Void> future = Future.future();
+        removeAll(sql, future.completer());
+        future.setHandler(ar -> {
+            if(ar.succeeded()){
+                resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+            }else {
+                resultHandler.handle(Future.failedFuture(ar.cause()));
+            }
+        });
+    }
 }
