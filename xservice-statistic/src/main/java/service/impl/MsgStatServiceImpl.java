@@ -53,6 +53,11 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 	}
 
 	private void statSinglePushMsg(MsgStatDto msgStatDto, Handler<AsyncResult<Map>> result) {
+		//如果msgId为空或者不是纯数字，不做处理
+		if(!isAllowMsgId(msgStatDto)){
+			result.handle(Future.failedFuture("非广告类消息msgId不做处理"));
+			return;
+		}
 		String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto);
 		List<String> fields = getFieldsForMsgStat(msgStatDto);
 		if (CollectionUtils.isEmpty(fields)) {
@@ -112,7 +117,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 
 	@Override
 	public void statPushMsg(List<MsgStatDto> msgStatDtos, Handler<AsyncResult<String>> result) {
-		logger.info("[MsgStatServiceImpl] the need msgStatDtos:{}", Json.encode(msgStatDtos));
+		logger.info("[MsgStatServiceImpl] the need msgStatDtos: " + Json.encode(msgStatDtos));
 		List<Future> pushFutureList = new ArrayList<>();
 		Map<Future<Map>, String> futureMap = Maps.newHashMap();
 		for (MsgStatDto msgStatDto : msgStatDtos) {
@@ -193,5 +198,22 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 		Map map = Maps.newHashMap();
 		map.put("status", BaseResponse.RESPONSE_SUC_CODE);
 		return map;
+	}
+
+	private boolean isAllowMsgId(MsgStatDto msgStatDto){
+		if(msgStatDto != null){
+			String msgId = msgStatDto.getMsgId();
+			System.out.println(msgId);
+			//如果msgId为空或者不是纯数字，不做处理
+			if(StringUtils.isNotBlank(msgId) && msgId.length() < 10 && msgId.matches("^[0-9]*$") ){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void main(String[] args) {
+		MsgStatDto msgStatDto = new MsgStatDto();
+//		msgStatDto.setMsgId("113-1111");
 	}
 }

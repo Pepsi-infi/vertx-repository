@@ -12,31 +12,31 @@
     "PUSH_MSG_PORT":8080
   },
   "redis.config": {
-  	"redis.cluster.password": "NQn+&%pq8y&2",
+  	"redis.cluster.password": "GofLOnz9FqY1YFgu",
 	"redis.slaves": [
 		{
-			"host": "10.0.7.47",
-			"port": 6380
-		},
-		{
-			"host": "10.0.7.47",
+			"host": "10.0.10.59",
 			"port": 6381
 		},
 		{
-			"host": "10.0.7.48",
-			"port": 6380
-		},
-		{
-			"host": "10.0.7.48",
+			"host": "10.0.10.60",
 			"port": 6381
 		},
 		{
-			"host": "10.0.7.49",
-			"port": 6380
+			"host": "10.0.10.61",
+			"port": 6381
 		},
 		{
-			"host": "10.0.7.49",
-			"port": 6381
+			"host": "10.0.10.59",
+			"port": 6382
+		},
+		{
+			"host": "10.0.10.60",
+			"port": 6382
+		},
+		{
+			"host": "10.0.10.61",
+			"port": 6382
 		}
 	],
     "encoding": "UTF-8",

@@ -18,6 +18,11 @@ import util.Md5Util;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
 
+/***
+ * 
+ * @author yanglf
+ *
+ */
 public class ConfigServiceImpl extends BaseServiceVerticle implements ConfigService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConfigServiceImpl.class);
@@ -72,41 +77,42 @@ public class ConfigServiceImpl extends BaseServiceVerticle implements ConfigServ
 				resultHandler.handle(
 						Future.succeededFuture(new ResultData<>(ErrorCodeEnum.SUCCESS, handler.result()).toString()));
 			} else {
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<>(ErrorCodeEnum.FAIL.getCode(), handler.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+				resultHandler.handle(Future.succeededFuture(new ResultData<>(ErrorCodeEnum.FAIL.getCode(),
+						handler.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 	}
 
 	private Future<String> getCheckFuture(String key) {
-		Future<String> checkFuture=Future.future();
+		Future<String> checkFuture = Future.future();
 		redisService.get(key, checkFuture.completer());
 		return checkFuture;
 	}
 
 	private Future<String> generateNewSender(String senderId, String senderKey, Future<String> checkFuture) {
-	   
+
 		return checkFuture.compose(res -> {
 			Future<String> setFuture = Future.future();
-			String serverSign=res;
+			String serverSign = res;
 			try {
-					
+
 				if ((!StringUtil.isNullOrEmpty(serverSign)
-						&& !(Md5Util.encodeByMd5AndSalt(senderId)).equals(serverSign))||StringUtil.isNullOrEmpty(serverSign)) {
-					logger.info("sender is not exist in redis,ge a new ");
+						&& !(Md5Util.encodeByMd5AndSalt(senderId)).equals(serverSign))
+						|| StringUtil.isNullOrEmpty(serverSign)) {
+					logger.info("sender is not exist in redis,generate a new sender");
 					redisService.setEx(PushConsts.MESSAGE_SENDER_PREFIX + senderId, 3600 * 24 * 365 * 100l,
 							Md5Util.encodeByMd5AndSalt(senderId), setRes -> {
 								if (setRes.succeeded()) {
+									logger.info("generate a new sender success:" + setRes.result());
 									setFuture.complete(setRes.result());
 								} else {
-									logger.error("gen new sender to redis error:", setRes.cause());
+									logger.error("generate new sender to redis error:", setRes.cause());
 									setFuture.fail(setRes.cause().getMessage());
 								}
 							});
 
 				} else {
-					setFuture.fail("sender is exsit");
+					setFuture.fail("sender is exist");
 				}
 			} catch (Exception e) {
 				logger.error("md5 exception", e);

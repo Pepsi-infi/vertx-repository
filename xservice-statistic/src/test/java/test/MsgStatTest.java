@@ -1,10 +1,5 @@
 package test;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import api.RestStatVerticle;
 import dao.impl.DeviceDaoImpl;
 import io.vertx.core.DeploymentOptions;
@@ -13,6 +8,11 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import service.impl.DeviceServiceImpl;
 import service.impl.MsgStatServiceImpl;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by lufei Date : 2017/7/25 14:27 Description :
