@@ -21,7 +21,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-		NetServerOptions options = new NetServerOptions().setPort(4321);
+		NetServerOptions options = new NetServerOptions().setPort(2345);
 		NetServer server = vertx.createNetServer(options);
 		eb = vertx.eventBus();
 
