@@ -1,19 +1,14 @@
 package api;
 
-import channel.ApplePushVerticle;
-import channel.HttpServerVerticle;
-import channel.MiPushVerticle;
-import channel.SocketVerticle;
+import channel.impl.ApplePushServiceImpl;
+import channel.impl.MiPushServiceImpl;
+import channel.impl.SocketServiceImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
-import service.impl.AdMessagePushServiceImpl;
-import service.impl.ConfigServiceImpl;
-import service.impl.MsgRecordServiceImpl;
-import service.impl.NonAdMessagePushServiceImpl;
-import service.impl.RedisServiceImpl;
+import service.impl.*;
 import xservice.HttpClientVerticle;
 
 public class StartVerticle extends AbstractVerticle {
@@ -28,17 +23,19 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(MsgRecordServiceImpl.class.getName());
 		this.deployVerticle(RedisServiceImpl.class.getName());
 
-		this.deployVerticle(MiPushVerticle.class.getName());
-		this.deployVerticle(SocketVerticle.class.getName());
-		this.deployVerticle(ApplePushVerticle.class.getName());
+		this.deployVerticle(MiPushServiceImpl.class.getName());
+		this.deployVerticle(SocketServiceImpl.class.getName());
+		this.deployVerticle(ApplePushServiceImpl.class.getName());
 
-		// this.deployVerticle(MessagePushContainer.class.getName());
 		this.deployVerticle(HttpClientVerticle.class.getName());
-		// this.deployVerticle(MessagePushNonAdver.class.getName());
 		this.deployVerticle(HttpServerVerticle.class.getName());
 		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(ConfigServiceImpl.class.getName());
+
+		//未过期消息补发
+		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
+		this.deployVerticle(PassengerUnSendVerticle.class.getName());
 		// 提供其他非EventBus服务
 	}
 

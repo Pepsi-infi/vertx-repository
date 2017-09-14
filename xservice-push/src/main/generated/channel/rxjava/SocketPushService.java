@@ -14,8 +14,10 @@
  * under the License.
  */
 
-package service.rxjava;
+package channel.rxjava;
 
+import java.util.Map;
+import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
@@ -24,36 +26,36 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 
-@io.vertx.lang.rxjava.RxGen(channel.XiaoMiPushService.class)
-public class XiaoMiPushService {
+@io.vertx.lang.rxjava.RxGen(channel.SocketPushService.class)
+public class SocketPushService {
 
-  public static final io.vertx.lang.rxjava.TypeArg<XiaoMiPushService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new XiaoMiPushService((channel.XiaoMiPushService) obj),
-    XiaoMiPushService::getDelegate
+  public static final io.vertx.lang.rxjava.TypeArg<SocketPushService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new SocketPushService((channel.SocketPushService) obj),
+    SocketPushService::getDelegate
   );
 
-  private final channel.XiaoMiPushService delegate;
+  private final channel.SocketPushService delegate;
   
-  public XiaoMiPushService(channel.XiaoMiPushService delegate) {
+  public SocketPushService(channel.SocketPushService delegate) {
     this.delegate = delegate;
   }
 
-  public channel.XiaoMiPushService getDelegate() {
+  public channel.SocketPushService getDelegate() {
     return delegate;
   }
 
-  public static XiaoMiPushService createProxy(Vertx vertx) { 
-    XiaoMiPushService ret = XiaoMiPushService.newInstance(channel.XiaoMiPushService.createProxy(vertx.getDelegate()));
+  public static SocketPushService createProxy(Vertx vertx) { 
+    SocketPushService ret = SocketPushService.newInstance(channel.SocketPushService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
-  public static XiaoMiPushService createLocalProxy(Vertx vertx) { 
-    XiaoMiPushService ret = XiaoMiPushService.newInstance(channel.XiaoMiPushService.createLocalProxy(vertx.getDelegate()));
+  public static SocketPushService createLocalProxy(Vertx vertx) { 
+    SocketPushService ret = SocketPushService.newInstance(channel.SocketPushService.createLocalProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static String getLocalAddress(String ip) { 
-    String ret = channel.XiaoMiPushService.getLocalAddress(ip);
+    String ret = channel.SocketPushService.getLocalAddress(ip);
     return ret;
   }
 
@@ -68,7 +70,7 @@ public class XiaoMiPushService {
   }
 
 
-  public static  XiaoMiPushService newInstance(channel.XiaoMiPushService arg) {
-    return arg != null ? new XiaoMiPushService(arg) : null;
+  public static  SocketPushService newInstance(channel.SocketPushService arg) {
+    return arg != null ? new SocketPushService(arg) : null;
   }
 }

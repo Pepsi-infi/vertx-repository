@@ -1,4 +1,4 @@
-package service;
+package channel;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
@@ -13,26 +13,26 @@ import utils.IPUtil;
 
 @ProxyGen
 @VertxGen
-public interface ApplePushService {
-	
+public interface SocketPushService {
+
 	/**
 	 * The name of the event bus service.
 	 */
-	String SERVICE_NAME = "x-push-apple-service";
+	String SERVICE_NAME = "x-push-socket-service";
 
 	/**
 	 * The address on which the service is published.
 	 */
-	String SERVICE_ADDRESS = "push.apple.service";
+	String SERVICE_ADDRESS = "push.socket.service";
 
-	String LOCAL_SERVICE_NAME = "local-x-push-apple-service";
+	String LOCAL_SERVICE_NAME = "local-x-push-socket-service";
 
-	static ApplePushService createProxy(Vertx vertx){
-		return ProxyHelper.createProxy(ApplePushService.class, vertx, ApplePushService.class.getName());
+	static SocketPushService createProxy(Vertx vertx){
+		return ProxyHelper.createProxy(SocketPushService.class, vertx, SocketPushService.class.getName());
 	}
 
-	static ApplePushService createLocalProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(ApplePushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
+	static SocketPushService createLocalProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(SocketPushService.class, vertx, getLocalAddress(IPUtil.getInnerIP()),
 				new DeliveryOptions().setSendTimeout(3000));
 	}
 
@@ -40,5 +40,7 @@ public interface ApplePushService {
 		return new StringBuffer().append(ip).append("-").append(SERVICE_ADDRESS).toString();
 	}
 
-	void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler);
+
+	void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler);
+
 }

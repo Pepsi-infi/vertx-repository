@@ -1,12 +1,10 @@
-package channel;
+package channel.impl;
 
-import java.util.Random;
-
+import channel.XiaoMiPushService;
 import com.xiaomi.push.sdk.ErrorCode;
 import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
-
 import constant.PushConsts;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.AbstractVerticle;
@@ -18,18 +16,19 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.serviceproxy.ProxyHelper;
-import service.XiaoMiPushService;
 import util.MsgUtil;
 import utils.BaseResponse;
+
+import java.util.Random;
 
 /**
  * @author yanglf
  *         <p>
  *         小米推送
  */
-public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushService {
+public class MiPushServiceImpl extends AbstractVerticle implements XiaoMiPushService {
 
-	private static final Logger logger = LoggerFactory.getLogger(MiPushVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(MiPushServiceImpl.class);
 
 	private JsonObject config;
 
@@ -135,7 +134,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 	public static void main(String[] args) throws Exception {
 
-		MiPushVerticle verticle = new MiPushVerticle();
+		MiPushServiceImpl verticle = new MiPushServiceImpl();
 
 		JsonObject recieveMsg = new JsonObject();
 				

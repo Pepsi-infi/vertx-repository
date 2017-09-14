@@ -1,5 +1,6 @@
-package channel;
+package api;
 
+import constant.PushUrlConstants;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
@@ -12,6 +13,7 @@ import io.vertx.ext.web.handler.CorsHandler;
 import service.AdMessagePushService;
 import service.ConfigService;
 import service.NonAdMessagePushService;
+import service.PassengerUnSendService;
 import xservice.RestAPIVerticle;
 
 public class HttpServerVerticle extends RestAPIVerticle {
@@ -21,7 +23,9 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private AdMessagePushService adMessagePushService;
 
 	private NonAdMessagePushService nonAdMessagePushService;
-	
+
+	private PassengerUnSendService passengerUnSendService;
+
 	private ConfigService configService;
 
 	private JsonObject config;
@@ -43,12 +47,15 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		router.route().handler(BodyHandler.create());
 
 		// 大后台乘客端广告消息推送
-		router.route(config.getString("PUSH_MSG_URL")).handler(this::pushAdMsg);
+		router.route(PushUrlConstants.PUSH_MSG_URL).handler(this::pushAdMsg);
 		// 非广告消息推送
-		router.route(config.getString("PUSH_MSG_NO_ADVER_URL")).handler(this::pushNonAdMsg);
+		router.route(PushUrlConstants.PUSH_MSG_NO_ADVER_URL).handler(this::pushNonAdMsg);
 		// 获取senderId senderKey
-		router.route("/mc-push/message/getVerifyFromMsgCenter.json").handler(this::getVerifyFromMsgCenter);
+		router.route(PushUrlConstants.PUSH_MSG_SENDERKEY).handler(this::getVerifyFromMsgCenter);
+		// 用户上线，未推送成功的消息继续推送给用户
+		router.route(PushUrlConstants.PUSH_MSG_UNSEND).handler(this::callUnSend);
 
+		logger.info("================= http server starting port " + config.getInteger("PUSH_MSG_PORT") + " ===============");
 		httpServer.requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 
 	}
@@ -57,6 +64,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		adMessagePushService = AdMessagePushService.createProxy(vertx);
 		nonAdMessagePushService = NonAdMessagePushService.createProxy(vertx);
 		configService=ConfigService.createProxy(vertx);
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx);
 	}
 
 	private void pushAdMsg(RoutingContext context) {
@@ -80,4 +88,11 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		configService.getVerifyFromMsgCenter(request.getParam("senderId"),request.getParam("senderKey"),resultHandler(context));
 		logger.info("###getVerifyFromMsgCenter method end###");
 	}
+
+	private void callUnSend(RoutingContext context){
+		HttpServerRequest request = context.request();
+		String phone = request.getParam("phone");
+		passengerUnSendService.pushUnSendMsg(phone, resultHandler(context));
+	}
+
 }

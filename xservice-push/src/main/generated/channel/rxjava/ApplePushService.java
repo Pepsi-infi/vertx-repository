@@ -14,8 +14,10 @@
  * under the License.
  */
 
-package service.rxjava;
+package channel.rxjava;
 
+import java.util.Map;
+import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;

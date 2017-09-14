@@ -14,51 +14,62 @@
 * under the License.
 */
 
-package service;
+package channel;
 
-import channel.XiaoMiPushService;
+import channel.ApplePushService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.ReplyException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.UUID;
+import java.util.stream.Collectors;
+import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import utils.BaseResponse;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import channel.ApplePushService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
+public class ApplePushServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final XiaoMiPushService service;
+  private final ApplePushService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, long timeoutInSecond) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public XiaoMiPushServiceVertxProxyHandler(Vertx vertx, XiaoMiPushService service, boolean topLevel, long timeoutSeconds) {
+  public ApplePushServiceVertxProxyHandler(Vertx vertx, ApplePushService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -116,7 +127,7 @@ public class XiaoMiPushServiceVertxProxyHandler extends ProxyHandler {
 
 
         case "sendMsg": {
-          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("recieveMsg"), res -> {
+          service.sendMsg((io.vertx.core.json.JsonObject)json.getValue("receiveMsg"), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
