@@ -58,13 +58,14 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         makeParam(param, positionStr, array);
         String sql = SQL_UNSEND_GET;
         sql = String.format(sql, positionStr.toString());
+        logger.info("获取用户未发送出去的消息sql[" + sql + "],param[" + array + "]");
         Future<List<JsonObject>> future = queryForList(array, sql);
         future.setHandler(res -> {
            if(res.succeeded()){
-               logger.info("获取用户未发送出去的消息成功,sql[" + SQL_UNSEND_GET + "],param[" + array + "]");
+               logger.info("获取用户未发送出去的消息成功param[" + array + "]");
                resultHandler.handle(Future.succeededFuture(res.result()));
            } else {
-               logger.error("获取用户未发送出去的消息失败,sql[" + SQL_UNSEND_GET + "],param[" + array + "]");
+               logger.error("获取用户未发送出去的消息失败param[" + array + "]");
                resultHandler.handle(Future.failedFuture(res.cause()));
            }
         });
@@ -78,6 +79,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         StringBuilder positionStr = new StringBuilder();
         makeInsertParam(param,  colStr, positionStr, array);
         sql = String.format(sql, colStr.toString(), positionStr.toString());
+        logger.info("新增未发送出去的消息,sql[" + sql + "],param[" + array + "]");
         Future<Integer> future = executeSQL(array, sql);
         future.setHandler(res -> {
             if(res.succeeded()){
@@ -106,6 +108,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
                     requestParam.put("userId", param.getString("userId"));
                     requestParam.put("expireTime", param.getString("expireTime"));
                     requestParam.put("content", param.getString("content"));
+                    logger.info("新增msgId[" + msgId + "],phone[" + phone + "]的未推送成功的消息");
                     this.addUnSendMsg(requestParam, Future.future());
                 } else {
                     logger.info("需要补发的消息已存在,msgId[" + param.getValue("msgId") + "],phone[" + param.getValue("phone") + "],不再新增");
