@@ -16,13 +16,11 @@
 
 package service.rxjava;
 
-import java.util.Map;
-import rx.Observable;
-import rx.Single;
-import utils.BaseResponse;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.rxjava.core.Vertx;
+import rx.Single;
+import utils.BaseResponse;
 
 /**
  * Created by lufei
@@ -57,7 +55,7 @@ public class MsgStatResultService {
   }
 
   /**
-   * 持久化push message 数据
+   * �־û�push message ����
    * @param result 
    */
   public void storeMsgStatResult(Handler<AsyncResult<BaseResponse>> result) { 
@@ -65,12 +63,22 @@ public class MsgStatResultService {
   }
 
   /**
-   * 持久化push message 数据
+   * �־û�push message ����
    * @return 
    */
   public Single<BaseResponse> rxStoreMsgStatResult() { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       storeMsgStatResult(fut);
+    }));
+  }
+
+  public void repireData(Handler<AsyncResult<BaseResponse>> result) { 
+    delegate.repireData(result);
+  }
+
+  public Single<BaseResponse> rxRepireData() { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      repireData(fut);
     }));
   }
 

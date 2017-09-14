@@ -43,4 +43,6 @@ public interface MsgStatResultDao {
     void getMsgStatResult(MsgStatResultDto msgStatResultDto, Handler<AsyncResult<MsgStatResultDto>> resultHandler);
 
     void queryMsgStatResultByPage(Map<String, String> params, int page, int limit, Handler<AsyncResult<MsgStatResultPageWrapper>> resultHandler);
+
+    void delErrorData(Handler<AsyncResult<BaseResponse>> resultHandler);
 }
