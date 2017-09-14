@@ -16,7 +16,7 @@
 
 package service;
 
-import service.GcmPushService;
+import service.AdMessagePushService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,10 +32,8 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.GcmPushService;
-import utils.BaseResponse;
+import service.AdMessagePushService;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -44,18 +42,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class GcmPushServiceVertxEBProxy implements GcmPushService {
+public class AdMessagePushServiceVertxEBProxy implements AdMessagePushService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public GcmPushServiceVertxEBProxy(Vertx vertx, String address) {
+  public AdMessagePushServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public GcmPushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public AdMessagePushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -65,21 +63,21 @@ public class GcmPushServiceVertxEBProxy implements GcmPushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void pushMsg(String httpMsg, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("recieveMsg", recieveMsg);
+    _json.put("httpMsg", httpMsg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "sendMsg");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _deliveryOptions.addHeader("action", "pushMsg");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
-                      }
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
     });
   }
 

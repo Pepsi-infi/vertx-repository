@@ -16,7 +16,7 @@
 
 package service;
 
-import service.RedisService;
+import service.PassengerUnSendService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,35 +39,37 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import java.util.List;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
-import service.RedisService;
 import io.vertx.core.Handler;
+import service.PassengerUnSendService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class RedisServiceVertxProxyHandler extends ProxyHandler {
+public class PassengerUnSendServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final RedisService service;
+  private final PassengerUnSendService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service, long timeoutInSecond) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public RedisServiceVertxProxyHandler(Vertx vertx, RedisService service, boolean topLevel, long timeoutSeconds) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -122,30 +124,28 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-
-
-        case "set": {
-          service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
+        case "getUnSendMsg": {
+          service.getUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createListHandler(msg));
           break;
         }
-        case "setEx": {
-          service.setEx((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), (java.lang.String)json.getValue("value"), createHandler(msg));
+        case "addUnSendMsg": {
+          service.addUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
-        case "expire": {
-          service.expire((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), createHandler(msg));
+        case "delExpireUnSendMsg": {
+          service.delExpireUnSendMsg(createHandler(msg));
           break;
         }
-        case "get": {
-          service.get((java.lang.String)json.getValue("key"), createHandler(msg));
+        case "delUnSendMsg": {
+          service.delUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
-        case "lpush": {
-          service.lpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
+        case "pushUnSendMsg": {
+          service.pushUnSendMsg((java.lang.String)json.getValue("phone"), createHandler(msg));
           break;
         }
-        case "rpush": {
-          service.rpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
+        case "pushAddUnSendMsg": {
+          service.pushAddUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
         default: {

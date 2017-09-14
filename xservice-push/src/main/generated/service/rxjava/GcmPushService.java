@@ -16,8 +16,6 @@
 
 package service.rxjava;
 
-import java.util.Map;
-import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
@@ -26,36 +24,36 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 
-@io.vertx.lang.rxjava.RxGen(service.GcmPushService.class)
+@io.vertx.lang.rxjava.RxGen(channel.GcmPushService.class)
 public class GcmPushService {
 
   public static final io.vertx.lang.rxjava.TypeArg<GcmPushService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new GcmPushService((service.GcmPushService) obj),
+    obj -> new GcmPushService((channel.GcmPushService) obj),
     GcmPushService::getDelegate
   );
 
-  private final service.GcmPushService delegate;
+  private final channel.GcmPushService delegate;
   
-  public GcmPushService(service.GcmPushService delegate) {
+  public GcmPushService(channel.GcmPushService delegate) {
     this.delegate = delegate;
   }
 
-  public service.GcmPushService getDelegate() {
+  public channel.GcmPushService getDelegate() {
     return delegate;
   }
 
   public static GcmPushService createProxy(Vertx vertx) { 
-    GcmPushService ret = GcmPushService.newInstance(service.GcmPushService.createProxy(vertx.getDelegate()));
+    GcmPushService ret = GcmPushService.newInstance(channel.GcmPushService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static GcmPushService createLocalProxy(Vertx vertx) { 
-    GcmPushService ret = GcmPushService.newInstance(service.GcmPushService.createLocalProxy(vertx.getDelegate()));
+    GcmPushService ret = GcmPushService.newInstance(channel.GcmPushService.createLocalProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static String getLocalAddress(String ip) { 
-    String ret = service.GcmPushService.getLocalAddress(ip);
+    String ret = channel.GcmPushService.getLocalAddress(ip);
     return ret;
   }
 
@@ -70,7 +68,7 @@ public class GcmPushService {
   }
 
 
-  public static  GcmPushService newInstance(service.GcmPushService arg) {
+  public static  GcmPushService newInstance(channel.GcmPushService arg) {
     return arg != null ? new GcmPushService(arg) : null;
   }
 }

@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package service;
+package channel;
 
-import channel.ApplePushService;
+import channel.SocketPushService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -29,10 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.function.Function;
-
+import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
+import channel.SocketPushService;
 import utils.BaseResponse;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -41,18 +44,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class ApplePushServiceVertxEBProxy implements ApplePushService {
+public class SocketPushServiceVertxEBProxy implements SocketPushService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public ApplePushServiceVertxEBProxy(Vertx vertx, String address) {
+  public SocketPushServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public ApplePushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public SocketPushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -62,13 +65,13 @@ public class ApplePushServiceVertxEBProxy implements ApplePushService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void sendMsg(JsonObject recieveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("receiveMsg", receiveMsg);
+    _json.put("recieveMsg", recieveMsg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "sendMsg");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {

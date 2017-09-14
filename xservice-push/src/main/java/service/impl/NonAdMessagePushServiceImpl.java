@@ -1,14 +1,8 @@
 package service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
+import channel.ApplePushService;
+import channel.SocketPushService;
+import channel.XiaoMiPushService;
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -29,18 +23,19 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.ApplePushService;
 import service.MsgRecordService;
 import service.NonAdMessagePushService;
 import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
 import util.DateUtil;
 import util.Md5Util;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.RestAPIVerticle;
+
+import java.util.*;
 
 public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService {
 

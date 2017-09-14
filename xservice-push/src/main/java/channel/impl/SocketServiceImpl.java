@@ -1,5 +1,6 @@
-package channel;
+package channel.impl;
 
+import channel.SocketPushService;
 import constant.PushConsts;
 import domain.ChatMsgVO;
 import enums.EnumPassengerMessageType;
@@ -18,7 +19,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import serializer.ByteUtils;
 import service.RedisService;
-import service.SocketPushService;
 import util.MsgUtil;
 import utils.BaseResponse;
 import xservice.BaseServiceVerticle;
@@ -32,9 +32,9 @@ import java.util.*;
  * 使用 socket 处理消息
  * Created by weim on 2017/7/25.
  */
-public class SocketVerticle extends BaseServiceVerticle implements SocketPushService {
+public class SocketServiceImpl extends BaseServiceVerticle implements SocketPushService {
 
-    private Logger logger = LoggerFactory.getLogger(SocketVerticle.class);
+    private Logger logger = LoggerFactory.getLogger(SocketServiceImpl.class);
     //下游地址列表
     private List<KeyValue> hostList = new ArrayList<>();
 
@@ -309,7 +309,7 @@ public class SocketVerticle extends BaseServiceVerticle implements SocketPushSer
      */
     public static void main(String[] args) {
 //        Vertx vertx1 = Vertx.vertx();
-//        vertx1.deployVerticle(SocketVerticle.class.getName());
+//        vertx1.deployVerticle(SocketServiceImpl.class.getName());
 //        MessageProducer<String> mp = vertx1.eventBus().sender(SocketPushService.SERVICE_ADDRESS);
 //        String json = "{\"phone\":\"13211112222\",\"devicePushType\":\"1\",\"msgId\":\"a56e4029-99f7-4b9d-829f-8627be78821a\"," +
 //                "\"customerId\":123,\"title\":\"发券啦\",\"content\":\"送您一张10元优惠券\"}";

@@ -1,14 +1,8 @@
 package service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
+import channel.ApplePushService;
+import channel.SocketPushService;
+import channel.XiaoMiPushService;
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -29,17 +23,19 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
 import service.AdMessagePushService;
-import service.ApplePushService;
 import service.MsgRecordService;
+import service.PassengerUnSendService;
 import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
 import util.DateUtil;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
+
+import java.util.*;
 
 public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdMessagePushService {
 
@@ -58,6 +54,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private DeviceService deviceService;
 
 	private ApplePushService applePushService;
+
+	private PassengerUnSendService passengerUnSendService;
 
 	private String token;
 	private Integer channel;
@@ -136,6 +134,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
+				saveUnSendMsg(receiveMsg);
 				resultHandler.handle(Future.succeededFuture(
 						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
 								.toString()));
@@ -154,6 +153,21 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			}
 		});
 
+	}
+
+	//未推送成功的消息入库，用户上线继续推送
+	private void saveUnSendMsg(JsonObject srcMsg){
+		try {
+			JsonObject param = new JsonObject();
+			param.put("msgId", srcMsg.getValue("msgId") + "");
+			param.put("phone", srcMsg.getString("phone"));
+			param.put("userId", srcMsg.getValue("customerId") + "");
+			param.put("expireTime", srcMsg.getValue("expireTime") + "");
+			param.put("content", srcMsg.toString());
+			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
+		}catch (Exception e){
+			logger.error("保存未推送成功的消息失败" + e);
+		}
 	}
 
 	public void responseSuccess(HttpServerResponse resp, String msg) {
@@ -245,6 +259,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
 		applePushService = ApplePushService.createProxy(vertx);
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx);
 	}
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {

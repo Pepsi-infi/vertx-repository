@@ -16,8 +16,6 @@
 
 package service.rxjava;
 
-import java.util.Map;
-import rx.Observable;
 import rx.Single;
 import utils.BaseResponse;
 import io.vertx.rxjava.core.Vertx;
@@ -26,36 +24,36 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 
-@io.vertx.lang.rxjava.RxGen(service.SocketPushService.class)
+@io.vertx.lang.rxjava.RxGen(channel.SocketPushService.class)
 public class SocketPushService {
 
   public static final io.vertx.lang.rxjava.TypeArg<SocketPushService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new SocketPushService((service.SocketPushService) obj),
+    obj -> new SocketPushService((channel.SocketPushService) obj),
     SocketPushService::getDelegate
   );
 
-  private final service.SocketPushService delegate;
+  private final channel.SocketPushService delegate;
   
-  public SocketPushService(service.SocketPushService delegate) {
+  public SocketPushService(channel.SocketPushService delegate) {
     this.delegate = delegate;
   }
 
-  public service.SocketPushService getDelegate() {
+  public channel.SocketPushService getDelegate() {
     return delegate;
   }
 
   public static SocketPushService createProxy(Vertx vertx) { 
-    SocketPushService ret = SocketPushService.newInstance(service.SocketPushService.createProxy(vertx.getDelegate()));
+    SocketPushService ret = SocketPushService.newInstance(channel.SocketPushService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static SocketPushService createLocalProxy(Vertx vertx) { 
-    SocketPushService ret = SocketPushService.newInstance(service.SocketPushService.createLocalProxy(vertx.getDelegate()));
+    SocketPushService ret = SocketPushService.newInstance(channel.SocketPushService.createLocalProxy(vertx.getDelegate()));
     return ret;
   }
 
   public static String getLocalAddress(String ip) { 
-    String ret = service.SocketPushService.getLocalAddress(ip);
+    String ret = channel.SocketPushService.getLocalAddress(ip);
     return ret;
   }
 
@@ -70,7 +68,7 @@ public class SocketPushService {
   }
 
 
-  public static  SocketPushService newInstance(service.SocketPushService arg) {
+  public static  SocketPushService newInstance(channel.SocketPushService arg) {
     return arg != null ? new SocketPushService(arg) : null;
   }
 }
