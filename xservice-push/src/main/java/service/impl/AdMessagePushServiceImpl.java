@@ -164,6 +164,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			param.put("userId", srcMsg.getValue("customerId") + "");
 			param.put("expireTime", srcMsg.getValue("expireTime") + "");
 			param.put("content", srcMsg.toString());
+			param.put("callFlag", "1");
 			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
 		}catch (Exception e){
 			logger.error("保存未推送成功的消息失败" + e);

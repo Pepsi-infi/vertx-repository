@@ -17,6 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import result.ResultData;
 import service.AdMessagePushService;
+import service.NonAdMessagePushService;
 import service.PassengerUnSendService;
 import util.DateUtil;
 import xservice.BaseServiceVerticle;
@@ -36,6 +37,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
 
     private AdMessagePushService adMessagePushService;
 
+    private NonAdMessagePushService nonAdMessagePushService;
     //乘客消息列表
     public static final String SQL_UNSEND_GET = "select * from msg_passenger_unsend where expireTime > now() %s ";
     public static final String SQL_UNSEND_EXPIREDEL = "delete from msg_passenger_unsend where expireTime < now() ";
@@ -49,6 +51,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         sqlClient = MySQLClient.createShared(vertx, mysqlOptions);
 
         adMessagePushService = AdMessagePushService.createProxy(vertx);
+        nonAdMessagePushService = NonAdMessagePushService.createProxy(vertx);
     }
 
     @Override
@@ -58,14 +61,14 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         makeParam(param, positionStr, array);
         String sql = SQL_UNSEND_GET;
         sql = String.format(sql, positionStr.toString());
-        logger.info("获取用户未发送出去的消息sql[" + sql + "],param[" + array + "]");
+        logger.info("【查询补发消息】查询补发消息sql[" + sql + "],param[" + array + "]");
         Future<List<JsonObject>> future = queryForList(array, sql);
         future.setHandler(res -> {
            if(res.succeeded()){
-               logger.info("获取用户未发送出去的消息成功param[" + array + "]");
+//               logger.info("获取用户未发送出去的消息成功param[" + array + "]");
                resultHandler.handle(Future.succeededFuture(res.result()));
            } else {
-               logger.error("获取用户未发送出去的消息失败param[" + array + "]");
+               logger.error("【查询补发消息】查询补发消息失败param[" + array + "]");
                resultHandler.handle(Future.failedFuture(res.cause()));
            }
         });
@@ -79,14 +82,14 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         StringBuilder positionStr = new StringBuilder();
         makeInsertParam(param,  colStr, positionStr, array);
         sql = String.format(sql, colStr.toString(), positionStr.toString());
-        logger.info("新增未发送出去的消息,sql[" + sql + "],param[" + array + "]");
+        logger.info("【新增补发消息】新增补发消息,sql[" + sql + "],param[" + array + "]");
         Future<Integer> future = executeSQL(array, sql);
         future.setHandler(res -> {
             if(res.succeeded()){
-                logger.info("新增未发送出去的消息成功");
+                logger.info("【新增补发消息】新增补发消息成功");
                 resultHandler.handle(Future.succeededFuture(res.result()));
             } else {
-                logger.error("新增未发送出去的消息失败，",res.cause());
+                logger.error("【新增补发消息】新增补发消息失败，",res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
             }
         });
@@ -108,10 +111,13 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
                     requestParam.put("userId", param.getString("userId"));
                     requestParam.put("expireTime", param.getString("expireTime"));
                     requestParam.put("content", param.getString("content"));
-                    logger.info("新增msgId[" + msgId + "],phone[" + phone + "]的未推送成功的消息");
+                    requestParam.put("callFlag", param.getString("callFlag"));
+                    requestParam.put("senderId", param.getString("senderId"));
+                    requestParam.put("senderKey", param.getString("senderKey"));
+                    logger.info("【调用新增补发消息】msgId[" + msgId + "],phone[" + phone + "]");
                     this.addUnSendMsg(requestParam, Future.future());
                 } else {
-                    logger.info("需要补发的消息已存在,msgId[" + param.getValue("msgId") + "],phone[" + param.getValue("phone") + "],不再新增");
+                    logger.info("【调用新增补发消息】需要补发的消息已存在,msgId[" + param.getValue("msgId") + "],phone[" + param.getValue("phone") + "],不再新增");
                 }
             } else {
 //					logger.error("获取用户未发送出去的消息失败");
@@ -128,7 +134,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
 //                logger.info("删除过期的未发送出去的消息成功");
                 resultHandler.handle(Future.succeededFuture(res.result()));
             } else {
-                logger.error("删除过期的未发送出去的消息失败，",res.cause());
+                logger.error("【删除过期补发消息】删除失败，",res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
             }
         });
@@ -142,10 +148,10 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         Future<Integer> future = executeSQL(array, SQL_UNSEND_DEL);
         future.setHandler(res -> {
             if(res.succeeded()){
-                logger.info("删除补发成功的消息完成");
+                logger.info("【删除补发消息】完成");
                 resultHandler.handle(Future.succeededFuture(res.result()));
             } else {
-                logger.error("删除补发成功的消息失败，",res.cause());
+                logger.error("【删除补发消息】失败，",res.cause());
                 resultHandler.handle(Future.failedFuture(res.cause()));
             }
         });
@@ -243,15 +249,15 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
         JsonObject param = new JsonObject();
         param.put("phone", phone);
         Future<List<JsonObject>> future = Future.future();
-        logger.info("开始查询用户未推送成功的消息调用getUnSendMsg，phone=" + phone);
+        logger.info("【补发消息】查询需要补发消息，phone=" + phone);
         this.getUnSendMsg(param, future);
         future.setHandler(res -> {
             if(res.succeeded()){
                 List<JsonObject> list = res.result();
-                logger.info("查询用户未推送成功的消息成功,phone=" + phone);
+//                logger.info("查询用户未推送成功的消息成功,phone=" + phone);
                 pushUnSendMsg(phone, list);
             }else{
-                logger.info("查询用户未推送成功的消息失败,phone=" + phone);
+                logger.info("【补发消息】查询需要补发消息失败,phone=" + phone);
             }
         });
         resultHandler.handle(Future.succeededFuture(new ResultData().toString()));
@@ -259,17 +265,25 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
 
     private void pushUnSendMsg(String phone, List<JsonObject> list){
         if(CollectionUtils.isNotEmpty(list)){
-            logger.info("用户需要补发的消息有" + list.size() + "条");
+            logger.info("【补发消息】用户需要补发的消息，共有" + list.size() + "条");
             for(JsonObject unSendMsg : list){
                 String msgId = unSendMsg.getValue("msgId") + "";
                 String msg = unSendMsg.getString("content");
+                Integer callFlag =  unSendMsg.getInteger("callFlag");
                 Future<String> pushFuture = Future.future();
-                logger.info("用户需要补发的消息:[" + msg + "]");
-                adMessagePushService.pushMsg(msg, pushFuture);
+//                logger.info("用户需要补发的消息:[" + msg + "]");
+                //1 是广告消息处理，2 是非广告消息处理
+                if(callFlag == 1){
+                    adMessagePushService.pushMsg(msg, pushFuture);
+                }else{
+                    String senderId = unSendMsg.getString("senderId");
+                    String senderKey = unSendMsg.getString("senderKey");
+                    nonAdMessagePushService.pushMsg(senderId, senderKey, msg, pushFuture);
+                }
                 pushFuture.setHandler(res -> {
                     if(res.succeeded()){
                         String result = res.result();
-                        logger.info("推送消息msgId[" + msgId +  "],phone[" + phone + "],返回结果：" + result);
+                        logger.info("【补发消息】推送消息msgId[" + msgId +  "],phone[" + phone + "],返回结果：" + result);
                         ResultData rd = Json.decodeValue(result, ResultData.class);
                         if(rd != null && ResultData.SUCCESS == rd.getCode()){
                             JsonObject param = new JsonObject();
@@ -281,7 +295,7 @@ public class PassengerUnSendServiceImpl extends BaseServiceVerticle implements P
                 });
             }
         }else {
-            logger.info("用户无未推送成功的消息不需要补发,phone="+ phone);
+            logger.info("【补发消息】用户无未推送成功的消息不需要补发,phone="+ phone);
         }
     }
 
