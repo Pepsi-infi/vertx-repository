@@ -14,6 +14,7 @@ import {port_table} from 'common/port_uri'
 //数据列表
 export function list(params) {
   return fetch({
+    baseURL: process.env.mc_statistic_baseURL,
     url: port_table.list,
     method: 'get',
     params
@@ -23,6 +24,7 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return fetch({
+    baseURL: process.env.mc_statistic_baseURL,
     url: port_table.get,
     method: 'get',
     params

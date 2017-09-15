@@ -29,7 +29,7 @@ export default function http(options) {
     //创建一个axios实例
     const instance = axios.create({
       //设置默认根地址
-      baseURL: process.env.server_base_url,
+      baseURL: options.baseURL,
       //设置请求超时设置
       timeout: 2000
       //设置请求时的header

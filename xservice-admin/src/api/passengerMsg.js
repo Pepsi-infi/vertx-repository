@@ -14,6 +14,7 @@ import {passengerMsg} from 'common/port_uri'
 //数据列表
 export function list(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.list,
     method: 'get',
     params
@@ -23,6 +24,7 @@ export function list(params) {
 //根据id查询数据
 export function addOrEdit(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.addOrEdit,
     method: 'post',
     params
@@ -32,6 +34,7 @@ export function addOrEdit(params) {
 //根据id查询数据
 export function get(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.get,
     method: 'get',
     params
@@ -41,6 +44,7 @@ export function get(params) {
 //根据id查询数据
 export function del(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.del,
     method: 'get',
     params
@@ -50,6 +54,7 @@ export function del(params) {
 //根据id查询数据
 export function push(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.push,
     method: 'get',
     params
@@ -59,6 +64,7 @@ export function push(params) {
 //根据id查询数据
 export function getImportFileList(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.getImportFileList,
     method: 'get',
     params
@@ -68,6 +74,7 @@ export function getImportFileList(params) {
 //根据id查询数据
 export function getCityList(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.getCityList,
     method: 'get',
     params
@@ -77,6 +84,7 @@ export function getCityList(params) {
 //根据id查询数据
 export function importFilePage(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: passengerMsg.importFilePage,
     method: 'get',
     params

@@ -1,6 +1,10 @@
 module.exports = {
   NODE_ENV: '"test"',
-  //接入服务器接口地址根目录
-  server_base_url: '"http://10.10.10.177:9100"'
+  //统计中心domain
+  mc_statistic_baseURL: '"http://10.10.10.177:9100"',
+  //配置中心domain
+  mc_config_baseURL: '"http://10.10.10.177:9200"',
+  //配置中心domain
+  mc_push_baseURL: '"http://10.10.10.177:8989"'
 }
 

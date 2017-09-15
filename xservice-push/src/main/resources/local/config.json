@@ -59,5 +59,41 @@
     "apple.test.apnsToken": "f476872c95b470282795ff92124ec9079c4935a8c181f1bdd10a6fb9ce0c28ce",
     "socket.test.customerId": "13666050",
     "socket.test.phone": "13621241006"
+  },
+  "rocketMq.config": {
+    "drive.namesrvAddr": "192.168.0.16:9876;192.168.0.17:9876",
+    "drive.topic": "driver_info"
+
+  },
+  "mongo.config":{
+    "host": "10.10.10.178",
+    "port": 27017,
+    "db_name":"im-mc",
+    "serverSelectionTimeoutMS": 30000,
+    "maxPoolSize": 50,
+    "minPoolSize": 25,
+    "maxIdleTimeMS": 300000,
+    "maxLifeTimeMS": 3600000,
+    "waitQueueMultiple": 10,
+    "waitQueueTimeoutMS": 10000,
+    "maintenanceFrequencyMS": 2000,
+    "maintenanceInitialDelayMS": 500,
+    "username": "im-mc",
+    "password": "im-mc",
+    "authSource": "im-mc",
+    "connectTimeoutMS": 300000,
+    "socketTimeoutMS": 100000,
+    "sendBufferSize": 8192,
+    "receiveBufferSize": 8192,
+    "keepAlive": true,
+    "heartbeat.socket": {
+      "connectTimeoutMS": 300000,
+      "socketTimeoutMS": 100000,
+      "sendBufferSize": 8192,
+      "receiveBufferSize": 8192,
+      "keepAlive": true
+    },
+    "heartbeatFrequencyMS": 1000,
+    "minHeartbeatFrequencyMS": 500
   }
 }
