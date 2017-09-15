@@ -1,12 +1,12 @@
 package domain;
 
-import java.util.Date;
+import java.io.Serializable;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 @DataObject(generateConverter = true)
-public class DriverMsg{
+public class DriverMsg implements Serializable {
 
 	/**
 	 * 
@@ -24,8 +24,10 @@ public class DriverMsg{
 	private int enabled;// 是否可用 0-不可用 1-可用
 	private String createUser;// 创建人
 	private String updateUser;// 修改人
-	private String createTime;
-    private String updateTime;
+	private String createTime;// 创建时间
+	private String updateTime;// 修改时间
+	private Integer readNum;// 已读人数
+	private Integer unReadNum;// 未读人数
 
 	public String getTitle() {
 		return title;
@@ -58,7 +60,7 @@ public class DriverMsg{
 	public void setMsgType(int msgType) {
 		this.msgType = msgType;
 	}
-	
+
 	public String getCreateUser() {
 		return createUser;
 	}
@@ -114,7 +116,7 @@ public class DriverMsg{
 	public void setIsShellsScreen(int isShellsScreen) {
 		this.isShellsScreen = isShellsScreen;
 	}
-	
+
 	public long getId() {
 		return id;
 	}
@@ -122,8 +124,6 @@ public class DriverMsg{
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	
 
 	public String getCreateTime() {
 		return createTime;
@@ -141,12 +141,28 @@ public class DriverMsg{
 		this.updateTime = updateTime;
 	}
 
+	public Integer getReadNum() {
+		return readNum;
+	}
+
+	public void setReadNum(Integer readNum) {
+		this.readNum = readNum;
+	}
+
+	public Integer getUnReadNum() {
+		return unReadNum;
+	}
+
+	public void setUnReadNum(Integer unReadNum) {
+		this.unReadNum = unReadNum;
+	}
+
 	public DriverMsg() {
 		super();
 	}
-	
+
 	public DriverMsg(JsonObject json) {
-	    DriverMsgConverter.fromJson(json,this);
+		DriverMsgConverter.fromJson(json, this);
 	}
 
 	public JsonObject toJson() {

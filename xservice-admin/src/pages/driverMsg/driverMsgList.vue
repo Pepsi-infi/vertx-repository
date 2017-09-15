@@ -50,20 +50,11 @@
         </el-table-column>
         <el-table-column prop="title"  label="消息标题" width="150">
         </el-table-column>
-        <el-table-column
-          prop="msgType"
-          label="消息类型"
-          width="100">
+        <el-table-column prop="msgType" label="消息类型" width="100">
         </el-table-column>
-        <el-table-column
-          prop=""
-          label="已读人数"
-          width="100">
+        <el-table-column prop="readNum" label="已读人数" width="100">
         </el-table-column>
-        <el-table-column
-          prop=""
-          label="未读人数"
-          width="100">
+        <el-table-column prop="unReadNum" label="未读人数" width="100">
         </el-table-column>
         <el-table-column prop="createTime" label="创建时间" :formatter="formatTime" width="180">
         </el-table-column>

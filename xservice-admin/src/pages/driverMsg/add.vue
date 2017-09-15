@@ -65,11 +65,11 @@
   	</el-checkbox-group>
   	</el-row>
   </el-form-item>
-  <el-form-item label="已选择推送司机" v-show="showDriver" prop="valDriverNames">
+  <el-form-item label="已选择推送司机" v-show="showDriver" prop="driverNames">
   	<el-button type="text" @click="dialogTableVisible = true">[选择]
 	</el-button>
   	<el-button type="text" @click="clearDrivers">[清空]</el-button>
-  	<el-input v-model="form.driverNames"></el-input>
+  	<el-input v-model="form.driverNames" readonly ></el-input>
   </el-form-item>
   <el-form-item>
     <el-button type="primary" @click="onSubmit('form')">立即创建</el-button>
@@ -135,13 +135,14 @@
         <el-table-column prop="providerId" label="供应商" width="100">
         </el-table-column>
       </el-table>
+
       <bottom-tool-bar>
         <div slot="page">
             <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="currentPage"
-              :page-sizes="[10, 20, 50, 100]"
+              :page-sizes="[10, 20, 50, 100,1000]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total">
@@ -168,15 +169,14 @@
           cooperationTypeArr:['5','6','7'],
           cityIds:[],
           driverIds:[],
-          driverNames:[],
-          valDriverNames:[]     
+          driverNames:[]   
         },
         rules: {
           title: [{required: true, message: '标题不能为空', trigger: 'blur'}],
           content: [{required: true, message: '消息内容不能为空', trigger: 'blur'}],
           synopsis: [{required: true, message: '内容梗概不能为空', trigger: 'blur'}],
           msgType: [{required: true, message: '请选择消息类型', trigger: 'change'}],
-          valDriverNames:[]
+          driverNames:[{}]
         },
         providerOptions:[],
         cities:[],
@@ -218,18 +218,12 @@
     methods: {
       //创建消息
       onSubmit(formName) {
+      	if(this.form.sendAll==3&&this.form.driverNames==""){
+        	this.rules.driverNames=[{required: true, message: '请选择司机', trigger: 'change'}];
+        }else{
+          this.rules.driverNames=[];
+        }
       	this.$refs[formName].validate((valid) => {
-      		 	
-        	
-        	
-        	if(this.form.sendAll==3&&this.form.driverIds==""){
-        		this.rules.valDriverNames=[{required: true, message: '请选择司机', trigger: 'change'}];
-        		this.form.valDriverNames=this.form.driverIds;
-        		if(!valid){ 
-        	    	alert(123);
-        			return false 
-        		}
-        	}
         	
         	if(!valid){ 
         		return false 

@@ -5,9 +5,11 @@ import java.util.Map;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sql.UpdateResult;
 import io.vertx.serviceproxy.ProxyHelper;
 
 @ProxyGen
@@ -25,7 +27,7 @@ public interface DriverMsgService {
 	 * @param msg
 	 * @param resultHandler
 	 */
-	void addDriverMsg(JsonObject msg, Handler<AsyncResult<Integer>> resultHandler);
+	void addDriverMsg(JsonObject msg, Handler<AsyncResult<UpdateResult>> resultHandler);
 	
 	/**
 	 * 分页查询司机端消息
@@ -39,12 +41,13 @@ public interface DriverMsgService {
 	 * @param completer
 	 */
 	void getDriverMsgDetail(Long id, Handler<AsyncResult<JsonObject>> completer);
-	
+		
 	/**
-	 * 司机端消息发送
-	 * @param driverMsg
+	 * 消息明细入库
+	 * @param dto
 	 * @param completer
+	 * @return 
 	 */
-	void sendDriverMsg(Map<String, String> driverMsg, Handler<AsyncResult<String>> completer);
+	void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<Integer>> completer);
 	
 }
