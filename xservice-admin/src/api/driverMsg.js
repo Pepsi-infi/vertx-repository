@@ -4,6 +4,7 @@ import {driverMsg} from 'common/port_uri'
 //数据列表
 export function list(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: driverMsg.list,
     method: 'get',
     params:params
@@ -13,6 +14,7 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: driverMsg.get,
     method: 'get',  
     params
@@ -22,6 +24,7 @@ export function get(params) {
 //添加或修改数据
 export function save(params) {
   return http({
+    baseURL: process.env.mc_push_baseURL,
     url: driverMsg.save,
     method: 'post',
     params
@@ -31,6 +34,7 @@ export function save(params) {
 //获取供应商列表
 export function providerList(){
 	return http({
+    baseURL: process.env.mc_push_baseURL,
 		url:driverMsg.providerList,
 		method:'get'
 	})
@@ -39,6 +43,7 @@ export function providerList(){
 //获取城市列表
 export function cityList(){
 	return http({
+    baseURL: process.env.mc_push_baseURL,
 		url:driverMsg.cityList,
 		method:'post'	
 	})
@@ -47,6 +52,7 @@ export function cityList(){
 //获取司机列表
 export function driverList(params){
 	return http({
+    baseURL: process.env.mc_push_baseURL,
 		url:driverMsg.driverList,
 		method:'post',
 		params
