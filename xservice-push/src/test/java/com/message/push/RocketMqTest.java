@@ -1,6 +1,5 @@
 package com.message.push;
 
-import api.RestPushVerticle;
 import constant.PushConsts;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -32,7 +31,6 @@ public class RocketMqTest {
 //        vertx.deployVerticle(DriverMessageProduce.class.getName(), options);
         vertx.deployVerticle(DriverMessageConsumer.class.getName(), options);
         vertx.deployVerticle(DriverServiceImpl.class.getName(), options);
-        vertx.deployVerticle(RestPushVerticle.class.getName(), options);
 //        deployRestService(vertx);
     }
 
@@ -40,7 +38,6 @@ public class RocketMqTest {
     private static Future<Void> deployRestService(Vertx vertx) {
         Future<String> future = Future.future();
         DeploymentOptions deploymentOptions = new DeploymentOptions();
-        vertx.deployVerticle(RestPushVerticle.class.getName(), deploymentOptions, future.completer());
 
         return future.map(r -> null);
     }

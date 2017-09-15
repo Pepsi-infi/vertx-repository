@@ -11,7 +11,8 @@
     "PUSH_MSG_URL":"/mc-push/message/push.json",
     "PUSH_MSG_PORT":8989,
     "city.url":"http://127.0.0.1/api/v1/region/list",
-    "provider.url":"http://127.0.0.1"
+    "provider.url":"http://127.0.0.1",
+    "UDP_HOSTS": "10.10.10.102:9099"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import api.RestPushVerticle;
 import enums.ErrorCodeEnum;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -24,7 +23,7 @@ import result.ResultData;
 
 public class HttpUtil extends AbstractVerticle{
 
-	private static final Logger logger = LoggerFactory.getLogger(RestPushVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
 
 	private static WebClient webClient;
 	
