@@ -10,7 +10,7 @@
     "socket.valid.url": "http://10.10.10.105:18080/webservice/passenger/webservice/chat/checkSocket",
     "PUSH_MSG_URL":"/mc-push/message/push.json",
     "PUSH_MSG_PORT":8989,
-    "UDP_HOSTS": "10.10.10.102:9099"
+    "UDP_HOSTS": "10.10.10.106:9099,10.10.10.105:9099"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",
