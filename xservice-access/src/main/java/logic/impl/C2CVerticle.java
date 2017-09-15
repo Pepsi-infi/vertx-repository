@@ -1,5 +1,7 @@
 package logic.impl;
 
+import java.time.LocalDate;
+
 import org.apache.commons.lang.StringUtils;
 
 import constants.IMMessageConstant;
@@ -82,17 +84,22 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						JsonObject header = msg.getJsonObject("header");
 						JsonObject body = msg.getJsonObject("body");
 						long ts = System.currentTimeMillis();
-						body.put("msgId", ts);
-						body.put("timeStamp", ts);
-
 						int clientVersion = header.getInteger("clientVersion");
 						int cmd = header.getInteger("cmd");
+						body.put("msgId", ts);
+						body.put("cmd", cmd);
+						body.put("timeStamp", ts);
+						body.put("date", LocalDate.now());
+
 						int bodyLength = body.toString().length();
 
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd, bodyLength);
 						eb.send(toHandlerID, headerBuffer.appendString(body.toString()).appendString("\001"));
 
+						/**
+						 * mongo message data: message body + msgId + timeStamp + date
+						 */
 						mongoService.saveDataBatch(body, mongo -> {
 						});
 					} else {

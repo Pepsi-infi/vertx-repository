@@ -19,6 +19,7 @@ import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
 import logic.SessionService;
 import logic.impl.C2CVerticle;
+import persistence.MongoService;
 import protocol.MessageBuilder;
 import util.ByteUtil;
 
@@ -27,6 +28,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
 
 	private C2CService c2cService;
+	private MongoService mongoService;
 	private EventBus eb;
 	private ConsistentHashingService consistentHashingService;
 
@@ -36,6 +38,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 
 		c2cService = C2CService.createProxy(vertx);
+		mongoService = MongoService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
@@ -90,6 +93,8 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
 		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
+
+		// 1、心跳消息确认
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
 
@@ -114,13 +119,17 @@ public class TCPServerVerticle extends AbstractVerticle {
 						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
 						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
 
-						// 给FROM发A
+						// 1、给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd + 100, 0);
 
 						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
 								clientVersion, cmd, bodyLength);
 						eb.send(handlerID, aMsgHeader.appendString("\001"));
+
+						// 2、发送离线消息
+						// JsonObject query = new JsonObject().put("cmd", 2003).put("toTel", from);
+						// eb.send(handlerID, );
 					}
 				}
 			} catch (Exception e) {

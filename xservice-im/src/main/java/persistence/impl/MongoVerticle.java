@@ -69,6 +69,16 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 		}
 	}
 
+	/**
+	 * {"msgId":1111111,"cmd":111,"timeStamp":11111,"date":"2017-01-01","toTel":123123123,"sceneId":11111}
+	 * 
+	 * @param json
+	 */
+	public void findData(JsonObject json,) {
+		JsonObject query = new JsonObject().put("author", "J. R. R. Tolkien");
+		client.findBatchWithOptions(collection, query, options, resultHandler);
+	}
+
 	@Override
 	public void updateData(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler) {
 		String collection = json.getString("collection");
