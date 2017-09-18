@@ -3,6 +3,10 @@ module.exports = {
   //统计中心domain
   mc_statistic_baseURL: '"http://10.10.10.177:9100"',
   //配置中心domain
-  mc_config_baseURL: '"http://10.10.10.193:9200"'
+  //
+  mc_config_baseURL: '"http://10.10.10.193:9200"',
+
+  //配置中心domain
+  mc_push_baseURL: '"http://10.10.10.177:8989"'
 }
 

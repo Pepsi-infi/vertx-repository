@@ -40,7 +40,6 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 
 		// 连接redis
 		this.initRedisClient();
-		
 
 	}
 
@@ -99,8 +98,8 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 	}
 
 	@Override
-	public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
+	public void lpush(String key, String value, Handler<AsyncResult<Long>> result) {
+		redisCluster.lpush(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -110,26 +109,27 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 	}
 
 	@Override
-	public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
-		redisCluster.lpush(queue, PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, handler -> {
+	public void rpush(String key, String value, Handler<AsyncResult<Long>> result) {
+		redisCluster.rpush(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
 				result.handle(Future.failedFuture(handler.cause()));
 			}
 		});
+
 	}
 
 	@Override
 	public void setEx(String key, long expire, String value, Handler<AsyncResult<String>> result) {
-		redisCluster.setex(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key,expire, value, handler -> {
+		redisCluster.setex(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, expire, value, handler -> {
 			if (handler.succeeded()) {
 				result.handle(Future.succeededFuture(handler.result()));
 			} else {
 				result.handle(Future.failedFuture(handler.cause()));
 			}
 		});
-		
+
 	}
 
 }
