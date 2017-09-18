@@ -19,7 +19,7 @@ package service.rxjava;
 import java.util.Map;
 import rx.Observable;
 import rx.Single;
-import java.util.Map;
+import io.vertx.ext.sql.UpdateResult;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
@@ -54,7 +54,7 @@ public class DriverMsgService {
    * @param msg 
    * @param resultHandler 
    */
-  public void addDriverMsg(JsonObject msg, Handler<AsyncResult<Integer>> resultHandler) { 
+  public void addDriverMsg(JsonObject msg, Handler<AsyncResult<UpdateResult>> resultHandler) { 
     delegate.addDriverMsg(msg, resultHandler);
   }
 
@@ -63,7 +63,7 @@ public class DriverMsgService {
    * @param msg 
    * @return 
    */
-  public Single<Integer> rxAddDriverMsg(JsonObject msg) { 
+  public Single<UpdateResult> rxAddDriverMsg(JsonObject msg) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       addDriverMsg(msg, fut);
     }));
@@ -110,22 +110,22 @@ public class DriverMsgService {
   }
 
   /**
-   * 司机端消息发送
-   * @param driverMsg 
-   * @param completer 
+   * 消息明细入库
+   * @param dto 
+   * @param handler 
    */
-  public void sendDriverMsg(Map<String,String> driverMsg, Handler<AsyncResult<String>> completer) { 
-    delegate.sendDriverMsg(driverMsg, completer);
+  public void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<JsonObject>> handler) { 
+    delegate.addDriverMsgItems(dto, handler);
   }
 
   /**
-   * 司机端消息发送
-   * @param driverMsg 
+   * 消息明细入库
+   * @param dto 
    * @return 
    */
-  public Single<String> rxSendDriverMsg(Map<String,String> driverMsg) { 
+  public Single<JsonObject> rxAddDriverMsgItems(JsonObject dto) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      sendDriverMsg(driverMsg, fut);
+      addDriverMsgItems(dto, fut);
     }));
   }
 

@@ -97,23 +97,23 @@ public class RedisService {
     }));
   }
 
-  public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) { 
-    delegate.lpush(queue, key, result);
+  public void lpush(String key, String value, Handler<AsyncResult<Long>> result) { 
+    delegate.lpush(key, value, result);
   }
 
-  public Single<Long> rxLpush(String queue, String key) { 
+  public Single<Long> rxLpush(String key, String value) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      lpush(queue, key, fut);
+      lpush(key, value, fut);
     }));
   }
 
-  public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) { 
-    delegate.rpush(queue, key, result);
+  public void rpush(String key, String value, Handler<AsyncResult<Long>> result) { 
+    delegate.rpush(key, value, result);
   }
 
-  public Single<Long> rxRpush(String queue, String key) { 
+  public Single<Long> rxRpush(String key, String value) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      rpush(queue, key, fut);
+      rpush(key, value, fut);
     }));
   }
 

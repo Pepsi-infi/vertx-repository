@@ -120,6 +120,42 @@ public class DriverServiceVertxEBProxy implements DriverService {
     });
   }
 
+  public void queryDriverCount(JsonObject query, Handler<AsyncResult<Long>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("query", query);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "queryDriverCount");
+    _vertx.eventBus().<Long>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void queryOneDriver(JsonObject query, Handler<AsyncResult<String>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("query", query);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "queryOneDriver");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
 
   private List<Character> convertToListChar(JsonArray arr) {
     List<Character> list = new ArrayList<>();

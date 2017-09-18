@@ -25,9 +25,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * Created by lufei
- * Date : 2017/8/23 11:13
- * Description :
+ * Created by lufei Date : 2017/8/23 11:13 Description :
  *
  * <p/>
  * NOTE: This class has been automatically generated from the {@link service.DriverService original} non RX-ified interface using Vert.x codegen.
@@ -83,6 +81,26 @@ public class DriverService {
   public Single<JsonObject> rxQueryBatchDriver(JsonObject query) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       queryBatchDriver(query, fut);
+    }));
+  }
+
+  public void queryDriverCount(JsonObject query, Handler<AsyncResult<Long>> result) { 
+    delegate.queryDriverCount(query, result);
+  }
+
+  public Single<Long> rxQueryDriverCount(JsonObject query) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryDriverCount(query, fut);
+    }));
+  }
+
+  public void queryOneDriver(JsonObject query, Handler<AsyncResult<String>> result) { 
+    delegate.queryOneDriver(query, result);
+  }
+
+  public Single<String> rxQueryOneDriver(JsonObject query) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      queryOneDriver(query, fut);
     }));
   }
 

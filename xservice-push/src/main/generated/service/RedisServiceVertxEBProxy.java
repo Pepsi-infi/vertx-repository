@@ -139,14 +139,14 @@ public class RedisServiceVertxEBProxy implements RedisService {
     });
   }
 
-  public void lpush(String queue, String key, Handler<AsyncResult<Long>> result) {
+  public void lpush(String key, String value, Handler<AsyncResult<Long>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("queue", queue);
     _json.put("key", key);
+    _json.put("value", value);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "lpush");
     _vertx.eventBus().<Long>send(_address, _json, _deliveryOptions, res -> {
@@ -158,14 +158,14 @@ public class RedisServiceVertxEBProxy implements RedisService {
     });
   }
 
-  public void rpush(String queue, String key, Handler<AsyncResult<Long>> result) {
+  public void rpush(String key, String value, Handler<AsyncResult<Long>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("queue", queue);
     _json.put("key", key);
+    _json.put("value", value);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "rpush");
     _vertx.eventBus().<Long>send(_address, _json, _deliveryOptions, res -> {

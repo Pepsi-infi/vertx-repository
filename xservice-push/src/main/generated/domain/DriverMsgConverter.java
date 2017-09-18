@@ -54,6 +54,9 @@ public class DriverMsgConverter {
     if (json.getValue("msgType") instanceof Number) {
       obj.setMsgType(((Number)json.getValue("msgType")).intValue());
     }
+    if (json.getValue("readNum") instanceof Number) {
+      obj.setReadNum(((Number)json.getValue("readNum")).intValue());
+    }
     if (json.getValue("status") instanceof Number) {
       obj.setStatus(((Number)json.getValue("status")).intValue());
     }
@@ -62,6 +65,9 @@ public class DriverMsgConverter {
     }
     if (json.getValue("title") instanceof String) {
       obj.setTitle((String)json.getValue("title"));
+    }
+    if (json.getValue("unReadNum") instanceof Number) {
+      obj.setUnReadNum(((Number)json.getValue("unReadNum")).intValue());
     }
     if (json.getValue("updateTime") instanceof String) {
       obj.setUpdateTime((String)json.getValue("updateTime"));
@@ -89,12 +95,18 @@ public class DriverMsgConverter {
       json.put("jumpUrl", obj.getJumpUrl());
     }
     json.put("msgType", obj.getMsgType());
+    if (obj.getReadNum() != null) {
+      json.put("readNum", obj.getReadNum());
+    }
     json.put("status", obj.getStatus());
     if (obj.getSynopsis() != null) {
       json.put("synopsis", obj.getSynopsis());
     }
     if (obj.getTitle() != null) {
       json.put("title", obj.getTitle());
+    }
+    if (obj.getUnReadNum() != null) {
+      json.put("unReadNum", obj.getUnReadNum());
     }
     if (obj.getUpdateTime() != null) {
       json.put("updateTime", obj.getUpdateTime());

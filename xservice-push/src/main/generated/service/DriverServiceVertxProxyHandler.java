@@ -135,6 +135,14 @@ public class DriverServiceVertxProxyHandler extends ProxyHandler {
           service.queryBatchDriver((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
           break;
         }
+        case "queryDriverCount": {
+          service.queryDriverCount((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
+          break;
+        }
+        case "queryOneDriver": {
+          service.queryOneDriver((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }
