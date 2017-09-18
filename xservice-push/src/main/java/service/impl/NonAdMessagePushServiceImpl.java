@@ -167,7 +167,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			param.put("phone", srcMsg.getString("phone"));
 			param.put("userId", srcMsg.getValue("customerId") + "");
             Object expireTime = srcMsg.getValue("expireTime");
-			//如果没传过期时间，就一天后过期
+			//如果没传过期时间，就一天后过期 
 			expireTime = (expireTime == null) ? System.currentTimeMillis() + 86400000 : expireTime;
 			param.put("expireTime",  expireTime + "");
 			param.put("content", srcMsg.toString());
