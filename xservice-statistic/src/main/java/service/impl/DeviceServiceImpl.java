@@ -60,13 +60,8 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 					if (dbDevice == null) {
 						deviceDao.addDevice(deviceDto, addFuture.completer());
 					} else {
-						if (!dbDevice.equals(deviceDto)) {
-							copyDevice(dbDevice, deviceDto);
-							deviceDao.updateDevice(dbDevice, updateFuture.completer());
-						} else {
-							logger.info("the device:{} has not change", dbDevice);
-							result.handle(Future.succeededFuture(baseResponse));
-						}
+						copyDevice(dbDevice, deviceDto);
+						deviceDao.updateDevice(dbDevice, updateFuture.completer());
 					}
 				} else {
 					logger.error(ar1.cause());
@@ -79,7 +74,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 				if (ar2.succeeded()) {
 					result.handle(Future.succeededFuture(baseResponse));
 				} else {
-					logger.error("add device:{} to db error.", deviceDto, ar2.cause());
+					logger.error("add device:" + deviceDto + " to db error.", ar2.cause());
 					buildErrorBaseResponse(baseResponse, ar2.cause().toString());
 					result.handle(Future.succeededFuture(baseResponse));
 				}
@@ -88,7 +83,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 				if (ar3.succeeded()) {
 					result.handle(Future.succeededFuture(baseResponse));
 				} else {
-					logger.error("update device:{} from db error.", deviceDto, ar3.cause());
+					logger.error("update device:" + deviceDto + " from db error.", ar3.cause());
 					buildErrorBaseResponse(baseResponse, ar3.cause().toString());
 					result.handle(Future.succeededFuture(baseResponse));
 				}
