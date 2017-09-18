@@ -98,6 +98,16 @@ public class MongoService {
     }));
   }
 
+  public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) { 
+    delegate.findOffLineMessage(query, resultHandler);
+  }
+
+  public Single<JsonObject> rxFindOffLineMessage(JsonObject query) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      findOffLineMessage(query, fut);
+    }));
+  }
+
 
   public static  MongoService newInstance(persistence.MongoService arg) {
     return arg != null ? new MongoService(arg) : null;

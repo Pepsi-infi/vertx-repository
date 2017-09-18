@@ -37,4 +37,6 @@ public interface MongoService {
 	void updateData(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler);
 
 	void saveDataBatch(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler);
+
+	void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler);
 }

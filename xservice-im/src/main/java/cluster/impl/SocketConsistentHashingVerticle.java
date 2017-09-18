@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import cluster.ConsistentHashingService;
-import helper.XProxyHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -16,9 +14,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-public class ConsistentHashingVerticle extends AbstractVerticle implements ConsistentHashingService {
+public class SocketConsistentHashingVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConsistentHashingVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(SocketConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
@@ -32,11 +30,8 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 		logger.info("start ... ");
 		this.realNodes = new ArrayList<String>();
 
-		this.realNodes.add("10.10.10.193:4321");// TODO
+		this.realNodes.add("10.10.10.193");// TODO
 		init();
-
-		XProxyHelper.registerService(ConsistentHashingService.class, vertx, this,
-				ConsistentHashingService.SERVICE_ADDRESS);
 	}
 
 	/**

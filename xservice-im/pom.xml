@@ -25,5 +25,11 @@
 			<artifactId>jprotobuf</artifactId>
 			<version>2.1.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+		<dependency>
+			<groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>3.3.1</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -19,6 +19,7 @@ import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
 import logic.SessionService;
 import logic.impl.C2CVerticle;
+import persistence.MongoService;
 import protocol.MessageBuilder;
 import util.ByteUtil;
 
@@ -27,6 +28,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
 
 	private C2CService c2cService;
+	private MongoService mongoService;
 	private EventBus eb;
 	private ConsistentHashingService consistentHashingService;
 
@@ -36,6 +38,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 
 		c2cService = C2CService.createProxy(vertx);
+		mongoService = MongoService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
@@ -73,6 +76,12 @@ public class TCPServerVerticle extends AbstractVerticle {
 				case IMCmdConstants.MSG_R:
 					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
+
+					break;
+				case IMCmdConstants.ACK_N:
+					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
+					msgAck(socket.writeHandlerID(), clientVersion, cmd, bufferBody);
+
 					break;
 				default:
 					break;
@@ -87,9 +96,35 @@ public class TCPServerVerticle extends AbstractVerticle {
 		server.listen();
 	}
 
+	private void msgAck(String handlerID, int clientVersion, int cmd, Buffer bufferBody) {
+		if (bufferBody != null && bufferBody.length() != 0) {
+			JsonObject jsonBody = null;
+			try {
+				jsonBody = bufferBody.toJsonObject();
+				if (jsonBody != null) {
+					String msgId = jsonBody.getString("msgId");
+					// {collection: "", data: {}}
+
+					JsonObject data = new JsonObject().put("msgId", msgId).put("status", cmd);
+					JsonObject update = new JsonObject().put("collection", "message").put("data", data);
+
+					mongoService.updateData(update, mongo -> {
+
+					});
+				}
+			} catch (Exception e) {
+				logger.error("Msg body parse error, buffer={}", bufferBody, e);
+			}
+		} else {
+			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
+		}
+	}
+
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
 		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
+
+		// 1、心跳消息确认
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
 	}
 
@@ -114,13 +149,24 @@ public class TCPServerVerticle extends AbstractVerticle {
 						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
 						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
 
-						// 给FROM发A
+						// 1、给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd + 100, 0);
 
 						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
 								clientVersion, cmd, bodyLength);
 						eb.send(handlerID, aMsgHeader.appendString("\001"));
+
+						String sceneId = jsonBody.getString("sceneId");
+						if (StringUtils.isNotEmpty(sceneId)) {
+							// 2、发送离线消息
+							JsonObject query = new JsonObject().put("cmd", 2003).put("toTel", from)
+									.put("sceneId", sceneId)
+									.put("timeStamp", new JsonObject().put("$lte", System.currentTimeMillis()));
+							mongoService.findOffLineMessage(query, mongo -> {
+								eb.send(handlerID, mongo.result());
+							});
+						}
 					}
 				}
 			} catch (Exception e) {

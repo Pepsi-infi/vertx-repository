@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.BulkOperation;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.mongo.MongoClientBulkWriteResult;
 import persistence.MongoService;
@@ -67,6 +68,17 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 			logger.info("saveDataBatch opList size={}", opList.size());
 			opList = new ArrayList<BulkOperation>();
 		}
+	}
+
+	/**
+	 * {"msgId":1111111,"cmd":111,"timeStamp":11111,"date":"2017-01-01","toTel":123123123,"sceneId":11111}
+	 * 
+	 * @param json
+	 */
+	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
+		FindOptions options = new FindOptions();
+		options.setLimit(50);
+		client.findBatchWithOptions("message", query, options, resultHandler);
 	}
 
 	@Override

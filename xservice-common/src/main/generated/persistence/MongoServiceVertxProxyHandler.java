@@ -135,6 +135,10 @@ public class MongoServiceVertxProxyHandler extends ProxyHandler {
           service.saveDataBatch((io.vertx.core.json.JsonObject)json.getValue("json"), createHandler(msg));
           break;
         }
+        case "findOffLineMessage": {
+          service.findOffLineMessage((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }
