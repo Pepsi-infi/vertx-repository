@@ -66,14 +66,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 	// 每次批量处理条数
 	public static final int BATCH_UPDATE_SIZE = 1000;
 
-	// 批量处理总数
-	private Integer batchNums = 0;
-
-	// 发送消息数量
-	private Integer sendNums = 0;
-
-	private int pageNumber = 0;
-
 	private MongoClient mongoClient;
 
 	@Override
@@ -437,7 +429,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			reSendMsg(to, msgId);
 		}
 
-		sendFuture.complete("success");
 		return sendFuture;
 	}
 
@@ -615,16 +606,17 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 	}
 
 	@Override
-	public void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<Integer>> resultHandler) {
-		
-		//构建查询司机信息请求参数
+	public void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<JsonObject>> resultHandler) {
+
+		// 构建查询司机信息请求参数
 		JsonObject query = buildJsonQuery(dto);
 
-		// Future<Long> countFuture = this.queryDriverCount(query);
+		Future<Long> countFuture = this.queryDriverCount(query);
 
-		Future<Integer> addBatchFuture = this.addBatchMsgItem(query, dto, dto.getInteger("driverMsgId"));
+		Future<JsonObject> batchFuture = Future.future();
+		this.addBatchMsgItem(query, dto, dto.getInteger("driverMsgId"), countFuture, batchFuture.completer());
 
-		addBatchFuture.setHandler(handler -> {
+		batchFuture.setHandler(handler -> {
 			if (handler.succeeded()) {
 				resultHandler.handle(Future.succeededFuture(handler.result()));
 			} else {
@@ -633,63 +625,158 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		});
 	}
 
-	private Future<Integer> addBatchMsgItem(JsonObject query, JsonObject dto, Integer driverMsgId) {
-		Future<Integer> addBatchFuture = Future.future();
+	private void addBatchMsgItem(JsonObject query, JsonObject dto, Integer driverMsgId, Future<Long> countFuture,
+			Handler<AsyncResult<JsonObject>> handler) {
+
+		countFuture.setHandler(countHandler -> {
+
+			if (countHandler.succeeded()) {
+
+				long totalCount = countHandler.result();
+				this.addBatchMsgAndSend2DriverClient(totalCount, query, dto, driverMsgId, handler);
+
+			} else {
+				logger.error("司机总数获取异常", countHandler.cause());
+				handler.handle(Future.failedFuture(countHandler.cause()));
+			}
+
+		});
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void addBatchMsgAndSend2DriverClient(long totalCount, JsonObject query, JsonObject dto, Integer driverMsgId,
+			Handler<AsyncResult<JsonObject>> handler) {
+
+		int listSize = (int) (totalCount % BATCH_UPDATE_SIZE == 0 ? totalCount / BATCH_UPDATE_SIZE
+				: totalCount / BATCH_UPDATE_SIZE + 1);
 		JsonArray driversArray = new JsonArray();
+		// 批量新增集合
+		List<Future> addFutureList = new ArrayList<>();
+		List<Future> sendFutureList = new ArrayList<>();
 		mongoClient.findBatch("driver", query, mongoRes -> {
 			if (mongoRes.succeeded()) {
+				Future<Integer> listFuture = Future.future();
+				Future<Integer> totalSendFuture = Future.future();
+
 				if (mongoRes.result() != null) {
 					driversArray.add(mongoRes.result());
 					if (driversArray.size() == BATCH_UPDATE_SIZE) {
-						Future<Integer> listFuture = this.addDriverMsgByBatch(driversArray, driverMsgId);
-						// 4.批量新增成功，对该部分数据直接push
-						Future<Integer> totalSendFuture = this.sendMsg(dto, driversArray);
-						driversArray.clear();
-						this.dealFuture(listFuture,totalSendFuture);
 
-						// listFuture.setHandler(batchHandler -> {
-						// if (batchHandler.succeeded()) {
-						// batchNums += batchHandler.result() == null ? 0 :
-						// batchHandler.result();
-						//
-						// } else {
-						// logger.error("司机消息明细批量入库异常", listFuture.cause());
-						// }
-						//
-						// });
+						// 批量写入消息明细到DB
+						listFuture = this.addDriverMsgByBatch(driversArray, driverMsgId);
+						addFutureList.add(listFuture);
+
+						// 批量push到司机端
+						totalSendFuture = this.sendMsg(dto, driversArray);
+						sendFutureList.add(totalSendFuture);
+
+						// join 批量处理结果
+						if (addFutureList.size() == listSize) {
+							logger.info("addFutureList size=" + addFutureList.size());
+							// this.dealAddListFutures(addFutureList,listSize,resultHandler);
+							Future<Integer> addFuture = this.dealAddListFutures(addFutureList, listSize);
+							Future<Integer> sendFuture = this.dealSendListFutures(sendFutureList, listSize);
+							this.dealFuture(addFuture, sendFuture, handler);
+						}
+
+						driversArray.clear();
+
 					}
 				} else {
-					Future<Integer> listFuture = this.addDriverMsgByBatch(driversArray, driverMsgId);
-					// 4.批量新增成功，对该部分数据直接push
-					Future<Integer> totalSendFuture = this.sendMsg(dto, driversArray);
+
+					// 批量写入消息明细到DB
+					listFuture = this.addDriverMsgByBatch(driversArray, driverMsgId);
+					addFutureList.add(listFuture);
+
+					// 批量push到司机端
+					totalSendFuture = this.sendMsg(dto, driversArray);
+					sendFutureList.add(totalSendFuture);
+
+					// join 批量处理结果
+					if (addFutureList.size() == listSize) {
+						logger.info("addFutureList size=" + addFutureList.size());
+						// this.dealAddListFutures(addFutureList,listSize,resultHandler);
+						Future<Integer> addFuture = this.dealAddListFutures(addFutureList, listSize);
+						Future<Integer> sendFuture = this.dealSendListFutures(sendFutureList, listSize);
+						this.dealFuture(addFuture, sendFuture, handler);
+					}
+
 					driversArray.clear();
-					// this.dealFuture(listFuture,totalSendFuture);
-					// listFuture.setHandler(batchHandler -> {
-					// if (batchHandler.succeeded()) {
-					// batchNums += batchHandler.result() == null ? 0 :
-					// batchHandler.result();
-					// } else {
-					// logger.error("司机消息明细批量入库异常", listFuture.cause());
-					// }
-					//
-					// });
 				}
+			} else {
+				logger.error("mongo query error", mongoRes.cause());
+				handler.handle(Future.failedFuture(mongoRes.cause()));
 			}
 		});
-		addBatchFuture.complete(batchNums);
-		batchNums = 0;
-		pageNumber = 0;
-		return addBatchFuture;
+
 	}
 
-	private void dealFuture(Future<Integer> listFuture, Future<Integer> totalSendFuture) {
-		CompositeFuture composeFuture = CompositeFuture.all(listFuture, totalSendFuture);
+	@SuppressWarnings("rawtypes")
+	private Future<Integer> dealSendListFutures(List<Future> sendFutureList, int listSize) {
+		CompositeFuture composeFuture = CompositeFuture.all(sendFutureList);
+		return composeFuture.compose(result -> {
+			Future<Integer> sendFuture = Future.future();
+			int totalNums = 0;
+			for (int i = 0; i < listSize; i++) {
+				totalNums += result.resultAt(i) == null ? 0 : (Integer) result.resultAt(i);
+			}
+			logger.info("driver msg send  totalNums=" + totalNums);
+			sendFuture.complete(totalNums);
+			return sendFuture;
+
+		});
+	}
+
+	@SuppressWarnings("rawtypes")
+	private Future<Integer> dealAddListFutures(List<Future> addFutureList, int listSize) {
+		CompositeFuture composeFuture = CompositeFuture.all(addFutureList);
+		return composeFuture.compose(result -> {
+			Future<Integer> addFuture = Future.future();
+			int totalNums = 0;
+			for (int i = 0; i < listSize; i++) {
+				totalNums += result.resultAt(i) == null ? 0 : (Integer) result.resultAt(i);
+			}
+			logger.info("driver msg batch add  totalNums=" + totalNums);
+			addFuture.complete(totalNums);
+			return addFuture;
+
+		});
+		// composeFuture.setHandler(handler->{
+		// if(handler.succeeded()){
+		// int totalNums=0;
+		// for(int i=0;i<listSize;i++){
+		// logger.info("total addNums="+totalNums);
+		// totalNums+=handler.result().resultAt(i)==null?0:(Integer)handler.result().resultAt(i);
+		// }
+		// resultHandler.handle(Future.succeededFuture(totalNums));
+		// }else{
+		// logger.info("join addFuture error:",handler.cause());
+		// resultHandler.handle(Future.failedFuture(handler.cause()));
+		// }
+		// });
+
+	}
+
+	private void dealFuture(Future<Integer> addFuture, Future<Integer> sendFuture,
+			Handler<AsyncResult<JsonObject>> resultHandler) {
+		CompositeFuture composeFuture = CompositeFuture.all(addFuture, sendFuture);
 		composeFuture.setHandler(handler -> {
 			if (handler.succeeded()) {
-				batchNums += (Integer) handler.result().resultAt(0);
-				sendNums += (Integer) handler.result().resultAt(1);
-			} else {
 
+				int addNums = handler.result().resultAt(0);
+				int sendNums = handler.result().resultAt(1);
+
+				logger.info("司机消息发送成功,addNums=" + addNums + "~sendNums=" + sendNums);
+				JsonObject json=new JsonObject();
+				json.put("addNums", addNums);
+				json.put("sendNums", sendNums);
+
+				resultHandler.handle(Future.succeededFuture(json));
+
+			} else {
+				logger.error("join futures error", handler.cause());
+				resultHandler.handle(Future.failedFuture(handler.cause()));
 			}
 		});
 
@@ -718,9 +805,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 	private Future<Integer> addBatch(String addBatch, List<JsonArray> msgItemList) {
 		return getConnection().compose(conn -> {
 			Future<Integer> listFuture = Future.future();
-			// conn.batchWithParams(Sql.ADD_BATCH, msgItemList,
-			// listFuture.completer());
-			// return listFuture;
 			StringBuffer sb = new StringBuffer();
 			sb.append(Sql.SIMPLE_ADD_BATCH);
 			for (JsonArray param : msgItemList) {
@@ -868,12 +952,14 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			if (handler.succeeded()) {
 
 				int size = comFutures.result().size();
+				int batchSendNums = 0;
 				for (int i = 0; i < size; i++) {
-					sendNums += (Integer) comFutures.resultAt(i);
+					batchSendNums += ("success".equals(comFutures.resultAt(i))) ? 1 : 0;
 				}
-				totalFuture.complete(sendNums);
-				logger.info("sendNums=" + sendNums);
+				totalFuture.complete(batchSendNums);
+				logger.info("batchSendNums=" + batchSendNums);
 			} else {
+				logger.error("send error", totalFuture.cause());
 				totalFuture.fail("send error");
 			}
 		});

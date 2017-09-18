@@ -45,9 +45,9 @@ public interface DriverMsgService {
 	/**
 	 * 消息明细入库
 	 * @param dto
-	 * @param completer
+	 * @param handler
 	 * @return 
 	 */
-	void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<Integer>> completer);
+	void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<JsonObject>> handler);
 	
 }

@@ -116,10 +116,10 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		Future<UpdateResult> addFuture =this.addDriverMsg(dto);
 
 		// 3.批量新增消息明细入库,批量push
-		Future<Integer> addBatchFuture = this.addDriverMsgItems(context, dto, addFuture);
-		addBatchFuture.setHandler(handler->{
-			if(addBatchFuture.succeeded()){
-				logger.info("公司消息明细批量处理完成，updateNum="+handler.result());
+		Future<JsonObject> batchFuture = this.addDriverMsgItems(context, dto, addFuture);
+		batchFuture.setHandler(handler->{
+			if(batchFuture.succeeded()){
+				logger.info("公司消息明细批量处理完成");
 			}else{
 				logger.error("公司消息明细批量处理失败",handler.cause());
 			}
@@ -139,9 +139,9 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		return addFuture;
 	}
 
-	private Future<Integer> addDriverMsgItems(RoutingContext context, JsonObject dto, Future<UpdateResult> addFuture) {
+	private Future<JsonObject> addDriverMsgItems(RoutingContext context, JsonObject dto, Future<UpdateResult> addFuture) {
 		return addFuture.compose(addRes -> {
-			Future<Integer> addBatchFuture = Future.future();
+			Future<JsonObject> batchFuture = Future.future();
 			int updateNum = addRes.getUpdated();
 			if (updateNum == 1) {
 				logger.info("add new driverMsg to db success");
@@ -150,13 +150,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 				JsonArray key = addRes.getKeys();
 				Integer driverMsgId = key.getInteger(0);
 				dto.put("driverMsgId", driverMsgId);
-				driverMsgService.addDriverMsgItems(dto, addBatchFuture.completer());
+				driverMsgService.addDriverMsgItems(dto, batchFuture.completer());
 			} else {
 				logger.error("add new driverMsg to db error:updateNum=" + updateNum);
 				HttpUtil.writeFailResponse2Client(context.response().getDelegate(), "server is error");
-				addBatchFuture.fail("updateNum=" + updateNum);
+				batchFuture.fail("updateNum=" + updateNum);
 			}
-			return addBatchFuture;
+			return batchFuture;
 		});
 	}
 
