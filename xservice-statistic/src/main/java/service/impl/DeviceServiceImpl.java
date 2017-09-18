@@ -58,13 +58,8 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 					if (dbDevice == null) {
 						deviceDao.addDevice(deviceDto, addFuture.completer());
 					} else {
-						if (!dbDevice.equals(deviceDto)) {
-							copyDevice(dbDevice, deviceDto);
-							deviceDao.updateDevice(dbDevice, updateFuture.completer());
-						} else {
-							logger.info("the device:{} has not change", dbDevice);
-							result.handle(Future.succeededFuture(baseResponse));
-						}
+						copyDevice(dbDevice, deviceDto);
+						deviceDao.updateDevice(dbDevice, updateFuture.completer());
 					}
 				} else {
 					logger.error(ar1.cause());
