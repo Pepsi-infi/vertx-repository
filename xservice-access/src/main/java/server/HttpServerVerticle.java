@@ -66,6 +66,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private void getIMServer(RoutingContext context) {
 		String userTel = context.request().getParam("userTel");
+		logger.info("userTel={}", userTel);
 		JsonObject response = new JsonObject();
 		if (StringUtils.isNotEmpty(userTel)) {
 			Future<String> hashFuture = Future.future();
@@ -76,15 +77,21 @@ public class HttpServerVerticle extends RestAPIVerticle {
 					data.put("server", res.result());
 					response.put("data", data);
 					response.put("code", 0);
+					response.put("time", System.currentTimeMillis());
+					context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 				} else {
 					response.put("code", 1);
+					response.put("msg", "Consistent Hash Error.");
+					response.put("time", System.currentTimeMillis());
+					context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 				}
 			});
 		} else {
 			response.put("code", 1);
+			response.put("msg", "param userTel is null.");
+			response.put("time", System.currentTimeMillis());
+			context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 		}
 
-		response.put("time", System.currentTimeMillis());
-		context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 	}
 }
