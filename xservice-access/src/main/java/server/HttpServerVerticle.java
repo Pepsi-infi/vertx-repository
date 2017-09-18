@@ -2,6 +2,7 @@ package server;
 
 import org.apache.commons.lang.StringUtils;
 
+import cluster.ConsistentHashingService;
 import constants.RestAccessConstants;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -22,6 +23,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private SharedData sharedData;
 	private LocalMap<String, String> sessionMap;// uid -> handlerID
 	private LocalMap<String, String> sessionReverse; // handlerID -> uid
+	private ConsistentHashingService consistentHashingService;
 
 	@Override
 	public void start() throws Exception {
@@ -30,11 +32,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
+		consistentHashingService = ConsistentHashingService.createProxy(vertx.getDelegate());
 
 		logger.info("Rest mc-access Verticle: Start...");
 
 		Router router = Router.router(vertx);
 		router.route(RestAccessConstants.ONLINE_NUMBER).handler(this::getOnlineNumber);
+		router.route(RestAccessConstants.SERVER).handler(this::getIMServer);
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
@@ -58,5 +62,29 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		result.put("sessionReverse", sessionReverse.size());
 
 		context.response().putHeader("content-type", "application/json").end(Json.encode(base));
+	}
+
+	private void getIMServer(RoutingContext context) {
+		String userTel = context.request().getParam("userTel");
+		JsonObject response = new JsonObject();
+		if (StringUtils.isNotEmpty(userTel)) {
+			Future<String> hashFuture = Future.future();
+			consistentHashingService.getNode(userTel, hashFuture.completer());
+			hashFuture.setHandler(res -> {
+				if (res.succeeded()) {
+					JsonObject data = new JsonObject();
+					data.put("server", res.result());
+					response.put("data", data);
+					response.put("code", 0);
+				} else {
+					response.put("code", 1);
+				}
+			});
+		} else {
+			response.put("code", 1);
+		}
+
+		response.put("time", System.currentTimeMillis());
+		context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 	}
 }

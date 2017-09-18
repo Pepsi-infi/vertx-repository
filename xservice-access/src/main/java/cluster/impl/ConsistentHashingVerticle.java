@@ -32,7 +32,7 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 		logger.info("start ... ");
 		this.realNodes = new ArrayList<String>();
 
-		this.realNodes.add("10.10.10.193");// TODO
+		this.realNodes.add("10.10.10.193:4321");// TODO
 		init();
 
 		XProxyHelper.registerService(ConsistentHashingService.class, vertx, this,
@@ -112,8 +112,8 @@ public class ConsistentHashingVerticle extends AbstractVerticle implements Consi
 			resultHandler.handle(Future.succeededFuture(en.getValue()));
 		}
 	}
-	
+
 	public void getNodeWithNodeList(String key, List<String> nodes, Handler<AsyncResult<String>> resultHandler) {
-		
+
 	}
 }
