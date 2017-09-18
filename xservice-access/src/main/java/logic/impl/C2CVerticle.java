@@ -90,6 +90,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						body.put("cmd", cmd);
 						body.put("timeStamp", ts);
 						body.put("date", LocalDate.now());
+						body.put("status", cmd);// 已发送，未确认
 
 						int bodyLength = body.toString().length();
 

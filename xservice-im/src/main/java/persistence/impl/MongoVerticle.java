@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.BulkOperation;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.mongo.MongoClientBulkWriteResult;
 import persistence.MongoService;
@@ -74,9 +75,10 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 	 * 
 	 * @param json
 	 */
-	public void findData(JsonObject json,) {
-		JsonObject query = new JsonObject().put("author", "J. R. R. Tolkien");
-		client.findBatchWithOptions(collection, query, options, resultHandler);
+	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
+		FindOptions options = new FindOptions();
+		options.setLimit(50);
+		client.findBatchWithOptions("message", query, options, resultHandler);
 	}
 
 	@Override
