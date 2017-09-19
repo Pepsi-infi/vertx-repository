@@ -1,14 +1,5 @@
 package service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -29,18 +20,17 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.ApplePushService;
-import service.MsgRecordService;
-import service.NonAdMessagePushService;
-import service.RedisService;
-import service.SocketPushService;
-import service.XiaoMiPushService;
+import service.*;
 import util.DateUtil;
 import util.Md5Util;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.RestAPIVerticle;
+
+import java.util.*;
 
 public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService {
 
@@ -220,7 +210,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		// 首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 		msgStatDto.setChannel(channel);
-		msgStatDto.setMsgId(receiveMsg.getString("senderId") + "_" + msgId);// msgId上报规则
+		msgStatDto.setMsgId(msgId);// msgId上报规则
 		// 1 安卓
 		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
