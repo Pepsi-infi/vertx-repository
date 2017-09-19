@@ -58,7 +58,7 @@ public class ConfigService {
   }
 
   /**
-   * 消息发送方身份注册
+   * 娑堟伅鍙戦�佹柟韬唤娉ㄥ唽
    * @param senderId 
    * @param senderKey 
    * @param resultHandler 
@@ -68,7 +68,7 @@ public class ConfigService {
   }
 
   /**
-   * 消息发送方身份注册
+   * 娑堟伅鍙戦�佹柟韬唤娉ㄥ唽
    * @param senderId 
    * @param senderKey 
    * @return 

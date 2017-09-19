@@ -159,23 +159,23 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	}
 
-	//未推送成功的消息入库，用户上线继续推送
-	private void saveUnSendMsg(JsonObject srcMsg){
+	// 未推送成功的消息入库，用户上线继续推送
+	private void saveUnSendMsg(JsonObject srcMsg) {
 		try {
 			JsonObject param = new JsonObject();
 			param.put("msgId", srcMsg.getValue("msgId") + "");
 			param.put("phone", srcMsg.getString("phone"));
 			param.put("userId", srcMsg.getValue("customerId") + "");
-            Object expireTime = srcMsg.getValue("expireTime");
-			//如果没传过期时间，就一天后过期 
+			Object expireTime = srcMsg.getValue("expireTime");
+			// 如果没传过期时间，就一天后过期
 			expireTime = (expireTime == null) ? System.currentTimeMillis() + 86400000 : expireTime;
-			param.put("expireTime",  expireTime + "");
+			param.put("expireTime", expireTime + "");
 			param.put("content", srcMsg.toString());
 			param.put("callFlag", "2");
 			param.put("senderId", srcMsg.getString("senderId"));
 			param.put("senderKey", srcMsg.getString("senderKey"));
 			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
-		}catch (Exception e){
+		} catch (Exception e) {
 			logger.error("保存未推送成功的消息失败" + e);
 		}
 	}

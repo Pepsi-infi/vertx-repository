@@ -1,6 +1,16 @@
 package api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
 import constant.MsgHttpConsts;
+import constant.PushUrlConstants;
 import constant.RestConstants;
 import enums.ErrorCodeEnum;
 import io.netty.util.internal.StringUtil;
@@ -17,16 +27,16 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
+import service.AdMessagePushService;
+import service.ConfigService;
 import service.DriverMsgService;
 import service.DriverService;
 import service.MessagePushService;
+import service.NonAdMessagePushService;
 import service.PassengerService;
+import service.PassengerUnSendService;
 import util.HttpUtil;
-
-import java.util.*;
 
 /**
  * 接收乘客端消息， http方式
@@ -44,6 +54,14 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private DriverMsgService driverMsgService;
 
+	private AdMessagePushService adMessagePushService;
+
+	private NonAdMessagePushService nonAdMessagePushService;
+
+	private PassengerUnSendService passengerUnSendService;
+
+	private ConfigService configService;
+
 	@Override
 	public void start() throws Exception {
 		config = config().getJsonObject("push.config");
@@ -58,6 +76,10 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		passengerService = PassengerService.createProxy(vertx.getDelegate());
 		driverService = DriverService.createProxy(vertx.getDelegate());
 		driverMsgService = DriverMsgService.createProxy(vertx.getDelegate());
+		adMessagePushService = AdMessagePushService.createProxy(vertx.getDelegate());
+		nonAdMessagePushService = NonAdMessagePushService.createProxy(vertx.getDelegate());
+		configService = ConfigService.createProxy(vertx.getDelegate());
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx.getDelegate());
 	}
 
 	private void recivedHttpMessage() {
@@ -65,6 +87,15 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		router.route().handler(BodyHandler.create());
 		router.route().handler(CorsHandler.create("*"));
 		router.route(config.getString("PUSH_MSG_URL")).handler(this::callPushMsgVerticle);
+
+		// 大后台乘客端广告消息推送
+		router.route(PushUrlConstants.PUSH_MSG_URL).handler(this::pushAdMsg);
+		// 非广告消息推送
+		router.route(PushUrlConstants.PUSH_MSG_NO_ADVER_URL).handler(this::pushNonAdMsg);
+		// 获取senderId senderKey
+		router.route(PushUrlConstants.PUSH_MSG_SENDERKEY).handler(this::getVerifyFromMsgCenter);
+		// 用户上线，未推送成功的消息继续推送给用户
+		router.route(PushUrlConstants.PUSH_MSG_UNSEND).handler(this::callUnSend);
 
 		/**
 		 * 乘客端相关
@@ -101,6 +132,35 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		vertx.createHttpServer().requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 	}
 
+	private void pushAdMsg(RoutingContext context) {
+		logger.info("###pushAdMsg method start###");
+		HttpServerRequest request = context.request();
+		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
+		logger.info("###pushAdMsg method end###");
+	}
+
+	private void pushNonAdMsg(RoutingContext context) {
+		logger.info("###pushNonAdMsg method start###");
+		HttpServerRequest request = context.request();
+		nonAdMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),
+				request.getParam("body"), resultHandler(context));
+		logger.info("###pushNonAdMsg method end###");
+	}
+
+	private void getVerifyFromMsgCenter(RoutingContext context) {
+		logger.info("###getVerifyFromMsgCenter method start###");
+		HttpServerRequest request = context.request();
+		configService.getVerifyFromMsgCenter(request.getParam("senderId"), request.getParam("senderKey"),
+				resultHandler(context));
+		logger.info("###getVerifyFromMsgCenter method end###");
+	}
+
+	private void callUnSend(RoutingContext context) {
+		HttpServerRequest request = context.request();
+		String phone = request.getParam("phone");
+		passengerUnSendService.pushUnSendMsg(phone, resultHandler(context));
+	}
+
 	private void callPushMsgVerticle(RoutingContext context) {
 		HttpServerResponse resp = context.response();
 		HttpServerRequest request = context.request();
@@ -117,10 +177,10 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		Future<UpdateResult> addFuture = this.addDriverMsg(dto);
 
 		// 3.批量新增消息明细入库,批量push
-		Future<Integer> addBatchFuture = this.addDriverMsgItems(context, dto, addFuture);
-		addBatchFuture.setHandler(handler -> {
-			if (addBatchFuture.succeeded()) {
-				logger.info("公司消息明细批量处理完成，updateNum=" + handler.result());
+		Future<JsonObject> batchFuture = this.addDriverMsgItems(context, dto, addFuture);
+		batchFuture.setHandler(handler -> {
+			if (batchFuture.succeeded()) {
+				logger.info("公司消息明细批量处理完成");
 			} else {
 				logger.error("公司消息明细批量处理失败", handler.cause());
 			}
@@ -140,9 +200,10 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		return addFuture;
 	}
 
-	private Future<Integer> addDriverMsgItems(RoutingContext context, JsonObject dto, Future<UpdateResult> addFuture) {
+	private Future<JsonObject> addDriverMsgItems(RoutingContext context, JsonObject dto,
+			Future<UpdateResult> addFuture) {
 		return addFuture.compose(addRes -> {
-			Future<Integer> addBatchFuture = Future.future();
+			Future<JsonObject> batchFuture = Future.future();
 			int updateNum = addRes.getUpdated();
 			if (updateNum == 1) {
 				logger.info("add new driverMsg to db success");
@@ -151,13 +212,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 				JsonArray key = addRes.getKeys();
 				Integer driverMsgId = key.getInteger(0);
 				dto.put("driverMsgId", driverMsgId);
-				driverMsgService.addDriverMsgItems(dto, addBatchFuture.completer());
+				driverMsgService.addDriverMsgItems(dto, batchFuture.completer());
 			} else {
 				logger.error("add new driverMsg to db error:updateNum=" + updateNum);
 				HttpUtil.writeFailResponse2Client(context.response().getDelegate(), "server is error");
-				addBatchFuture.fail("updateNum=" + updateNum);
+				batchFuture.fail("updateNum=" + updateNum);
 			}
-			return addBatchFuture;
+			return batchFuture;
 		});
 	}
 

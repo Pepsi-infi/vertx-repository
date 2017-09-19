@@ -1,11 +1,8 @@
 package service;
 
-import java.util.Map;
-
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -45,9 +42,9 @@ public interface DriverMsgService {
 	/**
 	 * 消息明细入库
 	 * @param dto
-	 * @param completer
+	 * @param handler
 	 * @return 
 	 */
-	void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<Integer>> completer);
+	void addDriverMsgItems(JsonObject dto, Handler<AsyncResult<JsonObject>> handler);
 	
 }

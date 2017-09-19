@@ -16,7 +16,7 @@
 
 package service;
 
-import service.MsgStatResultService;
+import service.DriverMsgService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -39,36 +39,37 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import utils.BaseResponse;
+import service.DriverMsgService;
+import io.vertx.ext.sql.UpdateResult;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
-import service.MsgStatResultService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
+public class DriverMsgServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final MsgStatResultService service;
+  private final DriverMsgService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service) {
+  public DriverMsgServiceVertxProxyHandler(Vertx vertx, DriverMsgService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, long timeoutInSecond) {
+  public DriverMsgServiceVertxProxyHandler(Vertx vertx, DriverMsgService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public MsgStatResultServiceVertxProxyHandler(Vertx vertx, MsgStatResultService service, boolean topLevel, long timeoutSeconds) {
+  public DriverMsgServiceVertxProxyHandler(Vertx vertx, DriverMsgService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -123,8 +124,8 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "storeMsgStatResult": {
-          service.storeMsgStatResult(res -> {
+        case "addDriverMsg": {
+          service.addDriverMsg((io.vertx.core.json.JsonObject)json.getValue("msg"), res -> {
             if (res.failed()) {
               if (res.cause() instanceof ServiceException) {
                 msg.reply(res.cause());
@@ -137,18 +138,16 @@ public class MsgStatResultServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
-        case "repireData": {
-          service.repireData(res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+        case "selectByPage": {
+          service.selectByPage((io.vertx.core.json.JsonObject)json.getValue("dto"), createHandler(msg));
+          break;
+        }
+        case "getDriverMsgDetail": {
+          service.getDriverMsgDetail(json.getValue("id") == null ? null : (json.getLong("id").longValue()), createHandler(msg));
+          break;
+        }
+        case "addDriverMsgItems": {
+          service.addDriverMsgItems((io.vertx.core.json.JsonObject)json.getValue("dto"), createHandler(msg));
           break;
         }
         default: {

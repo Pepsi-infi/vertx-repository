@@ -16,7 +16,7 @@
 
 package service;
 
-import service.PassengerMessageService;
+import service.PassengerService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -33,30 +33,29 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import java.util.List;
-import domain.PageBean;
-import service.PassengerMessageService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import service.PassengerService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class PassengerMessageServiceVertxEBProxy implements PassengerMessageService {
+public class PassengerServiceVertxEBProxy implements PassengerService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public PassengerMessageServiceVertxEBProxy(Vertx vertx, String address) {
+  public PassengerServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public PassengerMessageServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public PassengerServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -66,7 +65,7 @@ public class PassengerMessageServiceVertxEBProxy implements PassengerMessageServ
     } catch (IllegalStateException ex) {}
   }
 
-  public void list(JsonObject param, Handler<AsyncResult<PageBean>> resultHandler) {
+  public void list(JsonObject param, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -75,12 +74,12 @@ public class PassengerMessageServiceVertxEBProxy implements PassengerMessageServ
     _json.put("param", param);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "list");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new PageBean(res.result().body())));
-                      }
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
     });
   }
 
@@ -174,6 +173,42 @@ public class PassengerMessageServiceVertxEBProxy implements PassengerMessageServ
     });
   }
 
+  public void delImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", param);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "delImportFile");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void getImportFilePage(JsonObject param, Handler<AsyncResult<String>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", param);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "getImportFilePage");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
   public void getImportFileList(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
@@ -192,7 +227,7 @@ public class PassengerMessageServiceVertxEBProxy implements PassengerMessageServ
     });
   }
 
-  public void getImportPhone(JsonObject param, Handler<AsyncResult<String>> resultHandler) {
+  public void getImportPhoneList(String param, Handler<AsyncResult<List<JsonObject>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -200,12 +235,12 @@ public class PassengerMessageServiceVertxEBProxy implements PassengerMessageServ
     JsonObject _json = new JsonObject();
     _json.put("param", param);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "getImportPhone");
-    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+    _deliveryOptions.addHeader("action", "getImportPhoneList");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body()));
+        resultHandler.handle(Future.succeededFuture(convertList(res.result().body().getList())));
       }
     });
   }

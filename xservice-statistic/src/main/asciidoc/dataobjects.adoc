@@ -93,10 +93,9 @@
 [frame="topbot"]
 |===
 ^|Name | Type ^| Description
+|[[code]]`code`|`Number (int)`|-
 |[[data]]`data`|`link:dataobjects.html#MsgStatResultPage[MsgStatResultPage]`|-
-|[[errorCode]]`errorCode`|`String`|-
-|[[errorMessage]]`errorMessage`|`String`|-
-|[[resultStatus]]`resultStatus`|`Number (Integer)`|-
-|[[status]]`status`|`Number (Integer)`|-
+|[[msg]]`msg`|`String`|-
+|[[time]]`time`|`Number (long)`|-
 |===
 

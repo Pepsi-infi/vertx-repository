@@ -16,7 +16,7 @@
 
 package service;
 
-import service.DriverService;
+import service.MessagePushService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -32,9 +32,8 @@ import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
-import service.DriverService;
+import service.MessagePushService;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
@@ -43,18 +42,18 @@ import io.vertx.core.Handler;
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DriverServiceVertxEBProxy implements DriverService {
+public class MessagePushServiceVertxEBProxy implements MessagePushService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public DriverServiceVertxEBProxy(Vertx vertx, String address) {
+  public MessagePushServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public DriverServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public MessagePushServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -64,94 +63,20 @@ public class DriverServiceVertxEBProxy implements DriverService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void saveDriver(JsonObject jsonObject, Handler<AsyncResult<JsonObject>> result) {
+  public void bisnessMessage(String recieveMsg, Handler<AsyncResult<String>> resultHandler) {
     if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("jsonObject", jsonObject);
+    _json.put("recieveMsg", recieveMsg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "saveDriver");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void queryDriver(JsonObject query, int page, int size, Handler<AsyncResult<String>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("query", query);
-    _json.put("page", page);
-    _json.put("size", size);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "queryDriver");
+    _deliveryOptions.addHeader("action", "bisnessMessage");
     _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
+        resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        result.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void queryBatchDriver(JsonObject query, Handler<AsyncResult<JsonObject>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("query", query);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "queryBatchDriver");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void queryDriverCount(JsonObject query, Handler<AsyncResult<Long>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("query", query);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "queryDriverCount");
-    _vertx.eventBus().<Long>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body()));
-      }
-    });
-  }
-
-  public void queryOneDriver(JsonObject query, Handler<AsyncResult<String>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("query", query);
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "queryOneDriver");
-    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body()));
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
       }
     });
   }

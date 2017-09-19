@@ -21,7 +21,6 @@ public class StartVerticle extends AbstractVerticle {
 
 		this.deployVerticle(MsgRecordServiceImpl.class.getName());
 		this.deployVerticle(RedisServiceImpl.class.getName());
-
 		this.deployVerticle(MiPushVerticle.class.getName());
 		this.deployVerticle(SocketVerticle.class.getName());
 		this.deployVerticle(ApplePushVerticle.class.getName());
@@ -34,6 +33,14 @@ public class StartVerticle extends AbstractVerticle {
 
 		this.deployVerticle(MessagePushServiceImpl.class.getName());
 		this.deployVerticle(HttpServerVerticle.class.getName());
+
+		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
+		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
+		this.deployVerticle(ConfigServiceImpl.class.getName());
+
+		// 未过期消息补发
+		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
+		this.deployVerticle(PassengerUnSendVerticle.class.getName());
 		// 提供其他非EventBus服务
 	}
 
@@ -49,4 +56,5 @@ public class StartVerticle extends AbstractVerticle {
 		// options.setInstances(Runtime.getRuntime().availableProcessors());
 		return options;
 	}
+
 }

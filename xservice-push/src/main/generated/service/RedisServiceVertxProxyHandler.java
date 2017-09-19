@@ -141,11 +141,11 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "lpush": {
-          service.lpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
+          service.lpush((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
           break;
         }
         case "rpush": {
-          service.rpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
+          service.rpush((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
           break;
         }
         default: {

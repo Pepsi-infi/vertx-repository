@@ -20,7 +20,6 @@ import java.util.Map;
 import rx.Observable;
 import rx.Single;
 import java.util.List;
-import domain.PageBean;
 import io.vertx.rxjava.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
@@ -30,37 +29,37 @@ import io.vertx.core.Handler;
  * Created by weim on 2017/8/22.
  *
  * <p/>
- * NOTE: This class has been automatically generated from the {@link service.PassengerMessageService original} non RX-ified interface using Vert.x codegen.
+ * NOTE: This class has been automatically generated from the {@link service.PassengerService original} non RX-ified interface using Vert.x codegen.
  */
 
-@io.vertx.lang.rxjava.RxGen(service.PassengerMessageService.class)
-public class PassengerMessageService {
+@io.vertx.lang.rxjava.RxGen(service.PassengerService.class)
+public class PassengerService {
 
-  public static final io.vertx.lang.rxjava.TypeArg<PassengerMessageService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
-    obj -> new PassengerMessageService((service.PassengerMessageService) obj),
-    PassengerMessageService::getDelegate
+  public static final io.vertx.lang.rxjava.TypeArg<PassengerService> __TYPE_ARG = new io.vertx.lang.rxjava.TypeArg<>(
+    obj -> new PassengerService((service.PassengerService) obj),
+    PassengerService::getDelegate
   );
 
-  private final service.PassengerMessageService delegate;
+  private final service.PassengerService delegate;
   
-  public PassengerMessageService(service.PassengerMessageService delegate) {
+  public PassengerService(service.PassengerService delegate) {
     this.delegate = delegate;
   }
 
-  public service.PassengerMessageService getDelegate() {
+  public service.PassengerService getDelegate() {
     return delegate;
   }
 
-  public static PassengerMessageService createProxy(Vertx vertx) { 
-    PassengerMessageService ret = PassengerMessageService.newInstance(service.PassengerMessageService.createProxy(vertx.getDelegate()));
+  public static PassengerService createProxy(Vertx vertx) { 
+    PassengerService ret = PassengerService.newInstance(service.PassengerService.createProxy(vertx.getDelegate()));
     return ret;
   }
 
-  public void list(JsonObject param, Handler<AsyncResult<PageBean>> resultHandler) { 
+  public void list(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
     delegate.list(param, resultHandler);
   }
 
-  public Single<PageBean> rxList(JsonObject param) { 
+  public Single<String> rxList(JsonObject param) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       list(param, fut);
     }));
@@ -116,6 +115,26 @@ public class PassengerMessageService {
     }));
   }
 
+  public void delImportFile(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.delImportFile(param, resultHandler);
+  }
+
+  public Single<String> rxDelImportFile(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      delImportFile(param, fut);
+    }));
+  }
+
+  public void getImportFilePage(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
+    delegate.getImportFilePage(param, resultHandler);
+  }
+
+  public Single<String> rxGetImportFilePage(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      getImportFilePage(param, fut);
+    }));
+  }
+
   public void getImportFileList(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler) { 
     delegate.getImportFileList(param, resultHandler);
   }
@@ -126,18 +145,18 @@ public class PassengerMessageService {
     }));
   }
 
-  public void getImportPhone(JsonObject param, Handler<AsyncResult<String>> resultHandler) { 
-    delegate.getImportPhone(param, resultHandler);
+  public void getImportPhoneList(String param, Handler<AsyncResult<List<JsonObject>>> resultHandler) { 
+    delegate.getImportPhoneList(param, resultHandler);
   }
 
-  public Single<String> rxGetImportPhone(JsonObject param) { 
+  public Single<List<JsonObject>> rxGetImportPhoneList(String param) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      getImportPhone(param, fut);
+      getImportPhoneList(param, fut);
     }));
   }
 
 
-  public static  PassengerMessageService newInstance(service.PassengerMessageService arg) {
-    return arg != null ? new PassengerMessageService(arg) : null;
+  public static  PassengerService newInstance(service.PassengerService arg) {
+    return arg != null ? new PassengerService(arg) : null;
   }
 }

@@ -1,5 +1,45 @@
 = Cheatsheets
 
+[[DriverMsg]]
+== DriverMsg
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[content]]`content`|`String`|-
+|[[createTime]]`createTime`|`String`|-
+|[[createUser]]`createUser`|`String`|-
+|[[enabled]]`enabled`|`Number (int)`|-
+|[[id]]`id`|`Number (long)`|-
+|[[isImportant]]`isImportant`|`Number (int)`|-
+|[[isShellsScreen]]`isShellsScreen`|`Number (int)`|-
+|[[jumpUrl]]`jumpUrl`|`String`|-
+|[[msgType]]`msgType`|`Number (int)`|-
+|[[readNum]]`readNum`|`Number (Integer)`|-
+|[[status]]`status`|`Number (int)`|-
+|[[synopsis]]`synopsis`|`String`|-
+|[[title]]`title`|`String`|-
+|[[unReadNum]]`unReadNum`|`Number (Integer)`|-
+|[[updateTime]]`updateTime`|`String`|-
+|[[updateUser]]`updateUser`|`String`|-
+|===
+
+[[DriverMsgDto]]
+== DriverMsgDto
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[msgType]]`msgType`|`Number (Integer)`|-
+|[[pageNumber]]`pageNumber`|`Number (Integer)`|-
+|[[pageSize]]`pageSize`|`Number (Integer)`|-
+|[[title]]`title`|`String`|-
+|===
+
 [[MsgRecord]]
 == MsgRecord
 
@@ -17,5 +57,48 @@
 |[[id]]`id`|`Number (long)`|-
 |[[msgBody]]`msgBody`|`String`|-
 |[[status]]`status`|`Number (int)`|-
+|===
+
+[[Page]]
+== Page
+
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[hasNextPage]]`hasNextPage`|`Boolean`|-
+|[[list]]`list`|`Array of link:dataobjects.html#DriverMsg[DriverMsg]`|-
+|[[pageNumber]]`pageNumber`|`Number (int)`|-
+|[[pageSize]]`pageSize`|`Number (int)`|-
+|[[total]]`total`|`Number (Long)`|-
+|===
+
+[[PassengerMsgDto]]
+== PassengerMsgDto
+
+++++
+ Created by weim on 2017/8/23.
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[action]]`action`|`Number (Integer)`|-
+|[[cityIds]]`cityIds`|`String`|-
+|[[content]]`content`|`String`|-
+|[[expireTime]]`expireTime`|`String`|-
+|[[id]]`id`|`Number (Integer)`|-
+|[[importFileId]]`importFileId`|`String`|-
+|[[inMsgCenter]]`inMsgCenter`|`Number (Integer)`|-
+|[[msgCenterImgUrl]]`msgCenterImgUrl`|`String`|-
+|[[openType]]`openType`|`Number (Integer)`|-
+|[[openUrl]]`openUrl`|`String`|-
+|[[sendTime]]`sendTime`|`String`|-
+|[[sendType]]`sendType`|`Number (Integer)`|-
+|[[status]]`status`|`Number (Integer)`|-
+|[[title]]`title`|`String`|-
 |===
 
