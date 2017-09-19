@@ -46,8 +46,8 @@ public interface RedisService {
 
 	void get(String key, Handler<AsyncResult<String>> result);
 
-	void lpush(String key, String value, Handler<AsyncResult<Long>> result);
+	void lpush(String queue, String key, Handler<AsyncResult<Long>> result);
 
-	void rpush(String key, String value, Handler<AsyncResult<Long>> result);
+	void rpush(String queue, String key, Handler<AsyncResult<Long>> result);
 
 }

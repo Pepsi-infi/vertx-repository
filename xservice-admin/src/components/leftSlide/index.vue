@@ -70,18 +70,6 @@
               path: "/sensitiveWord/list"
             }
           ]
-        },{
-          title: "推送中心",
-          path: "/mc-push",
-          icon: "fa-table",
-          child: [{
-            title: "司机消息推送",
-            path: "/driverMsg/driverMsgList"
-          },
-           {
-             title: "乘客消息列表",
-             path: "/passengerMsg"
-           }]
         }]
       }
     }

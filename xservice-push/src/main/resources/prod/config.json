@@ -42,7 +42,7 @@
     "tcpNoDelay": "true"
   },
   "mysql.config": {
-    "host": "127.0.0.1",
+    "host": "10.10.10.178",
     "port": 3306,
     "maxPoolSize": 100,
     "username": "sqyc_message",

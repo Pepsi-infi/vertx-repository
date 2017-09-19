@@ -12,11 +12,9 @@
 import tools_verify from './tools_verify'
 import tools_base64 from './tools_base64'
 import tools_uri from './tools_uri'
-import date_util from './date_util'
 
 export {
   tools_verify,
   tools_base64,
-  tools_uri,
-  date_util
+  tools_uri
 }
