@@ -1,6 +1,16 @@
 package api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
 import constant.MsgHttpConsts;
+import constant.PushUrlConstants;
 import constant.RestConstants;
 import enums.ErrorCodeEnum;
 import io.netty.util.internal.StringUtil;
@@ -17,16 +27,16 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import io.vertx.rxjava.ext.web.handler.CorsHandler;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import rxjava.RestAPIVerticle;
+import service.AdMessagePushService;
+import service.ConfigService;
 import service.DriverMsgService;
 import service.DriverService;
 import service.MessagePushService;
+import service.NonAdMessagePushService;
 import service.PassengerService;
+import service.PassengerUnSendService;
 import util.HttpUtil;
-
-import java.util.*;
 
 /**
  * 接收乘客端消息， http方式
@@ -44,6 +54,14 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private DriverMsgService driverMsgService;
 
+	private AdMessagePushService adMessagePushService;
+
+	private NonAdMessagePushService nonAdMessagePushService;
+
+	private PassengerUnSendService passengerUnSendService;
+
+	private ConfigService configService;
+
 	@Override
 	public void start() throws Exception {
 		config = config().getJsonObject("push.config");
@@ -53,17 +71,31 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		this.initService();
 	}
 
-	private void initService(){
+	private void initService() {
 		messagePushService = MessagePushService.createProxy(vertx.getDelegate());
 		passengerService = PassengerService.createProxy(vertx.getDelegate());
 		driverService = DriverService.createProxy(vertx.getDelegate());
 		driverMsgService = DriverMsgService.createProxy(vertx.getDelegate());
+		adMessagePushService = AdMessagePushService.createProxy(vertx.getDelegate());
+		nonAdMessagePushService = NonAdMessagePushService.createProxy(vertx.getDelegate());
+		configService = ConfigService.createProxy(vertx.getDelegate());
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx.getDelegate());
 	}
+
 	private void recivedHttpMessage() {
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
 		router.route().handler(CorsHandler.create("*"));
 		router.route(config.getString("PUSH_MSG_URL")).handler(this::callPushMsgVerticle);
+
+		// 大后台乘客端广告消息推送
+		router.route(PushUrlConstants.PUSH_MSG_URL).handler(this::pushAdMsg);
+		// 非广告消息推送
+		router.route(PushUrlConstants.PUSH_MSG_NO_ADVER_URL).handler(this::pushNonAdMsg);
+		// 获取senderId senderKey
+		router.route(PushUrlConstants.PUSH_MSG_SENDERKEY).handler(this::getVerifyFromMsgCenter);
+		// 用户上线，未推送成功的消息继续推送给用户
+		router.route(PushUrlConstants.PUSH_MSG_UNSEND).handler(this::callUnSend);
 
 		/**
 		 * 乘客端相关
@@ -100,7 +132,36 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		vertx.createHttpServer().requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 	}
 
-	private void callPushMsgVerticle(RoutingContext context){
+	private void pushAdMsg(RoutingContext context) {
+		logger.info("###pushAdMsg method start###");
+		HttpServerRequest request = context.request();
+		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
+		logger.info("###pushAdMsg method end###");
+	}
+
+	private void pushNonAdMsg(RoutingContext context) {
+		logger.info("###pushNonAdMsg method start###");
+		HttpServerRequest request = context.request();
+		nonAdMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),
+				request.getParam("body"), resultHandler(context));
+		logger.info("###pushNonAdMsg method end###");
+	}
+
+	private void getVerifyFromMsgCenter(RoutingContext context) {
+		logger.info("###getVerifyFromMsgCenter method start###");
+		HttpServerRequest request = context.request();
+		configService.getVerifyFromMsgCenter(request.getParam("senderId"), request.getParam("senderKey"),
+				resultHandler(context));
+		logger.info("###getVerifyFromMsgCenter method end###");
+	}
+
+	private void callUnSend(RoutingContext context) {
+		HttpServerRequest request = context.request();
+		String phone = request.getParam("phone");
+		passengerUnSendService.pushUnSendMsg(phone, resultHandler(context));
+	}
+
+	private void callPushMsgVerticle(RoutingContext context) {
 		HttpServerResponse resp = context.response();
 		HttpServerRequest request = context.request();
 		String httpMsg = request.getParam("body");
@@ -113,33 +174,34 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		JsonObject dto = HttpUtil.converteParams2JsonObject(request.params().getDelegate());
 
 		// 2.新增消息入库
-		Future<UpdateResult> addFuture =this.addDriverMsg(dto);
+		Future<UpdateResult> addFuture = this.addDriverMsg(dto);
 
 		// 3.批量新增消息明细入库,批量push
 		Future<JsonObject> batchFuture = this.addDriverMsgItems(context, dto, addFuture);
-		batchFuture.setHandler(handler->{
-			if(batchFuture.succeeded()){
+		batchFuture.setHandler(handler -> {
+			if (batchFuture.succeeded()) {
 				logger.info("公司消息明细批量处理完成");
-			}else{
-				logger.error("公司消息明细批量处理失败",handler.cause());
+			} else {
+				logger.error("公司消息明细批量处理失败", handler.cause());
 			}
 		});
 
-
 		// 4.查询司机列表
-		//Future<JsonObject> driversFuture = this.queryDriverList(context, dto, addBatchFuture);
+		// Future<JsonObject> driversFuture = this.queryDriverList(context, dto,
+		// addBatchFuture);
 
 		// 5.发送消息
-		//this.sendMsg(dto, driversFuture);
+		// this.sendMsg(dto, driversFuture);
 	}
 
 	private Future<UpdateResult> addDriverMsg(JsonObject dto) {
-		Future<UpdateResult> addFuture=Future.future();
+		Future<UpdateResult> addFuture = Future.future();
 		driverMsgService.addDriverMsg(dto, addFuture.completer());
 		return addFuture;
 	}
 
-	private Future<JsonObject> addDriverMsgItems(RoutingContext context, JsonObject dto, Future<UpdateResult> addFuture) {
+	private Future<JsonObject> addDriverMsgItems(RoutingContext context, JsonObject dto,
+			Future<UpdateResult> addFuture) {
 		return addFuture.compose(addRes -> {
 			Future<JsonObject> batchFuture = Future.future();
 			int updateNum = addRes.getUpdated();
@@ -300,28 +362,28 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context));
 	}
 
-	//推送消息
-	private void pushMsg(RoutingContext context){
+	// 推送消息
+	private void pushMsg(RoutingContext context) {
 		String id = context.request().getParam("id");
 		JsonObject param = new JsonObject().put("id", id);
 		Future<String> future = Future.future();
 		passengerService.getPushMsg(param, future);
 		future.setHandler(res -> {
-			if(res.succeeded()){
+			if (res.succeeded()) {
 				String result = res.result();
 				pushPassengerMsg(result);
-			}else{
+			} else {
 				logger.error(res.cause());
 			}
 		});
 	}
 
-	private void list(RoutingContext context){
+	private void list(RoutingContext context) {
 		JsonObject param = buildParams(context);
 		passengerService.list(param, resultHandler(context));
 	}
 
-	private void addOrUpdate(RoutingContext context){
+	private void addOrUpdate(RoutingContext context) {
 		HttpServerRequest request = context.request();
 		JsonObject param = new JsonObject();
 		param.put("id", request.getParam("id"));
@@ -342,43 +404,43 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		passengerService.addOrUpdate(param, resultHandler(context));
 	}
 
-	private void get(RoutingContext context){
+	private void get(RoutingContext context) {
 		String id = context.request().getParam("id");
 		JsonObject param = new JsonObject().put("id", id);
 		passengerService.get(param, resultHandler(context));
 	}
 
-	private void del(RoutingContext context){
+	private void del(RoutingContext context) {
 		String id = context.request().getParam("id");
 		JsonObject param = new JsonObject().put("id", id);
 		passengerService.del(param, resultHandler(context));
 	}
 
-	private JsonObject buildParams(RoutingContext context){
+	private JsonObject buildParams(RoutingContext context) {
 		JsonObject param = new JsonObject();
 		HttpServerRequest request = context.request();
 		MultiMap map = request.params();
-		for(String name : map.names()){
-			param.put(name ,map.get(name));
+		for (String name : map.names()) {
+			param.put(name, map.get(name));
 		}
 		setPageParams(request, param);
 		return param;
 	}
 
-	private void setPageParams(HttpServerRequest request, JsonObject param){
-		//查分页数据
+	private void setPageParams(HttpServerRequest request, JsonObject param) {
+		// 查分页数据
 		String pageS = request.getParam("page");
 		String pageSizeS = request.getParam("pageSize");
 		int page = Integer.parseInt(pageS);
 		int pageSize = Integer.parseInt(pageSizeS);
 		int pageIndex = (page - 1) * pageSize;
-		param.put("page",page);
-		param.put("pageIndex",pageIndex);
-		param.put("pageSize",pageSize);
+		param.put("page", page);
+		param.put("pageIndex", pageIndex);
+		param.put("pageSize", pageSize);
 	}
 
-	private void pushPassengerMsg(String jsonMsg){
-		if(StringUtils.isNotBlank(jsonMsg)) {
+	private void pushPassengerMsg(String jsonMsg) {
+		if (StringUtils.isNotBlank(jsonMsg)) {
 			JsonObject message = new JsonObject(jsonMsg);
 			message.put("msgId", message.getValue("id"));
 			message.put("jumpPage", message.getValue("action"));
@@ -390,56 +452,56 @@ public class HttpServerVerticle extends RestAPIVerticle {
 			message.put("url", message.getValue("openUrl"));
 			message.put("type", message.getValue("openType"));
 			String sendType = message.getString("sendType");
-			if(StringUtils.isNotBlank(sendType) && "1".equals(sendType)){
+			if (StringUtils.isNotBlank(sendType) && "1".equals(sendType)) {
 				logger.info("全部用户推送消息");
 				sendForAllUser(message);
-			}else if(StringUtils.isNotBlank(sendType) && "2".equals(sendType)){
+			} else if (StringUtils.isNotBlank(sendType) && "2".equals(sendType)) {
 				logger.info("指定用户推送消息");
 				sendByOnlyUser(message);
-			}else if(StringUtils.isNotBlank(sendType) && "3".equals(sendType)){
+			} else if (StringUtils.isNotBlank(sendType) && "3".equals(sendType)) {
 				logger.info("指定城市推送消息");
 				sendForCityUser(message);
-			}else{
+			} else {
 				logger.error("发送类型未指定，推送不执行");
 			}
-		}else {
+		} else {
 			logger.error("无符合条件的消息数据，推送不执行");
 		}
 	}
 
-	//1、推送所有用户
-	private void sendForAllUser(JsonObject message){
+	// 1、推送所有用户
+	private void sendForAllUser(JsonObject message) {
 		message.put("phone", "13621241006");
 		message.put("customerId", 13666050);
 	}
 
-//    2、按指定用户推送
-//    private void sendByOnlyUser(JsonObject message){
-//        String importFileId = message.getString("importFileId");
-//        Future<List<JsonObject>> future = Future.future();
-//        passengerService.getImportPhoneList(importFileId, future);
-//        future.setHandler(res -> {
-//            if (res.succeeded()) {
-//                List<JsonObject> phoneList = res.result();
-//                if (CollectionUtils.isNotEmpty(phoneList)) {
-//                    for (JsonObject phone : phoneList) {
-//                        message.put("phone", phone.getString("telephone"));
-//                        message.put("customerId", 13666050);
-//                        sendMessage(message);
-//                    }
-//                } else {
-//                    logger.info("查询指定手机号列表为空，importFileId：" + importFileId);
-//                }
-//            } else {
-//                logger.info("查询指定手机号列表为空失败，importFileId：" + importFileId);
-//            }
-//        });
-//    }
+	// 2、按指定用户推送
+	// private void sendByOnlyUser(JsonObject message){
+	// String importFileId = message.getString("importFileId");
+	// Future<List<JsonObject>> future = Future.future();
+	// passengerService.getImportPhoneList(importFileId, future);
+	// future.setHandler(res -> {
+	// if (res.succeeded()) {
+	// List<JsonObject> phoneList = res.result();
+	// if (CollectionUtils.isNotEmpty(phoneList)) {
+	// for (JsonObject phone : phoneList) {
+	// message.put("phone", phone.getString("telephone"));
+	// message.put("customerId", 13666050);
+	// sendMessage(message);
+	// }
+	// } else {
+	// logger.info("查询指定手机号列表为空，importFileId：" + importFileId);
+	// }
+	// } else {
+	// logger.info("查询指定手机号列表为空失败，importFileId：" + importFileId);
+	// }
+	// });
+	// }
 
-	//2、按指定用户推送
-	private void sendByOnlyUser(JsonObject message){
+	// 2、按指定用户推送
+	private void sendByOnlyUser(JsonObject message) {
 		try {
-			//新的指定用户，是把手机号以字符串的形式存到了数据库中
+			// 新的指定用户，是把手机号以字符串的形式存到了数据库中
 			String inputPhones = message.getString("inputPhones");
 			String[] phones = inputPhones.split(",");
 			if (phones != null && phones.length > 0) {
@@ -448,21 +510,22 @@ public class HttpServerVerticle extends RestAPIVerticle {
 					sendMessage(message);
 				}
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			logger.error("指定用户推送出错：" + e.getMessage());
 		}
 	}
-	//3、按城市推送
-	private void sendForCityUser(JsonObject message){
+
+	// 3、按城市推送
+	private void sendForCityUser(JsonObject message) {
 		message.put("phone", "13621241006");
 		message.put("customerId", 13666050);
 	}
 
-	private void sendMessage(JsonObject message){
+	private void sendMessage(JsonObject message) {
 		JsonObject buildMessage = new JsonObject();
 		buildMessage.put("body", message.toString());
 		Future<String> future = Future.future();
-		//调用发送消息
+		// 调用发送消息
 		messagePushService.bisnessMessage(buildMessage.toString(), future);
 		future.setHandler(resPush -> {
 			if (resPush.succeeded()) {
@@ -472,8 +535,9 @@ public class HttpServerVerticle extends RestAPIVerticle {
 			}
 		});
 	}
-	//查询导入的手机号文件列表
-	private void getImportFileList(RoutingContext context){
+
+	// 查询导入的手机号文件列表
+	private void getImportFileList(RoutingContext context) {
 		JsonObject param = new JsonObject();
 		HttpServerRequest request = context.request();
 		String createTime = request.getParam("createTime");
@@ -481,13 +545,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		passengerService.getImportFileList(param, resultHandler(context));
 	}
 
-	private void getCityListForPassenger(RoutingContext context){
+	private void getCityListForPassenger(RoutingContext context) {
 		Map params = new HashMap();
 		logger.info("调用城市列表接口");
 		HttpUtil.doGet(params, config().getString("city.list.url"), resultHandler(context));
 	}
 
-	private void getImportFilePage(RoutingContext context){
+	private void getImportFilePage(RoutingContext context) {
 		JsonObject param = new JsonObject();
 		HttpServerRequest request = context.request();
 		String createTime = request.getParam("createTime");
@@ -497,7 +561,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	}
 
 	/**
-	 *  查询设备
+	 * 查询设备
+	 * 
 	 * @param context
 	 */
 	private void queryDriverForPage(RoutingContext context) {
@@ -520,6 +585,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotBlank(supplierId)) {
 			query.put("supplierId", NumberUtils.toInt(supplierId));
 		}
-		driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size), resultStringHandler(context));
+		driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size),
+				resultStringHandler(context));
 	}
 }
