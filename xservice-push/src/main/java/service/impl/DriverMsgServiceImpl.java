@@ -741,20 +741,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			addFuture.complete(totalNums);
 			return addFuture;
 
-		});
-		// composeFuture.setHandler(handler->{
-		// if(handler.succeeded()){
-		// int totalNums=0;
-		// for(int i=0;i<listSize;i++){
-		// logger.info("total addNums="+totalNums);
-		// totalNums+=handler.result().resultAt(i)==null?0:(Integer)handler.result().resultAt(i);
-		// }
-		// resultHandler.handle(Future.succeededFuture(totalNums));
-		// }else{
-		// logger.info("join addFuture error:",handler.cause());
-		// resultHandler.handle(Future.failedFuture(handler.cause()));
-		// }
-		// });
+		});		
 
 	}
 
@@ -957,7 +944,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 					batchSendNums += ("success".equals(comFutures.resultAt(i))) ? 1 : 0;
 				}
 				totalFuture.complete(batchSendNums);
-				logger.info("batchSendNums=" + batchSendNums);
+				logger.info("batchSendNums=" + batchSendNums); 
 			} else {
 				logger.error("send error", totalFuture.cause());
 				totalFuture.fail("send error");
