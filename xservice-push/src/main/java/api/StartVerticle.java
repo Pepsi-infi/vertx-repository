@@ -1,15 +1,15 @@
 package api;
 
-import channel.impl.ApplePushVerticle;
-import channel.impl.MiPushVerticle;
-import channel.impl.SocketVerticle;
+import channel.impl.ApplePushServiceImpl;
+import channel.impl.MiPushServiceImpl;
+import channel.impl.SocketServiceImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
 import service.impl.*;
-import util.HttpUtil;
+import xservice.HttpClientVerticle;
 
 public class StartVerticle extends AbstractVerticle {
 
@@ -17,36 +17,37 @@ public class StartVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
+		super.start();
 		// 提供EventBus服务
 
 		this.deployVerticle(MsgRecordServiceImpl.class.getName());
 		this.deployVerticle(RedisServiceImpl.class.getName());
 
-		this.deployVerticle(MiPushVerticle.class.getName());
-		this.deployVerticle(SocketVerticle.class.getName());
-		this.deployVerticle(ApplePushVerticle.class.getName());
+		this.deployVerticle(MiPushServiceImpl.class.getName());
+		this.deployVerticle(SocketServiceImpl.class.getName());
+		this.deployVerticle(ApplePushServiceImpl.class.getName());
 
-		this.deployVerticle(HttpUtil.class.getName());
-		this.deployVerticle(DriverMsgServiceImpl.class.getName());
-
-		this.deployVerticle(PassengerServiceImpl.class.getName());
-		this.deployVerticle(DriverServiceImpl.class.getName());
-
-		this.deployVerticle(MessagePushServiceImpl.class.getName());
+		this.deployVerticle(HttpClientVerticle.class.getName());
 		this.deployVerticle(HttpServerVerticle.class.getName());
+		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
+		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
+		this.deployVerticle(ConfigServiceImpl.class.getName());
+
+		//未过期消息补发
+		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
+		this.deployVerticle(PassengerUnSendVerticle.class.getName());
 		// 提供其他非EventBus服务
 	}
 
 	public void deployVerticle(String verticleName) {
 		Future<String> future = Future.future();
-		// future.setHandler(ar -> logger.info(ar.succeeded() ? "success:" + ar.result()
-		// : "failed:" + ar.cause()));
-		vertx.deployVerticle(verticleName, readBossOpts().setConfig(config()));
+		future.setHandler(ar -> logger.info(ar.succeeded() ? "success:" + ar.result() : "failed:" + ar.cause()));
+		vertx.deployVerticle(verticleName, readBossOpts().setConfig(config()), future.completer());
 	}
 
 	public static DeploymentOptions readBossOpts() {
 		DeploymentOptions options = new DeploymentOptions();
-		// options.setInstances(Runtime.getRuntime().availableProcessors());
+		options.setInstances(Runtime.getRuntime().availableProcessors());
 		return options;
 	}
 }

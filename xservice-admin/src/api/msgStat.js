@@ -24,7 +24,6 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return fetch({
-    baseURL: process.env.mc_statistic_baseURL,
     url: port_table.get,
     method: 'get',
     params

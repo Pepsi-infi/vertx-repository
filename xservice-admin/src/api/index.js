@@ -14,17 +14,13 @@ import * as api_msgStat from './msgStat'
 import * as api_imCommonLanguage from './imCommonLanguage'
 import * as api_sensitiveWord from './sensitiveWord'
 import * as api_user from './user'
-import * as api_passengerMsg from './passengerMsg'
-import * as api_driverMsg from './driverMsg'  //引入driverMsg.js文件
 
 const apiObj = {
   api_file,
   api_msgStat,
   api_user,
   api_imCommonLanguage,
-  api_sensitiveWord,
-  api_passengerMsg,
-  api_driverMsg
+  api_sensitiveWord
 }
 
 const install = function (Vue) {
@@ -34,15 +30,6 @@ const install = function (Vue) {
   //定义属性到Vue原型中
   Object.defineProperties(Vue.prototype, {
     $fetch: {
-      get() {
-        return apiObj
-      }
-    }
-  })
-
-  //定义属性到Vue原型中
-  Object.defineProperties(Vue.prototype, {
-    $http: {
       get() {
         return apiObj
       }

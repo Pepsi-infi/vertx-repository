@@ -1,9 +1,0 @@
---指定用户文件所对应的手机列表
-CREATE TABLE `msg_passenger_importphone` (
-  `id` int(11) NOT NULL,
-  `msgId` int(11) NOT NULL,
-  `importFileId` int(11) DEFAULT NULL,
-  `telephone` varchar(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
