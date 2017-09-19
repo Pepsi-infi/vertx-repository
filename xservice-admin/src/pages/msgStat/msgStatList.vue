@@ -28,6 +28,7 @@
         <el-table-column
           prop="statTime"
           label="统计时间"
+          :formatter="datetimeFormat"
           width="190">
         </el-table-column>
         <el-table-column
@@ -212,6 +213,13 @@
           })
           .catch(() => {
           })
+      },
+      datetimeFormat(row,column,val){
+        let time;
+        if(val){
+          time = new Date(val).Format("yyyy-MM-dd hh:mm:ss");
+        }
+        return time;
       }
     }
   }

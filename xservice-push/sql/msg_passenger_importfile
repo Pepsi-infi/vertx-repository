@@ -1,0 +1,8 @@
+-- 指定用户表
+CREATE TABLE `msg_passenger_importfile` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fileName` varchar(50) NOT NULL,
+  `createTime` datetime DEFAULT NULL,
+  `createUser` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
