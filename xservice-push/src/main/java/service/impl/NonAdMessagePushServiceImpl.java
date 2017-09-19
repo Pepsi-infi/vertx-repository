@@ -159,23 +159,23 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	}
 
-	//未推送成功的消息入库，用户上线继续推送
-	private void saveUnSendMsg(JsonObject srcMsg){
+	// 未推送成功的消息入库，用户上线继续推送
+	private void saveUnSendMsg(JsonObject srcMsg) {
 		try {
 			JsonObject param = new JsonObject();
 			param.put("msgId", srcMsg.getValue("msgId") + "");
 			param.put("phone", srcMsg.getString("phone"));
 			param.put("userId", srcMsg.getValue("customerId") + "");
-            Object expireTime = srcMsg.getValue("expireTime");
-			//如果没传过期时间，就一天后过期
+			Object expireTime = srcMsg.getValue("expireTime");
+			// 如果没传过期时间，就一天后过期
 			expireTime = (expireTime == null) ? System.currentTimeMillis() + 86400000 : expireTime;
-			param.put("expireTime",  expireTime + "");
+			param.put("expireTime", expireTime + "");
 			param.put("content", srcMsg.toString());
 			param.put("callFlag", "2");
 			param.put("senderId", srcMsg.getString("senderId"));
 			param.put("senderKey", srcMsg.getString("senderKey"));
 			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
-		}catch (Exception e){
+		} catch (Exception e) {
 			logger.error("保存未推送成功的消息失败" + e);
 		}
 	}
@@ -240,7 +240,9 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		// 首约app乘客端 1001；首约app司机端 1002
 		msgStatDto.setAppCode(PushConsts.MsgStat_APPCODE_ENGER);
 		msgStatDto.setChannel(channel);
-		msgStatDto.setMsgId(receiveMsg.getString("senderId") + "_" + msgId);// msgId上报规则
+		// msgStatDto.setMsgId(receiveMsg.getString("senderId") + "_" +
+		// msgId);// msgId上报规则
+		msgStatDto.setMsgId(msgId);// msgId上报规则
 		// 1 安卓
 		if (PushTypeEnum.APNS.getSrcCode() == channel) {
 			msgStatDto.setOsType(PushConsts.MsgStat_OSTYPE_IOS);
