@@ -86,7 +86,7 @@ public class RestStatVerticle extends RestAPIVerticle {
 
     private void reportUserDevice(RoutingContext context) {
         DeviceDto userDeviceDto = buildDeviceDto(context);
-        logger.info("the request params : userDeviceDto : {}", userDeviceDto);
+        logger.info("the request params : userDeviceDto : " + userDeviceDto);
         if (null == userDeviceDto) {
             paramBadRequest(context, "Required  parameters cannot be empty.");
         } else {
