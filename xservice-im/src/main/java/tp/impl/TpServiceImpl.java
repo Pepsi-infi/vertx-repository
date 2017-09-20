@@ -9,16 +9,20 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.core.eventbus.EventBus;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import rx.Single;
+import tp.TpService;
 
-public class TpServiceImpl extends AbstractVerticle {
+public class TpServiceImpl extends AbstractVerticle implements TpService {
 
 	private CircuitBreaker circuitBreaker;
 
 	private WebClient webClient;
+
+	private EventBus eb;
 
 	@Override
 	public void start() throws Exception {
@@ -91,4 +95,49 @@ public class TpServiceImpl extends AbstractVerticle {
 		});
 	}
 
+	public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
+		circuitBreaker.<String>execute(future -> {
+			MultiMap form = MultiMap.caseInsensitiveMultiMap();
+			form.set("uid", msg.getString("uid"));
+			form.set("msg", msg.encode());
+			Single<HttpResponse<String>> httpRequest = webClient.post(80, "", "/webservice/chat/userMsgSubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
+			httpRequest.subscribe(resp -> {
+				if (resp.statusCode() == 200) {
+					future.complete(resp.body());
+				} else {
+					future.fail(resp.statusCode() + resp.statusMessage());
+				}
+			});
+		}).setHandler(ar -> {
+			if (ar.succeeded()) {
+				result.handle(Future.succeededFuture(ar.result()));
+			} else {
+				result.handle(Future.succeededFuture(null));
+			}
+		});
+	}
+
+	public void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
+		circuitBreaker.<String>execute(future -> {
+			MultiMap form = MultiMap.caseInsensitiveMultiMap();
+			form.set("uid", msg.getString("uid"));
+			form.set("msg", msg.encode());
+			Single<HttpResponse<String>> httpRequest = webClient.post(80, "", "/webservice/chat/userMsgUnsubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
+			httpRequest.subscribe(resp -> {
+				if (resp.statusCode() == 200) {
+					future.complete(resp.body());
+				} else {
+					future.fail(resp.statusCode() + resp.statusMessage());
+				}
+			});
+		}).setHandler(ar -> {
+			if (ar.succeeded()) {
+				result.handle(Future.succeededFuture(ar.result()));
+			} else {
+				result.handle(Future.succeededFuture(null));
+			}
+		});
+	}
 }

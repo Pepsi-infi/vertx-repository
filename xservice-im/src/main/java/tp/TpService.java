@@ -1,5 +1,5 @@
 package tp;
 
-public class TpService {
+public interface TpService {
 
 }
