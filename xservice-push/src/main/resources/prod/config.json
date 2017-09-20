@@ -8,7 +8,9 @@
     "apple.push.url": "http://10.0.200.8/apns/push",
     "socket.valid.url": "http://10.0.200.54/webservice/passenger/webservice/chat/checkSocket",
     "PUSH_MSG_URL":"/mc-push/message/push.json",
-    "PUSH_MSG_PORT":8080
+    "PUSH_MSG_PORT":8080,
+    "city.url":"http://mp.01zhuanche.com/api/v1/region/list"
+    
   },
   "redis.config": {
   	"redis.cluster.password": "NQn+&%pq8y&2",

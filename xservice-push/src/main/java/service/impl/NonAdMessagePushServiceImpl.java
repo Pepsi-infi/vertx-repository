@@ -64,6 +64,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 	private JsonObject config;
 
 	@Override
+	
 	public void start() throws Exception {
 
 		super.start();

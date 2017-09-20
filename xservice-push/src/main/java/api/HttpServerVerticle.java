@@ -1,9 +1,9 @@
 package api;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +39,7 @@ import service.PassengerUnSendService;
 import util.HttpUtil;
 
 /**
- * 接收乘客端消息， http方式
+ * 接收乘客端消息， http方式   
  */
 public class HttpServerVerticle extends RestAPIVerticle {
 
@@ -109,7 +109,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		router.route(MsgHttpConsts.PASSENGERMSG_GET_CITYLIST).handler(this::getCityListForPassenger);
 		router.route(MsgHttpConsts.PASSENGERMSG_GET_FILEPAGE).handler(this::getImportFilePage);
 
-		router.route(RestConstants.DRIVER_QUERY).handler(this::queryDriverForPage);
+		//router.route(RestConstants.DRIVER_QUERY).handler(this::queryDriverForPage);
 
 		/**
 		 * 司机端相关
@@ -262,17 +262,17 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		Map<String, String> params = new HashMap<>();
 		params.put("pid", "");
 
-		if (1 == 1) {
-			List<Map<String, Object>> list = new ArrayList<>();
-			for (int i = 0; i < 5; i++) {
-				Map<String, Object> map = new HashMap<>();
-				map.put("cityId", i + 1);
-				map.put("cityName", "cityName" + (i + 1));
-				list.add(map);
-			}
-			HttpUtil.writeSuccessResponse2Client(response.getDelegate(), list);
-			return;
-		}
+		// if (1 == 1) {
+		// List<Map<String, Object>> list = new ArrayList<>();
+		// for (int i = 0; i < 5; i++) {
+		// Map<String, Object> map = new HashMap<>();
+		// map.put("cityId", i + 1);
+		// map.put("cityName", "cityName" + (i + 1));
+		// list.add(map);
+		// }
+		// HttpUtil.writeSuccessResponse2Client(response.getDelegate(), list);
+		// return;
+		// }
 
 		HttpUtil.doGet(params, config.getString("city.url"), resultFuture.completer());
 
@@ -305,7 +305,17 @@ public class HttpServerVerticle extends RestAPIVerticle {
 			return;
 		}
 
-		HttpUtil.writeSuccessResponse2Client(response.getDelegate(), result.getValue("data"));
+		JsonObject cityJson = (JsonObject) result.getValue("data");
+
+		JsonArray cityArray = new JsonArray();
+
+		Iterator<Entry<String, Object>> iter = cityJson.iterator();
+		while (iter.hasNext()) {
+			Entry<String, Object> entry = iter.next();
+			cityArray.addAll((JsonArray) entry.getValue());
+		}
+
+		HttpUtil.writeSuccessResponse2Client(response.getDelegate(), cityArray);
 
 	}
 
@@ -587,5 +597,21 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		}
 		driverService.queryDriver(query, NumberUtils.toInt(page), NumberUtils.toInt(size),
 				resultStringHandler(context));
+	}
+
+	public static void main(String[] args) {
+		JsonObject cityJson = new JsonObject(
+				"{\"B\":[{\"name\":\"北京\",\"id\":44},{\"name\":\"保定\",\"id\":70}],\"C\":[{\"name\":\"重庆\",\"id\":82},{\"name\":\"长春\",\"id\":88},{\"name\":\"常州\",\"id\":96}],\"D\":[{\"name\":\"大连\",\"id\":91},{\"name\":\"东莞\",\"id\":119}],\"F\":[{\"name\":\"福州\",\"id\":97},{\"name\":\"佛山\",\"id\":115}],\"G\":[{\"name\":\"广州\",\"id\":67},{\"name\":\"贵阳\",\"id\":123},{\"name\":\"桂林\",\"id\":143}],\"H\":[{\"name\":\"杭州\",\"id\":66},{\"name\":\"合肥\",\"id\":93},{\"name\":\"哈尔滨\",\"id\":94},{\"name\":\"邯郸\",\"id\":74},{\"name\":\"惠州\",\"id\":121},{\"name\":\"海口\",\"id\":139}],\"J\":[{\"name\":\"济南\",\"id\":87},{\"name\":\"嘉兴\",\"id\":141}],\"K\":[{\"name\":\"昆明\",\"id\":95}],\"L\":[{\"name\":\"兰州\",\"id\":145}],\"N\":[{\"name\":\"南京\",\"id\":73},{\"name\":\"南昌\",\"id\":89},{\"name\":\"宁波\",\"id\":92},{\"name\":\"南宁\",\"id\":99}],\"Q\":[{\"name\":\"青岛\",\"id\":83}],\"S\":[{\"name\":\"上海\",\"id\":79},{\"name\":\"苏州\",\"id\":84},{\"name\":\"沈阳\",\"id\":90},{\"name\":\"三亚\",\"id\":127},{\"name\":\"石家庄\",\"id\":105},{\"name\":\"深圳\",\"id\":111}],\"T\":[{\"name\":\"太原\",\"id\":101},{\"name\":\"天津\",\"id\":107}],\"W\":[{\"name\":\"武汉\",\"id\":71},{\"name\":\"无锡\",\"id\":85},{\"name\":\"温州\",\"id\":113},{\"name\":\"渭南\",\"id\":135}],\"X\":[{\"name\":\"厦门\",\"id\":72},{\"name\":\"西安\",\"id\":81},{\"name\":\"咸阳\",\"id\":125}],\"Y\":[{\"name\":\"银川\",\"id\":151}],\"Z\":[{\"name\":\"漳州\",\"id\":129},{\"name\":\"珠海\",\"id\":103},{\"name\":\"郑州\",\"id\":109},{\"name\":\"中山\",\"id\":117}]}");
+
+		System.out.println(cityJson.size());
+		JsonArray cityArray = new JsonArray();
+
+		Iterator<Entry<String, Object>> iter = cityJson.iterator();
+		while (iter.hasNext()) {
+			Entry<String, Object> entry = iter.next();
+			System.out.println("name=" + entry.getKey() + "~~value=" + cityJson.getJsonArray(entry.getKey()));
+			cityArray.addAll((JsonArray) entry.getValue());
+		}
+		System.out.println(cityArray);
 	}
 }
