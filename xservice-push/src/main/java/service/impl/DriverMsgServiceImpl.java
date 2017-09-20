@@ -611,6 +611,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		// 构建查询司机信息请求参数
 		JsonObject query = buildJsonQuery(dto);
 
+		// 获取司机总数
 		Future<Long> countFuture = this.queryDriverCount(query);
 
 		Future<JsonObject> batchFuture = Future.future();
@@ -633,6 +634,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			if (countHandler.succeeded()) {
 
 				long totalCount = countHandler.result();
+				// 批量保存消息，批量发送至司机端
 				this.addBatchMsgAndSend2DriverClient(totalCount, query, dto, driverMsgId, handler);
 
 			} else {
@@ -741,7 +743,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			addFuture.complete(totalNums);
 			return addFuture;
 
-		});		
+		});
 
 	}
 
@@ -755,7 +757,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 				int sendNums = handler.result().resultAt(1);
 
 				logger.info("司机消息发送成功,addNums=" + addNums + "~sendNums=" + sendNums);
-				JsonObject json=new JsonObject();
+				JsonObject json = new JsonObject();
 				json.put("addNums", addNums);
 				json.put("sendNums", sendNums);
 
@@ -825,7 +827,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 
 	private JsonObject buildJsonQuery(JsonObject dto) {
 		JsonObject query = new JsonObject();
-
 		String sendAll = dto.getString("sendAll");
 		String driverIdsStr = dto.getString("driverIds");
 		// supplierId=0 查询全部供应商
@@ -841,7 +842,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 				cityIds = cityIdsStr.split("\\,");
 				for (String cityId : cityIds) {
 
-					cityIdsArray.add(cityId);
+					cityIdsArray.add(Integer.valueOf(cityId));
 				}
 			}
 
@@ -849,7 +850,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 				query.put("cityId", new JsonObject().put("$in", cityIdsArray));
 			}
 			if (!StringUtil.isNullOrEmpty(supplierId)) {
-				query.put("supplierId", supplierId);
+				query.put("supplierId", Integer.valueOf(supplierId));
 			}
 
 			return query;
@@ -944,7 +945,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 					batchSendNums += ("success".equals(comFutures.resultAt(i))) ? 1 : 0;
 				}
 				totalFuture.complete(batchSendNums);
-				logger.info("batchSendNums=" + batchSendNums); 
+				logger.info("batchSendNums=" + batchSendNums);
 			} else {
 				logger.error("send error", totalFuture.cause());
 				totalFuture.fail("send error");

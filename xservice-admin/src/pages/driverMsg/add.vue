@@ -76,7 +76,7 @@
     <el-button  @click="onCancel">取消</el-button>
   </el-form-item>
 </el-form>
-  <el-dialog title="司机列表" :visible.sync="dialogTableVisible" @open="openDriverList">
+  <el-dialog title="司机列表" :visible.sync="dialogTableVisible" @open="openDriverList" size="large">
   	<el-form ref="driverForm" :rules="rules" v-bind:model="driverForm" label-width="80px">
 	<el-row justify="space-between" style="margin-top: 12px;">
       <el-col :span="6">
@@ -124,15 +124,15 @@
     	</el-table-column>
         <el-table-column prop="driverId"  label="序号" width="190">
         </el-table-column>
-        <el-table-column prop="driverName" label="司机姓名" width="100">
+        <el-table-column prop="driverName" label="司机姓名" width="200">
         </el-table-column>
-        <el-table-column prop="driverPhone" label="手机号" width="100">
+        <el-table-column prop="driverPhone" label="手机号" width="200">
         </el-table-column>
-        <el-table-column prop="carNumber" label="车牌号" width="100">
+        <el-table-column prop="carNumber" label="车牌号" width="200">
         </el-table-column>
-        <el-table-column prop="supplierId" label="城市" width="100">
+        <el-table-column prop="city" label="城市" width="100">
         </el-table-column>
-        <el-table-column prop="providerId" label="供应商" width="100">
+        <el-table-column prop="supplierFullName" label="供应商" width="200">
         </el-table-column>
       </el-table>
 
@@ -224,7 +224,6 @@
           this.rules.driverNames=[];
         }
       	this.$refs[formName].validate((valid) => {
-        	
         	if(!valid){ 
         		return false 
         	}
@@ -417,13 +416,13 @@
       //获取城市列表
       getCityList(){
       	this.$http.api_driverMsg.cityList()
-      	.then(({code,msg,data})=>{
+      	.then(({data:{code, msg, data}})=>{
       		data.forEach((element,index)=>{
       			if(element!==null){
       				let e={};
-      				e.label=element.cityName;
-      				e.key=element.cityId; 
-      				e.value=element.cityId;    			
+      				e.label=element.name;
+      				e.key=element.id; 
+      				e.value=element.id;    			
       				this.cities.push(e);
       			}
       		});

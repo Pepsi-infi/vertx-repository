@@ -10,7 +10,7 @@
 		"socket.valid.url": "http://10.10.10.105:18080/webservice/passenger/webservice/chat/checkSocket",
 		"PUSH_MSG_URL": "/mc-push/message/push.json",
 		"PUSH_MSG_PORT": 8989,
-		"city.url": "http://127.0.0.1/api/v1/region/list",
+		"city.url": "http://10.10.10.177:8085/api/v1/region/list",
 		"provider.url": "http://127.0.0.1",
 		"UDP_HOSTS": "10.10.10.106:9099,10.10.10.105:9099"
 	},
