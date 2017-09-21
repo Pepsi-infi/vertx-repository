@@ -262,18 +262,6 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		Map<String, String> params = new HashMap<>();
 		params.put("pid", "");
 
-		// if (1 == 1) {
-		// List<Map<String, Object>> list = new ArrayList<>();
-		// for (int i = 0; i < 5; i++) {
-		// Map<String, Object> map = new HashMap<>();
-		// map.put("cityId", i + 1);
-		// map.put("cityName", "cityName" + (i + 1));
-		// list.add(map);
-		// }
-		// HttpUtil.writeSuccessResponse2Client(response.getDelegate(), list);
-		// return;
-		// }
-
 		HttpUtil.doGet(params, config.getString("city.url"), resultFuture.completer());
 
 		resultFuture.setHandler(handler -> {
