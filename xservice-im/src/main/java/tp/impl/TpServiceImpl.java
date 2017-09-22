@@ -47,6 +47,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		return CircuitBreaker.create(name, vertx.getDelegate(), options);
 	}
 
+	@Override
 	public void updateOnlineState(String uid, String date, String content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
@@ -71,12 +72,13 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		});
 	}
 
-	public void updateOnlineSimple(String uid, String date, String content, Handler<AsyncResult<String>> result) {
+	@Override
+	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", uid);
 			form.set("time", date);
-			form.set("msg", content);
+			form.set("msg", content.encode());
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(80, "", "/webservice/chat/updateSimpleOnlineState/").as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {

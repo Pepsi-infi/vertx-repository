@@ -75,10 +75,20 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				String action = headers.get("action");
 				String from = body.getString("from");
 				String handlerID = body.getString("handlerID");
+				String to = body.getString("to");
 				logger.info("from={}action={}innerIP={}", from, action, innerIP);
 				switch (action) {
+				case "setUserSocket":
+					res.reply(setUserSocket(from, handlerID));
+					break;
 				case "delUserSocket":
 					res.reply(delUserSocket(from, handlerID));
+					break;
+				case "getHandlerIDByUid":
+					res.reply(getHandlerIDByUid(to));
+					break;
+				case "getUidByHandlerID":
+					res.reply(getUidByHandlerID(handlerID));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -125,5 +135,12 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		jo.put("handlerID", sessionMap.get(uid));
 
 		return jo;
+	}
+
+	// ---------------------------
+	private JsonObject getUidByHandlerID(String handlerID) {
+		JsonObject result = new JsonObject();
+		result.put("uid", sessionReverse.get(handlerID));
+		return result;
 	}
 }

@@ -1,8 +1,10 @@
 package test;
 
 import io.vertx.core.Vertx;
+import logic.iml.SocketSessionVerticle;
 import server.SocketServerVerticle;
 import server.ValidateServerVerticle;
+import tp.impl.TpServiceImpl;
 
 public class Tester {
 
@@ -12,6 +14,8 @@ public class Tester {
 		// DeploymentOptions().setConfig(config()));
 //		vertx.deployVerticle(ValidateServerVerticle.class.getName());
 		vertx.deployVerticle(SocketServerVerticle.class.getName());
+		vertx.deployVerticle(TpServiceImpl.class.getName());
+		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 
 		// MongoService service = MongoService.createProxy(vertx);
 		// JsonObject test = new JsonObject().put("collection", "message").put("data",
