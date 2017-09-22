@@ -45,7 +45,7 @@ public class ValidateServerVerticle extends AbstractVerticle {
 	}
 
 	private void sendValidateOK(String writeHandlerID) {
-		Buffer response = Buffer.buffer().appendString("HTTP01.0 200 OK").appendString("\r\n")
+		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK").appendString("\r\n")
 				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)").appendString("\r\n")
 				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT").appendString("\r\n")
 				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("\r\n")

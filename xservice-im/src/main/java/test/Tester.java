@@ -10,7 +10,7 @@ public class Tester {
 		Vertx vertx = Vertx.vertx();
 		// vertx.deployVerticle(MongoVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(config()));
-		vertx.deployVerticle(ValidateServerVerticle.class.getName());
+//		vertx.deployVerticle(ValidateServerVerticle.class.getName());
 		vertx.deployVerticle(SocketServerVerticle.class.getName());
 
 		// MongoService service = MongoService.createProxy(vertx);
