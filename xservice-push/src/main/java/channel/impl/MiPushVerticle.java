@@ -52,24 +52,41 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 			return;
 		}
 
-		try {
-			Result result = sendMessage(receiveMsg);
+		vertx.executeBlocking(future -> {
+			try {
+				
+				Result result = sendMessage(receiveMsg);
+				future.complete(result);
 
-			if (result == null) {
-				resultHandler.handle(Future.failedFuture("xiaomi push result is null"));
-				return;
+			} catch (Exception e) {
+				logger.error("小米push调用异常", e);
+				resultHandler.handle(Future.failedFuture(e));
 			}
 
-			if (ErrorCode.Success == result.getErrorCode()) {
-				resultHandler.handle(Future.succeededFuture(new BaseResponse()));
-			} else {
-				resultHandler.handle(Future.failedFuture(result.getReason()));
-			}
+		}, res -> {
+			
+			if(res.succeeded()){
+				
+				Result result = (Result) res.result();
+				
+				if (result == null) {
+					resultHandler.handle(Future.failedFuture("xiaomi push result is null"));
+					return;
+				}
 
-		} catch (Exception e) {
-			resultHandler.handle(Future.failedFuture(e));
-			logger.error("recieveMsg=" + receiveMsg, e);
-		}
+				if (ErrorCode.Success == result.getErrorCode()) {
+					resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+				} else {
+					resultHandler.handle(Future.failedFuture(result.getReason()));
+				}
+				
+			}else{
+				logger.error("小米push結果返回異常",res.cause());
+				resultHandler.handle(Future.failedFuture(res.cause()));
+			}
+	
+		});
+
 	}
 
 	public Result sendMessage(JsonObject recieveMsg) throws Exception {
@@ -98,7 +115,7 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		Integer openType = recieveMsg.getInteger("type");
 		String url = recieveMsg.getString("url");
 		String psnCenterImgUrl = recieveMsg.getString("psnCenterImgUrl");
-		psnCenterImgUrl=StringUtil.isNullOrEmpty(psnCenterImgUrl)?"":psnCenterImgUrl;
+		psnCenterImgUrl = StringUtil.isNullOrEmpty(psnCenterImgUrl) ? "" : psnCenterImgUrl;
 
 		String action;
 		if (PushConsts.PUSH_OPEN_TYPE_APP == openType) {
@@ -112,8 +129,9 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 
 		Message message = new Message.Builder().title(title).description(content).payload(wholeMsg)
 				.extra("messageId", msgId).extra("action", action).extra("title", title).extra("content", content)
-				.extra("isIntoPsnCenter", isIntoPsnCenter==null?"":isIntoPsnCenter+"").extra("psnCenterImgUrl", psnCenterImgUrl+"")
-				.restrictedPackageName(packageName).passThrough(PushConsts.XIAOMI_PASS_THROUGH_TOUCHUAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
+				.extra("isIntoPsnCenter", isIntoPsnCenter == null ? "" : isIntoPsnCenter + "")
+				.extra("psnCenterImgUrl", psnCenterImgUrl + "").restrictedPackageName(packageName)
+				.passThrough(PushConsts.XIAOMI_PASS_THROUGH_TOUCHUAN) // 设置消息是否通过透传的方式送给app，1表示透传消息，0表示通知栏消息。
 				.notifyType(PushConsts.XIAOMI_NOTIFY_TYPE_DEFAULT_SOUND) // 使用默认提示音提示
 				.build();
 		return message;
@@ -137,27 +155,27 @@ public class MiPushVerticle extends AbstractVerticle implements XiaoMiPushServic
 		MiPushVerticle verticle = new MiPushVerticle();
 
 		JsonObject recieveMsg = new JsonObject();
-				
+
 		recieveMsg.put("devicePushType", "");
 		recieveMsg.put("msgId", new Random().nextInt(1000000));
-		recieveMsg.put("customerId", 13666053);//卫明
-		recieveMsg.put("deviceToken", "");
+		recieveMsg.put("customerId", 13666143);// 卫明
+		recieveMsg.put("deviceToken", "lbP4GFaydgIhdzhWNRrkyii6UxAr53Q2HbGunbYwZkk=");
 		recieveMsg.put("isIntoPsnCenter", 1);
 		recieveMsg.put("title", "小米推送測試");
 		recieveMsg.put("content", "好好学习，天天向上");
 
-		recieveMsg.put("phone", "18810616483");//卫明
+		recieveMsg.put("phone", "18501120705");// 卫明
 		recieveMsg.put("jumpPage", 4);
 		recieveMsg.put("apnsToken", "");
 		recieveMsg.put("type", 1);
-		recieveMsg.put("expireTime", System.currentTimeMillis()+100000l);
+		recieveMsg.put("expireTime", System.currentTimeMillis() + 100000l);
 		recieveMsg.put("msgId", "1231313132");
-		recieveMsg.put("regId", "3TgmHfDHGwvzrPm77bOl3cqo+s8H1zJ68Al0R1D1RU0=");
+		recieveMsg.put("regId", "lbP4GFaydgIhdzhWNRrkyii6UxAr53Q2HbGunbYwZkk");
 		recieveMsg.put("title", "发券啦");
 		recieveMsg.put("content", "送您一张10元优惠券");
 		recieveMsg.put("jumpPage", 4);
 		recieveMsg.put("isIntoPsnCenter", 0);
-		recieveMsg.put("regId", "3TgmHfDHGwvzrPm77bOl3cqo+s8H1zJ68Al0R1D1RU0=");
+		recieveMsg.put("regId", "lbP4GFaydgIhdzhWNRrkyii6UxAr53Q2HbGunbYwZkk");
 		System.out.println(verticle.sendMessage(recieveMsg));
 	}
 
