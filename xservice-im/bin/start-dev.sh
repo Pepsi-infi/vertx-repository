@@ -1,6 +1,6 @@
 #!/bin/sh
 set -x
-
+source /etc/profile
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
