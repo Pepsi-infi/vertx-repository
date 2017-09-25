@@ -7,7 +7,10 @@ pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
 if [ ! -z "$pid" ]
 then 
   kill -9 $pid
+  echo "111"
 fi
+
+echo "222"
 
 /usr/bin/nohup /usr/local/jdk1.8/bin/java \
 -server \
