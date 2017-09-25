@@ -48,11 +48,11 @@ public class TpService {
     return ret;
   }
 
-  public void updateOnlineState(String uid, String date, String content, Handler<AsyncResult<String>> result) { 
+  public void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) { 
     delegate.updateOnlineState(uid, date, content, result);
   }
 
-  public Single<String> rxUpdateOnlineState(String uid, String date, String content) { 
+  public Single<String> rxUpdateOnlineState(String uid, String date, JsonObject content) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       updateOnlineState(uid, date, content, fut);
     }));

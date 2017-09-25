@@ -48,14 +48,15 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	}
 
 	@Override
-	public void updateOnlineState(String uid, String date, String content, Handler<AsyncResult<String>> result) {
+	public void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", uid);
 			form.set("time", date);
-			form.set("msg", content);
-			Single<HttpResponse<String>> httpRequest = webClient.post(80, "", "/webservice/chat/updateOnlineState/")
-					.as(BodyCodec.string()).rxSendForm(form);
+			form.set("msg", content.encode());
+			Single<HttpResponse<String>> httpRequest = webClient
+					.post(8082, "192.168.0.6", "/webservice/chat/updateOnlineState/").as(BodyCodec.string())
+					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					future.complete(resp.body());
@@ -80,7 +81,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			form.set("time", date);
 			form.set("msg", content.encode());
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(80, "", "/webservice/chat/updateSimpleOnlineState/").as(BodyCodec.string()).rxSendForm(form);
+					.post(8082, "192.168.0.6", "/webservice/chat/updateSimpleOnlineState/").as(BodyCodec.string())
+					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					future.complete(resp.body());

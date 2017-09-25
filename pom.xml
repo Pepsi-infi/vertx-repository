@@ -116,6 +116,7 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-unit</artifactId>
 			<version>${vertx-version}</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- Unit Test End -->
 

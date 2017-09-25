@@ -7,6 +7,8 @@ import java.util.Map;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.datagram.DatagramSocket;
+import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -91,36 +93,23 @@ public class SocketServerVerticle extends AbstractVerticle {
 					break;
 				}
 			}));
-
-			// parser = RecordParser.newFixed(4, buffer -> {
-			// logger.info("buffer " + buffer);
-			// if (header) {
-			// int bodyLength = buffer.getInt(0);
-			// parser.fixedSizeMode(bodyLength);
-			// header = false;
-			// } else {
-			// JsonObject message = buffer.toJsonObject();
-			// header = true;
-			// int cmd = message.getInteger("cmd");
-			//
-			// switch (cmd) {
-			// case 14:
-			// heartBeat(socket.writeHandlerID());
-			// break;
-			// case 17:
-			// subscribe(socket.writeHandlerID(), message);
-			// break;
-			// case 18:
-			// unsubscribe(socket.writeHandlerID(), message);
-			// break;
-			// default:
-			// break;
-			// }
-			// }
-			// }));
 		});
 
 		server.listen();
+
+		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
+		socket.listen(4321, "192.168.2.220", asyncResult -> {
+			if (asyncResult.succeeded()) {
+				socket.handler(packet -> {
+					logger.info("1101 Receive " + packet.data());
+				});
+			} else {
+			}
+		});
+	}
+
+	private void sendMsgFromUDP() {
+
 	}
 
 	private void getUidByHandlerID(String writeHandlerID, JsonObject message2) {
@@ -139,6 +128,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				String date = "2017-09-22 13:30:22";// TODO
 				tpService.updateOnlineSimple(uid, date, message2, result -> {
 					logger.info(result.result());
+					eb.send(writeHandlerID, result.result());
 				});
 			} else {
 				// TODO
@@ -165,6 +155,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		option.addHeader("action", "setUserSocket");
 		JsonObject message = new JsonObject();
 		message.put("from", userId);
+		message.put("handlerID", writeHandlerID);
 
 		eb.send(SocketSessionVerticle.class.getName(), message, option, reply -> {
 			if (reply.succeeded()) {

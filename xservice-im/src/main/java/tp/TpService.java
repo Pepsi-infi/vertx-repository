@@ -20,7 +20,7 @@ public interface TpService {
 		return ProxyHelper.createProxy(TpService.class, vertx, SERVICE_ADDRESS);
 	}
 
-	void updateOnlineState(String uid, String date, String content, Handler<AsyncResult<String>> result);
+	void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result);
 
 	void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result);
 }

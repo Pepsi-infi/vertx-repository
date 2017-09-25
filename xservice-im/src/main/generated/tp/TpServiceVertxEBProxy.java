@@ -64,7 +64,7 @@ public class TpServiceVertxEBProxy implements TpService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void updateOnlineState(String uid, String date, String content, Handler<AsyncResult<String>> result) {
+  public void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
