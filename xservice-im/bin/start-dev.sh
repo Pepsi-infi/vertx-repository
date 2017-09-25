@@ -8,8 +8,7 @@ then
   kill -9 $pid
 fi
 
-BUILD_ID=
-java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
