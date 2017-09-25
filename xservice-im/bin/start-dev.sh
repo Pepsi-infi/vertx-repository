@@ -8,9 +8,9 @@ then
   kill -9 $pid
 fi
 
-sleep 5s
+#sleep 5s
 
-nohup /usr/local/jdk1.8/bin/java \
+BUILD_ID=dontKillMe nohup /usr/local/jdk1.8/bin/java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -30,6 +30,6 @@ nohup /usr/local/jdk1.8/bin/java \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
 
-sleep 2s
+#sleep 2s
 
 exit 0
