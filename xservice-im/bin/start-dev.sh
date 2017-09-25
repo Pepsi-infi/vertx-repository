@@ -1,5 +1,6 @@
 #!/bin/sh
 set -x
+
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
@@ -26,6 +27,6 @@ nohup /usr/local/jdk1.8/bin/java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
+-jar ${root_path}/xservice-im-fat.jar >/dev/null 2>&1 &
 
 exit 0
