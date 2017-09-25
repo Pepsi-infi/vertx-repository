@@ -9,7 +9,7 @@ then
   kill -9 $pid
 fi
 
-nohup /usr/local/jdk1.8/bin/java \
+/usr/bin/nohup /usr/local/jdk1.8/bin/java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
