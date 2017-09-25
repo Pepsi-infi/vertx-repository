@@ -27,5 +27,3 @@ nohup java \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
-
-exit 0
