@@ -32,4 +32,4 @@ echo "222"
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >/dev/null 2>&1 &
 
-exit 0
+exit 123
