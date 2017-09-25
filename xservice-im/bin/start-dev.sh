@@ -1,18 +1,34 @@
 #!/bin/sh
 set -x
-source /etc/profile
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
 pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
 if [ ! -z "$pid" ]
 then 
   kill -9 $pid
-  echo "111"
 fi
 
-echo "222"
+/usr/local/jdk1.8/bin/java \
+-server \
+-XX:+PrintGCApplicationStoppedTime \
+-XX:+PrintGCTimeStamps \
+-XX:+PrintGCDetails \
+-Xms2g -Xmx2g -Xmn1380m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
+-XX:MaxDirectMemorySize=2560m \
+-XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
+-XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
+-XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
+-XX:-UseCounterDecay \
+-Djava.net.preferIPv4Stack=true \
+-Xloggc:${root_path}/gc.log \
+-Dlog.path=${root_path}/log \
+-Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
+-Dlog4j.configurationFile=log4j2.xml \
+-Dconfig=dev \
+-Dvertx.zookeeper.config=zookeeper-dev.json \
+-jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out1 &
 
-/usr/bin/nohup java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -32,4 +48,4 @@ echo "222"
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
 
-exit 123
+exit 0
