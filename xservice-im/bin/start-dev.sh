@@ -12,7 +12,7 @@ fi
 
 echo "222"
 
-/usr/bin/nohup /usr/local/jdk1.8/bin/java \
+/usr/bin/nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -30,6 +30,6 @@ echo "222"
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-im-fat.jar >/dev/null 2>&1 &
+-jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
 
 exit 123
