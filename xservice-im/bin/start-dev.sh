@@ -8,7 +8,7 @@ then
   kill -9 $pid
 fi
 
-nohup java \
+nohup /usr/local/jdk1.8/bin/java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
@@ -27,3 +27,5 @@ nohup java \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
+
+exit 0
