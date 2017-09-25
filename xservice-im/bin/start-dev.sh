@@ -28,7 +28,7 @@ fi
 -Dvertx.zookeeper.config=zookeeper-dev.json \
 -jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out1 &
 
-nohup java \
+nohup /usr/local/jdk1.8/bin/java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
