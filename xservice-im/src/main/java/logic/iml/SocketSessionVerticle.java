@@ -42,6 +42,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("innerIP={}", innerIP);
 		eb = vertx.eventBus();
+
 		eb.<JsonObject>consumer(SocketSessionVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
@@ -50,7 +51,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				String from = body.getString("from");
 				String handlerID = body.getString("handlerID");
 				String to = body.getString("to");
+
 				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+
 				switch (action) {
 				case "setUserSocket":
 					res.reply(setUserSocket(from, handlerID));
@@ -60,6 +63,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 					break;
 				case "getHandlerIDByUid":
 					res.reply(getHandlerIDByUid(to));
+					break;
+				case "getUidByHandlerID":
+					res.reply(getUidByHandlerID(handlerID));
 					break;
 				default:
 					res.reply(1);// Fail!

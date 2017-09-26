@@ -1,9 +1,13 @@
 package server;
 
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
@@ -22,14 +26,13 @@ import serializer.ByteUtils;
 import tp.TpService;
 import tp.impl.TpServiceImpl;
 import util.ByteUtil;
+import utils.IPUtil;
 
 public class SocketServerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocketServerVerticle.class);
 
 	private int op;// 1 登录 2 header 3 body
-
-	private int redirect = 0;
 
 	private RecordParser parser;
 
@@ -45,7 +48,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		tpService = TpService.createProxy(vertx);
 
-		logger.info("start...");
+		String innerIP = IPUtil.getInnerIP();
+		logger.info("start...innerIP={}", innerIP);
 
 		server.connectHandler(socket -> {
 			op = 1;
@@ -54,16 +58,15 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 				switch (op) {
 				case 1:
-					logger.info("login op " + op + buffer);
+					logger.info("TCP op={}buffer={}", op, buffer);
 
 					sendValidateOK(socket.writeHandlerID());
 
-					logger.info("redirect " + redirect);
 					Map<String, String> paramMap = URLRequest(buffer.toString());
-					login(socket.writeHandlerID(), buffer.toString());
+					loginSocketSession(innerIP, socket.writeHandlerID(), buffer.toString());
 					loginConfirm(socket.writeHandlerID(), paramMap);
-					op = 2;
 
+					op = 2;
 					parser.fixedSizeMode(4);
 
 					break;
@@ -85,8 +88,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 					switch (cmd) {
 					case 14:
 						heartBeat(socket.writeHandlerID());
-						getUidByHandlerID(socket.writeHandlerID(), message);
-						updateOnlineSimple();
+						getUidByHandlerID(innerIP, socket.writeHandlerID(), message);
 						break;
 
 					default:
@@ -151,26 +153,25 @@ public class SocketServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void sendMsgFromUDP() {
-
-	}
-
-	private void getUidByHandlerID(String writeHandlerID, JsonObject message2) {
-
+	private void getUidByHandlerID(String innerIP, String writeHandlerID, JsonObject message) {
 		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
 		option.addHeader("action", "getUidByHandlerID");
 
-		JsonObject message = new JsonObject();
-		message.put("handlerID", writeHandlerID);
+		JsonObject param = new JsonObject();
+		param.put("handlerID", writeHandlerID);
 
-		eb.<JsonObject>send(SocketSessionVerticle.class.getName(), message, option, reply -> {
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("uid");
 
-				String date = "2017-09-22 13:30:22";// TODO
-				tpService.updateOnlineSimple(uid, date, message2, result -> {
-					logger.info(result.result());
+				LocalDateTime now = LocalDateTime.now();
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+				String date = now.format(format);
+
+				tpService.updateOnlineSimple(uid, date, message, result -> {
+					logger.info("updateOnlineSimple={}", result.result());
 					eb.send(writeHandlerID, result.result());
 				});
 			} else {
@@ -179,29 +180,22 @@ public class SocketServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void updateOnlineSimple() {
-		// TODO Auto-generated method stub
-
-	}
-
 	/**
 	 * req get /mobile?user=1123123&hash=
 	 * 
 	 * @param writeHandlerID
 	 * @param req
 	 */
-	private void login(String writeHandlerID, String req) {
-		Map<String, String> paramMap = URLRequest(req);
-		String userId = paramMap.get("user");
-		logger.info("user={}", userId);
-
+	private void loginSocketSession(String innerIP, String writeHandlerID, String userId) {
 		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
 		option.addHeader("action", "setUserSocket");
+
 		JsonObject message = new JsonObject();
 		message.put("from", userId);
 		message.put("handlerID", writeHandlerID);
 
-		eb.send(SocketSessionVerticle.class.getName(), message, option, reply -> {
+		eb.send(SocketSessionVerticle.class.getName() + innerIP, message, option, reply -> {
 			if (reply.succeeded()) {
 				logger.info("setUserSocket " + reply.result());
 			} else {
@@ -226,7 +220,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		if (strUrlParam == null) {
 			return mapRequest;
 		}
-		// 每个键值为一组 www.2cto.com
+
 		arrSplit = strUrlParam.split("[&]");
 		for (String strSplit : arrSplit) {
 			String[] arrSplitEqual = null;
@@ -236,7 +230,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (arrSplitEqual.length > 1) {
 				// 正确解析
 				mapRequest.put(arrSplitEqual[0], arrSplitEqual[1]);
-
 			} else {
 				if (arrSplitEqual[0] != "") {
 					// 只有参数没有值，不加入
@@ -245,6 +238,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 			}
 		}
 
+		// TODO delete
 		mapRequest.forEach((k, v) -> {
 			logger.info("mapRequest, k={} v={}", k, v);
 		});
@@ -285,7 +279,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 				.appendString("Content-Type: text/x-live-message").appendString("\r\n")
 				.appendString("Connection: keep-alive").appendString("\r\n")
 				.appendString("Cache-Control: no-cache, must-revalidate").appendString("\r\n\r\n");
-		logger.info("send validate ok " + response);
 		eb.send(writeHandlerID, response);
 	}
 
@@ -301,7 +294,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 	}
 
 	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
-
 		String userId = paramMap.get("userId");
 		String hash = paramMap.get("hash");
 		String mid = paramMap.get("mid");
@@ -328,15 +320,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 		message.put("cmd", 54);
 
 		JsonObject data = new JsonObject();
-		data.put("uid", 13666098);
-		data.put("omc", 0);
+		data.put("uid", userId);
+		data.put("omc", 0);// session:get_unread_msg_count(User, ?MOBILE_USER)
 		List<String> tokenList = new ArrayList<String>();
-		tokenList.add("710d5e67139a68ff2666729a84dfb642");
-		tokenList.add("4944092672b9b81a13cb7554f6e45144");
-		tokenList.add("81e450f7f9064dc828ded649ba64d9be");
-		tokenList.add("16e088060f929d1749a82cfba56c5182");
+		for (int i = 0; i < 4; i++) {
+			tokenList.add(UUID.randomUUID().toString().replaceAll("-", ""));
+		}
 		data.put("tokens", tokenList);
-		data.put("now", "1506042848");
+		data.put("now", System.currentTimeMillis() / 1000);
 
 		message.put("data", data);
 
