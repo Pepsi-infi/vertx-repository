@@ -63,7 +63,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 					sendValidateOK(socket.writeHandlerID());
 
 					Map<String, String> paramMap = URLRequest(buffer.toString());
-					loginSocketSession(innerIP, socket.writeHandlerID(), buffer.toString());
+					String userId = paramMap.get("user");
+					loginSocketSession(innerIP, socket.writeHandlerID(), userId);
 					loginConfirm(socket.writeHandlerID(), paramMap);
 
 					op = 2;
@@ -140,6 +141,26 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 							logger.info("userId={}Msg2Send={}", userId, msg2Send.encode());
 
+							DeliveryOptions option = new DeliveryOptions();
+							option.setSendTimeout(3000);
+							option.addHeader("action", "getHandlerIDByUid");
+
+							JsonObject param = new JsonObject();
+							param.put("userId", userId);
+							eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option,
+									reply -> {
+										if (reply.succeeded()) {
+											JsonObject res = reply.result().body();
+											String handlerID = res.getString("handlerID");
+
+											Buffer bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
+													.appendString(msg2Send.encode());
+											eb.send(handlerID, bf);
+										} else {
+											// TODO
+										}
+									});
+
 						} catch (Exception e2) {
 							logger.error("Get userId error ", e2);
 						}
@@ -164,7 +185,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
-				String uid = res.getString("uid");
+				String uid = res.getString("userId");
 
 				LocalDateTime now = LocalDateTime.now();
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
@@ -192,7 +213,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		option.addHeader("action", "setUserSocket");
 
 		JsonObject message = new JsonObject();
-		message.put("from", userId);
+		message.put("userId", userId);
 		message.put("handlerID", writeHandlerID);
 
 		eb.send(SocketSessionVerticle.class.getName() + innerIP, message, option, reply -> {
@@ -294,7 +315,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 	}
 
 	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
-		String userId = paramMap.get("userId");
+		String userId = paramMap.get("user");
 		String hash = paramMap.get("hash");
 		String mid = paramMap.get("mid");
 		String cid = paramMap.get("cid");

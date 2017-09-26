@@ -73,6 +73,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					logger.info("updateOnlineState={}", resp.body());
 					future.complete(resp.body());
 				} else {
+					logger.error("updateOnlineState={}", resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
@@ -100,6 +101,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					logger.info("updateOnlineSimple={}", resp.body());
 					future.complete(resp.body());
 				} else {
+					logger.error("updateOnlineSimple={}", resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
@@ -122,8 +124,10 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
+					logger.info("subscribe={}", resp.body());
 					future.complete(resp.body());
 				} else {
+					logger.error("subscribe={}", resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
@@ -187,6 +191,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					logger.info("auth={}", resp.body());
 					future.complete(resp.body());
 				} else {
+					logger.error("auth={}", resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});

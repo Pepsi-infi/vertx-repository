@@ -48,21 +48,20 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				String from = body.getString("from");
+				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
-				String to = body.getString("to");
 
-				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+				logger.info("userId={}action={}innerIP={}", userId, action, innerIP);
 
 				switch (action) {
 				case "setUserSocket":
-					res.reply(setUserSocket(from, handlerID));
+					res.reply(setUserSocket(userId, handlerID));
 					break;
 				case "delUserSocket":
-					res.reply(delUserSocket(from, handlerID));
+					res.reply(delUserSocket(userId, handlerID));
 					break;
 				case "getHandlerIDByUid":
-					res.reply(getHandlerIDByUid(to));
+					res.reply(getHandlerIDByUid(userId));
 					break;
 				case "getUidByHandlerID":
 					res.reply(getUidByHandlerID(handlerID));
@@ -79,16 +78,16 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				String from = body.getString("from");
+				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
 				String to = body.getString("to");
-				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+				logger.info("userId={}action={}innerIP={}", userId, action, innerIP);
 				switch (action) {
 				case "setUserSocket":
-					res.reply(setUserSocket(from, handlerID));
+					res.reply(setUserSocket(userId, handlerID));
 					break;
 				case "delUserSocket":
-					res.reply(delUserSocket(from, handlerID));
+					res.reply(delUserSocket(userId, handlerID));
 					break;
 				case "getHandlerIDByUid":
 					res.reply(getHandlerIDByUid(to));
@@ -104,10 +103,10 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		});
 	}
 
-	public int setUserSocket(String uid, String handlerId) {
-		logger.info("setUserSocket, uid={}", uid);
-		this.sessionMap.put(uid, handlerId);
-		this.sessionReverse.put(handlerId, uid);
+	public int setUserSocket(String userId, String handlerId) {
+		logger.info("setUserSocket, userId={}", userId);
+		this.sessionMap.put(userId, handlerId);
+		this.sessionReverse.put(handlerId, userId);
 
 		return 0;
 	}
@@ -147,7 +146,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	// ---------------------------
 	private JsonObject getUidByHandlerID(String handlerID) {
 		JsonObject result = new JsonObject();
-		result.put("uid", sessionReverse.get(handlerID));
+		result.put("userId", sessionReverse.get(handlerID));
 		return result;
 	}
 }
