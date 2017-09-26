@@ -38,7 +38,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-		NetServerOptions options = new NetServerOptions().setPort(4321);
+		NetServerOptions options = new NetServerOptions().setPort(9099);
 		NetServer server = vertx.createNetServer(options);
 		eb = vertx.eventBus();
 
@@ -98,10 +98,10 @@ public class SocketServerVerticle extends AbstractVerticle {
 		server.listen();
 
 		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		socket.listen(4321, "192.168.2.220", asyncResult -> {
+		socket.listen(9099, "10.10.10.102", asyncResult -> {
 			if (asyncResult.succeeded()) {
 				socket.handler(packet -> {
-					logger.info("1101 Receive " + packet.data());
+					logger.info("UDP packet " + packet.data());
 				});
 			} else {
 			}
