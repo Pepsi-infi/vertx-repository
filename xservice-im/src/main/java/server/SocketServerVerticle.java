@@ -119,6 +119,10 @@ public class SocketServerVerticle extends AbstractVerticle {
 					if (map != null) {
 						logger.info("Map " + map.toString());
 
+						map.forEach((k, v) -> {
+							logger.info("map k={}v={}", k, v);
+						});
+
 						try {
 							JsonObject msgBody = (JsonObject) map.get("body");
 							userId = msgBody.getString("userId");
