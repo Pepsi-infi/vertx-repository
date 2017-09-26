@@ -182,6 +182,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 	private void login(String writeHandlerID, String req) {
 		Map<String, String> paramMap = URLRequest(req);
 		String userId = paramMap.get("user");
+		logger.info("user={}", userId);
 
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", "setUserSocket");
@@ -232,6 +233,11 @@ public class SocketServerVerticle extends AbstractVerticle {
 				}
 			}
 		}
+
+		mapRequest.forEach((k, v) -> {
+			logger.info("mapRequest, k={} v={}", k, v);
+		});
+
 		return mapRequest;
 	}
 
