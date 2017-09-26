@@ -124,11 +124,11 @@ public class SocketServerVerticle extends AbstractVerticle {
 						});
 
 						try {
-							JsonObject msgBody = (JsonObject) map.get("body");
-							userId = msgBody.getString("userId");
+							ArrayList<String> msgBody = (ArrayList<String>) map.get("params");
+							userId = msgBody.get(0);// userId
 							logger.info("UDP userId={}", userId);
 						} catch (Exception e2) {
-							logger.error("Json parse ", e2.getCause());
+							logger.error("Get userId error ", e2.getMessage());
 						}
 					} else {
 						logger.info("Map is null.");
