@@ -1,5 +1,6 @@
 package tp.impl;
 
+import helper.XProxyHelper;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.AsyncResult;
@@ -15,6 +16,8 @@ import io.vertx.rxjava.core.eventbus.EventBus;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
+import io.vertx.serviceproxy.ProxyHelper;
+import logic.C2CService;
 import rx.Single;
 import tp.TpService;
 
@@ -38,6 +41,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		this.circuitBreaker = this.createCircuitBreaker(vertx, new JsonObject());
 
 		webClient = WebClient.create(vertx);
+
+		XProxyHelper.registerService(TpService.class, vertx.getDelegate(), this, TpService.SERVICE_ADDRESS);
 	}
 
 	private CircuitBreaker createCircuitBreaker(Vertx vertx, JsonObject config) {
