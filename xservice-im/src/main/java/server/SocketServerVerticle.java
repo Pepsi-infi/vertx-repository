@@ -113,11 +113,19 @@ public class SocketServerVerticle extends AbstractVerticle {
 						map = (Map<String, Object>) ByteUtils.byteToObject(packet.data().getBytes());
 					} catch (Exception e) {
 						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
-						e.printStackTrace();
 					}
 
+					String userId = null;
 					if (map != null) {
 						logger.info("Map " + map.toString());
+
+						try {
+							JsonObject msgBody = (JsonObject) map.get("body");
+							userId = msgBody.getString("userId");
+							logger.info("UDP userId={}", userId);
+						} catch (Exception e2) {
+							logger.error("Json parse ", e2.getCause());
+						}
 					} else {
 						logger.info("Map is null.");
 					}
