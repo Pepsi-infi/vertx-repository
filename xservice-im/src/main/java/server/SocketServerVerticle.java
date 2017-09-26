@@ -43,6 +43,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 
 		tpService = TpService.createProxy(vertx);
+		
+		logger.info("start...");
 
 		server.connectHandler(socket -> {
 			op = 1;
@@ -100,10 +102,12 @@ public class SocketServerVerticle extends AbstractVerticle {
 		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 		socket.listen(9099, "10.10.10.102", asyncResult -> {
 			if (asyncResult.succeeded()) {
+				logger.info("UDP listening...");
 				socket.handler(packet -> {
 					logger.info("UDP packet " + packet.data());
 				});
 			} else {
+				logger.error("UDP", asyncResult.cause());
 			}
 		});
 	}
