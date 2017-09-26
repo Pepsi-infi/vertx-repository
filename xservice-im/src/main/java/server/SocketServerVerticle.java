@@ -120,15 +120,15 @@ public class SocketServerVerticle extends AbstractVerticle {
 						logger.info("Map " + map.toString());
 
 						map.forEach((k, v) -> {
-							logger.info("map k={}v={}", k, v);
+							logger.info("map k={} v={}", k, v);
 						});
 
 						try {
-							ArrayList<String> msgBody = (ArrayList<String>) map.get("params");
-							userId = msgBody.get(0);// userId
+							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
+							userId = String.valueOf(msgBody.get(0));// userId
 							logger.info("UDP userId={}", userId);
 						} catch (Exception e2) {
-							logger.error("Get userId error ", e2.getMessage());
+							logger.error("Get userId error ", e2);
 						}
 					} else {
 						logger.info("Map is null.");
