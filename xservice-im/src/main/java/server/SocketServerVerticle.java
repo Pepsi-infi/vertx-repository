@@ -18,6 +18,7 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
 import logic.iml.SocketSessionVerticle;
+import serializer.ByteUtils;
 import tp.TpService;
 import tp.impl.TpServiceImpl;
 import util.ByteUtil;
@@ -43,7 +44,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 
 		tpService = TpService.createProxy(vertx);
-		
+
 		logger.info("start...");
 
 		server.connectHandler(socket -> {
@@ -105,6 +106,21 @@ public class SocketServerVerticle extends AbstractVerticle {
 				logger.info("UDP listening...");
 				socket.handler(packet -> {
 					logger.info("UDP packet " + packet.data());
+
+					Map<String, Object> map = null;
+
+					try {
+						map = (Map<String, Object>) ByteUtils.byteToObject(packet.data().getBytes());
+					} catch (Exception e) {
+						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
+						e.printStackTrace();
+					}
+
+					if (map != null) {
+						logger.info("Map " + map.toString());
+					} else {
+						logger.info("Map is null.");
+					}
 				});
 			} else {
 				logger.error("UDP", asyncResult.cause());
