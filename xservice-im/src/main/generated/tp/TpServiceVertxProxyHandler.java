@@ -123,6 +123,10 @@ public class TpServiceVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
+        case "auth": {
+          service.auth((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
+          break;
+        }
         case "updateOnlineState": {
           service.updateOnlineState((java.lang.String)json.getValue("uid"), (java.lang.String)json.getValue("date"), (io.vertx.core.json.JsonObject)json.getValue("content"), createHandler(msg));
           break;

@@ -59,8 +59,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 					sendValidateOK(socket.writeHandlerID());
 
 					logger.info("redirect " + redirect);
+					Map<String, String> paramMap = URLRequest(buffer.toString());
 					login(socket.writeHandlerID(), buffer.toString());
-					loginConfirm(socket.writeHandlerID());
+					loginConfirm(socket.writeHandlerID(), paramMap);
 					op = 2;
 
 					parser.fixedSizeMode(4);
@@ -289,7 +290,19 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.send(writeHandlerID, bf);
 	}
 
-	private void loginConfirm(String writeHandlerID) {
+	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
+
+		String userId = paramMap.get("userId");
+		String hash = paramMap.get("hash");
+		String mid = paramMap.get("mid");
+		String cid = paramMap.get("cid");
+		String version = paramMap.get("ver");
+
+		logger.info("Params userId={}hash={}mid={}cid={}version={}", userId, hash, mid, cid, version);
+		
+		
+		
+
 		JsonObject message = new JsonObject();
 		message.put("cmd", 54);
 

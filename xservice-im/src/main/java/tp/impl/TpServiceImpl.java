@@ -6,6 +6,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.Vertx;
@@ -18,11 +20,15 @@ import tp.TpService;
 
 public class TpServiceImpl extends AbstractVerticle implements TpService {
 
+	private static final Logger logger = LoggerFactory.getLogger(TpServiceImpl.class);
+
 	private CircuitBreaker circuitBreaker;
 
 	private WebClient webClient;
 
 	private EventBus eb;
+
+	private static final String CAR_API_HOST = "10.0.10.45";
 
 	@Override
 	public void start() throws Exception {
@@ -55,10 +61,11 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			form.set("time", date);
 			form.set("msg", content.encode());
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(8082, "192.168.0.6", "/webservice/chat/updateOnlineState/").as(BodyCodec.string())
+					.post(8082, CAR_API_HOST, "/webservice/chat/updateOnlineState/").as(BodyCodec.string())
 					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
+					logger.info("updateOnlineState={}", resp.body());
 					future.complete(resp.body());
 				} else {
 					future.fail(resp.statusCode() + resp.statusMessage());
@@ -81,10 +88,11 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			form.set("time", date);
 			form.set("msg", content.encode());
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(8082, "192.168.0.6", "/webservice/chat/updateSimpleOnlineState/").as(BodyCodec.string())
+					.post(8082, CAR_API_HOST, "/webservice/chat/updateSimpleOnlineState/").as(BodyCodec.string())
 					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
+					logger.info("updateOnlineSimple={}", resp.body());
 					future.complete(resp.body());
 				} else {
 					future.fail(resp.statusCode() + resp.statusMessage());
@@ -104,8 +112,9 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("uid"));
 			form.set("msg", msg.encode());
-			Single<HttpResponse<String>> httpRequest = webClient.post(80, "", "/webservice/chat/userMsgSubscribe/")
-					.as(BodyCodec.string()).rxSendForm(form);
+			Single<HttpResponse<String>> httpRequest = webClient
+					.post(80, CAR_API_HOST, "/webservice/chat/userMsgSubscribe/").as(BodyCodec.string())
+					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					future.complete(resp.body());
@@ -127,10 +136,50 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("uid"));
 			form.set("msg", msg.encode());
-			Single<HttpResponse<String>> httpRequest = webClient.post(80, "", "/webservice/chat/userMsgUnsubscribe/")
-					.as(BodyCodec.string()).rxSendForm(form);
+			Single<HttpResponse<String>> httpRequest = webClient
+					.post(80, CAR_API_HOST, "/webservice/chat/userMsgUnsubscribe/").as(BodyCodec.string())
+					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
+					future.complete(resp.body());
+				} else {
+					future.fail(resp.statusCode() + resp.statusMessage());
+				}
+			});
+		}).setHandler(ar -> {
+			if (ar.succeeded()) {
+				result.handle(Future.succeededFuture(ar.result()));
+			} else {
+				result.handle(Future.succeededFuture(null));
+			}
+		});
+	}
+
+	/**
+	 * 
+	 * @param msg
+	 * @param result
+	 */
+	public void auth(JsonObject param, Handler<AsyncResult<String>> result) {
+		circuitBreaker.<String>execute(future -> {
+			String userId = param.getString("userId");
+			String hash = param.getString("hash");
+			String ip = param.getString("ip");
+			String channelid = param.getString("channelid");
+			String mark = param.getString("mark");
+			String ver = param.getString("ver");
+			String mode = param.getString("mode");
+
+			String requestURI = new StringBuffer("/webservice/chat/signinUserHash/").append("user=").append(userId)
+					.append("&hash=").append(hash).append("&ip=").append(ip).append("&channelid=").append(channelid)
+					.append("&mark=").append(mark).append("&ver=").append(ver).append("&mode=").append(mode).toString();
+
+			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_HOST, requestURI).as(BodyCodec.string())
+					.rxSend();
+
+			httpRequest.subscribe(resp -> {
+				if (resp.statusCode() == 200) {
+					logger.info("auth={}", resp.body());
 					future.complete(resp.body());
 				} else {
 					future.fail(resp.statusCode() + resp.statusMessage());

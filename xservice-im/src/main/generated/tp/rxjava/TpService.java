@@ -48,6 +48,16 @@ public class TpService {
     return ret;
   }
 
+  public void auth(JsonObject param, Handler<AsyncResult<String>> result) { 
+    delegate.auth(param, result);
+  }
+
+  public Single<String> rxAuth(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      auth(param, fut);
+    }));
+  }
+
   public void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) { 
     delegate.updateOnlineState(uid, date, content, result);
   }
