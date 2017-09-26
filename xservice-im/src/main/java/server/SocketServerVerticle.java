@@ -127,7 +127,17 @@ public class SocketServerVerticle extends AbstractVerticle {
 						try {
 							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
 							userId = String.valueOf(msgBody.get(0));// userId
+							String cmd = String.valueOf(msgBody.get(1));
 							logger.info("UDP userId={}", userId);
+
+							JsonObject data = JsonObject.mapFrom(msgBody.get(3));
+
+							JsonObject msg2Send = new JsonObject();
+							msg2Send.put("cmd", cmd);
+							msg2Send.put("data", data);
+
+							logger.info("userId={}Msg2Send={}", userId, msg2Send.encode());
+
 						} catch (Exception e2) {
 							logger.error("Get userId error ", e2);
 						}
@@ -299,9 +309,20 @@ public class SocketServerVerticle extends AbstractVerticle {
 		String version = paramMap.get("ver");
 
 		logger.info("Params userId={}hash={}mid={}cid={}version={}", userId, hash, mid, cid, version);
-		
-		
-		
+
+		JsonObject param = new JsonObject();
+		param.put("userId", userId);
+		param.put("hash", hash);
+		param.put("mid", mid);
+		param.put("cid", cid);
+		param.put("ver", version);
+		tpService.auth(param, res -> {
+			if (res.succeeded()) {
+				logger.info("Auth " + res.result());
+			} else {
+				logger.error("Auth " + res.cause());
+			}
+		});
 
 		JsonObject message = new JsonObject();
 		message.put("cmd", 54);
