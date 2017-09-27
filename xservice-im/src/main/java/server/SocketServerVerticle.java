@@ -55,7 +55,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 			// op = 1;
 			String handlerID = socket.writeHandlerID();
 			socket.handler(parser = RecordParser.newDelimited("\n\n", buffer -> {
-				logger.info("handlerID={} buffer={}", handlerID, buffer);
+				logger.info("handlerID={} buffer={} op={}", handlerID, buffer, op);
 
 				switch (op) {
 				case 1:
@@ -73,14 +73,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 					break;
 				case 2:
-					logger.info("handlerID={} header={}", handlerID, buffer.getInt(0));
+					logger.info("handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
 
 					op = 3;
 					int bodyLength = buffer.getInt(0);
 					parser.fixedSizeMode(bodyLength);
 					break;
 				case 3:
-					logger.info("handlerID={} body={}", handlerID, buffer);
+					logger.info("handlerID={} body={} op={}", handlerID, buffer, op);
 
 					op = 2;
 					parser.fixedSizeMode(4);
