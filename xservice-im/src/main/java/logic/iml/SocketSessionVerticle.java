@@ -147,6 +147,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	private JsonObject getUidByHandlerID(String handlerID) {
 		JsonObject result = new JsonObject();
 		result.put("userId", sessionReverse.get(handlerID));
+		
 		return result;
 	}
 }

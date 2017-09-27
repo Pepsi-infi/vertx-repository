@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
@@ -191,14 +193,25 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
+				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
 
 				LocalDateTime now = LocalDateTime.now();
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 				String date = now.format(format);
 
 				tpService.updateOnlineSimple(uid, date, message, result -> {
-					logger.info("updateOnlineSimple={}", result.result());
-					eb.send(writeHandlerID, result.result());
+					if (result.succeeded()) {
+						logger.info("updateOnlineSimple={}", result.result());
+						if (StringUtils.isNotEmpty(result.result())) {
+							Buffer bf = Buffer.buffer(ByteUtil.intToBytes(result.result().length()))
+									.appendString(result.result());
+							eb.send(writeHandlerID, bf);
+						} else {
+							logger.warn("updateOnlineSimple, result is null");
+						}
+					} else {
+						logger.error("updateOnlineSimple, result={}", result.cause());
+					}
 				});
 			} else {
 				// TODO
@@ -401,7 +414,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		message.put("data", data);
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
 
-		logger.info("heart beat " + bf);
+		logger.info("heart beat, handlerID={} bf={}", writeHandlerID, bf);
 
 		eb.send(writeHandlerID, bf);
 	}

@@ -101,7 +101,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					logger.info("updateOnlineSimple={}", resp.body());
 					future.complete(resp.body());
 				} else {
-					logger.error("updateOnlineSimple={}", resp.statusMessage());
+					logger.error("updateOnlineSimple, statusCode={} statusMessage={}", resp.statusCode(),
+							resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
