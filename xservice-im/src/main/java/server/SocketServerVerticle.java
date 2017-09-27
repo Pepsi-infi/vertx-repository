@@ -93,7 +93,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 						switch (cmd) {
 						case 14:
 							heartBeat(handlerID);
-//							getUidByHandlerID(innerIP, handlerID, message);
+							// getUidByHandlerID(innerIP, handlerID, message);
 							break;
 
 						default:
@@ -427,7 +427,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
 				.appendBytes(message.encode().getBytes());
 
-		logger.info("heart beat, handlerID={} bf={}", writeHandlerID, bf);
+		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message,
+				message.encode().length());
 
 		eb.send(writeHandlerID, bf);
 	}
