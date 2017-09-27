@@ -424,13 +424,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 		data.put("speed", "3000");
 
 		message.put("data", data);
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
-				.appendBytes(message.encode().getBytes());
+
+		Buffer bf = Buffer.buffer().appendBytes(ByteUtil.intToBytes(message.encode().length()))
+				.appendString(message.encode());
 
 		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message,
 				message.encode().length());
 
-		eb.send(writeHandlerID, bf);
+		eb.send(writeHandlerID, message);
 	}
 
 }
