@@ -11,10 +11,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.datagram.DatagramSocket;
-import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -22,177 +19,51 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
-import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import logic.iml.SocketSessionVerticle;
-import serializer.ByteUtils;
 import tp.TpService;
 import tp.impl.TpServiceImpl;
 import util.ByteUtil;
 import utils.IPUtil;
 
-public class SocketServerVerticle extends AbstractVerticle {
+public class TestSocketServerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(SocketServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(TestSocketServerVerticle.class);
+
+	private int op;// 1 登录 2 header 3 body
+
+	private RecordParser parser;
 
 	private EventBus eb;
 
 	private TpService tpService;
-	private String innerIP;
 
 	@Override
 	public void start() throws Exception {
 		eb = vertx.eventBus();
 		tpService = TpService.createProxy(vertx);
-		innerIP = IPUtil.getInnerIP();
+		String innerIP = IPUtil.getInnerIP();
 		logger.info("start...innerIP={}", innerIP);
 
 		NetServerOptions options = new NetServerOptions().setPort(8088);
 		NetServer server = vertx.createNetServer(options);
 
-		server.connectHandler(new Handler<NetSocket>() {
+		server.connectHandler(socket -> {
+			// op = 1;
+			String handlerID = socket.writeHandlerID();
+			socket.handler(this::bufferHandler);
 
-			private RecordParser parser;
-
-			private int op;// 1 登录 2 header 3 body
-
-			@Override
-			public void handle(final NetSocket socket) {
-				String handlerID = socket.writeHandlerID();
-				socket.handler(parser = RecordParser.newDelimited("\n\n", buffer -> {
-					logger.info("handlerID={} buffer={} op={}", handlerID, buffer, op);
-
-					switch (op) {
-					case 1:
-						logger.info("TCP handlerID={} op={} buffer={}", handlerID, op, buffer);
-
-						sendValidateOK(handlerID);
-
-						Map<String, String> paramMap = URLRequest(buffer.toString());
-						String userId = paramMap.get("user");
-						loginSocketSession(innerIP, handlerID, userId);
-						loginConfirm(handlerID, paramMap);
-
-						op = 2;
-						parser.fixedSizeMode(4);
-
-						break;
-					case 2:
-						logger.info("handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
-
-						op = 3;
-						int bodyLength = buffer.getInt(0);
-						parser.fixedSizeMode(bodyLength);
-						break;
-					case 3:
-						logger.info("handlerID={} body={} op={}", handlerID, buffer, op);
-
-						op = 2;
-						parser.fixedSizeMode(4);
-
-						JsonObject message = buffer.toJsonObject();
-						int cmd = message.getInteger("cmd");
-						switch (cmd) {
-						case 14:
-							heartBeat(handlerID);
-							getUidByHandlerID(innerIP, handlerID, message);
-							break;
-
-						default:
-							break;
-						}
-						break;
-					default:
-						break;
-					}
-				}));
-				socket.closeHandler(v -> {
-					op = 1;
-					logger.info("closeHandler, handlerID={} op={} close", handlerID, op);
-				});
-
-				socket.exceptionHandler(t -> {
-					op = 1;
-					logger.info("exceptionHandler, handlerID={} op={} close", handlerID, op);
-				});
-			}
+			socket.closeHandler(v -> {
+				op = 1;
+				logger.info("handlerID={} op={} close", handlerID, op);
+				// socketClose(socket.writeHandlerID());
+			});
 		});
 
 		server.listen();
+	}
 
-		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		socket.listen(9099, "10.10.10.102", asyncResult -> {
-			if (asyncResult.succeeded()) {
-				logger.info("UDP listening...");
-				socket.handler(packet -> {
-					logger.info("UDP packet " + packet.data());
-
-					Map<String, Object> map = null;
-
-					try {
-						map = (Map<String, Object>) ByteUtils.byteToObject(packet.data().getBytes());
-					} catch (Exception e) {
-						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
-					}
-
-					String userId = null;
-					if (map != null) {
-						logger.info("Map " + map.toString());
-
-						map.forEach((k, v) -> {
-							logger.info("map k={} v={}", k, v);
-						});
-
-						try {
-							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
-							userId = String.valueOf(msgBody.get(0));// userId
-							String cmd = String.valueOf(msgBody.get(1));
-							logger.info("UDP userId={}", userId);
-
-							JsonObject data = JsonObject.mapFrom(msgBody.get(3));
-
-							JsonObject msg2Send = new JsonObject();
-							msg2Send.put("cmd", cmd);
-							msg2Send.put("data", data);
-
-							logger.info("userId={}Msg2Send={}", userId, msg2Send.encode());
-
-							DeliveryOptions option = new DeliveryOptions();
-							option.setSendTimeout(3000);
-							option.addHeader("action", "getHandlerIDByUid");
-
-							JsonObject param = new JsonObject();
-							param.put("userId", userId);
-							eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option,
-									reply -> {
-										if (reply.succeeded()) {
-											JsonObject res = reply.result().body();
-											String handlerID = res.getString("handlerID");
-
-											if (StringUtils.isNotEmpty(handlerID)) {
-												Buffer bf = Buffer
-														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
-														.appendString(msg2Send.encode());
-												eb.send(handlerID, bf);
-											} else {
-												logger.warn("handlerID is null.");
-											}
-										} else {
-											// TODO
-										}
-									});
-
-						} catch (Exception e2) {
-							logger.error("Get userId error ", e2);
-						}
-					} else {
-						logger.info("Map is null.");
-					}
-				});
-			} else {
-				logger.error("UDP", asyncResult.cause());
-			}
-		});
+	private void bufferHandler(Buffer buffer) {
 	}
 
 	private void getUidByHandlerID(String innerIP, String writeHandlerID, JsonObject message) {
