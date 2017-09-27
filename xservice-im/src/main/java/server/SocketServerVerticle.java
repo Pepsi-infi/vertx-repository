@@ -93,7 +93,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 						switch (cmd) {
 						case 14:
 							heartBeat(handlerID);
-							getUidByHandlerID(innerIP, handlerID, message);
+//							getUidByHandlerID(innerIP, handlerID, message);
 							break;
 
 						default:
