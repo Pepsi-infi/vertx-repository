@@ -60,11 +60,13 @@ public class SocketServerVerticle extends AbstractVerticle {
 			public void handle(final NetSocket socket) {
 				String handlerID = socket.writeHandlerID();
 				socket.handler(parser = RecordParser.newDelimited("\n\n", buffer -> {
-					logger.info("handlerID={} buffer={} op={}", handlerID, buffer, op);
+					logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
 
 					switch (op) {
 					case 1:
-						logger.info("TCP handlerID={} op={} buffer={}", handlerID, op, buffer);
+						op = 2;
+						parser.fixedSizeMode(4);
+						logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
 
 						sendValidateOK(handlerID);
 
@@ -73,13 +75,10 @@ public class SocketServerVerticle extends AbstractVerticle {
 						loginSocketSession(innerIP, handlerID, userId);
 						loginConfirm(handlerID, paramMap);
 
-						op = 2;
-						parser.fixedSizeMode(4);
-
 						break;
 					case 2:
 						op = 3;
-						logger.info("handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
+						logger.info("header, handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
 
 						int bodyLength = buffer.getInt(0);
 						parser.fixedSizeMode(bodyLength);
@@ -87,7 +86,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 					case 3:
 						op = 2;
 						parser.fixedSizeMode(4);
-						logger.info("handlerID={} body={} op={}", handlerID, buffer, op);
+						logger.info("body, handlerID={} body={} op={}", handlerID, buffer, op);
 
 						JsonObject message = buffer.toJsonObject();
 						int cmd = message.getInteger("cmd");
@@ -425,7 +424,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 		data.put("speed", "3000");
 
 		message.put("data", data);
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
+				.appendBytes(message.encode().getBytes());
 
 		logger.info("heart beat, handlerID={} bf={}", writeHandlerID, bf);
 
