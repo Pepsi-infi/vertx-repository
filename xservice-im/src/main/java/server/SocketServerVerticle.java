@@ -41,23 +41,23 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-		NetServerOptions options = new NetServerOptions().setPort(8088);
-		NetServer server = vertx.createNetServer(options);
 		eb = vertx.eventBus();
-
 		tpService = TpService.createProxy(vertx);
-
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("start...innerIP={}", innerIP);
 
+		NetServerOptions options = new NetServerOptions().setPort(8088);
+		NetServer server = vertx.createNetServer(options);
+
 		server.connectHandler(socket -> {
-			op = 1;
+			// op = 1;
+			String handlerID = socket.writeHandlerID();
 			socket.handler(parser = RecordParser.newDelimited("\n\n", buffer -> {
-				logger.info("buffer " + buffer);
+				logger.info("handlerID={}buffer={}", handlerID, buffer);
 
 				switch (op) {
 				case 1:
-					logger.info("TCP op={}buffer={}", op, buffer);
+					logger.info("TCP handlerID={}op={}buffer={}", handlerID, op, buffer);
 
 					sendValidateOK(socket.writeHandlerID());
 
@@ -71,14 +71,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 					break;
 				case 2:
-					logger.info("header " + buffer.getInt(0));
+					logger.info("handlerID={}header={}", handlerID, buffer.getInt(0));
 
 					op = 3;
 					int bodyLength = buffer.getInt(0);
 					parser.fixedSizeMode(bodyLength);
 					break;
 				case 3:
-					logger.info("body " + buffer);
+					logger.info("handlerID={}body={}", handlerID, buffer);
 
 					op = 2;
 					parser.fixedSizeMode(4);
@@ -99,6 +99,12 @@ public class SocketServerVerticle extends AbstractVerticle {
 					break;
 				}
 			}));
+
+			socket.closeHandler(v -> {
+				op = 1;
+				logger.info("handlerID={}op={}close", handlerID, op);
+				// socketClose(socket.writeHandlerID());
+			});
 		});
 
 		server.listen();

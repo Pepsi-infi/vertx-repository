@@ -1,5 +1,7 @@
+package socket;
+
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClient;
+import io.vertx.core.net.NetClient;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestOptions;
 import io.vertx.ext.unit.TestSuite;
@@ -15,13 +17,14 @@ public class SocketTest {
 
 	public void run() {
 		TestOptions options = new TestOptions().addReporter(new ReportOptions().setTo("console"));
-		TestSuite suite = TestSuite.create("io.vertx.example.unit.test.VertxUnitTest");
+		TestSuite suite = TestSuite.create("socket.SocketTest");
 
-		suite.before(context -> {
-			vertx = Vertx.vertx();
-			vertx.createHttpServer().requestHandler(req -> req.response().end("foo")).listen(8080,
-					context.asyncAssertSuccess());
-		});
+		// suite.before(context -> {
+		// vertx = Vertx.vertx();
+		// vertx.createHttpServer().requestHandler(req ->
+		// req.response().end("foo")).listen(8080,
+		// context.asyncAssertSuccess());
+		// });
 
 		suite.after(context -> {
 			vertx.close(context.asyncAssertSuccess());
@@ -30,13 +33,19 @@ public class SocketTest {
 		// Specifying the test names seems ugly...
 		suite.test("some_test1", context -> {
 			// Send a request and get a response
-			HttpClient client = vertx.createHttpClient();
+			NetClient client = vertx.createNetClient();
+
 			Async async = context.async();
-			client.getNow(8080, "localhost", "/", resp -> {
-				resp.bodyHandler(body -> context.assertEquals("foo", body.toString("UTF-8")));
-				client.close();
-				async.complete();
+
+			client.connect(8088, "10.10.10.102", res -> {
+				res.result().write("");
 			});
+
+//			client.getNow(8080, "localhost", "/", resp -> {
+//				resp.bodyHandler(body -> context.assertEquals("foo", body.toString("UTF-8")));
+//				client.close();
+//				async.complete();
+//			});
 		});
 		suite.test("some_test2", context -> {
 			// Deploy and undeploy a verticle
