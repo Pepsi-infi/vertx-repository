@@ -32,9 +32,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
 				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
@@ -104,10 +104,13 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	}
 
 	public int setUserSocket(String userId, String handlerId) {
+		long start = System.currentTimeMillis();
 		logger.info("setUserSocket, handlerID={} userId={}", handlerId, userId);
 		this.sessionMap.put(userId, handlerId);
 		this.sessionReverse.put(handlerId, userId);
 
+		long end = System.currentTimeMillis();
+		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
 		return 0;
 	}
 
@@ -147,7 +150,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	private JsonObject getUidByHandlerID(String handlerID) {
 		JsonObject result = new JsonObject();
 		result.put("userId", sessionReverse.get(handlerID));
-		
+
 		return result;
 	}
 }
