@@ -160,9 +160,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 											JsonObject res = reply.result().body();
 											String handlerID = res.getString("handlerID");
 
-											Buffer bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
-													.appendString(msg2Send.encode());
-											eb.send(handlerID, bf);
+											if (StringUtils.isNotEmpty(handlerID)) {
+												Buffer bf = Buffer
+														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
+														.appendString(msg2Send.encode());
+												eb.send(handlerID, bf);
+											} else {
+												logger.warn("handlerID is null.");
+											}
 										} else {
 											// TODO
 										}
