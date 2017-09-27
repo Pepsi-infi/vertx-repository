@@ -425,7 +425,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		message.put("data", data);
 
-		Buffer bf = Buffer.buffer(message.encode());
+		Buffer bf = Buffer.buffer(ByteUtil.Int2Bytes_LE(message.encode().length())).appendString(message.encode());
 
 		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message.encode(),
 				message.encode().length());
