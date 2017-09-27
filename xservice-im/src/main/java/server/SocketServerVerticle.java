@@ -54,7 +54,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 			private RecordParser parser;
 
-			private int op;// 1 登录 2 header 3 body
+			private int op = 1;// 1 登录 2 header 3 body
 
 			@Override
 			public void handle(final NetSocket socket) {
@@ -78,17 +78,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 						break;
 					case 2:
+						op = 3;
 						logger.info("handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
 
-						op = 3;
 						int bodyLength = buffer.getInt(0);
 						parser.fixedSizeMode(bodyLength);
 						break;
 					case 3:
-						logger.info("handlerID={} body={} op={}", handlerID, buffer, op);
-
 						op = 2;
 						parser.fixedSizeMode(4);
+						logger.info("handlerID={} body={} op={}", handlerID, buffer, op);
 
 						JsonObject message = buffer.toJsonObject();
 						int cmd = message.getInteger("cmd");
