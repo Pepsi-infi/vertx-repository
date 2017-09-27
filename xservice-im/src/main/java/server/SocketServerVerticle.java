@@ -223,9 +223,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		eb.send(SocketSessionVerticle.class.getName() + innerIP, message, option, reply -> {
 			if (reply.succeeded()) {
-				logger.info("setUserSocket " + reply.result());
+				logger.info("handlerID={} setUserSocket={}", writeHandlerID, reply.result());
 			} else {
-				logger.error("setUserSocket " + reply.cause());
+				logger.error("handlerID={} setUserSocket={}", writeHandlerID, reply.cause());
 			}
 		});
 	}
@@ -326,7 +326,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 		String cid = paramMap.get("cid");
 		String version = paramMap.get("ver");
 
-		logger.info("Params userId={}hash={}mid={}cid={}version={}", userId, hash, mid, cid, version);
+		logger.info("Params handlerID={} userId={} hash={} mid={} cid={} version={}", writeHandlerID, userId, hash, mid,
+				cid, version);
 
 		JsonObject param = new JsonObject();
 		param.put("userId", userId);

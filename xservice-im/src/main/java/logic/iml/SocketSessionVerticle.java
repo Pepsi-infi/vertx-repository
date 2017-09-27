@@ -104,7 +104,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	}
 
 	public int setUserSocket(String userId, String handlerId) {
-		logger.info("setUserSocket, userId={}", userId);
+		logger.info("setUserSocket, handlerID={} userId={}", handlerId, userId);
 		this.sessionMap.put(userId, handlerId);
 		this.sessionReverse.put(handlerId, userId);
 
