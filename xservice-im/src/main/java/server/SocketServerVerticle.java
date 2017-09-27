@@ -359,7 +359,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		message.put("data", data);
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
-		logger.info("loginConfirm " + bf);
+		logger.info("loginConfirm, handlerID={} bf={}", writeHandlerID, bf);
 		eb.send(writeHandlerID, bf);
 	}
 
