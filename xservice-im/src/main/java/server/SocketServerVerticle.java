@@ -125,7 +125,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 			public void handle(NetSocket socket) {
 				String handlerID = socket.writeHandlerID();
 
-				RecordParser parser = RecordParser.newDelimited("\n\n", null);
+				logger.info("TCP ... ###");
+				
+				final RecordParser parser = RecordParser.newDelimited("\n\n", null);
 				parser.setOutput(new Handler<Buffer>() {
 					private int op = 1;// 1 登录 2 header 3 body
 
