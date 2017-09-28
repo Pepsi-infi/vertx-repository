@@ -16,8 +16,6 @@ import io.vertx.rxjava.core.eventbus.EventBus;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
-import io.vertx.serviceproxy.ProxyHelper;
-import logic.C2CService;
 import rx.Single;
 import tp.TpService;
 
@@ -212,6 +210,35 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 
 			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/setclientonline/")
 					.append("uid=").append(userId).toString();
+
+			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
+					.as(BodyCodec.string()).rxSend();
+
+			httpRequest.subscribe(resp -> {
+				if (resp.statusCode() == 200) {
+					logger.info("setClientOnline, {}", resp.body());
+					future.complete(resp.body());
+				} else {
+					logger.error("setClientOnline, statusCode={} statusMessage={}", resp.statusCode(),
+							resp.statusMessage());
+					future.fail(resp.statusCode() + resp.statusMessage());
+				}
+			});
+		}).setHandler(ar -> {
+			if (ar.succeeded()) {
+				result.handle(Future.succeededFuture(ar.result()));
+			} else {
+				result.handle(Future.succeededFuture(null));
+			}
+		});
+	}
+
+	public void setClientOffline(JsonObject param, Handler<AsyncResult<String>> result) {
+		circuitBreaker.<String>execute(future -> {
+			String userId = param.getString("userId");
+
+			String requestURI = new StringBuffer("/webservice/chat/setClientOffline/").append("uid=").append(userId)
+					.toString();
 
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();

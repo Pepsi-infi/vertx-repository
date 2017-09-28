@@ -27,4 +27,6 @@ public interface TpService {
 	void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result);
 
 	void setClientOnline(JsonObject param, Handler<AsyncResult<String>> result);
+
+	void setClientOffline(JsonObject param, Handler<AsyncResult<String>> result);
 }

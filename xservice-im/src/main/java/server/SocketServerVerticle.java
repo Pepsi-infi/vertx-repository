@@ -104,7 +104,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							switch (cmd) {
 							case 14:
 								heartBeat(handlerID);
-								getUidByHandlerID(innerIP, handlerID, message);
+								updateOnlineState(innerIP, handlerID, message);
 								break;
 
 							default:
@@ -120,6 +120,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				socket.handler(parser);
 
 				socket.closeHandler(v -> {
+					setClientOffline(handlerID);
 					logger.info("closeHandler, handlerID={} close", handlerID);
 				});
 
@@ -127,6 +128,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 					logger.info("exceptionHandler, handlerID={} close", handlerID);
 				});
 			}
+
 		});
 
 		server.listen();
@@ -209,7 +211,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void getUidByHandlerID(String innerIP, String writeHandlerID, JsonObject message) {
+	private void updateOnlineState(String innerIP, String writeHandlerID, JsonObject message) {
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
 		option.addHeader("action", "getUidByHandlerID");
@@ -227,23 +229,20 @@ public class SocketServerVerticle extends AbstractVerticle {
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 				String date = now.format(format);
 
-				// tpService.updateOnlineSimple(uid, date, message, result -> {
-				// if (result.succeeded()) {
-				// logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID,
-				// result.result());
-				// if (StringUtils.isNotEmpty(result.result())) {
-				// Buffer bf = Buffer.buffer(ByteUtil.intToBytes(result.result().length()))
-				// .appendString(result.result());
-				// eb.send(writeHandlerID, bf);
-				// } else {
-				// logger.warn("updateOnlineSimple, handlerID={} result is null",
-				// writeHandlerID);
-				// }
-				// } else {
-				// logger.error("updateOnlineSimple, handlerID={} result={}", writeHandlerID,
-				// result.cause());
-				// }
-				// });
+				tpService.updateOnlineState(uid, date, message, result -> {
+					if (result.succeeded()) {
+						logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.result());
+						if (StringUtils.isNotEmpty(result.result())) {
+							Buffer bf = Buffer.buffer(ByteUtil.intToBytes(result.result().length()))
+									.appendString(result.result());
+							eb.send(writeHandlerID, bf);
+						} else {
+							logger.warn("updateOnlineSimple, handlerID={} result is null", writeHandlerID);
+						}
+					} else {
+						logger.error("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.cause());
+					}
+				});
 			} else {
 				// TODO
 			}
@@ -464,6 +463,35 @@ public class SocketServerVerticle extends AbstractVerticle {
 				logger.info("setClientOnline, result={}", result.result());
 			} else {
 				logger.error("setClientOnline, e={}", result.cause());
+			}
+		});
+	}
+
+	private void setClientOffline(String handlerID) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
+
+				JsonObject clientOfflineParam = new JsonObject();
+				clientOfflineParam.put("userId", uid);
+				tpService.setClientOffline(clientOfflineParam, r -> {
+					if (r.succeeded()) {
+						logger.info("setClientOffline, result={}", r.result());
+					} else {
+						logger.error("setClientOffline, e={}", r.cause());
+					}
+				});
+			} else {
+				// TODO
 			}
 		});
 
