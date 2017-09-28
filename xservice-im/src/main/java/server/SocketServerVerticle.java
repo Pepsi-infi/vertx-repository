@@ -184,6 +184,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 					}
 
 				});
+				
+				socket.handler(parser);
 
 				// socket.handler(parser = RecordParser.newDelimited("\n\n", new
 				// Handler<Buffer>() {
