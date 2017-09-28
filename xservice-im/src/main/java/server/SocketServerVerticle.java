@@ -180,9 +180,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 									reply -> {
 										if (reply.succeeded()) {
 											JsonObject res = reply.result().body();
-											String handlerID = res.getString("handlerID");
-
-											if (StringUtils.isNotEmpty(handlerID)) {
+											if (res != null) {
+												String handlerID = res.getString("handlerID");
 												Buffer bf = Buffer
 														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
 														.appendString(msg2Send.encode());
@@ -190,8 +189,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 												logger.info("UDP send, handlerID={} bf={}", handlerID, bf);
 
 												eb.send(handlerID, bf);
-											} else {
-												logger.warn("handlerID is null.");
 											}
 										} else {
 											logger.error("getHandlerIDByUid, e={}", reply.cause());
