@@ -72,7 +72,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 						Map<String, String> paramMap = URLRequest(buffer.toString());
 						String userId = paramMap.get("user");
-						loginSocketSession(innerIP, handlerID, userId);
+//						loginSocketSession(innerIP, handlerID, userId);
 						loginConfirm(handlerID, paramMap);
 
 						break;
