@@ -77,7 +77,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							parser.fixedSizeMode(4);
 							logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
 
-							sendValidateOK(handlerID);
+//							sendValidateOK(handlerID);
 
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 							String userId = paramMap.get("user");
