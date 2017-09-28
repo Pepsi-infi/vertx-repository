@@ -488,7 +488,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				subscribeParam.put("data", message.getJsonObject("data").encode());
 				tpService.subscribe(subscribeParam, r -> {
 					if (r.succeeded()) {
-						logger.info("subscribe, result={}", r.result().encode());
+						logger.info("subscribe, result={}", r.result());
 					} else {
 						logger.error("subscribe, e={}", r.cause());
 					}
