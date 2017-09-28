@@ -118,16 +118,16 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("uid"));
-			form.set("msg", msg.encode());
+			form.set("msg", msg.getString("data"));
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/chat/userMsgSubscribe/").as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgSubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
-					logger.info("subscribe={}", resp.body());
+					logger.info("subscribe, {}", resp.body());
 					future.complete(resp.body());
 				} else {
-					logger.error("subscribe={}", resp.statusMessage());
+					logger.error("subscribe, statusCode={} statusMessage={}", resp.statusCode(), resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
@@ -143,11 +143,11 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.set("uid", msg.getString("uid"));
-			form.set("msg", msg.encode());
+			form.set("uid", msg.getString("userId"));
+			form.set("msg", msg.getString("data"));
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/chat/userMsgUnsubscribe/").as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgUnsubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					future.complete(resp.body());

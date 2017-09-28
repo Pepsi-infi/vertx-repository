@@ -88,6 +88,36 @@ public class TpService {
     }));
   }
 
+  public void setClientOffline(JsonObject param, Handler<AsyncResult<String>> result) { 
+    delegate.setClientOffline(param, result);
+  }
+
+  public Single<String> rxSetClientOffline(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      setClientOffline(param, fut);
+    }));
+  }
+
+  public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) { 
+    delegate.subscribe(msg, result);
+  }
+
+  public Single<String> rxSubscribe(JsonObject msg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      subscribe(msg, fut);
+    }));
+  }
+
+  public void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result) { 
+    delegate.unsubscribe(msg, result);
+  }
+
+  public Single<String> rxUnsubscribe(JsonObject msg) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      unsubscribe(msg, fut);
+    }));
+  }
+
 
   public static  TpService newInstance(tp.TpService arg) {
     return arg != null ? new TpService(arg) : null;

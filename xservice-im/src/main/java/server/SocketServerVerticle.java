@@ -102,11 +102,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 							JsonObject message = buffer.toJsonObject();
 							int cmd = message.getInteger("cmd");
 							switch (cmd) {
-							case 14:
+							case 14:// heart beat
 								heartBeat(handlerID);
 								updateOnlineState(innerIP, handlerID, message);
 								break;
-
+							case 17:// 订阅
+								subscribe(handlerID, message);
+								break;
+							case 18:// 取消订阅
+								unsubscribe(handlerID, message);
+								break;
 							default:
 								break;
 							}
@@ -396,28 +401,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.send(writeHandlerID, bf);
 	}
 
-	private void subscribe(String writeHandlerID, JsonObject message) {
-		String uid = message.getString("uid");
-
-		DeliveryOptions option = new DeliveryOptions();
-		option.addHeader("action", "subscribe");
-		JsonObject msg = new JsonObject();
-		msg.put("uid", message.getString(uid));
-
-		eb.send(TpServiceImpl.class.getName(), message, option);
-	}
-
-	private void unsubscribe(String writeHandlerID, JsonObject message) {
-		String uid = message.getString("uid");
-
-		DeliveryOptions option = new DeliveryOptions();
-		option.addHeader("action", "subscribe");
-		JsonObject msg = new JsonObject();
-		msg.put("uid", message.getString(uid));
-
-		eb.send(TpServiceImpl.class.getName(), message, option);
-	}
-
 	/**
 	 * {"cmd":14,"data":{"ping":"ok"}} //心跳发送成功
 	 * 
@@ -484,6 +467,65 @@ public class SocketServerVerticle extends AbstractVerticle {
 				// TODO
 			}
 		});
+	}
 
+	private void subscribe(String handlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				logger.info("subscribe, handlerID={} userId={}", handlerID, uid);
+
+				JsonObject subscribeParam = new JsonObject();
+				subscribeParam.put("userId", uid);
+				subscribeParam.put("data", message.getJsonObject("data").encode());
+				tpService.subscribe(subscribeParam, r -> {
+					if (r.succeeded()) {
+						logger.info("subscribe, result={}", r.result());
+					} else {
+						logger.error("subscribe, e={}", r.cause());
+					}
+				});
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void unsubscribe(String handlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				logger.info("unsubscribe, handlerID={} userId={}", handlerID, uid);
+
+				JsonObject subscribeParam = new JsonObject();
+				subscribeParam.put("userId", uid);
+				subscribeParam.put("data", message.getJsonObject("data").encode());
+				tpService.unsubscribe(subscribeParam, r -> {
+					if (r.succeeded()) {
+						logger.info("unsubscribe, result={}", r.result());
+					} else {
+						logger.error("unsubscribe, e={}", r.cause());
+					}
+				});
+			} else {
+				// TODO
+			}
+		});
 	}
 }

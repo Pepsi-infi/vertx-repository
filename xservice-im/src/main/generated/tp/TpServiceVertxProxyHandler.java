@@ -139,6 +139,18 @@ public class TpServiceVertxProxyHandler extends ProxyHandler {
           service.setClientOnline((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
+        case "setClientOffline": {
+          service.setClientOffline((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
+          break;
+        }
+        case "subscribe": {
+          service.subscribe((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
+          break;
+        }
+        case "unsubscribe": {
+          service.unsubscribe((io.vertx.core.json.JsonObject)json.getValue("msg"), createHandler(msg));
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }

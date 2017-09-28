@@ -29,4 +29,8 @@ public interface TpService {
 	void setClientOnline(JsonObject param, Handler<AsyncResult<String>> result);
 
 	void setClientOffline(JsonObject param, Handler<AsyncResult<String>> result);
+
+	void subscribe(JsonObject msg, Handler<AsyncResult<String>> result);
+
+	void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result);
 }
