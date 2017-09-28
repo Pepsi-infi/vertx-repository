@@ -117,7 +117,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.set("uid", msg.getString("uid"));
+			form.set("uid", msg.getString("userId"));
 			form.set("msg", msg.getString("data"));
 
 			logger.info("subscribe, uid={} data={}", msg.getString("uid"), msg.getString("data"));
