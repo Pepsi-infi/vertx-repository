@@ -131,13 +131,6 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		return 0;
 	}
 
-	public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) {
-		resultHandler.handle(Future.succeededFuture(sessionMap.get(uid)));
-	}
-
-	public void getUidByHandlerId(String handlerId, Handler<AsyncResult<String>> resultHandler) {
-		resultHandler.handle(Future.succeededFuture(sessionReverse.get(handlerId)));
-	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
 		JsonObject jo = null;
