@@ -120,7 +120,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			form.set("uid", msg.getString("userId"));
 			form.set("msg", msg.getString("data"));
 
-			logger.info("subscribe, uid={} data={}", msg.getString("uid"), msg.getString("data"));
+			logger.info("subscribe, uid={} data={}", msg.getString("userId"), msg.getString("data"));
 
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgSubscribe/")
