@@ -30,7 +30,7 @@ public interface TpService {
 
 	void setClientOffline(JsonObject param, Handler<AsyncResult<String>> result);
 
-	void subscribe(JsonObject msg, Handler<AsyncResult<String>> result);
+	void subscribe(JsonObject msg, Handler<AsyncResult<JsonObject>> result);
 
 	void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result);
 }

@@ -77,7 +77,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							parser.fixedSizeMode(4);
 							logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
 
-//							sendValidateOK(handlerID);
+							// sendValidateOK(handlerID);
 
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 							String userId = paramMap.get("user");
@@ -488,7 +488,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				subscribeParam.put("data", message.getJsonObject("data").encode());
 				tpService.subscribe(subscribeParam, r -> {
 					if (r.succeeded()) {
-						logger.info("subscribe, result={}", r.result());
+						logger.info("subscribe, result={}", r.result().encode());
 					} else {
 						logger.error("subscribe, e={}", r.cause());
 					}

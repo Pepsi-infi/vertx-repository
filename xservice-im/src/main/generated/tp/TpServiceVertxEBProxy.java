@@ -158,7 +158,7 @@ public class TpServiceVertxEBProxy implements TpService {
     });
   }
 
-  public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
+  public void subscribe(JsonObject msg, Handler<AsyncResult<JsonObject>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -167,7 +167,7 @@ public class TpServiceVertxEBProxy implements TpService {
     _json.put("msg", msg);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "subscribe");
-    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         result.handle(Future.failedFuture(res.cause()));
       } else {

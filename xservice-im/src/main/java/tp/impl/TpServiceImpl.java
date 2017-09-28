@@ -114,14 +114,14 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		});
 	}
 
-	public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) {
-		circuitBreaker.<String>execute(future -> {
+	public void subscribe(JsonObject msg, Handler<AsyncResult<JsonObject>> result) {
+		circuitBreaker.<JsonObject>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("uid"));
 			form.set("msg", msg.getString("data"));
-			Single<HttpResponse<String>> httpRequest = webClient
+			Single<HttpResponse<JsonObject>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgSubscribe/")
-					.as(BodyCodec.string()).rxSendForm(form);
+					.as(BodyCodec.jsonObject()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("subscribe, {}", resp.body());

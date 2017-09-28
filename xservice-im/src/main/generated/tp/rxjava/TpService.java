@@ -98,11 +98,11 @@ public class TpService {
     }));
   }
 
-  public void subscribe(JsonObject msg, Handler<AsyncResult<String>> result) { 
+  public void subscribe(JsonObject msg, Handler<AsyncResult<JsonObject>> result) { 
     delegate.subscribe(msg, result);
   }
 
-  public Single<String> rxSubscribe(JsonObject msg) { 
+  public Single<JsonObject> rxSubscribe(JsonObject msg) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
       subscribe(msg, fut);
     }));
