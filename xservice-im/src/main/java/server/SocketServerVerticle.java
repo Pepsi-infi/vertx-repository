@@ -231,16 +231,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 				tpService.updateOnlineState(uid, date, message, result -> {
 					if (result.succeeded()) {
-						logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.result());
-						if (StringUtils.isNotEmpty(result.result())) {
-							Buffer bf = Buffer.buffer(ByteUtil.intToBytes(result.result().length()))
-									.appendString(result.result());
-							eb.send(writeHandlerID, bf);
-						} else {
-							logger.warn("updateOnlineSimple, handlerID={} result is null", writeHandlerID);
-						}
+						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
 					} else {
-						logger.error("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.cause());
+						logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
 					}
 				});
 			} else {
