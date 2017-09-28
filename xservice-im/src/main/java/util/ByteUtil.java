@@ -187,4 +187,12 @@ public class ByteUtil {
 	private static byte charToByte(char c) {
 		return (byte) "0123456789ABCDEF".indexOf(c);
 	}
+	
+	public static void main(String[] args) {
+		byte[] a2 = intToBytes(46);
+		for (byte b : a2) {
+			System.out.print(b);
+		}
+		System.out.println(Int2Bytes_LE(46));
+	}
 }

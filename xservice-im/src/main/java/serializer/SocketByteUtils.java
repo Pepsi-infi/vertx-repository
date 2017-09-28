@@ -6,7 +6,7 @@ package serializer;
  * @author will
  * 
  */
-public final class ByteUtils {
+public final class SocketByteUtils {
 
 	/**
 	 * 合并两个byte数组，产生新的byte 返回。

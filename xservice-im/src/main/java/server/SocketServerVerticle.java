@@ -25,7 +25,7 @@ import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import logic.iml.SocketSessionVerticle;
-import serializer.ByteUtils;
+import serializer.SocketByteUtils;
 import tp.TpService;
 import tp.impl.TpServiceImpl;
 import util.ByteUtil;
@@ -128,7 +128,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 					Map<String, Object> map = null;
 
 					try {
-						map = (Map<String, Object>) ByteUtils.byteToObject(packet.data().getBytes());
+						map = (Map<String, Object>) SocketByteUtils.byteToObject(packet.data().getBytes());
 					} catch (Exception e) {
 						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
 					}
@@ -425,12 +425,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		message.put("data", data);
 
-		Buffer bf = Buffer.buffer(ByteUtil.Int2Bytes_LE(message.encode().length())).appendString(message.encode());
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
+				.appendBytes(message.encode().getBytes());
+		int msgLength = message.encode().getBytes().length;
+		byte[] result = ByteUtil.intToBytes(msgLength);
+		logger.info("heart beat, byteLength={}", msgLength);
 
-		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message.encode(),
-				message.encode().length());
+		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID,
+				SocketByteUtils.objectToByte(message), message.encode(), message.encode().length());
 
-		eb.send(writeHandlerID, bf);
+		eb.send(writeHandlerID, SocketByteUtils.objectToByte(message));
 	}
 
 }
