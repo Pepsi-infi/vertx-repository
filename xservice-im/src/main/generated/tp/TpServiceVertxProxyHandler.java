@@ -135,6 +135,10 @@ public class TpServiceVertxProxyHandler extends ProxyHandler {
           service.updateOnlineSimple((java.lang.String)json.getValue("uid"), (java.lang.String)json.getValue("date"), (io.vertx.core.json.JsonObject)json.getValue("content"), createHandler(msg));
           break;
         }
+        case "setClientOnline": {
+          service.setClientOnline((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }

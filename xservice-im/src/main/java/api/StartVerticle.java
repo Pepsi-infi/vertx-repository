@@ -14,9 +14,9 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(MongoVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
-		
+
 		vertx.deployVerticle(SocketServerVerticle.class.getName());
-		
+
 		vertx.deployVerticle(TpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(SocketSessionVerticle.class.getName());

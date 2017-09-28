@@ -78,6 +78,16 @@ public class TpService {
     }));
   }
 
+  public void setClientOnline(JsonObject param, Handler<AsyncResult<String>> result) { 
+    delegate.setClientOnline(param, result);
+  }
+
+  public Single<String> rxSetClientOnline(JsonObject param) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      setClientOnline(param, fut);
+    }));
+  }
+
 
   public static  TpService newInstance(tp.TpService arg) {
     return arg != null ? new TpService(arg) : null;
