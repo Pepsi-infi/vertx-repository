@@ -50,75 +50,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 		NetServerOptions options = new NetServerOptions().setPort(8088);
 		NetServer server = vertx.createNetServer(options);
 
-		// server.connectHandler(socket -> {
-		// socket.handler(new Handler<Buffer>() {
-		//
-		// private int op = 1;
-		//
-		// private RecordParser parser;
-		//
-		// private String handlerID = socket.writeHandlerID();
-		//
-		// @Override
-		// public void handle(Buffer event) {
-		// parser = RecordParser.newDelimited("\n\n", buffer -> {
-		//
-		// logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
-		//
-		// if (buffer.toString().startsWith("get /mobile?")) {
-		// logger.info("send login, ");
-		// op = 1;
-		// }
-		//
-		// switch (op) {
-		// case 1:
-		// op = 2;
-		// parser.fixedSizeMode(4);
-		// logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
-		//
-		// sendValidateOK(handlerID);
-		//
-		// Map<String, String> paramMap = URLRequest(buffer.toString());
-		// String userId = paramMap.get("user");
-		// // loginSocketSession(innerIP, handlerID, userId);
-		// loginConfirm(handlerID, paramMap);
-		//
-		// break;
-		// case 2:
-		// op = 3;
-		// logger.info("header, handlerID={} header={} op={}", handlerID,
-		// buffer.getInt(0), op);
-		//
-		// int bodyLength = buffer.getInt(0);
-		// parser.fixedSizeMode(bodyLength);
-		// break;
-		// case 3:
-		// op = 2;
-		// parser.fixedSizeMode(4);
-		// logger.info("body, handlerID={} body={} op={}", handlerID, buffer, op);
-		//
-		// JsonObject message = buffer.toJsonObject();
-		// int cmd = message.getInteger("cmd");
-		// switch (cmd) {
-		// case 14:
-		// heartBeat(handlerID);
-		// // getUidByHandlerID(innerIP, handlerID, message);
-		// break;
-		//
-		// default:
-		// break;
-		// }
-		// break;
-		// default:
-		// break;
-		// }
-		//
-		// });
-		// }
-		//
-		// });
-		// });
-
 		server.connectHandler(new Handler<NetSocket>() {
 
 			@Override
@@ -126,7 +57,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				String handlerID = socket.writeHandlerID();
 
 				logger.info("TCP ... ###");
-				
+
 				final RecordParser parser = RecordParser.newDelimited("\n\n", null);
 				parser.setOutput(new Handler<Buffer>() {
 					private int op = 1;// 1 登录 2 header 3 body
@@ -184,77 +115,15 @@ public class SocketServerVerticle extends AbstractVerticle {
 					}
 
 				});
-				
+
 				socket.handler(parser);
 
-				// socket.handler(parser = RecordParser.newDelimited("\n\n", new
-				// Handler<Buffer>() {
-				// private int op = 1;// 1 登录 2 header 3 body
-				//
-				// private RecordParser parser;
-				//
-				// @Override
-				// public void handle(Buffer buffer) {
-				// logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
-				//
-				// if (buffer.toString().startsWith("get /mobile?")) {
-				// logger.info("send login, ");
-				// op = 1;
-				// }
-				//
-				// switch (op) {
-				// case 1:
-				// op = 2;
-				// parser.fixedSizeMode(4);
-				// logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
-				//
-				// sendValidateOK(handlerID);
-				//
-				// Map<String, String> paramMap = URLRequest(buffer.toString());
-				// String userId = paramMap.get("user");
-				// // loginSocketSession(innerIP, handlerID, userId);
-				// loginConfirm(handlerID, paramMap);
-				//
-				// break;
-				// case 2:
-				// op = 3;
-				// logger.info("header, handlerID={} header={} op={}", handlerID,
-				// buffer.getInt(0), op);
-				//
-				// int bodyLength = buffer.getInt(0);
-				// parser.fixedSizeMode(bodyLength);
-				// break;
-				// case 3:
-				// op = 2;
-				// parser.fixedSizeMode(4);
-				// logger.info("body, handlerID={} body={} op={}", handlerID, buffer, op);
-				//
-				// JsonObject message = buffer.toJsonObject();
-				// int cmd = message.getInteger("cmd");
-				// switch (cmd) {
-				// case 14:
-				// heartBeat(handlerID);
-				// // getUidByHandlerID(innerIP, handlerID, message);
-				// break;
-				//
-				// default:
-				// break;
-				// }
-				// break;
-				// default:
-				// break;
-				// }
-				// }
-				//
-				// }));
 				socket.closeHandler(v -> {
-					// op = 1;
-					// logger.info("closeHandler, handlerID={} op={} close", handlerID, op);
+					logger.info("closeHandler, handlerID={} close", handlerID);
 				});
 
 				socket.exceptionHandler(t -> {
-					// op = 1;
-					// logger.info("exceptionHandler, handlerID={} op={} close", handlerID, op);
+					logger.info("exceptionHandler, handlerID={} close", handlerID);
 				});
 			}
 		});
