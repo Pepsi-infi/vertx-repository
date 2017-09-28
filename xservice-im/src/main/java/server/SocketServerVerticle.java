@@ -81,7 +81,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 							String userId = paramMap.get("user");
-							// loginSocketSession(innerIP, handlerID, userId);
+							loginSocketSession(innerIP, handlerID, userId);
 							loginConfirm(handlerID, paramMap);
 
 							break;
@@ -91,6 +91,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 							int bodyLength = buffer.getInt(0);
 							parser.fixedSizeMode(bodyLength);
+
 							break;
 						case 3:
 							op = 2;
@@ -183,12 +184,15 @@ public class SocketServerVerticle extends AbstractVerticle {
 												Buffer bf = Buffer
 														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
 														.appendString(msg2Send.encode());
+
+												logger.info("UDP send, handlerID={} bf={}", handlerID, bf);
+
 												eb.send(handlerID, bf);
 											} else {
 												logger.warn("handlerID is null.");
 											}
 										} else {
-											// TODO
+											logger.error("getHandlerIDByUid, e={}", reply.cause());
 										}
 									});
 
