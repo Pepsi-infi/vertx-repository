@@ -62,6 +62,11 @@ public class SocketServerVerticle extends AbstractVerticle {
 				socket.handler(parser = RecordParser.newDelimited("\n\n", buffer -> {
 					logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
 
+					if (buffer.toString().startsWith("get /mobile?")) {
+						logger.info("send login, ");
+						op = 1;
+					}
+
 					switch (op) {
 					case 1:
 						op = 2;
@@ -72,7 +77,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 						Map<String, String> paramMap = URLRequest(buffer.toString());
 						String userId = paramMap.get("user");
-//						loginSocketSession(innerIP, handlerID, userId);
+						// loginSocketSession(innerIP, handlerID, userId);
 						loginConfirm(handlerID, paramMap);
 
 						break;
