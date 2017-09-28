@@ -16,13 +16,13 @@ public class Tester {
 		// DeploymentOptions().setConfig(config()));
 		// vertx.deployVerticle(ValidateServerVerticle.class.getName());
 		// ----------------------
-		// vertx.deployVerticle(SocketServerVerticle.class.getName());
-		// vertx.deployVerticle(TpServiceImpl.class.getName());
-		// vertx.deployVerticle(SocketSessionVerticle.class.getName());
-		// vertx.deployVerticle(UdpServerVerticle.class.getName());
-		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
+		 vertx.deployVerticle(SocketServerVerticle.class.getName());
+//		 vertx.deployVerticle(TpServiceImpl.class.getName());
+//		 vertx.deployVerticle(SocketSessionVerticle.class.getName());
+//		 vertx.deployVerticle(UdpServerVerticle.class.getName());
+//		 vertx.deployVerticle(TestUdpServerVerticle.class.getName());
 		// ----------------------
-		vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new DeploymentOptions().setInstances(1));
+//		vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new DeploymentOptions().setInstances(1));
 
 		// MongoService service = MongoService.createProxy(vertx);
 		// JsonObject test = new JsonObject().put("collection", "message").put("data",
