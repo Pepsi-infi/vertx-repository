@@ -425,8 +425,10 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		message.put("data", data);
 
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
-				.appendBytes(message.encode().getBytes());
+		byte[] object = SocketByteUtils.objectToByte(message);
+		int length = object.length;
+
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(length)).appendBytes(object);
 		int msgLength = message.encode().getBytes().length;
 		byte[] result = ByteUtil.intToBytes(msgLength);
 		logger.info("heart beat, byteLength={}", msgLength);
@@ -434,7 +436,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID,
 				SocketByteUtils.objectToByte(message), message.encode(), message.encode().length());
 
-		eb.send(writeHandlerID, SocketByteUtils.objectToByte(message));
+		eb.send(writeHandlerID, bf);
 	}
 
 }
