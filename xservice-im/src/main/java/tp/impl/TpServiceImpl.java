@@ -12,6 +12,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.web.impl.Utils;
 import io.vertx.rxjava.core.AbstractVerticle;
 import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.Vertx;
@@ -65,12 +66,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
-			try {
-				form.add("time", URLEncoder.encode(date, "utf-8"));
-				form.add("msg", URLEncoder.encode(content.encode(), "utf-8"));
-			} catch (UnsupportedEncodingException e) {
-				logger.error("updateOnlineState, e={}", e.getMessage());
-			}
+			form.add("time", Utils.normalizePath(date));
+			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateOnlineState/")
@@ -98,13 +95,9 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.add("uid", uid);
-			try {
-				form.add("time", URLEncoder.encode(date, "utf-8"));
-				form.add("msg", URLEncoder.encode(content.encode(), "utf-8"));
-			} catch (UnsupportedEncodingException e) {
-				logger.error("updateOnlineSimple, e={}", e.getMessage());
-			}
+			form.set("uid", uid);
+			form.add("time", Utils.normalizePath(date));
+			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
