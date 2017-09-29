@@ -63,6 +63,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 				parser.setOutput(new Handler<Buffer>() {
 					private int op = 1;// 1 登录 2 header 3 body
 
+					private int simpleHeartBeatCount = 0;
+
 					@Override
 					public void handle(Buffer buffer) {
 						logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
@@ -105,7 +107,13 @@ public class SocketServerVerticle extends AbstractVerticle {
 							switch (cmd) {
 							case 14:// heart beat
 								heartBeat(handlerID);
-								updateOnlineState(innerIP, handlerID, message);
+								updateOnlineSimple(innerIP, handlerID, message);
+								simpleHeartBeatCount++;
+								logger.info("simpleHeartBeatCount, {}", simpleHeartBeatCount);
+								if (simpleHeartBeatCount == 10) {
+									updateOnlineState(innerIP, handlerID, message);
+									simpleHeartBeatCount = 0;
+								}
 								break;
 							case 17:// 订阅
 								subscribe(handlerID, message);
@@ -244,6 +252,37 @@ public class SocketServerVerticle extends AbstractVerticle {
 						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
 					} else {
 						logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
+					}
+				});
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void updateOnlineSimple(String innerIP, String writeHandlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", writeHandlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
+
+				LocalDateTime now = LocalDateTime.now();
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+				String date = now.format(format);
+
+				tpService.updateOnlineSimple(uid, date, message, result -> {
+					if (result.succeeded()) {
+						logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.result());
+					} else {
+						logger.error("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.cause());
 					}
 				});
 			} else {
