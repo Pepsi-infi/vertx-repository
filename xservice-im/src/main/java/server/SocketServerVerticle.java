@@ -109,7 +109,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 								heartBeat(handlerID);
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
-								logger.info("simpleHeartBeatCount, {}", simpleHeartBeatCount);
+								logger.info("simpleHeartBeatCount, handlerID={}count={}", handlerID,
+										simpleHeartBeatCount);
 								if (simpleHeartBeatCount == 10) {
 									updateOnlineState(innerIP, handlerID, message);
 									simpleHeartBeatCount = 0;

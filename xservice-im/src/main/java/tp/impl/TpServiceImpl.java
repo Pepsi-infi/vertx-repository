@@ -61,9 +61,9 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void updateOnlineState(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.set("uid", uid);
-			form.set("time", date);
-			form.set("msg", content.encode());
+			form.add("uid", uid);
+			form.add("time", date);
+			form.add("msg", content.encode());
 
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateOnlineState/")
@@ -91,15 +91,16 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.set("uid", uid);
-			form.set("time", date);
-			form.set("msg", content.encode());
+			form.add("uid", uid);
+			form.add("time", date);
+			form.add("msg", content.encode());
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
 					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
-					logger.info("updateOnlineSimple={}", resp.body());
+					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid, date, content.encode(),
+							resp.body());
 					future.complete(resp.body());
 				} else {
 					logger.error("updateOnlineSimple, statusCode={} statusMessage={}", resp.statusCode(),
