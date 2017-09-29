@@ -64,9 +64,12 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			form.set("uid", uid);
 			form.set("time", date);
 			form.set("msg", content.encode());
+
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateOnlineState/")
-					.as(BodyCodec.string()).rxSendForm(form);
+					.putHeader("Content-Length", String.valueOf(JsonObject.mapFrom(form).encode().length()))
+					.putHeader("Content-Type", "application/x-www-form-urlencoded").as(BodyCodec.string())
+					.rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineState, uid={}&time={}&msg={}, response={}", uid, date, content.encode(),
