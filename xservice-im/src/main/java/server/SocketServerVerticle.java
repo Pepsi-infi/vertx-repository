@@ -1,5 +1,6 @@
 package server;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -187,9 +188,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 											JsonObject res = reply.result().body();
 											if (res != null) {
 												String handlerID = res.getString("handlerID");
-												Buffer bf = Buffer
-														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
-														.appendString(msg2Send.encode());
+												Buffer bf = null;
+												try {
+													bf = Buffer
+															.buffer(ByteUtil.intToBytes(
+																	msg2Send.encode().getBytes("GBK").length))
+															.appendString(msg2Send.encode());
+												} catch (UnsupportedEncodingException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
 
 												logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
 														msg2Send.encode().length(), bf);
