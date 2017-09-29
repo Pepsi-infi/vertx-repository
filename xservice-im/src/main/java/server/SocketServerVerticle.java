@@ -192,15 +192,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 												try {
 													bf = Buffer
 															.buffer(ByteUtil.intToBytes(
-																	msg2Send.encode().getBytes("GBK").length))
+																	msg2Send.encode().getBytes("ISO8859-1").length))
 															.appendString(msg2Send.encode());
+													logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
+															msg2Send.encode().getBytes("ISO8859-1").length, bf);
 												} catch (UnsupportedEncodingException e) {
 													// TODO Auto-generated catch block
 													e.printStackTrace();
 												}
-
-												logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
-														msg2Send.encode().length(), bf);
 
 												eb.send(handlerID, bf);
 											}
