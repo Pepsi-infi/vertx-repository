@@ -55,7 +55,7 @@ public class Tester {
 
 		form.add("time", Utils.normalizePath("2017-09-29 05:44:59"));
 		form.add("msg",
-				Utils.normalizePath("{\"cmd\":14,\"data\":\"{\\\"lat\\\":\\\"39.92043158637153\\\",\\\"lon\\\":\\\"116.4331773546007\\\"}\"}").substring(1));
+				Utils.normalizePath("{\"lat\":39.920229,\"lon\":116.432982}").substring(1));
 
 		System.out.println(URLEncoder
 				.encode("{\"lon\":116.432981,\"lat\":39.920212,\"groupId\":\"34\",\"module\":5001}", "UTF-8"));

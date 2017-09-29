@@ -280,8 +280,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 				LocalDateTime now = LocalDateTime.now();
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 				String date = now.format(format);
+				JsonObject data = message.getJsonObject("data");
 
-				tpService.updateOnlineSimple(uid, date, message, result -> {
+				tpService.updateOnlineSimple(uid, date, data, result -> {
 					if (result.succeeded()) {
 						logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.result());
 					} else {
