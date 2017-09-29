@@ -11,6 +11,9 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -25,6 +28,8 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 	// 真实节点信息
 	private List<String> realNodes;
 
+	private EventBus eb;
+
 	@Override
 	public void start() throws Exception {
 		logger.info("start ... ");
@@ -32,6 +37,24 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 
 		this.realNodes.add("10.10.10.193");// TODO
 		init();
+
+		eb = vertx.eventBus();
+		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
+			MultiMap headers = res.headers();
+			JsonObject param = res.body();
+			if (headers != null) {
+				String action = headers.get("action");
+				switch (action) {
+				case "getNode":
+					String key = param.getString("");
+					res.reply(getNode(key));
+					break;
+				default:
+					res.reply(1);// Fail!
+					break;
+				}
+			}
+		});
 	}
 
 	/**
@@ -93,19 +116,22 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 	}
 
 	/**
-	 * 获取一个结点
 	 * 
-	 * @param uid
-	 * @return
+	 * @param key
+	 * @param nodes
+	 * @param resultHandler
 	 */
-	public void getNode(String key, Handler<AsyncResult<String>> resultHandler) {
+	public String getNode(String key) {
+		String result = null;
 		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			resultHandler.handle(Future.succeededFuture(virtualNodes.firstEntry().getValue()));
+			result = virtualNodes.firstEntry().getValue();
 		} else {
-			resultHandler.handle(Future.succeededFuture(en.getValue()));
+			result = en.getValue();
 		}
+
+		return result;
 	}
 
 	public void getNodeWithNodeList(String key, List<String> nodes, Handler<AsyncResult<String>> resultHandler) {

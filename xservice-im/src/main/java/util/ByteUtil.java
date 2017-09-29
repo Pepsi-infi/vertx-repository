@@ -35,6 +35,42 @@ public class ByteUtil {
 	}
 
 	/**
+	 * 转换byte数组为int（小端）
+	 * 
+	 * @return
+	 * @note 数组长度至少为4，按小端方式转换,即传入的bytes是小端的，按这个规律组织成int
+	 */
+	public static int Bytes2Int_LE(byte[] bytes) {
+		if (bytes.length < 4)
+			return -1;
+		int iRst = (bytes[0] & 0xFF);
+		iRst |= (bytes[1] & 0xFF) << 8;
+		iRst |= (bytes[2] & 0xFF) << 16;
+		iRst |= (bytes[3] & 0xFF) << 24;
+
+		return iRst;
+	}
+
+	/**
+	 * int转换为小端byte[]（高位放在高地址中）
+	 * 
+	 * @param iValue
+	 * @return
+	 */
+	public static byte[] Int2Bytes_LE(int iValue) {
+		byte[] rst = new byte[4];
+		// 先写int的最后一个字节
+		rst[0] = (byte) (iValue & 0xFF);
+		// int 倒数第二个字节
+		rst[1] = (byte) ((iValue & 0xFF00) >> 8);
+		// int 倒数第三个字节
+		rst[2] = (byte) ((iValue & 0xFF0000) >> 16);
+		// int 第一个字节
+		rst[3] = (byte) ((iValue & 0xFF000000) >> 24);
+		return rst;
+	}
+
+	/**
 	 * 将一个4位字节数组转换为浮点数。<br>
 	 * 注意，函数中不会对字节数组长度进行判断，请自行保证传入参数的正确性。
 	 * 
@@ -56,7 +92,7 @@ public class ByteUtil {
 	public static byte[] floatToBytes(float f) {
 		return intToBytes(Float.floatToIntBits(f));
 	}
-	
+
 	/**
 	 * short整数转换为2字节的byte数组
 	 * 
@@ -150,5 +186,13 @@ public class ByteUtil {
 	 */
 	private static byte charToByte(char c) {
 		return (byte) "0123456789ABCDEF".indexOf(c);
+	}
+	
+	public static void main(String[] args) {
+		byte[] a2 = intToBytes(46);
+		for (byte b : a2) {
+			System.out.print(b);
+		}
+		System.out.println(Int2Bytes_LE(46));
 	}
 }

@@ -33,8 +33,10 @@ public class ValidateServerVerticle extends AbstractVerticle {
 			socket.handler(RecordParser.newDelimited("\n\n", buffer -> {
 				/// mobile?user=13666098&hash=UDE4NTEwMjUyNzk5fDE1MDUyNjc5NDY3ODQ.&mid=iphone&cid=AppStore&ver=5.2.0
 				/// HTTP/
-				logger.info("validate " + buffer);
+				logger.info("sendValidateOK " + buffer);
 				sendValidateOK(socket.writeHandlerID());
+
+				logger.info("sendRedirect ");
 				sendRedirect(socket.writeHandlerID());
 			}));
 		});
@@ -43,11 +45,14 @@ public class ValidateServerVerticle extends AbstractVerticle {
 	}
 
 	private void sendValidateOK(String writeHandlerID) {
-		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK").appendString("\n")
-				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)")
-				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT")
-				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("Content-Type: text/x-live-message")
-				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate");
+		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK").appendString("\r\n")
+				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)").appendString("\r\n")
+				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT").appendString("\r\n")
+				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("\r\n")
+				.appendString("Content-Type: text/x-live-message").appendString("\r\n")
+				.appendString("Connection: keep-alive").appendString("\r\n")
+				.appendString("Cache-Control: no-cache, must-revalidate").appendString("\n\n");
+		logger.info("send validate ok " + response);
 		eb.send(writeHandlerID, response);
 	}
 
@@ -58,8 +63,11 @@ public class ValidateServerVerticle extends AbstractVerticle {
 	private void sendRedirect(String writeHandlerID) {
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
+		message.put("data", "192.168.2.220:2345");
+		Buffer bf = Buffer.buffer(message.encode()).appendString("\n\n");
 
-		eb.send(writeHandlerID, message);
+		logger.info("send redirect " + bf);
+		eb.send(writeHandlerID, bf);
 	}
 
 }

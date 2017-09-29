@@ -32,9 +32,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
 				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
@@ -42,24 +42,29 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("innerIP={}", innerIP);
 		eb = vertx.eventBus();
+
 		eb.<JsonObject>consumer(SocketSessionVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				String from = body.getString("from");
+				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
-				String to = body.getString("to");
-				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+
+				logger.info("userId={}action={}innerIP={}", userId, action, innerIP);
+
 				switch (action) {
 				case "setUserSocket":
-					res.reply(setUserSocket(from, handlerID));
+					res.reply(setUserSocket(userId, handlerID));
 					break;
 				case "delUserSocket":
-					res.reply(delUserSocket(from, handlerID));
+					res.reply(delUserSocket(userId, handlerID));
 					break;
 				case "getHandlerIDByUid":
-					res.reply(getHandlerIDByUid(to));
+					res.reply(getHandlerIDByUid(userId));
+					break;
+				case "getUidByHandlerID":
+					res.reply(getUidByHandlerID(handlerID));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -73,12 +78,22 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				String from = body.getString("from");
+				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
-				logger.info("from={}action={}innerIP={}", from, action, innerIP);
+				String to = body.getString("to");
+				logger.info("userId={}action={}innerIP={}", userId, action, innerIP);
 				switch (action) {
+				case "setUserSocket":
+					res.reply(setUserSocket(userId, handlerID));
+					break;
 				case "delUserSocket":
-					res.reply(delUserSocket(from, handlerID));
+					res.reply(delUserSocket(userId, handlerID));
+					break;
+				case "getHandlerIDByUid":
+					res.reply(getHandlerIDByUid(to));
+					break;
+				case "getUidByHandlerID":
+					res.reply(getUidByHandlerID(handlerID));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -88,10 +103,14 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		});
 	}
 
-	public int setUserSocket(String uid, String handlerId) {
-		this.sessionMap.put(uid, handlerId);
-		this.sessionReverse.put(handlerId, uid);
+	public int setUserSocket(String userId, String handlerId) {
+		long start = System.currentTimeMillis();
+		logger.info("setUserSocket, handlerID={} userId={}", handlerId, userId);
+		this.sessionMap.put(userId, handlerId);
+		this.sessionReverse.put(handlerId, userId);
 
+		long end = System.currentTimeMillis();
+		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
 		return 0;
 	}
 
@@ -112,18 +131,27 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		return 0;
 	}
 
-	public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) {
-		resultHandler.handle(Future.succeededFuture(sessionMap.get(uid)));
-	}
-
-	public void getUidByHandlerId(String handlerId, Handler<AsyncResult<String>> resultHandler) {
-		resultHandler.handle(Future.succeededFuture(sessionReverse.get(handlerId)));
-	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
-		JsonObject jo = new JsonObject();
-		jo.put("handlerID", sessionMap.get(uid));
+		JsonObject jo = null;
+		if (StringUtils.isNotEmpty(uid)) {
+			String handlerID = sessionMap.get(uid);
+			if (StringUtils.isNotEmpty(handlerID)) {
+				jo = new JsonObject();
+				jo.put("handlerID", handlerID);
+			}
+		}
 
 		return jo;
+	}
+
+	// ---------------------------
+	private JsonObject getUidByHandlerID(String handlerID) {
+		JsonObject result = new JsonObject();
+		result.put("userId", sessionReverse.get(handlerID));
+
+		logger.info("getUidByHandlerID, {}", result.encode());
+
+		return result;
 	}
 }
