@@ -107,6 +107,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 							switch (cmd) {
 							case 14:// heart beat
 								heartBeat(handlerID);
+
+								logger.info("updateOnlineSimple, message={}", message);
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
 								logger.info("simpleHeartBeatCount, handlerID={}count={}", handlerID,

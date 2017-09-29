@@ -1,8 +1,5 @@
 package tp.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import helper.XProxyHelper;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
@@ -95,7 +92,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
-			form.set("uid", uid);
+			form.add("uid", uid);
 			form.add("time", Utils.normalizePath(date));
 			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
@@ -104,8 +101,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
-					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid, date, content.encode(),
-							resp.body());
+					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid,
+							Utils.normalizePath(date), Utils.normalizePath(content.encode()).substring(1), resp.body());
 					future.complete(resp.body());
 				} else {
 					logger.error("updateOnlineSimple, statusCode={} statusMessage={}", resp.statusCode(),
