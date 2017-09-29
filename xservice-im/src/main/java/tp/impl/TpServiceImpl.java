@@ -63,7 +63,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
-			form.add("time", Utils.normalizePath(date));
+			form.add("time", Utils.normalizePath(date).substring(1));
 			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
@@ -71,7 +71,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
-					logger.info("updateOnlineState, uid={}&time={}&msg={}, response={}", uid, date, content.encode(),
+					logger.info("updateOnlineState, uid={}&time={}&msg={}, response={}", uid,
+							Utils.normalizePath(date).substring(1), Utils.normalizePath(content.encode()).substring(1),
 							resp.body());
 					future.complete(resp.body());
 				} else {
@@ -93,7 +94,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
-			form.add("time", Utils.normalizePath(date));
+			form.add("time", Utils.normalizePath(date).substring(1));
 			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
@@ -102,7 +103,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid,
-							Utils.normalizePath(date), Utils.normalizePath(content.encode()).substring(1), resp.body());
+							Utils.normalizePath(date).substring(1), Utils.normalizePath(content.encode()).substring(1),
+							resp.body());
 					future.complete(resp.body());
 				} else {
 					logger.error("updateOnlineSimple, statusCode={} statusMessage={}", resp.statusCode(),
