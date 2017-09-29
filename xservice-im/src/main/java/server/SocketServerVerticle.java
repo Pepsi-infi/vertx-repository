@@ -249,8 +249,9 @@ public class SocketServerVerticle extends AbstractVerticle {
 				LocalDateTime now = LocalDateTime.now();
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 				String date = now.format(format);
+				JsonObject data = message.getJsonObject("data");
 
-				tpService.updateOnlineState(uid, date, message, result -> {
+				tpService.updateOnlineState(uid, date, data, result -> {
 					if (result.succeeded()) {
 						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
 					} else {

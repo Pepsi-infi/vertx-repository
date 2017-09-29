@@ -125,7 +125,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("userId"));
-			form.set("msg", msg.getString("data"));
+			form.set("msg", Utils.normalizePath(msg.getString("data")).substring(1));
 
 			logger.info("subscribe, uid={} data={}", msg.getString("userId"), msg.getString("data"));
 
@@ -154,7 +154,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.set("uid", msg.getString("userId"));
-			form.set("msg", msg.getString("data"));
+			form.set("msg", Utils.normalizePath(msg.getString("data")).substring(1));
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgUnsubscribe/")
 					.as(BodyCodec.string()).rxSendForm(form);
