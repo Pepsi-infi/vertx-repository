@@ -167,7 +167,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							String cmd = String.valueOf(msgBody.get(1));
 							logger.info("UDP userId={}", userId);
 
-							JsonObject data = JsonObject.mapFrom(msgBody.get(3));
+							String data = (String) msgBody.get(3);
 
 							JsonObject msg2Send = new JsonObject();
 							msg2Send.put("cmd", cmd);
