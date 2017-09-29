@@ -69,7 +69,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
-					logger.info("updateOnlineState={}", resp.body());
+					logger.info("updateOnlineState, uid={}&time={}&msg={}, response={}", uid, date, content.encode(),
+							resp.body());
 					future.complete(resp.body());
 				} else {
 					logger.error("updateOnlineState={}", resp.statusMessage());

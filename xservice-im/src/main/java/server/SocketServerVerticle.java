@@ -173,7 +173,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							msg2Send.put("cmd", cmd);
 							msg2Send.put("data", data);
 
-							logger.info("userId={}Msg2Send={}", userId, msg2Send.encode());
+							logger.info("userId={}, Msg2Send={}", userId, msg2Send.encode());
 
 							DeliveryOptions option = new DeliveryOptions();
 							option.setSendTimeout(3000);
@@ -191,7 +191,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 														.buffer(ByteUtil.intToBytes(msg2Send.encode().length()))
 														.appendString(msg2Send.encode());
 
-												logger.info("UDP send, handlerID={} bf={}", handlerID, bf);
+												logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
+														msg2Send.encode().length(), bf);
 
 												eb.send(handlerID, bf);
 											}
