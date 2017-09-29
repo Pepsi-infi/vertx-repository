@@ -1,5 +1,8 @@
 package tp.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import helper.XProxyHelper;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
@@ -62,8 +65,12 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
-			form.add("time", date);
-			form.add("msg", content.encode());
+			try {
+				form.add("time", URLEncoder.encode(date, "utf-8"));
+				form.add("msg", URLEncoder.encode(content.encode(), "utf-8"));
+			} catch (UnsupportedEncodingException e) {
+				logger.error("updateOnlineState, e={}", e.getMessage());
+			}
 
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateOnlineState/")
@@ -92,8 +99,13 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
-			form.add("time", date);
-			form.add("msg", content.encode());
+			try {
+				form.add("time", URLEncoder.encode(date, "utf-8"));
+				form.add("msg", URLEncoder.encode(content.encode(), "utf-8"));
+			} catch (UnsupportedEncodingException e) {
+				logger.error("updateOnlineSimple, e={}", e.getMessage());
+			}
+
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
 					.as(BodyCodec.string()).rxSendForm(form);
