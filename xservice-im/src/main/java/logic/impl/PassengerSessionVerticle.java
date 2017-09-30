@@ -32,9 +32,9 @@ public class PassengerSessionVerticle extends AbstractVerticle {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(3, MemoryUnit.GB)))
 				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(3, MemoryUnit.GB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);

@@ -50,10 +50,6 @@ public class UdpServerVerticle extends AbstractVerticle {
 					if (map != null) {
 						logger.info("Map " + map.toString());
 
-						map.forEach((k, v) -> {
-							logger.info("map k={} v={}", k, v);
-						});
-
 						try {
 							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
 							userId = String.valueOf(msgBody.get(0));// userId

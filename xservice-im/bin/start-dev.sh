@@ -16,7 +16,7 @@ nohup /usr/local/jdk1.8/bin/java \
 -XX:+PrintGCTimeStamps \
 -XX:+PrintGCDetails \
 -Xms2g -Xmx2g -Xmn1380m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
--XX:MaxDirectMemorySize=2560m \
+-XX:MaxDirectMemorySize=6g \
 -XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
 -XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
