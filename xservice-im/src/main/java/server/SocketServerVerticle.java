@@ -22,6 +22,7 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
+import io.vertx.ext.web.impl.Utils;
 import logic.impl.SocketSessionVerticle;
 import tp.TpService;
 import util.ByteUtil;
@@ -203,7 +204,12 @@ public class SocketServerVerticle extends AbstractVerticle {
 					LocalDateTime now = LocalDateTime.now();
 					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 					String date = now.format(format);
-					JsonObject data = message.getJsonObject("data");
+					// JsonObject data = message.getJsonObject("data");
+
+					String dataStr = Utils.normalizePath(message.getString("data")).substring(1);
+
+					logger.info("normalizePath, handlerID={} data={}", handlerID, dataStr);
+					JsonObject data = JsonObject.mapFrom(dataStr);
 
 					tpService.updateOnlineSimple(uid, date, data, result -> {
 						if (result.succeeded()) {
