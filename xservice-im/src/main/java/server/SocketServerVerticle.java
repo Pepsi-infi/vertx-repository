@@ -80,7 +80,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 
 							if (paramMap.get("mid").equalsIgnoreCase("iphone")) {
-								sendValidateOK(handlerID);
+//								sendValidateOK(handlerID);
 							}
 
 							String userId = paramMap.get("user");
