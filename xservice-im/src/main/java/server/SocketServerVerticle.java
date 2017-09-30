@@ -306,17 +306,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 	}
 
 	private void sendValidateOK(String handlerID) {
-		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK").appendString("\r\n")
-				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)").appendString("\r\n")
-				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT").appendString("\r\n")
-				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("\r\n")
-				.appendString("Content-Type: text/x-live-message").appendString("\r\n")
-				.appendString("Connection: keep-alive").appendString("\r\n")
-				.appendString("Cache-Control: no-cache, must-revalidate").appendString("\r\n\r\n");
+		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK")
+				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)")
+				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT")
+				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("Content-Type: text/x-live-message")
+				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate")
+				.appendString("\r\n\r\n");
 
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.length())).appendBuffer(response);
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.getBytes().length)).appendBuffer(response);
 
-		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf);
+		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf.toString());
 
 		eb.send(handlerID, bf);
 	}
