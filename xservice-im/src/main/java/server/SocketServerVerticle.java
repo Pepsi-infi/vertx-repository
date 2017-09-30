@@ -305,7 +305,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		return strAllParam;
 	}
 
-	private void sendValidateOK(String writeHandlerID) {
+	private void sendValidateOK(String handlerID) {
 		Buffer response = Buffer.buffer().appendString("HTTP/1.0 200 OK").appendString("\r\n")
 				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)").appendString("\r\n")
 				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT").appendString("\r\n")
@@ -313,7 +313,10 @@ public class SocketServerVerticle extends AbstractVerticle {
 				.appendString("Content-Type: text/x-live-message").appendString("\r\n")
 				.appendString("Connection: keep-alive").appendString("\r\n")
 				.appendString("Cache-Control: no-cache, must-revalidate").appendString("\r\n\r\n");
-		eb.send(writeHandlerID, response);
+
+		logger.info("sendValidateOK, handlerID={}", handlerID);
+
+		eb.send(handlerID, response);
 	}
 
 	private void sendReLogin(String writeHandlerID) {
