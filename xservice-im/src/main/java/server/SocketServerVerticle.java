@@ -1,6 +1,5 @@
 package server;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,13 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.datagram.DatagramSocket;
-import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -26,9 +23,7 @@ import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import logic.iml.SocketSessionVerticle;
-import serializer.SocketByteUtils;
 import tp.TpService;
-import tp.impl.TpServiceImpl;
 import util.ByteUtil;
 import utils.IPUtil;
 
@@ -39,6 +34,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 	private EventBus eb;
 
 	private TpService tpService;
+
 	private String innerIP;
 
 	@Override
@@ -149,87 +145,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 		});
 
 		server.listen();
-
-		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		socket.listen(9099, "10.10.10.102", asyncResult -> {
-			if (asyncResult.succeeded()) {
-				logger.info("UDP listening...");
-				socket.handler(packet -> {
-					logger.info("UDP packet " + packet.data());
-
-					Map<String, Object> map = null;
-
-					try {
-						map = (Map<String, Object>) SocketByteUtils.byteToObject(packet.data().getBytes());
-					} catch (Exception e) {
-						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
-					}
-
-					String userId = null;
-					if (map != null) {
-						logger.info("Map " + map.toString());
-
-						map.forEach((k, v) -> {
-							logger.info("map k={} v={}", k, v);
-						});
-
-						try {
-							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
-							userId = String.valueOf(msgBody.get(0));// userId
-							String cmd = String.valueOf(msgBody.get(1));
-							logger.info("UDP userId={}", userId);
-
-							JsonObject data = JsonObject.mapFrom(msgBody.get(3));
-
-							JsonObject msg2Send = new JsonObject();
-							msg2Send.put("cmd", cmd);
-							msg2Send.put("data", data);
-
-							logger.info("userId={}, Msg2Send={}", userId, msg2Send.encode());
-
-							DeliveryOptions option = new DeliveryOptions();
-							option.setSendTimeout(3000);
-							option.addHeader("action", "getHandlerIDByUid");
-
-							JsonObject param = new JsonObject();
-							param.put("userId", userId);
-							eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option,
-									reply -> {
-										if (reply.succeeded()) {
-											JsonObject res = reply.result().body();
-											if (res != null) {
-												String handlerID = res.getString("handlerID");
-												Buffer bf = null;
-												try {
-													bf = Buffer
-															.buffer(ByteUtil.intToBytes(
-																	msg2Send.encode().getBytes("UTF-8").length))
-															.appendString(msg2Send.encode());
-													logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
-															msg2Send.encode().getBytes("UTF-8").length, bf);
-												} catch (UnsupportedEncodingException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
-
-												eb.send(handlerID, bf);
-											}
-										} else {
-											logger.error("getHandlerIDByUid, e={}", reply.cause());
-										}
-									});
-
-						} catch (Exception e2) {
-							logger.error("Get userId error ", e2);
-						}
-					} else {
-						logger.info("Map is null.");
-					}
-				});
-			} else {
-				logger.error("UDP", asyncResult.cause());
-			}
-		});
 	}
 
 	private void updateOnlineState(String innerIP, String writeHandlerID, JsonObject message) {
@@ -264,32 +179,37 @@ public class SocketServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private void updateOnlineSimple(String innerIP, String writeHandlerID, JsonObject message) {
+	private void updateOnlineSimple(String innerIP, String handlerID, JsonObject message) {
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
 		option.addHeader("action", "getUidByHandlerID");
 
 		JsonObject param = new JsonObject();
-		param.put("handlerID", writeHandlerID);
+		param.put("handlerID", handlerID);
 
 		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
+				if (StringUtils.isEmpty(uid)) {
+					// uid is null, relogin.
+					sendReLogin(handlerID);
+				} else {
+					logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
 
-				LocalDateTime now = LocalDateTime.now();
-				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-				String date = now.format(format);
-				JsonObject data = message.getJsonObject("data");
+					LocalDateTime now = LocalDateTime.now();
+					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+					String date = now.format(format);
+					JsonObject data = message.getJsonObject("data");
 
-				tpService.updateOnlineSimple(uid, date, data, result -> {
-					if (result.succeeded()) {
-						logger.info("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.result());
-					} else {
-						logger.error("updateOnlineSimple, handlerID={} result={}", writeHandlerID, result.cause());
-					}
-				});
+					tpService.updateOnlineSimple(uid, date, data, result -> {
+						if (result.succeeded()) {
+							logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
+						} else {
+							logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
+						}
+					});
+				}
 			} else {
 				// TODO
 			}
@@ -354,11 +274,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 			}
 		}
 
-		// TODO delete
-		mapRequest.forEach((k, v) -> {
-			logger.info("mapRequest, k={} v={}", k, v);
-		});
-
 		return mapRequest;
 	}
 
@@ -398,14 +313,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.send(writeHandlerID, response);
 	}
 
-	private void sendRedirect(String writeHandlerID) {
+	private void sendReLogin(String writeHandlerID) {
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
-		message.put("data", "192.168.2.220:4321");
-		// Buffer bf = Buffer.buffer(message.encode()).appendString("\n\n");
+		message.put("data", innerIP + ":4321");
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
 
-		logger.info("send redirect " + bf);
+		logger.info("sendReLogin, bf={}", bf);
+
 		eb.send(writeHandlerID, bf);
 	}
 
@@ -534,17 +449,21 @@ public class SocketServerVerticle extends AbstractVerticle {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
 				logger.info("subscribe, handlerID={} userId={}", handlerID, uid);
-
-				JsonObject subscribeParam = new JsonObject();
-				subscribeParam.put("userId", uid);
-				subscribeParam.put("data", message.getJsonObject("data").encode());
-				tpService.subscribe(subscribeParam, r -> {
-					if (r.succeeded()) {
-						logger.info("subscribe, result={}", r.result());
-					} else {
-						logger.error("subscribe, e={}", r.cause());
-					}
-				});
+				if (StringUtils.isEmpty(uid)) {
+					// uid is null, relogin.
+					sendReLogin(handlerID);
+				} else {
+					JsonObject subscribeParam = new JsonObject();
+					subscribeParam.put("userId", uid);
+					subscribeParam.put("data", message.getJsonObject("data").encode());
+					tpService.subscribe(subscribeParam, r -> {
+						if (r.succeeded()) {
+							logger.info("subscribe, result={}", r.result());
+						} else {
+							logger.error("subscribe, e={}", r.cause());
+						}
+					});
+				}
 			} else {
 				// TODO
 			}
@@ -564,17 +483,21 @@ public class SocketServerVerticle extends AbstractVerticle {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
 				logger.info("unsubscribe, handlerID={} userId={}", handlerID, uid);
-
-				JsonObject subscribeParam = new JsonObject();
-				subscribeParam.put("userId", uid);
-				subscribeParam.put("data", message.getJsonObject("data").encode());
-				tpService.unsubscribe(subscribeParam, r -> {
-					if (r.succeeded()) {
-						logger.info("unsubscribe, result={}", r.result());
-					} else {
-						logger.error("unsubscribe, e={}", r.cause());
-					}
-				});
+				if (StringUtils.isEmpty(uid)) {
+					// uid is null, relogin.
+					sendReLogin(handlerID);
+				} else {
+					JsonObject subscribeParam = new JsonObject();
+					subscribeParam.put("userId", uid);
+					subscribeParam.put("data", message.getJsonObject("data").encode());
+					tpService.unsubscribe(subscribeParam, r -> {
+						if (r.succeeded()) {
+							logger.info("unsubscribe, result={}", r.result());
+						} else {
+							logger.error("unsubscribe, e={}", r.cause());
+						}
+					});
+				}
 			} else {
 				// TODO
 			}
