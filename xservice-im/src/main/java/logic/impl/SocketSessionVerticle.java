@@ -1,4 +1,4 @@
-package logic.iml;
+package logic.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.ehcache.Cache;
@@ -51,7 +51,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
 
-				logger.info("userId={}action={}innerIP={}", userId, action, innerIP);
+				logger.info("consumer, userId={}action={}innerIP={}", userId, action, innerIP);
 
 				switch (action) {
 				case "setUserSocket":
@@ -130,7 +130,6 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 		return 0;
 	}
-
 
 	private JsonObject getHandlerIDByUid(String uid) {
 		JsonObject jo = null;
