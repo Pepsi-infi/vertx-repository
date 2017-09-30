@@ -76,9 +76,12 @@ public class SocketServerVerticle extends AbstractVerticle {
 							parser.fixedSizeMode(4);
 							logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
 
-							// sendValidateOK(handlerID);
-
 							Map<String, String> paramMap = URLRequest(buffer.toString());
+
+							if (paramMap.get("mid").equalsIgnoreCase("iphone")) {
+								sendValidateOK(handlerID);
+							}
+
 							String userId = paramMap.get("user");
 							loginSocketSession(innerIP, handlerID, userId);
 							loginConfirm(handlerID, paramMap);
