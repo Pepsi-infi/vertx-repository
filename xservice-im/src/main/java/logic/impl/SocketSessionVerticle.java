@@ -1,4 +1,4 @@
-package logic.iml;
+package logic.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.ehcache.Cache;
