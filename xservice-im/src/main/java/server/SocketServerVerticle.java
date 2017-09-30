@@ -311,12 +311,12 @@ public class SocketServerVerticle extends AbstractVerticle {
 				.appendString("Server: MochiWeb/1.0 (Any of you quaids got a smint?)")
 				.appendString("Expires: Mon, 26 Jul 1997 05:00:00 GMT")
 				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("Content-Type: text/x-live-message")
-				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate")
-				.appendString("\r\n\r\n");
+				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate");
 
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.getBytes().length)).appendBuffer(response);
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.getBytes().length)).appendBuffer(response)
+				.appendString("\r\n");
 
-		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf.toString());
+		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf.getBytes().toString());
 
 		eb.send(handlerID, bf);
 	}
