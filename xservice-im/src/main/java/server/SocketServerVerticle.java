@@ -208,8 +208,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 					try {
 						data = message.getJsonObject("data");
 					} catch (Exception e) {
-						data = JsonObject.mapFrom(message.getString("data").replace("\\", ""));
-						logger.info("replace, {}", message.getString("data").replace("\\", ""));
+						logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
+						data = JsonObject.mapFrom(message.getString("data").replace("\\\\", ""));
 					}
 
 					tpService.updateOnlineSimple(uid, date, data, result -> {
