@@ -65,7 +65,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 					public void handle(Buffer buffer) {
 						logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
 
-						if (buffer.toString().startsWith("get /mobile?")) {
+						if (buffer.toString().startsWith("get /mobile?")
+								|| buffer.toString().contains("get /mobile?")) {
 							logger.info("send login, ");
 							op = 1;
 						}
