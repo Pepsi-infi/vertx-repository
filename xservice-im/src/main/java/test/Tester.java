@@ -1,11 +1,13 @@
 package test;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.impl.Utils;
 import io.vertx.rxjava.core.MultiMap;
@@ -54,8 +56,7 @@ public class Tester {
 		form.add("uid", "13666098");
 
 		form.add("time", Utils.normalizePath("2017-09-29 05:44:59"));
-		form.add("msg",
-				Utils.normalizePath("{\"lat\":39.920229,\"lon\":116.432982}").substring(1));
+		form.add("msg", Utils.normalizePath("{\"lat\":39.920229,\"lon\":116.432982}").substring(1));
 
 		System.out.println(URLEncoder
 				.encode("{\"lon\":116.432981,\"lat\":39.920212,\"groupId\":\"34\",\"module\":5001}", "UTF-8"));
@@ -67,15 +68,16 @@ public class Tester {
 				.post(18080, "10.10.10.105", "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
 				.as(BodyCodec.string()).rxSendForm(form);
 
-		System.out.println(Utils.normalizePath("{\"cmd\":14,\"data\":{\"lat\":39.920256,\"lon\":116.433006}}").substring(1));
+		System.out.println(
+				Utils.normalizePath("{\"cmd\":14,\"data\":{\"lat\":39.920256,\"lon\":116.433006}}").substring(1));
 
-		httpRequest.subscribe(resp -> {
-			if (resp.statusCode() == 200) {
-				System.out.println(resp.body());
-			} else {
-				System.out.println(resp.statusCode() + resp.statusMessage());
-			}
-		});
+		// httpRequest.subscribe(resp -> {
+		// if (resp.statusCode() == 200) {
+		// System.out.println(resp.body());
+		// } else {
+		// System.out.println(resp.statusCode() + resp.statusMessage());
+		// }
+		// });
 
 		String a = "a";
 		System.out.println(a);
@@ -85,6 +87,17 @@ public class Tester {
 
 		String b = "b";
 
+		try {
+			HeartBeat a1 = Json.mapper.readValue(
+					"{\"lat\":\"39.92042236328125\",\"lon\":\"116.4331694878472\"}".replace("\\\\", ""),
+					HeartBeat.class);
+
+			System.out.println(Json.encode(a1));
+			System.out.println(a1.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {

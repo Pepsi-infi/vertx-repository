@@ -1,5 +1,6 @@
 package server;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,12 +10,15 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -23,6 +27,7 @@ import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import logic.impl.SocketSessionVerticle;
+import test.HeartBeat;
 import tp.TpService;
 import util.ByteUtil;
 import utils.IPUtil;
@@ -209,7 +214,13 @@ public class SocketServerVerticle extends AbstractVerticle {
 						data = message.getJsonObject("data");
 					} catch (Exception e) {
 						logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
-						data = JsonObject.mapFrom(message.getString("data").replace("\\\\", ""));
+						try {
+							HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
+									HeartBeat.class);
+							data = JsonObject.mapFrom(hb);
+						} catch (Exception e1) {
+							logger.error(e1);
+						}
 					}
 
 					tpService.updateOnlineSimple(uid, date, data, result -> {
