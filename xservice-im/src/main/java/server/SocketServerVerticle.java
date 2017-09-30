@@ -314,9 +314,11 @@ public class SocketServerVerticle extends AbstractVerticle {
 				.appendString("Connection: keep-alive").appendString("\r\n")
 				.appendString("Cache-Control: no-cache, must-revalidate").appendString("\r\n\r\n");
 
-		logger.info("sendValidateOK, handlerID={}", handlerID);
+		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.length())).appendBuffer(response);
 
-		eb.send(handlerID, response);
+		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf);
+
+		eb.send(handlerID, bf);
 	}
 
 	private void sendReLogin(String writeHandlerID) {
