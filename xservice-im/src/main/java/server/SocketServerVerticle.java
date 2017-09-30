@@ -80,7 +80,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 
 							if (paramMap.get("mid").equalsIgnoreCase("iphone")) {
-//								sendValidateOK(handlerID);
+								// sendValidateOK(handlerID);
 							}
 
 							String userId = paramMap.get("user");
@@ -209,7 +209,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 						data = message.getJsonObject("data");
 					} catch (Exception e) {
 						data = JsonObject.mapFrom(message.getString("data").replace("\\", ""));
-						logger.info("replace, ");
+						logger.info("replace, {}", message.getString("data").replace("\\", ""));
 					}
 
 					tpService.updateOnlineSimple(uid, date, data, result -> {
