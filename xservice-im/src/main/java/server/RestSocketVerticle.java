@@ -61,16 +61,24 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userId)) {
 			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, reply -> {
 				if (reply.succeeded()) {
-					context.response().putHeader("content-type", "application/json").end(reply.result().body().encode(),
-							ENCODE);
+					result.put("code", 0);
+					result.put("time", System.currentTimeMillis());
+					result.put("data", reply.result().body());
+					context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
 				} else {
+					result.put("code", 500);
+					result.put("time", System.currentTimeMillis());
+					result.put("data", reply.cause());
 					context.response().setStatusCode(500).putHeader("content-type", "application/json")
-							.end(new JsonObject().put("error", reply.cause()).encodePrettily(), ENCODE);
+							.end(result.encode(), ENCODE);
 				}
 			});
 		} else {
-			context.response().setStatusCode(400).putHeader("content-type", "application/json")
-					.end(new JsonObject().put("error", "param userId is required").encodePrettily(), ENCODE);
+			result.put("code", 400);
+			result.put("time", System.currentTimeMillis());
+			result.put("data", "param userId must not be null");
+			context.response().setStatusCode(400).putHeader("content-type", "application/json").end(result.encode(),
+					ENCODE);
 		}
 
 	}
