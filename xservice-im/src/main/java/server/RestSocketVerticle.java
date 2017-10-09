@@ -76,11 +76,14 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	}
 
 	private void socketStatus(RoutingContext context) {
+		String userId = context.request().params().get("userId");
+
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
 		option.addHeader("action", "status");
 
 		JsonObject message = new JsonObject();
+		message.put("userId", userId);
 
 		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + IPUtil.getInnerIP(), message, option, reply -> {
 			if (reply.succeeded()) {
@@ -88,7 +91,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 						ENCODE);
 			} else {
 				context.response().setStatusCode(500).putHeader("content-type", "application/json")
-						.end(new JsonObject().put("error", reply.cause().getMessage()).encodePrettily(), ENCODE);
+						.end(new JsonObject().put("error", reply.cause().getMessage()).encode(), ENCODE);
 			}
 		});
 	}

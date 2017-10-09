@@ -140,10 +140,13 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 				socket.closeHandler(v -> {
 					setClientOffline(handlerID);
+					sessionLogout(handlerID);
 					logger.info("closeHandler, handlerID={} close", handlerID);
 				});
 
 				socket.exceptionHandler(t -> {
+					setClientOffline(handlerID);
+					sessionLogout(handlerID);
 					logger.info("exceptionHandler, handlerID={} close", handlerID);
 				});
 			}
@@ -532,6 +535,23 @@ public class SocketServerVerticle extends AbstractVerticle {
 						}
 					});
 				}
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void sessionLogout(String handlerID) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "delUserSocket");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				logger.info("sessionLogout, {}", handlerID);
 			} else {
 				// TODO
 			}

@@ -70,7 +70,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 					res.reply(getUidByHandlerID(handlerID));
 					break;
 				case "status":
-					res.reply(status());
+					res.reply(status(userId));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -124,7 +124,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		return 0;
 	}
 
-	public int delUserSocket(String uid, String handlerId) {
+	public JsonObject delUserSocket(String uid, String handlerId) {
 		if (StringUtils.isNotEmpty(uid)) {
 			// logout
 			this.sessionMap.remove(uid);
@@ -141,7 +141,7 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		counter--;
 		recounter--;
 
-		return 0;
+		return new JsonObject().put("status", 0);
 	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
@@ -167,11 +167,15 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		return result;
 	}
 
-	private Object status() {
+	private Object status(String userId) {
 		JsonObject status = new JsonObject();
 		status.put("ip", IPUtil.getInnerIP());
 		status.put("sessionMap", counter);
 		status.put("sessionReverse", recounter);
+
+		if (StringUtils.isNotEmpty(userId)) {
+			status.put("status", sessionMap.get(userId));
+		}
 
 		return status;
 	}
