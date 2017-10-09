@@ -35,7 +35,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		router.route(RestConstants.Socket.SOCKET_STATUS).handler(this::socketStatus);
 		Future<Void> voidFuture = Future.future();
 
-		String serverHost = "192.168.0.57";// this.getServerHost();
+		String serverHost = getServerHost();
 		createHttpServer(router, serverHost, RestConstants.Socket.HTTP_PORT)
 				.compose(serverCreated -> publishHttpEndpoint(RestConstants.Socket.SERVICE_NAME, serverHost,
 						RestConstants.Socket.HTTP_PORT, RestConstants.Socket.SERVICE_ROOT))
