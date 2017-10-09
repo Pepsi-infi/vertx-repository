@@ -4,6 +4,7 @@ import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import logic.impl.SocketSessionVerticle;
+import server.RestSocketVerticle;
 import server.SocketServerVerticle;
 import server.UdpServerVerticle;
 import tp.impl.TpServiceImpl;
@@ -19,6 +20,8 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(TpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(SocketSessionVerticle.class.getName());
+
+		vertx.deployVerticle(RestSocketVerticle.class.getName());
 	};
 
 	public static DeploymentOptions readBossOpts() {

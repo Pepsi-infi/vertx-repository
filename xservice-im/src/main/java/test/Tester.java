@@ -15,6 +15,7 @@ import io.vertx.rxjava.core.Vertx;
 import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
+import logic.impl.SocketSessionVerticle;
 import rx.Single;
 import server.RestSocketVerticle;
 
@@ -34,6 +35,7 @@ public class Tester {
 
 		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
 		vertx.deployVerticle(RestSocketVerticle.class.getName());
+		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 
 		// ----------------------
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new

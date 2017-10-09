@@ -49,6 +49,7 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 					String key = param.getString("userId");
 					res.reply(getNode(key));
 					break;
+
 				default:
 					res.reply(1);// Fail!
 					break;

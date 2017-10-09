@@ -27,6 +27,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	private Cache<String, String> sessionMap;// uid -> handlerID
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
+	private long counter = 0;
+	private long recounter = 0;
+
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
@@ -65,6 +68,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 					break;
 				case "getUidByHandlerID":
 					res.reply(getUidByHandlerID(handlerID));
+					break;
+				case "status":
+					res.reply(status());
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -111,6 +117,10 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 		long end = System.currentTimeMillis();
 		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
+
+		counter++;
+		recounter++;
+
 		return 0;
 	}
 
@@ -127,6 +137,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				sessionMap.remove(uid);
 			}
 		}
+
+		counter--;
+		recounter--;
 
 		return 0;
 	}
@@ -152,5 +165,14 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		logger.info("getUidByHandlerID, {}", result.encode());
 
 		return result;
+	}
+
+	private Object status() {
+		JsonObject status = new JsonObject();
+		status.put("ip", IPUtil.getInnerIP());
+		status.put("sessionMap", counter);
+		status.put("sessionReverse", recounter);
+
+		return status;
 	}
 }

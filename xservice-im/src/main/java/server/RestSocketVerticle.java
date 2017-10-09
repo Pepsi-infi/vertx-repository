@@ -12,6 +12,7 @@ import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.core.eventbus.EventBus;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import logic.impl.SocketSessionVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
@@ -31,6 +32,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
+		router.route(RestConstants.Socket.SOCKET_STATUS).handler(this::socketStatus);
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = "192.168.0.57";// this.getServerHost();
@@ -71,5 +73,23 @@ public class RestSocketVerticle extends RestAPIVerticle {
 					.end(new JsonObject().put("error", "param userId is required").encodePrettily(), ENCODE);
 		}
 
+	}
+
+	private void socketStatus(RoutingContext context) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "status");
+
+		JsonObject message = new JsonObject();
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + IPUtil.getInnerIP(), message, option, reply -> {
+			if (reply.succeeded()) {
+				context.response().putHeader("content-type", "application/json").end(reply.result().body().encode(),
+						ENCODE);
+			} else {
+				context.response().setStatusCode(500).putHeader("content-type", "application/json")
+						.end(new JsonObject().put("error", reply.cause().getMessage()).encodePrettily(), ENCODE);
+			}
+		});
 	}
 }

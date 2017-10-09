@@ -11,5 +11,7 @@ public class RestConstants {
 		static final String SERVICE_ROOT = "/mc-socket/";
 
 		static final String GET_SOCKET_HOST = "/mc-socket/host/get.json";
+
+		static final String SOCKET_STATUS = "/mc-socket/status.json";
 	}
 }
