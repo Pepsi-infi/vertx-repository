@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
@@ -35,7 +34,8 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 		logger.info("start ... ");
 		this.realNodes = new ArrayList<String>();
 
-		this.realNodes.add("10.10.10.193");// TODO
+		this.realNodes.add("111.206.162.233:8088");
+		this.realNodes.add("111.206.162.234:8088");
 		init();
 
 		eb = vertx.eventBus();
@@ -46,7 +46,7 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 				String action = headers.get("action");
 				switch (action) {
 				case "getNode":
-					String key = param.getString("");
+					String key = param.getString("userId");
 					res.reply(getNode(key));
 					break;
 				default:
@@ -121,14 +121,14 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 	 * @param nodes
 	 * @param resultHandler
 	 */
-	public String getNode(String key) {
-		String result = null;
+	public JsonObject getNode(String key) {
+		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			result = virtualNodes.firstEntry().getValue();
+			result.put("host", virtualNodes.firstEntry().getValue());
 		} else {
-			result = en.getValue();
+			result.put("host", en.getValue());
 		}
 
 		return result;

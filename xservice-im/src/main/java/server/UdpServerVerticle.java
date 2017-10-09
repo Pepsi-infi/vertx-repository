@@ -48,7 +48,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 					String userId = null;
 					if (map != null) {
-						logger.info("Map " + map.toString());
+						logger.info("UDP Map " + map.toString());
 
 						try {
 							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
@@ -62,7 +62,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 							msg2Send.put("cmd", cmd);
 							msg2Send.put("data", data);
 
-							logger.info("userId={}, Msg2Send={}", userId, msg2Send.encode());
+							logger.info("UDP userId={}, Msg2Send={}", userId, msg2Send.encode());
 
 							DeliveryOptions option = new DeliveryOptions();
 							option.setSendTimeout(3000);

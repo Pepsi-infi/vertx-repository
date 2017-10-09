@@ -221,6 +221,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/setclientonline/")
 					.append("uid=").append(userId).toString();
 
+			logger.info("setClientOnline, host={}port={}uri={}", CAR_API_HOST, CAR_API_PORT, requestURI);
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
 

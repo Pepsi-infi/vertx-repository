@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
+import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
@@ -16,6 +16,7 @@ import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import rx.Single;
+import server.RestSocketVerticle;
 
 public class Tester {
 
@@ -30,6 +31,10 @@ public class Tester {
 		// vertx.deployVerticle(SocketSessionVerticle.class.getName());
 		// vertx.deployVerticle(UdpServerVerticle.class.getName());
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
+
+		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
+		vertx.deployVerticle(RestSocketVerticle.class.getName());
+
 		// ----------------------
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new
 		// DeploymentOptions().setInstances(1));
