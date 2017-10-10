@@ -394,7 +394,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				JsonObject jsonRes = res.result().body();
 				String socketNode = jsonRes.getString("host");
-				logger.info("cHash, socketNode={}", socketNode);
+				logger.info("cHash, userId={}socketNode={}", userId, socketNode);
 				if (!socketNode.equalsIgnoreCase(localhost)) {
 					sendReLogin(handlerID, ipMap.get(socketNode));
 				}

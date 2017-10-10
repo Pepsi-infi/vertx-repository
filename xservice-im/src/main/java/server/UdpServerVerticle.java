@@ -88,6 +88,9 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 									JsonObject param = new JsonObject();
 									param.put("userId", userId);
+
+									logger.info("UDP userId={}innerIP={}", userId, innerIP);
+
 									eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param,
 											SocketSessionOption, ssFuture.completer());
 								} else {
