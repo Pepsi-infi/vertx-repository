@@ -1,6 +1,5 @@
 package server;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -8,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 
 import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -18,9 +16,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
-import logic.impl.SocketSessionVerticle;
 import serializer.SocketByteUtils;
-import util.ByteUtil;
 import utils.IPUtil;
 
 public class UdpServerVerticle extends AbstractVerticle {
