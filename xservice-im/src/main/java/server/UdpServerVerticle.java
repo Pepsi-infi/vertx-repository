@@ -82,55 +82,29 @@ public class UdpServerVerticle extends AbstractVerticle {
 									JsonObject jsonRes = res.result().body();
 									String innerIP = jsonRes.getString("host");
 
-									DeliveryOptions SocketSessionOption = new DeliveryOptions();
-									SocketSessionOption.setSendTimeout(3000);
-									SocketSessionOption.addHeader("action", "getHandlerIDByUid");
-
-									JsonObject param = new JsonObject();
-									param.put("userId", userId);
+									DeliveryOptions msOption = new DeliveryOptions();
+									msOption.setSendTimeout(3000);
+									msOption.addHeader("action", "sendMsg");
 
 									logger.info("UDP userId={}innerIP={}", userId, innerIP);
 
-									eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param,
-											SocketSessionOption, ssFuture.completer());
+									JsonObject data = JsonObject.mapFrom(msgBody.get(3));
+
+									JsonObject msg2Send = new JsonObject();
+									msg2Send.put("cmd", cmd);
+									msg2Send.put("data", data);
+
+									JsonObject param = new JsonObject();
+									param.put("userId", userId);
+									param.put("msg", msg2Send);
+
+									eb.<JsonObject>send(MessageSendVerticle.class.getName() + innerIP, param, msOption,
+											ssFuture.completer());
+
 								} else {
 
 								}
 							});
-
-							ssFuture.setHandler(ssRes -> {
-								if (ssRes.succeeded()) {
-									JsonObject res = ssRes.result().body();
-									if (res != null) {
-										String handlerID = res.getString("handlerID");
-										Buffer bf = null;
-
-										JsonObject data = JsonObject.mapFrom(msgBody.get(3));
-
-										JsonObject msg2Send = new JsonObject();
-										msg2Send.put("cmd", cmd);
-										msg2Send.put("data", data);
-
-										logger.info("UDP userId={}, Msg2Send={}", userId, msg2Send.encode());
-
-										try {
-											bf = Buffer
-													.buffer(ByteUtil
-															.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
-													.appendString(msg2Send.encode());
-											logger.info("UDP send, handlerID={} header={} bf={}", handlerID,
-													msg2Send.encode().getBytes("UTF-8").length, bf);
-										} catch (UnsupportedEncodingException e) {
-											logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
-										}
-
-										eb.send(handlerID, bf);
-									}
-								} else {
-									logger.error("getHandlerIDByUid, e={}", ssRes.cause().getMessage());
-								}
-							});
-							//
 
 							logger.info("UDP userId={}", userId);
 
