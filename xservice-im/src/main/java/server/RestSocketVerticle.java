@@ -54,7 +54,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
-		option.addHeader("action", "getNode");
+		option.addHeader("action", "getSocketNode");
 
 		JsonObject message = new JsonObject();
 		message.put("userId", userId);
@@ -68,7 +68,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 				} else {
 					result.put("code", 500);
 					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.cause());
+					result.put("data", reply.cause().getMessage());
 					context.response().setStatusCode(500).putHeader("content-type", "application/json")
 							.end(result.encode(), ENCODE);
 				}

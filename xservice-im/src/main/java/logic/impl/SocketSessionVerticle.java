@@ -53,8 +53,6 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
 
-				logger.info("consumer, userId={}action={}innerIP={}", userId, action, innerIP);
-
 				switch (action) {
 				case "setUserSocket":
 					res.reply(setUserSocket(userId, handlerID));
@@ -150,6 +148,8 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			if (StringUtils.isNotEmpty(handlerID)) {
 				jo = new JsonObject();
 				jo.put("handlerID", handlerID);
+
+				logger.info("getHandlerIDByUid, {}", jo.encode());
 			}
 		}
 

@@ -38,9 +38,9 @@ public class Tester {
 		// vertx.deployVerticle(UdpServerVerticle.class.getName());
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
 
-//		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
-//		vertx.deployVerticle(RestSocketVerticle.class.getName());
-//		vertx.deployVerticle(SocketSessionVerticle.class.getName());
+		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
+		vertx.deployVerticle(RestSocketVerticle.class.getName());
+		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 		
 //		vertx.deployVerticle(SocketClientVerticle.class.getName());
 		

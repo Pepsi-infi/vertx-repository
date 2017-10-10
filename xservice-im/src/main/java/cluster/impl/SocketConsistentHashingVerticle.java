@@ -22,21 +22,34 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
-	// 虚拟节点信息
+
+	// 虚拟Socket节点信息
 	private TreeMap<Long, String> virtualNodes;
+
+	// 虚拟内网ip
+	private TreeMap<Long, String> virtualInnerNodes;
+
 	// 真实节点信息
-	private List<String> realNodes;
+	private List<String> realSocketNodes;
+
+	private List<String> realInnerNodes;
 
 	private EventBus eb;
 
 	@Override
 	public void start() throws Exception {
 		logger.info("start ... ");
-		this.realNodes = new ArrayList<String>();
+		this.realSocketNodes = new ArrayList<String>();
 
-		this.realNodes.add("111.206.162.233:8088");
-		this.realNodes.add("111.206.162.234:8088");
-		init();
+		this.realSocketNodes.add("111.206.162.233:8088");
+		this.realSocketNodes.add("111.206.162.234:8088");
+
+		this.realInnerNodes = new ArrayList<String>();
+		realInnerNodes.add("10.10.10.102");
+		realInnerNodes.add("10.10.10.103");
+
+		initSocketNodes();
+		initInnerNodes();
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
@@ -44,12 +57,16 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 			JsonObject param = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
+				String key = null;
 				switch (action) {
-				case "getNode":
-					String key = param.getString("userId");
+				case "getSocketNode":
+					key = param.getString("userId");
 					res.reply(getNode(key));
 					break;
-
+				case "getInnerNode":
+					key = param.getString("userId");
+					res.reply(getInnerNode(key));
+					break;
 				default:
 					res.reply(1);// Fail!
 					break;
@@ -61,11 +78,23 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 	/**
 	 * 初始化虚拟节点
 	 */
-	private void init() {
+	private void initSocketNodes() {
 		virtualNodes = new TreeMap<Long, String>();
-		for (int i = 0; i < realNodes.size(); i++) {
+		for (int i = 0; i < realSocketNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
-				virtualNodes.put(hash("aa" + i + j), realNodes.get(i));
+				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
+			}
+		}
+	}
+
+	/**
+	 * 初始化虚拟内网IP
+	 */
+	private void initInnerNodes() {
+		virtualInnerNodes = new TreeMap<Long, String>();
+		for (int i = 0; i < realInnerNodes.size(); i++) {
+			for (int j = 0; j < length; j++) {
+				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
 			}
 		}
 	}
@@ -128,6 +157,25 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
 			result.put("host", virtualNodes.firstEntry().getValue());
+		} else {
+			result.put("host", en.getValue());
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @param nodes
+	 * @param resultHandler
+	 */
+	public JsonObject getInnerNode(String key) {
+		JsonObject result = new JsonObject();
+		Long hashedKey = hash(key);
+		Entry<Long, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		if (en == null) {
+			result.put("host", virtualInnerNodes.firstEntry().getValue());
 		} else {
 			result.put("host", en.getValue());
 		}
