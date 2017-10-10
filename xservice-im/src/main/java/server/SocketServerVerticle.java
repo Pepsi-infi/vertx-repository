@@ -8,13 +8,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
+import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -23,6 +25,7 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
+import io.vertx.rxjava.core.Future;
 import logic.impl.SocketSessionVerticle;
 import test.HeartBeat;
 import tp.TpService;
@@ -39,8 +42,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	private String innerIP;
 
+	private Map<String, String> ipMap = new HashMap<String, String>();
+
 	@Override
 	public void start() throws Exception {
+
+		ipMap.put("10.10.10.102", "111.206.162.233:8088");
+		ipMap.put("10.10.10.103", "111.206.162.234:8088");
+
 		eb = vertx.eventBus();
 		tpService = TpService.createProxy(vertx);
 		innerIP = IPUtil.getInnerIP();
@@ -71,6 +80,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 								|| buffer.toString().contains("get /mobile?")) {
 							logger.info("send login, ");
 							op = 1;
+							logger.info("socket host={}", socket.localAddress().host());
 						}
 
 						switch (op) {
@@ -86,6 +96,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							}
 
 							String userId = paramMap.get("user");
+							cHash(socket.localAddress().host(), userId, handlerID);
 							loginSocketSession(innerIP, handlerID, userId);
 							loginConfirm(handlerID, paramMap);
 							setClientOnline(userId);
@@ -214,7 +225,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
 
@@ -350,15 +361,48 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.send(handlerID, bf);
 	}
 
-	private void sendReLogin(String writeHandlerID) {
+	private void sendReLogin(String writeHandlerID, String socketNode) {
+		if (StringUtils.isEmpty(socketNode)) {
+			socketNode = "111.206.162.233:8088";
+		}
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
-		message.put("data", innerIP + ":4321");
+		message.put("data", socketNode);
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
 
 		logger.info("sendReLogin, bf={}", bf.toString());
 
 		eb.send(writeHandlerID, bf);
+	}
+
+	private void cHash(String localhost, String userId, String handlerID) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getInnerNode");
+
+		Future<Message<JsonObject>> chFuture = Future.future();
+
+		JsonObject message = new JsonObject();
+		message.put("userId", userId);
+		if (StringUtils.isNotEmpty(userId)) {
+			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, chFuture.completer());
+		} else {
+
+		}
+
+		chFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject jsonRes = res.result().body();
+				String socketNode = jsonRes.getString("host");
+				logger.info("cHash, socketNode={}", socketNode);
+				if (!socketNode.equalsIgnoreCase(localhost)) {
+					sendReLogin(handlerID, ipMap.get(socketNode));
+				}
+			} else {
+
+			}
+		});
+
 	}
 
 	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
@@ -488,7 +532,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				logger.info("subscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
@@ -522,7 +566,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				logger.info("unsubscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
