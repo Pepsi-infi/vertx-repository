@@ -9,6 +9,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.web.impl.Utils;
 import io.vertx.rxjava.core.MultiMap;
 import io.vertx.rxjava.core.Vertx;
@@ -18,8 +20,11 @@ import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import logic.impl.SocketSessionVerticle;
 import rx.Single;
 import server.RestSocketVerticle;
+import server.SocketServerVerticle;
 
 public class Tester {
+	
+	private static final Logger logger = LoggerFactory.getLogger(Tester.class);
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
 		Vertx vertx = Vertx.vertx();
@@ -33,9 +38,12 @@ public class Tester {
 		// vertx.deployVerticle(UdpServerVerticle.class.getName());
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
 
-		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
-		vertx.deployVerticle(RestSocketVerticle.class.getName());
-		vertx.deployVerticle(SocketSessionVerticle.class.getName());
+//		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
+//		vertx.deployVerticle(RestSocketVerticle.class.getName());
+//		vertx.deployVerticle(SocketSessionVerticle.class.getName());
+		
+//		vertx.deployVerticle(SocketClientVerticle.class.getName());
+		
 
 		// ----------------------
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new
@@ -105,6 +113,9 @@ public class Tester {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		String a222 = "null";
+		logger.info("e={}", a222);
 	}
 
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {

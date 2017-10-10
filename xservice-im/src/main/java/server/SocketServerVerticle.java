@@ -497,7 +497,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 						if (r.succeeded()) {
 							logger.info("subscribe, result={}", r.result());
 						} else {
-							logger.error("subscribe, e={}", r.cause());
+							logger.error("subscribe, e={}", r.cause().getMessage());
 						}
 					});
 				}

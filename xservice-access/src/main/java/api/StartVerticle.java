@@ -23,7 +23,7 @@ public class StartVerticle extends AbstractVerticle {
 		/**
 		 * Instance should be 1 because of ehcache.
 		 */
-		vertx.deployVerticle(SessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(SessionVerticle.class.getName());
 	};
 
 	public static DeploymentOptions readBossOpts() {

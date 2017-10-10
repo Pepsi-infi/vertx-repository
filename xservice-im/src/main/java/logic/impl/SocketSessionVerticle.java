@@ -9,9 +9,7 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -35,9 +33,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(3, MemoryUnit.GB)))
 				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
+						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(3, MemoryUnit.GB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
