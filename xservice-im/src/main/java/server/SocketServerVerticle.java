@@ -356,7 +356,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 		message.put("data", innerIP + ":4321");
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
 
-		logger.info("sendReLogin, bf={}", bf);
+		logger.info("sendReLogin, bf={}", bf.toString());
 
 		eb.send(writeHandlerID, bf);
 	}
@@ -439,7 +439,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (result.succeeded()) {
 				logger.info("setClientOnline, result={}", result.result());
 			} else {
-				logger.error("setClientOnline, e={}", result.cause());
+				logger.error("setClientOnline, e={}", result.cause().getMessage());
 			}
 		});
 	}

@@ -92,7 +92,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 												eb.send(handlerID, bf);
 											}
 										} else {
-											logger.error("getHandlerIDByUid, e={}", reply.cause());
+											logger.error("getHandlerIDByUid, e={}", reply.cause().getMessage());
 										}
 									});
 
