@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 
 import cluster.impl.SocketConsistentHashingVerticle;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -31,8 +30,9 @@ import test.HeartBeat;
 import tp.TpService;
 import util.ByteUtil;
 import utils.IPUtil;
+import xservice.BaseServiceVerticle;
 
-public class SocketServerVerticle extends AbstractVerticle {
+public class SocketServerVerticle extends BaseServiceVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocketServerVerticle.class);
 
@@ -46,13 +46,16 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-
 		ipMap.put("10.10.10.102", "111.206.162.233:8088");
 		ipMap.put("10.10.10.103", "111.206.162.234:8088");
 
 		eb = vertx.eventBus();
 		tpService = TpService.createProxy(vertx);
 		innerIP = IPUtil.getInnerIP();
+
+		publishTCPService(SocketServerVerticle.class.getName(), innerIP,
+				new JsonObject().put("publicAddress", ipMap.get(innerIP)));
+
 		logger.info("start...innerIP={}", innerIP);
 
 		NetServerOptions options = new NetServerOptions().setPort(8088);

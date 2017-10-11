@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -15,8 +14,10 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.servicediscovery.Record;
+import xservice.BaseServiceVerticle;
 
-public class SocketConsistentHashingVerticle extends AbstractVerticle {
+public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocketConsistentHashingVerticle.class);
 
@@ -43,6 +44,19 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 
 		this.realSocketNodes.add("111.206.162.233:8088");
 		this.realSocketNodes.add("111.206.162.234:8088");
+
+		JsonObject filter = new JsonObject().put("type", "socket-server");
+		vertx.setPeriodic(5000, handler -> {
+			discovery.getRecords(filter, result -> {
+				if (result.succeeded()) {
+					List<Record> records = result.result();
+					for (Record r : records) {
+						String address = r.getMetadata().getString("publicAddress");
+						logger.info("publicAddress, {}", address);
+					}
+				}
+			});
+		});
 
 		this.realInnerNodes = new ArrayList<String>();
 		realInnerNodes.add("10.10.10.102");

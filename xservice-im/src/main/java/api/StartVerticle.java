@@ -23,7 +23,7 @@ public class StartVerticle extends AbstractVerticle {
 
 		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 
-		vertx.deployVerticle(RestSocketVerticle.class.getName());
+		vertx.deployVerticle(RestSocketVerticle.class.getName(), readBossOpts().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {

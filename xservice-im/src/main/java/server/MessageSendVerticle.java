@@ -65,18 +65,20 @@ public class MessageSendVerticle extends AbstractVerticle {
 
 		ssFuture.setHandler(res -> {
 			if (res.succeeded()) {
-				String handlerID = res.result().body().getString("handlerID");
+				if (res.result().body() != null) {
+					String handlerID = res.result().body().getString("handlerID");
 
-				Buffer bf = null;
-				try {
-					bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
-							.appendString(msg2Send.encode());
-					logger.info("sendMsg, handlerID={} header={} bf={}", handlerID,
-							msg2Send.encode().getBytes("UTF-8").length, bf);
-				} catch (UnsupportedEncodingException e) {
-					logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
+					Buffer bf = null;
+					try {
+						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
+								.appendString(msg2Send.encode());
+						logger.info("sendMsg, handlerID={} header={} bf={}", handlerID,
+								msg2Send.encode().getBytes("UTF-8").length, bf);
+					} catch (UnsupportedEncodingException e) {
+						logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
+					}
+					eb.send(handlerID, bf);
 				}
-				eb.send(handlerID, bf);
 			} else {
 
 			}
