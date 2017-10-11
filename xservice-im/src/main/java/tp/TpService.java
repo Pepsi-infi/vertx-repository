@@ -5,6 +5,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 
@@ -17,7 +18,8 @@ public interface TpService {
 	static final String SERVICE_ADDRESS = TpService.class.getName();
 
 	static TpService createProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(TpService.class, vertx, SERVICE_ADDRESS);
+		return ProxyHelper.createProxy(TpService.class, vertx, SERVICE_ADDRESS,
+				new DeliveryOptions().setSendTimeout(3000));
 	}
 
 	void auth(JsonObject param, Handler<AsyncResult<String>> result);
