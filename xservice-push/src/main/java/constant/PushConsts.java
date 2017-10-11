@@ -78,4 +78,22 @@ public class PushConsts {
 
 	// 消息发送方身份前缀
 	public static final String MESSAGE_SENDER_PREFIX = "sender_";
+	
+	//公司消息推送：推送司机方式(按供应商)
+	public static final String COMPANY_MSG_SENDALL_TYPE_PROVIDER="1";
+	
+	//公司消息推送：推送司机方式(按服务城市)
+	public static final String COMPANY_MSG_SENDALL_TYPE_CITY="2";
+	
+	//公司消息推送：推送司机方式(选择司机推送)
+	public static final String COMPANY_MSG_SENDALL_TYPE_DRIVERS="3";
+	
+	//公司消息推送：推送司机方式(所有司机推送)
+	public static final String COMPANY_MSG_SENDALL_TYPE_ALLDRIVER="4";
+	
+	//用户类型：乘客
+	public static final int USER_TYPE_PASSENGER=0;
+	
+	//用户类型：司机
+	public static final int USER_TYPE_DRIVER=1;
 }

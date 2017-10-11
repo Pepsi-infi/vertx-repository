@@ -406,8 +406,8 @@
       		data.forEach((element,index)=>{
       			if(element!==null){
       				let e={};
-      				e.label=element.providerName;
-      				e.value=element.providerId+"";
+      				e.label=element.name;
+      				e.value=element.id+"";
       				this.providerOptions.push(e);
       			}
       		});

@@ -235,6 +235,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 		Future<JsonObject> resultFuture = Future.future();
 		Map<String, String> params = new HashMap<>();
+		params.put("cid", "");
+		params.put("sid", "");
 
 		HttpUtil.doGet(params, config.getString("provider.url"), resultFuture.completer());
 
@@ -242,7 +244,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 			if (handler.succeeded()) {
 				JsonObject result = handler.result();
 				logger.info("query provider list result:" + result);
-				this.dealRemoteCityListResult(result, response);
+				this.dealRemoteProviderListResult(result, response);
 			} else {
 				logger.error("供应商列表接口调用异常", handler.cause());
 				HttpUtil.writeFailResponse2Client(response.getDelegate(), "server is error");
@@ -305,6 +307,36 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 		HttpUtil.writeSuccessResponse2Client(response.getDelegate(), cityArray);
 
+	}
+	
+	private void dealRemoteProviderListResult(JsonObject result, HttpServerResponse response) {
+		if (result == null) {
+			logger.error("query provider list result is null");
+			HttpUtil.writeFailResponse2Client(response.getDelegate(), "query result is null");
+			return;
+		}
+		
+		int code = result.getInteger("code");
+		String msg = result.getString("msg");
+		
+		if (ErrorCodeEnum.SUCCESS.getCode() != code) {
+			logger.error(msg);
+			HttpUtil.writeFailResponse2Client(response.getDelegate(), msg);
+			return;
+		}
+		
+		JsonArray providerArray = (JsonArray) result.getValue("data");
+		
+//		JsonArray providerArray = new JsonArray();
+//		
+//		Iterator<Entry<String, Object>> iter = providerJson.iterator();
+//		while (iter.hasNext()) {
+//			Entry<String, Object> entry = iter.next();
+//			providerArray.addAll((JsonArray) entry.getValue());
+//		}
+		
+		HttpUtil.writeSuccessResponse2Client(response.getDelegate(), providerArray);
+		
 	}
 
 	private void getDriverList(RoutingContext context) {
