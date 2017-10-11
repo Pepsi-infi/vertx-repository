@@ -2,6 +2,9 @@ package util;
 
 
 import java.security.MessageDigest;
+import java.util.Base64;
+
+import utils.MD5;
 
 public class Md5Util {
 	
@@ -56,8 +59,15 @@ public class Md5Util {
 
 	public static void main(String[] args) {
 		try {
-			String token=md5Encode("login18810616483");
-			System.out.println(token+":"+token.length());
+			System.out.println(md5Encode("hello1234"));
+			System.out.println(MD5.Md5("hello1234"));
+			String encodeStr=Base64.getEncoder().encodeToString("hello1234".getBytes());
+			String originStr=new String(Base64.getDecoder().decode(encodeStr));
+			System.out.println(encodeStr);
+			System.out.println(originStr);
+			
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

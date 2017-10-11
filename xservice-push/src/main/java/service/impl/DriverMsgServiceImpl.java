@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 
+import constant.PushConsts;
 import domain.DriverMsg;
 import domain.Page;
 import enums.ErrorCodeEnum;
@@ -830,11 +831,11 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		String sendAll = dto.getString("sendAll");
 		String driverIdsStr = dto.getString("driverIds");
 		// supplierId=0 查询全部供应商
-		String supplierId = dto.getString("supplierId");
+		String supplierId = dto.getString("providerId");
 		// cityIds=0 查询全部城市
 		String cityIdsStr = dto.getString("cityIds");
 
-		if ("1".equals(sendAll) || "2".equals(sendAll) || "4".equals(sendAll)) {
+		if (PushConsts.COMPANY_MSG_SENDALL_TYPE_PROVIDER.equals(sendAll) || PushConsts.COMPANY_MSG_SENDALL_TYPE_CITY.equals(sendAll) || PushConsts.COMPANY_MSG_SENDALL_TYPE_ALLDRIVER.equals(sendAll)) {
 
 			JsonArray cityIdsArray = new JsonArray();
 			String[] cityIds = null;
@@ -856,7 +857,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			return query;
 		}
 
-		if ("3".equals(sendAll) && !StringUtil.isNullOrEmpty(driverIdsStr) && driverIdsStr.length() > 0) {
+		if (PushConsts.COMPANY_MSG_SENDALL_TYPE_DRIVERS.equals(sendAll) && !StringUtil.isNullOrEmpty(driverIdsStr) && driverIdsStr.length() > 0) {
 
 			JsonArray driverIdsArray = new JsonArray();
 			if (driverIdsStr.length() > 0) {
@@ -926,7 +927,9 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 
 		while (iter.hasNext()) {
 			// 逐条发送
+			// 1.构建消息
 			Map<String, String> driverMsg = composeMsg((JsonObject) iter.next(), dto);
+			// 2.发送消息
 			Future<String> sendFuture = this.sendDriverMsg(driverMsg);
 			futures.add(sendFuture);
 		}
@@ -956,15 +959,15 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 
 	private Map<String, String> composeMsg(JsonObject driver, JsonObject dto) {
 		Map<String, String> news = new HashMap<>();
-		news.put("newId", dto.getString("id"));
-		news.put("isScreen", dto.getString("isShellsScreen"));
-		news.put("title", dto.getString("title"));
-		news.put("detil", dto.getString("content"));
-		news.put("linkAdd", dto.getString("jumpUrl"));
-		news.put("msgTime", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
-		news.put("ifImport", dto.getString("isImportant"));
-		news.put("userId", driver.getInteger("driverId") + "");
-		news.put("userType", "1");// 0：乘客 1：司机
+		news.put("newId", dto.getString("id"));//消息ID
+		news.put("isScreen", dto.getString("isShellsScreen"));//是否弹屏: 1-是   0-否
+		news.put("title", dto.getString("title"));//消息标题
+		news.put("detil", dto.getString("content"));//消息内容
+		news.put("linkAdd", dto.getString("jumpUrl"));//跳转url
+		news.put("msgTime", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));//消息发送时间
+		news.put("ifImport", dto.getString("isImportant"));//是否重要：1-是  0-否
+		news.put("userId", driver.getInteger("driverId") + "");//司机ID
+		news.put("userType", PushConsts.USER_TYPE_DRIVER+"");// 0：乘客 1：司机
 		return news;
 	}
 }
