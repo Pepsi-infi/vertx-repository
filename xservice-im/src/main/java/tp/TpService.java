@@ -19,7 +19,7 @@ public interface TpService {
 
 	static TpService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(TpService.class, vertx, SERVICE_ADDRESS,
-				new DeliveryOptions().setSendTimeout(3000));
+				new DeliveryOptions().setSendTimeout(2000));
 	}
 
 	void auth(JsonObject param, Handler<AsyncResult<String>> result);
