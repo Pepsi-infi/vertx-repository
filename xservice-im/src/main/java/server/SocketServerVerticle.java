@@ -83,6 +83,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 					@Override
 					public void handle(Buffer buffer) {
+						long start = System.currentTimeMillis();
+
 						logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
 
 						if (buffer.toString().startsWith("get /mobile?")
@@ -124,15 +126,15 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							int cmd = message.getInteger("cmd");
 							switch (cmd) {
 							case 14:// heart beat
-								heartBeat(handlerID);
+								heartBeat(handlerID, start);
 
-//								logger.info("updateOnlineSimple, message={}", message);
-//								updateOnlineSimple(innerIP, handlerID, message);
-//								simpleHeartBeatCount++;
-//								if (simpleHeartBeatCount == 10) {
-//									updateOnlineState(innerIP, handlerID, message);
-//									simpleHeartBeatCount = 0;
-//								}
+								// logger.info("updateOnlineSimple, message={}", message);
+								// updateOnlineSimple(innerIP, handlerID, message);
+								// simpleHeartBeatCount++;
+								// if (simpleHeartBeatCount == 10) {
+								// updateOnlineState(innerIP, handlerID, message);
+								// simpleHeartBeatCount = 0;
+								// }
 								break;
 							case 17:// 订阅
 								subscribe(handlerID, message);
@@ -453,7 +455,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	 * 
 	 * @param writeHandlerID
 	 */
-	private void heartBeat(String writeHandlerID) {
+	private void heartBeat(String writeHandlerID, long start) {
 		JsonObject message = new JsonObject();
 		message.put("cmd", 14);
 
@@ -467,6 +469,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				.appendBytes(message.encode().getBytes());
 
 		eb.send(writeHandlerID, bf);
+
+		logger.info("heartBeat={}", System.currentTimeMillis() - start);
 	}
 
 	private void setClientOnline(String userId) {
