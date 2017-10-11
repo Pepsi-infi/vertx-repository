@@ -49,8 +49,8 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 		JsonObject circuitObject = config.getJsonObject("circuit-breaker");
 		JsonObject cbOptions = circuitObject != null ? circuitObject : new JsonObject();
 		CircuitBreakerOptions options = new CircuitBreakerOptions();
-		options.setMaxFailures(cbOptions.getInteger("max-failures", 5));
-		options.setTimeout(cbOptions.getLong("timeout", 10000L));
+		options.setMaxFailures(cbOptions.getInteger("max-failures", 3));
+		options.setTimeout(cbOptions.getLong("timeout", 3000L));
 		options.setFallbackOnFailure(true);
 		options.setResetTimeout(cbOptions.getLong("reset-timeout", 30000L));
 		String name = cbOptions.getString("name", "circuit-breaker");
