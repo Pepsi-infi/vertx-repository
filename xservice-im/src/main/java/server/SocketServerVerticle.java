@@ -47,7 +47,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	@Override
 	public void start() throws Exception {
 		super.start();
-		
+
 		ipMap.put("10.10.10.102", "111.206.162.233:8088");
 		ipMap.put("10.10.10.103", "111.206.162.234:8088");
 
@@ -56,7 +56,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		innerIP = IPUtil.getInnerIP();
 
 		publishTCPService(SocketServerVerticle.class.getName(), innerIP,
-				new JsonObject().put("publicAddress", ipMap.get(innerIP)));
+				new JsonObject().put("publicAddress", ipMap.get(innerIP)).put("innerIP", innerIP));
 
 		logger.info("start...innerIP={}", innerIP);
 

@@ -40,32 +40,26 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	@Override
 	public void start() throws Exception {
 		super.start();
-		
+
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
 
-		this.realSocketNodes.add("111.206.162.233:8088");
-		this.realSocketNodes.add("111.206.162.234:8088");
-
-		JsonObject filter = new JsonObject().put("type", "socket-server");
-		vertx.setPeriodic(5000, handler -> {
-			discovery.getRecords(filter, result -> {
-				if (result.succeeded()) {
-					List<Record> records = result.result();
-					for (Record r : records) {
-						String address = r.getMetadata().getString("publicAddress");
-						logger.info("publicAddress, {}", address);
-					}
-				}
-			});
-		});
+		// this.realSocketNodes.add("111.206.162.233:8088");
+		// this.realSocketNodes.add("111.206.162.234:8088");
 
 		this.realInnerNodes = new ArrayList<String>();
-		realInnerNodes.add("10.10.10.102");
-		realInnerNodes.add("10.10.10.103");
+		// realInnerNodes.add("10.10.10.102");
+		// realInnerNodes.add("10.10.10.103");
 
+		getNodesFromDiscovery();
 		initSocketNodes();
 		initInnerNodes();
+
+		vertx.setPeriodic(5000, handler -> {
+			getNodesFromDiscovery();
+			initSocketNodes();
+			initInnerNodes();
+		});
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
@@ -89,6 +83,27 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 				}
 			}
 		});
+	}
+
+	private void getNodesFromDiscovery() {
+		JsonObject filter = new JsonObject().put("type", "socket-server");
+		discovery.getRecords(filter, result -> {
+			if (result.succeeded()) {
+				List<Record> records = result.result();
+				for (Record r : records) {
+					String publicAddress = r.getMetadata().getString("publicAddress");
+					String innerIP = r.getMetadata().getString("innerIP");
+					if (!realSocketNodes.contains(publicAddress)) {
+						realSocketNodes.add(publicAddress);
+					}
+					if (!realInnerNodes.contains(innerIP)) {
+						realInnerNodes.add(innerIP);
+					}
+					logger.info("publicAddress={}innerNodes={}", publicAddress, innerIP);
+				}
+			}
+		});
+
 	}
 
 	/**
