@@ -39,6 +39,8 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 	@Override
 	public void start() throws Exception {
+		super.start();
+		
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
 
