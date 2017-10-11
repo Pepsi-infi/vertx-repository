@@ -16,14 +16,17 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(SocketServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(UdpServerVerticle.class.getName());
 
 		vertx.deployVerticle(TpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(MessageSendVerticle.class.getName(), readBossOpts().setConfig(config()));
 
-		vertx.deployVerticle(SocketSessionVerticle.class.getName());
-
 		vertx.deployVerticle(RestSocketVerticle.class.getName(), readBossOpts().setConfig(config()));
+
+		// Just one instance because of port conflicts.
+		vertx.deployVerticle(UdpServerVerticle.class.getName());
+
+		// Just one instance because of ehcache.
+		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 	};
 
 	public static DeploymentOptions readBossOpts() {

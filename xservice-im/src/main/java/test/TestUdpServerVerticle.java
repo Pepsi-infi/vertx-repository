@@ -1,4 +1,4 @@
-package server;
+package test;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.datagram.DatagramSocket;

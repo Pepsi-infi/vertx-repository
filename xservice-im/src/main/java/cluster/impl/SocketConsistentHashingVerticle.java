@@ -9,8 +9,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -45,19 +43,13 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
-
-		// this.realSocketNodes.add("111.206.162.233:8088");
-		// this.realSocketNodes.add("111.206.162.234:8088");
-
 		this.realInnerNodes = new ArrayList<String>();
-		// realInnerNodes.add("10.10.10.102");
-		// realInnerNodes.add("10.10.10.103");
 
 		getNodesFromDiscovery();
 		initSocketNodes();
 		initInnerNodes();
 
-		vertx.setPeriodic(5000, handler -> {
+		vertx.setPeriodic(3000, handler -> {
 			getNodesFromDiscovery();
 			initSocketNodes();
 			initInnerNodes();
@@ -214,9 +206,5 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		}
 
 		return result;
-	}
-
-	public void getNodeWithNodeList(String key, List<String> nodes, Handler<AsyncResult<String>> resultHandler) {
-
 	}
 }

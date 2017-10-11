@@ -17,6 +17,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -48,8 +49,11 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		ipMap.put("10.10.10.102", "111.206.162.233:8088");
-		ipMap.put("10.10.10.103", "111.206.162.234:8088");
+		JsonArray socketNodes = config().getJsonArray("socket");
+		for (Object object : socketNodes) {
+			JsonObject node = JsonObject.mapFrom(object);
+			ipMap.put(node.getString("innerIP"), node.getString("node"));
+		}
 
 		eb = vertx.eventBus();
 		tpService = TpService.createProxy(vertx);
@@ -58,7 +62,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		publishTCPService(SocketServerVerticle.class.getName(), innerIP,
 				new JsonObject().put("publicAddress", ipMap.get(innerIP)).put("innerIP", innerIP));
 
-		logger.info("start...innerIP={}", innerIP);
+		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());
 
 		NetServerOptions options = new NetServerOptions().setPort(8088);
 		NetServer server = vertx.createNetServer(options);
@@ -83,9 +87,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 						if (buffer.toString().startsWith("get /mobile?")
 								|| buffer.toString().contains("get /mobile?")) {
-							logger.info("send login, ");
 							op = 1;
-							logger.info("socket host={}", socket.localAddress().host());
 						}
 
 						switch (op) {
@@ -109,8 +111,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							break;
 						case 2:
 							op = 3;
-							logger.info("header, handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
-
 							int bodyLength = buffer.getInt(0);
 							parser.fixedSizeMode(bodyLength);
 
@@ -129,8 +129,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 								logger.info("updateOnlineSimple, message={}", message);
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
-								logger.info("simpleHeartBeatCount, handlerID={}count={}", handlerID,
-										simpleHeartBeatCount);
 								if (simpleHeartBeatCount == 10) {
 									updateOnlineState(innerIP, handlerID, message);
 									simpleHeartBeatCount = 0;
@@ -157,13 +155,13 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				socket.closeHandler(v -> {
 					setClientOffline(handlerID);
 					sessionLogout(handlerID);
-					logger.info("closeHandler, handlerID={} close", handlerID);
+					logger.info("closeHandler, handlerID={}", handlerID);
 				});
 
 				socket.exceptionHandler(t -> {
 					setClientOffline(handlerID);
 					sessionLogout(handlerID);
-					logger.info("exceptionHandler, handlerID={} close", handlerID);
+					logger.info("exceptionHandler, handlerID={}", handlerID);
 				});
 			}
 
@@ -193,7 +191,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				try {
 					data = message.getJsonObject("data");
 				} catch (Exception e) {
-					logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
 					try {
 						HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
 								HeartBeat.class);
@@ -241,7 +238,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					try {
 						data = message.getJsonObject("data");
 					} catch (Exception e) {
-						logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
 						try {
 							HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
 									HeartBeat.class);
@@ -417,9 +413,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		String cid = paramMap.get("cid");
 		String version = paramMap.get("ver");
 
-		logger.info("Params handlerID={} userId={} hash={} mid={} cid={} version={}", writeHandlerID, userId, hash, mid,
-				cid, version);
-
 		JsonObject param = new JsonObject();
 		param.put("userId", userId);
 		param.put("hash", hash);
@@ -450,7 +443,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		message.put("data", data);
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
-		logger.info("loginConfirm, handlerID={} bf={}", writeHandlerID, bf);
+		logger.info("loginConfirm, Params handlerID={} userId={} hash={} mid={} cid={} version={}, bf={}",
+				writeHandlerID, userId, hash, mid, cid, version, bf);
 		eb.send(writeHandlerID, bf);
 	}
 
@@ -471,12 +465,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
 				.appendBytes(message.encode().getBytes());
-		int msgLength = message.encode().getBytes().length;
-		byte[] result = ByteUtil.intToBytes(msgLength);
-		logger.info("heart beat, byteLength={}", msgLength);
-
-		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message.encode(),
-				message.encode().length());
 
 		eb.send(writeHandlerID, bf);
 	}
@@ -534,7 +522,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("subscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
 					sendReLogin(handlerID, null);
@@ -544,9 +531,10 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 					tpService.subscribe(subscribeParam, r -> {
 						if (r.succeeded()) {
-							logger.info("subscribe, result={}", r.result());
+							logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
 						} else {
-							logger.error("subscribe, e={}", r.cause().getMessage());
+							logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
 						}
 					});
 				}
@@ -568,7 +556,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("unsubscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
 					sendReLogin(handlerID, null);
@@ -578,9 +565,10 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 					tpService.unsubscribe(subscribeParam, r -> {
 						if (r.succeeded()) {
-							logger.info("unsubscribe, result={}", r.result());
+							logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
 						} else {
-							logger.error("unsubscribe, e={}", r.cause());
+							logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
 						}
 					});
 				}

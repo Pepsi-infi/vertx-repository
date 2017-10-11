@@ -57,8 +57,6 @@ public class MessageSendVerticle extends AbstractVerticle {
 		JsonObject param = new JsonObject();
 		param.put("userId", userId);
 
-		logger.info("sendMsg, userId={}innerIP={}", userId, innerIP);
-
 		Future<Message<JsonObject>> ssFuture = Future.future();
 		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, SocketSessionOption,
 				ssFuture.completer());
@@ -72,8 +70,8 @@ public class MessageSendVerticle extends AbstractVerticle {
 					try {
 						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
 								.appendString(msg2Send.encode());
-						logger.info("sendMsg, handlerID={} header={} bf={}", handlerID,
-								msg2Send.encode().getBytes("UTF-8").length, bf);
+						logger.info("sendMsg, userId={} innerIP={} handlerID={} header={} bf={}", userId, innerIP,
+								handlerID, msg2Send.encode().getBytes("UTF-8").length, bf);
 					} catch (UnsupportedEncodingException e) {
 						logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
 					}
