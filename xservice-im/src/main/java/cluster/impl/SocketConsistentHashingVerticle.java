@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
@@ -93,10 +95,10 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 				for (Record r : records) {
 					String publicAddress = r.getMetadata().getString("publicAddress");
 					String innerIP = r.getMetadata().getString("innerIP");
-					if (!realSocketNodes.contains(publicAddress)) {
+					if (!realSocketNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
 						realSocketNodes.add(publicAddress);
 					}
-					if (!realInnerNodes.contains(innerIP)) {
+					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
 						realInnerNodes.add(innerIP);
 					}
 					logger.info("publicAddress={}innerNodes={}", publicAddress, innerIP);
