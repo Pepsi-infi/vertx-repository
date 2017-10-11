@@ -128,13 +128,13 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID, start);
 
-								// logger.info("updateOnlineSimple, message={}", message);
-								// updateOnlineSimple(innerIP, handlerID, message);
-								// simpleHeartBeatCount++;
-								// if (simpleHeartBeatCount == 10) {
-								// updateOnlineState(innerIP, handlerID, message);
-								// simpleHeartBeatCount = 0;
-								// }
+								logger.info("updateOnlineSimple, message={}", message);
+								updateOnlineSimple(innerIP, handlerID, message);
+								simpleHeartBeatCount++;
+								if (simpleHeartBeatCount == 10) {
+									updateOnlineState(innerIP, handlerID, message);
+									simpleHeartBeatCount = 0;
+								}
 								break;
 							case 17:// 订阅
 								subscribe(handlerID, message);

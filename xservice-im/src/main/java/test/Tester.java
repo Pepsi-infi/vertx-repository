@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 
 import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -38,11 +39,11 @@ public class Tester {
 		// vertx.deployVerticle(UdpServerVerticle.class.getName());
 		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
 
-		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
-		vertx.deployVerticle(RestSocketVerticle.class.getName());
-		vertx.deployVerticle(SocketSessionVerticle.class.getName());
+//		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
+//		vertx.deployVerticle(RestSocketVerticle.class.getName());
+//		vertx.deployVerticle(SocketSessionVerticle.class.getName());
 		
-//		vertx.deployVerticle(SocketClientVerticle.class.getName());
+		vertx.deployVerticle(SocketClientVerticle.class.getName(), new DeploymentOptions().setInstances(1000));
 		
 
 		// ----------------------
