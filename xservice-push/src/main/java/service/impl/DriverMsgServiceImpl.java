@@ -850,7 +850,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			if (cityIdsArray.size() > 0) {
 				query.put("cityId", new JsonObject().put("$in", cityIdsArray));
 			}
-			if (!StringUtil.isNullOrEmpty(supplierId)) {
+			if (!StringUtil.isNullOrEmpty(supplierId)&&PushConsts.COMPANY_MSG_SENDALL_TYPE_PROVIDER.equals(sendAll)&&!"0".equals(supplierId)) {
 				query.put("supplierId", Integer.valueOf(supplierId));
 			}
 

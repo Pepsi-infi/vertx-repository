@@ -365,7 +365,8 @@
       		this.showProvider=true;
         	this.showCity=false;
         	this.showDriver=false; 
-        	this.form.providerId='0'; 
+        	this.form.providerId='0';
+        	this.form.cityIds=[]; 
       	}else if(sendAll==2){
       		this.showProvider=false;
         	this.showCity=true;
@@ -373,7 +374,7 @@
         	this.form.cooperationTypeArr=['5','6','7'];
         	this.isIndeterminate = true;
         	this.checkAll=true;
-        	this.form.cityIds=[];
+        	//this.form.cityIds=[];
       	}else if(sendAll==3){
       		this.showProvider=false;
         	this.showCity=false;
