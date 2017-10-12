@@ -199,7 +199,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 					}
 				}
 			} catch (Exception e) {
-				logger.error("logout, buffer={} e={}", bufferBody, e.getMessage());
+				logger.error("logout, buffer={} e={}", bufferBody, e.getCause().getMessage());
 			}
 		} else {
 			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
@@ -212,6 +212,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 			try {
 				jsonBody = bufferBody.toJsonObject();
 				if (jsonBody != null) {
+					logger.info("msgRequest, json={}", jsonBody);
 					String from = jsonBody.getString("fromTel");
 					String to = jsonBody.getString("toTel");
 					if (StringUtils.isNotEmpty(from) && StringUtils.isNotEmpty(to)) {
@@ -225,6 +226,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 						Future<String> hashFuture = Future.future();
 						consistentHashingService.getNode(to, hashFuture.completer());
 						hashFuture.setHandler(res -> {
+							logger.info("msgRequest, hashFuture={}", res.result());
 							if (res.succeeded()) {
 								JsonObject param = new JsonObject();
 

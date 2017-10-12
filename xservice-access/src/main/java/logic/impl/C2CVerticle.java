@@ -51,6 +51,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		String innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(C2CVerticle.SERVICE_ADDRESS + innerIP, res -> {
+			logger.info("C2CVerticle, {}", res.body().encode());
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {
@@ -79,7 +80,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			}
 			if (StringUtils.isNotEmpty(to)) {
 				sessionService.getHandlerIDByUid(to, res -> {
-					
+					logger.info("sendMessage, {}", res.result());
 					if (res.succeeded()) {
 						String toHandlerID = res.result();
 						JsonObject header = msg.getJsonObject("header");
