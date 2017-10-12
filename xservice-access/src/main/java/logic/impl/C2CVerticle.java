@@ -79,6 +79,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			}
 			if (StringUtils.isNotEmpty(to)) {
 				sessionService.getHandlerIDByUid(to, res -> {
+					
 					if (res.succeeded()) {
 						String toHandlerID = res.result();
 						JsonObject header = msg.getJsonObject("header");
@@ -96,6 +97,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd, bodyLength);
+						logger.info("sendMessage, {}", body.toString());
 						eb.send(toHandlerID, headerBuffer.appendString(body.toString()).appendString("\001"));
 
 						/**

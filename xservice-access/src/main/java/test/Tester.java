@@ -4,14 +4,24 @@ import cluster.impl.ConsistentHashingVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import logic.impl.C2CVerticle;
+import logic.impl.SessionVerticle;
 import server.HttpServerVerticle;
+import server.TCPServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(ConsistentHashingVerticle.class.getName());
-		vertx.deployVerticle(HttpServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
+
+		/**
+		 * Instance should be 1 because of ehcache.
+		 */
+		vertx.deployVerticle(SessionVerticle.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.
@@ -33,5 +43,12 @@ public class Tester {
 
 		JsonObject jsonObject = new JsonObject(prop);
 		return jsonObject;
+	}
+
+	public static DeploymentOptions readBossOpts() {
+		DeploymentOptions options = new DeploymentOptions();
+		options.setInstances(Runtime.getRuntime().availableProcessors());
+
+		return options;
 	}
 }
