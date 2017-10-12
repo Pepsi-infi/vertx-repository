@@ -11,6 +11,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -82,10 +83,16 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 				logger.error("sendMessage, Parse json error.", e);
 			}
 			if (StringUtils.isNotEmpty(to)) {
-				sessionService.getHandlerIDByUid(to, res -> {
+
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", "getHandlerIDByUid");
+				option.setSendTimeout(3000);
+				JsonObject p = new JsonObject().put("to", to);
+				eb.<JsonObject>send(SessionService.SERVICE_ADDRESS + "10.10.10.193", p, option, res -> {
 					logger.info("sendMessage, {}", res.result());
 					if (res.succeeded()) {
-						String toHandlerID = res.result();
+						JsonObject res11 = res.result().body();
+						String toHandlerID = res11.getString("handlerID");
 						JsonObject header = msg.getJsonObject("header");
 						JsonObject body = msg.getJsonObject("body");
 						long ts = System.currentTimeMillis();
@@ -112,7 +119,9 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 					} else {
 						logger.error("sendMessage error.", res.cause());
 					}
+
 				});
+
 			} else {
 				result = 1;
 			}
