@@ -94,7 +94,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						body.put("msgId", ts);
 						body.put("cmd", cmd);
 						body.put("timeStamp", ts);
-						body.put("date", LocalDate.now());
+						body.put("date", LocalDate.now().toString());
 						body.put("status", cmd);// 已发送，未确认
 
 						int bodyLength = body.toString().length();
@@ -124,5 +124,9 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	@Override
 	public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
 		//  gei to fa msg, xiao xi ru ku
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(LocalDate.now().toString());
 	}
 }
