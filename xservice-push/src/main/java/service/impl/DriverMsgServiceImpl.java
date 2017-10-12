@@ -654,8 +654,9 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		int listSize = (int) (totalCount % BATCH_UPDATE_SIZE == 0 ? totalCount / BATCH_UPDATE_SIZE
 				: totalCount / BATCH_UPDATE_SIZE + 1);
 		JsonArray driversArray = new JsonArray();
-		// 批量新增集合
+		// 批量新增Future集合
 		List<Future> addFutureList = new ArrayList<>();
+		// 批量发送消息Future集合
 		List<Future> sendFutureList = new ArrayList<>();
 		mongoClient.findBatch("driver", query, mongoRes -> {
 			if (mongoRes.succeeded()) {
@@ -678,7 +679,9 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 						if (addFutureList.size() == listSize) {
 							logger.info("addFutureList size=" + addFutureList.size());
 							// this.dealAddListFutures(addFutureList,listSize,resultHandler);
+							// join批量新增结果
 							Future<Integer> addFuture = this.dealAddListFutures(addFutureList, listSize);
+							// join批量发送结果
 							Future<Integer> sendFuture = this.dealSendListFutures(sendFutureList, listSize);
 							this.dealFuture(addFuture, sendFuture, handler);
 						}
@@ -850,7 +853,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			if (cityIdsArray.size() > 0) {
 				query.put("cityId", new JsonObject().put("$in", cityIdsArray));
 			}
-			if (!StringUtil.isNullOrEmpty(supplierId)) {
+			if (!StringUtil.isNullOrEmpty(supplierId)&&PushConsts.COMPANY_MSG_SENDALL_TYPE_PROVIDER.equals(sendAll)&&!"0".equals(supplierId)) {
 				query.put("supplierId", Integer.valueOf(supplierId));
 			}
 
