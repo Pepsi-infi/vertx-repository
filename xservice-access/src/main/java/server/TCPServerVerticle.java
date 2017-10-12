@@ -199,7 +199,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 					}
 				}
 			} catch (Exception e) {
-				logger.error("Msg body parse error, buffer={}", bufferBody);
+				logger.error("logout, buffer={} e={}", bufferBody, e.getMessage());
 			}
 		} else {
 			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
@@ -256,7 +256,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 					}
 				}
 			} catch (Exception e) {
-				logger.error("Msg body parse error, buffer={}", bufferBody);
+				logger.error("msgRequest, buffer={} e={}", bufferBody, e.getMessage());
 			}
 		} else {
 			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
