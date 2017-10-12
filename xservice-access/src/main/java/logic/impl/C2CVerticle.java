@@ -99,7 +99,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						long ts = System.currentTimeMillis();
 						int clientVersion = header.getInteger("clientVersion");
 						int cmd = header.getInteger("cmd");
-						body.put("msgId", ts);
+//						body.put("msgId", ts);
 						body.put("cmd", 2003);
 						body.put("timeStamp", ts);
 						body.put("date", LocalDate.now().toString());

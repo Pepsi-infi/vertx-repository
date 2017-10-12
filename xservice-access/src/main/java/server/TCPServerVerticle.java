@@ -97,6 +97,9 @@ public class TCPServerVerticle extends AbstractVerticle {
 	}
 
 	private void msgAck(String handlerID, int clientVersion, int cmd, Buffer bufferBody) {
+		
+		logger.info("msgAck, buffer={}", bufferBody);
+		
 		if (bufferBody != null && bufferBody.length() != 0) {
 			JsonObject jsonBody = null;
 			try {
