@@ -70,14 +70,15 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	}
 
 	private int sendMessage(MultiMap headers, JsonObject msg) {
+		logger.info("send start ... ");
 		int result = 0;
 		if (msg != null) {
 			String to = null;
 			try {
-				to = msg.getString("to");
+				to = msg.getJsonObject("body").getString("to");
 			} catch (Exception e) {
 				result = 1;
-				logger.error("Parse json error.", e);
+				logger.error("sendMessage, Parse json error.", e);
 			}
 			if (StringUtils.isNotEmpty(to)) {
 				sessionService.getHandlerIDByUid(to, res -> {
