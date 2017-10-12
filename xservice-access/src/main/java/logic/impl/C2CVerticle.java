@@ -99,16 +99,19 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						int clientVersion = header.getInteger("clientVersion");
 						int cmd = header.getInteger("cmd");
 						body.put("msgId", ts);
-						body.put("cmd", cmd);
+						body.put("cmd", 2003);
 						body.put("timeStamp", ts);
 						body.put("date", LocalDate.now().toString());
 						body.put("status", cmd);// 已发送，未确认
+						
+						body.put("fromTel", body.getString("from"));
+						body.put("toTel", body.getString("to"));
 
 						int bodyLength = body.toString().length();
 
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd, bodyLength);
-						logger.info("sendMessage, toHandlerID={}body={}", body.toString());
+						logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
 						eb.send(toHandlerID, headerBuffer.appendString(body.toString()).appendString("\001"));
 
 						/**
