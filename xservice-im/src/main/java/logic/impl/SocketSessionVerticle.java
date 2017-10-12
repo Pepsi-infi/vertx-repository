@@ -161,8 +161,6 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		JsonObject result = new JsonObject();
 		result.put("userId", sessionReverse.get(handlerID));
 
-		logger.info("getUidByHandlerID, {}", result.encode());
-
 		return result;
 	}
 

@@ -118,7 +118,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 						case 3:
 							op = 2;
 							parser.fixedSizeMode(4);
-							logger.info("body, handlerID={} body={} op={}", handlerID, buffer, op);
 
 							JsonObject message = buffer.toJsonObject();
 							int cmd = message.getInteger("cmd");
@@ -126,7 +125,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								logger.info("updateOnlineSimple, message={}", message);
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
 								if (simpleHeartBeatCount == 10) {
@@ -493,7 +491,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
 
 				JsonObject clientOfflineParam = new JsonObject();
 				clientOfflineParam.put("userId", uid);
