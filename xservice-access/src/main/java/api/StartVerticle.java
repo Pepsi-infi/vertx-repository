@@ -8,19 +8,19 @@ import io.vertx.core.logging.LoggerFactory;
 import logic.impl.C2CVerticle;
 import logic.impl.SessionVerticle;
 import persistence.impl.MongoVerticle;
-import server.HttpServerVerticle;
-import server.TCPServerVerticle;
+import server.RestServerVerticle;
+import server.IMServerVerticle;
 
 public class StartVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(StartVerticle.class);
 
 	public void start() throws Exception {
-		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(RestServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
-		
+
 		vertx.deployVerticle(MongoVerticle.class.getName());
 
 		/**

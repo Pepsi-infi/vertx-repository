@@ -6,22 +6,28 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import logic.impl.C2CVerticle;
 import logic.impl.SessionVerticle;
-import server.HttpServerVerticle;
-import server.TCPServerVerticle;
+import server.RestServerVerticle;
+import server.IMServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(TCPServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(IMServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(RestServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(C2CVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+
+		vertx.deployVerticle(TCPTest.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.
 		 */
-		vertx.deployVerticle(SessionVerticle.class.getName());
+		// vertx.deployVerticle(SessionVerticle.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.

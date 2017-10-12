@@ -9,14 +9,14 @@ import io.vertx.serviceproxy.ProxyHelper;
 
 @ProxyGen
 @VertxGen
-public interface SessionService {
+public interface IMSessionService {
 
-	static final String SERVICE_NAME = "logic.SessionService";
+	static final String SERVICE_NAME = IMSessionService.class.getName();
 
-	static final String SERVICE_ADDRESS = "logic.SessionService";
+	static final String SERVICE_ADDRESS = IMSessionService.class.getName();
 
-	static SessionService createProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(SessionService.class, vertx, SERVICE_ADDRESS);
+	static IMSessionService createProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(IMSessionService.class, vertx, SERVICE_ADDRESS);
 	}
 
 	void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler);

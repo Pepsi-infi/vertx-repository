@@ -53,7 +53,7 @@
 			<appender-ref ref="proxyFile" />
 		</logger>
 
-		<Root level="ERROR">
+		<Root level="info">
 			<!--<AppenderRef ref="Console" />-->
 			<AppenderRef ref="ServerFile" />
 		</Root>

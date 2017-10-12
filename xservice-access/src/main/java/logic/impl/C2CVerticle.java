@@ -18,7 +18,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
-import logic.SessionService;
+import logic.IMSessionService;
 import persistence.MongoService;
 import protocol.MessageBuilder;
 import utils.IPUtil;
@@ -35,7 +35,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 	private MongoService mongoService;
 
-	private SessionService sessionService;
+	private IMSessionService sessionService;
 
 	private static final String MONGO_COLLECTION = "message";
 
@@ -48,7 +48,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		XProxyHelper.registerService(C2CService.class, vertx, this, C2CService.SERVICE_ADDRESS);
 
 		mongoService = MongoService.createProxy(vertx);
-		sessionService = SessionService.createProxy(vertx);
+		sessionService = IMSessionService.createProxy(vertx);
 
 		String innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
@@ -89,7 +89,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 				option.addHeader("action", "getHandlerIDByUid");
 				option.setSendTimeout(3000);
 				JsonObject p = new JsonObject().put("to", to);
-				eb.<JsonObject>send(SessionService.SERVICE_ADDRESS + "10.10.10.193", p, option, res -> {
+				eb.<JsonObject>send(IMSessionService.SERVICE_ADDRESS + "10.10.10.193", p, option, res -> {
 					logger.info("sendMessage, {}", res.result());
 					if (res.succeeded()) {
 						JsonObject res11 = res.result().body();

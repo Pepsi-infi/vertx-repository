@@ -16,9 +16,9 @@ import io.vertx.rxjava.ext.web.RoutingContext;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
-public class HttpServerVerticle extends RestAPIVerticle {
+public class RestServerVerticle extends RestAPIVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestServerVerticle.class);
 
 	private SharedData sharedData;
 	private LocalMap<String, String> sessionMap;// uid -> handlerID

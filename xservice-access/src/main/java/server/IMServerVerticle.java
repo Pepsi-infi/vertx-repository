@@ -17,15 +17,15 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
-import logic.SessionService;
+import logic.IMSessionService;
 import logic.impl.C2CVerticle;
 import persistence.MongoService;
 import protocol.MessageBuilder;
 import util.ByteUtil;
 
-public class TCPServerVerticle extends AbstractVerticle {
+public class IMServerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(TCPServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(IMServerVerticle.class);
 
 	private C2CService c2cService;
 	private MongoService mongoService;
@@ -48,7 +48,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {
-			socket.handler(RecordParser.newDelimited("\001", buffer -> {
+			socket.handler(RecordParser.newDelimited(MessageBuilder.IM_MSG_SEPARATOR, buffer -> {
 				int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
 				int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
 				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
@@ -97,9 +97,9 @@ public class TCPServerVerticle extends AbstractVerticle {
 	}
 
 	private void msgAck(String handlerID, int clientVersion, int cmd, Buffer bufferBody) {
-		
+
 		logger.info("msgAck, buffer={}", bufferBody);
-		
+
 		if (bufferBody != null && bufferBody.length() != 0) {
 			JsonObject jsonBody = null;
 			try {
@@ -125,7 +125,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
-		logger.info("Msg Ack HeartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
+		logger.info("heartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 
 		// 1、心跳消息确认
 		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
@@ -150,15 +150,15 @@ public class TCPServerVerticle extends AbstractVerticle {
 						option.setSendTimeout(3000);
 						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
 						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
-						eb.send(SessionService.SERVICE_ADDRESS + "10.10.10.193", msg, option);
+						eb.send(IMSessionService.SERVICE_ADDRESS + "10.10.10.193", msg, option);
 
 						// 1、给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-								clientVersion, cmd + 100, 0);
+								clientVersion, cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 
 						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
 								clientVersion, cmd, bodyLength);
-						eb.send(handlerID, aMsgHeader.appendString("\001"));
+						eb.send(handlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
 
 						String sceneId = jsonBody.getString("sceneId");
 						if (StringUtils.isNotEmpty(sceneId)) {
@@ -193,7 +193,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 						option.addHeader("action", "delUserSocket");
 						option.setSendTimeout(3000);
 						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
+						eb.send(IMSessionService.SERVICE_ADDRESS, msg, option);
 
 						// 给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
@@ -228,6 +228,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 						//
 						Future<String> hashFuture = Future.future();
 						consistentHashingService.getNode(to, hashFuture.completer());
+
 						hashFuture.setHandler(res -> {
 							logger.info("msgRequest, hashFuture={}", res.result());
 							if (res.succeeded()) {

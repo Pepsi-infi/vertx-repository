@@ -19,10 +19,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
-import logic.SessionService;
+import logic.IMSessionService;
 import utils.IPUtil;
 
-public class SessionVerticle extends AbstractVerticle implements SessionService {
+public class SessionVerticle extends AbstractVerticle implements IMSessionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SessionVerticle.class);
 
@@ -33,7 +33,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		
-		XProxyHelper.registerService(SessionService.class, vertx, this, SessionService.SERVICE_ADDRESS);
+		XProxyHelper.registerService(IMSessionService.class, vertx, this, IMSessionService.SERVICE_ADDRESS);
 		
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
@@ -48,7 +48,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("innerIP={}", innerIP);
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS + innerIP, res -> {
+		eb.<JsonObject>consumer(IMSessionService.SERVICE_ADDRESS + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
@@ -74,7 +74,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 			}
 		});
 
-		eb.<JsonObject>consumer(SessionService.SERVICE_ADDRESS, res -> {
+		eb.<JsonObject>consumer(IMSessionService.SERVICE_ADDRESS, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
