@@ -6,12 +6,10 @@ import java.util.UUID;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 import api.RestConstant;
-import cluster.ConsistentHashingService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.eventbus.Message;
 import io.vertx.core.file.FileProps;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.http.HttpMethod;
@@ -20,7 +18,6 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import logic.C2CService;
 
 public class FileServerVerticle extends AbstractVerticle {
 
@@ -30,8 +27,8 @@ public class FileServerVerticle extends AbstractVerticle {
 
 	private String lastCreated;
 
-	private ConsistentHashingService consistentHashingService;
-	private C2CService c2cService;
+	// private ConsistentHashingService consistentHashingService;
+	// private C2CService c2cService;
 	private EventBus eb;
 	private String uploadFilePathPrefix;
 
@@ -41,8 +38,8 @@ public class FileServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 		HttpServer httpServer = vertx.createHttpServer();
 
-		c2cService = C2CService.createProxy(vertx);
-		consistentHashingService = ConsistentHashingService.createProxy(vertx);
+		// c2cService = C2CService.createProxy(vertx);
+		// consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		logger.info("config uploadFilePathPrefix " + uploadFilePathPrefix);
@@ -101,39 +98,61 @@ public class FileServerVerticle extends AbstractVerticle {
 							// content 文件地址 + ts 服务器时间戳 发给 to 的handler
 
 							Future<String> consistentHashFuture = Future.future();
-							consistentHashingService.getNode(to, consistentHashFuture.completer());
-							Future<Message<JsonObject>> sessionFuture = Future.future();
+							// consistentHashingService.getNode(to, consistentHashFuture.completer());
+
+//							DeliveryOptions option = new DeliveryOptions();
+//							option.setSendTimeout(3000);
+//							option.addHeader("action", "getNode");
+
+//							JsonObject param = new JsonObject();
+//							param.put("handlerID", );
+
+//							eb.<JsonObject>send(ConsistentHashingService.SERVICE_ADDRESS + "", param, option,
+//									reply -> {
+//
+//									});
+
+//							Future<Message<JsonObject>> sessionFuture = Future.future();
 							// 根据to去session查出对应handlerID
-							consistentHashFuture.setHandler(res -> {
-								if (res.succeeded()) {
-									DeliveryOptions option = new DeliveryOptions();
-									option.addHeader("action", "getHandlerIDByUid");
-									option.setSendTimeout(3000);
-									JsonObject rMsg = new JsonObject().put("to", to);
-									eb.send("session-eb-service" + res.result(), rMsg, option,
-											sessionFuture.completer());
-								} else {
-									logger.error("Consistent Hash ", res.cause());
-								}
+//							consistentHashFuture.setHandler(res -> {
+//								if (res.succeeded()) {
+//									DeliveryOptions option = new DeliveryOptions();
+//									option.addHeader("action", "getHandlerIDByUid");
+//									option.setSendTimeout(3000);
+//									JsonObject rMsg = new JsonObject().put("to", to);
+//									eb.send("session-eb-service" + res.result(), rMsg, option,
+//											sessionFuture.completer());
+//								} else {
+//									logger.error("Consistent Hash ", res.cause());
+//								}
+//							});
+							
+							
+							DeliveryOptions option = new DeliveryOptions();
+							option.addHeader("action", "getHandlerIDByUid");
+							option.setSendTimeout(3000);
+							JsonObject p = new JsonObject().put("to", to);
+							eb.<JsonObject>send("" + "10.10.10.193", p, option, res -> {
+								
 							});
 
 							Future<JsonObject> c2cFuture = Future.future();
-							sessionFuture.setHandler(res -> {
-								if (res.succeeded()) {
-									JsonObject result = res.result().body();
-									String toHandlerID = result.getString("handlerID");
-
-									JsonObject msgBody = new JsonObject();
-									msgBody.put("from", from);
-									msgBody.put("id", id);
-									msgBody.put("type", type);
-									JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion)
-											.put("body", msgBody).put("toHandlerID", toHandlerID);
-									c2cService.doWithFileUpload(rMsg, c2cFuture.completer());
-								} else {
-									logger.error("Session ", res.cause());
-								}
-							});
+//							sessionFuture.setHandler(res -> {
+//								if (res.succeeded()) {
+//									JsonObject result = res.result().body();
+//									String toHandlerID = result.getString("handlerID");
+//
+//									JsonObject msgBody = new JsonObject();
+//									msgBody.put("from", from);
+//									msgBody.put("id", id);
+//									msgBody.put("type", type);
+//									JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion)
+//											.put("body", msgBody).put("toHandlerID", toHandlerID);
+//									c2cService.doWithFileUpload(rMsg, c2cFuture.completer());
+//								} else {
+//									logger.error("Session ", res.cause());
+//								}
+//							});
 
 							JsonObject response = new JsonObject();
 							response.put("code", 0);
