@@ -244,7 +244,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 								DeliveryOptions option = new DeliveryOptions();
 								option.addHeader("action", "sendMessage");
 								option.setSendTimeout(1000);
-								eb.send(C2CVerticle.SERVICE_ADDRESS + res.result(), param, option);
+								eb.send(C2CVerticle.SERVICE_ADDRESS + res.result().split(":")[0], param, option);
 							}
 						});
 
