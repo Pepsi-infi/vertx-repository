@@ -1,5 +1,6 @@
 package logic.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 
 import org.apache.commons.lang.StringUtils;
@@ -103,11 +104,17 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						body.put("timeStamp", ts);
 						body.put("date", LocalDate.now().toString());
 						body.put("status", cmd);// 已发送，未确认
-						
+
 						body.put("fromTel", body.getString("from"));
 						body.put("toTel", body.getString("to"));
 
-						int bodyLength = body.toString().length();
+						int bodyLength = 0;
+						try {
+							bodyLength = body.toString().getBytes("UTF-8").length;
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd, bodyLength);
