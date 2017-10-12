@@ -8,6 +8,7 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 
+import helper.XProxyHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -17,6 +18,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import logic.C2CService;
 import logic.SessionService;
 import utils.IPUtil;
 
@@ -30,6 +32,9 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
+		
+		XProxyHelper.registerService(SessionVerticle.class, vertx, this, SessionVerticle.SERVICE_ADDRESS);
+		
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
