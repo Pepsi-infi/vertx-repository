@@ -76,6 +76,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			String to = null;
 			try {
 				to = msg.getJsonObject("body").getString("to");
+				logger.info("send to={}", to);
 			} catch (Exception e) {
 				result = 1;
 				logger.error("sendMessage, Parse json error.", e);
