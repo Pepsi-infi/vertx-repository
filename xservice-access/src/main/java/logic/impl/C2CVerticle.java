@@ -125,7 +125,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
 		//  gei to fa msg, xiao xi ru ku
 	}
-	
+
 	public static void main(String[] args) {
 		System.out.println(LocalDate.now().toString());
 	}

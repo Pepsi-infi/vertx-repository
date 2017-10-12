@@ -120,6 +120,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 
 	@Override
 	public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) {
+		logger.info("getHandlerIDByUid, uid={}handlerID={}", uid, sessionMap.get(uid));
 		resultHandler.handle(Future.succeededFuture(sessionMap.get(uid)));
 	}
 
