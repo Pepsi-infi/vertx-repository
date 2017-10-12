@@ -93,8 +93,9 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
 						realInnerNodes.add(innerIP);
 					}
-					logger.info("publicAddress={}innerNodes={}", publicAddress, innerIP);
 				}
+				logger.info("realSocketNodes={}realInnerNodes={}", realSocketNodes.toString(),
+						realInnerNodes.toString());
 			}
 		});
 

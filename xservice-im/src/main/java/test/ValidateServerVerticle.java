@@ -1,4 +1,4 @@
-package server;
+package test;
 
 import cluster.ConsistentHashingService;
 import io.vertx.core.AbstractVerticle;
