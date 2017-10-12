@@ -132,9 +132,9 @@ public class FileServerVerticle extends AbstractVerticle {
 							option.addHeader("action", "getHandlerIDByUid");
 							option.setSendTimeout(3000);
 							JsonObject p = new JsonObject().put("to", to);
-							eb.<JsonObject>send("" + "10.10.10.193", p, option, res -> {
-								
-							});
+//							eb.<JsonObject>send("" + "10.10.10.193", p, option, res -> {
+//								
+//							});
 
 							Future<JsonObject> c2cFuture = Future.future();
 //							sessionFuture.setHandler(res -> {
@@ -157,7 +157,7 @@ public class FileServerVerticle extends AbstractVerticle {
 							JsonObject response = new JsonObject();
 							response.put("code", 0);
 							response.put("time", System.currentTimeMillis());
-							request.response().end(response.encode());
+							request.response().putHeader("content-type", "application/json").end(response.encode());
 						});
 					});
 
