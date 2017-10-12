@@ -147,7 +147,7 @@ public class TCPServerVerticle extends AbstractVerticle {
 						option.setSendTimeout(3000);
 						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
 						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
-						eb.send(SessionService.SERVICE_ADDRESS, msg, option);
+						eb.send(SessionService.SERVICE_ADDRESS + "10.10.10.193", msg, option);
 
 						// 1、给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
