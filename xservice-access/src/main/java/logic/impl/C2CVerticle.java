@@ -56,6 +56,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			JsonObject param = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
+				logger.info("action={}", action);
 				switch (action) {
 				case "sendMessage":
 					res.reply(sendMessage(headers, param));
