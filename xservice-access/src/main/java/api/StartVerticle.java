@@ -7,6 +7,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.impl.C2CVerticle;
 import logic.impl.SessionVerticle;
+import persistence.impl.MongoVerticle;
 import server.HttpServerVerticle;
 import server.TCPServerVerticle;
 
@@ -19,6 +20,8 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(HttpServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
+		
+		vertx.deployVerticle(MongoVerticle.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.

@@ -33,7 +33,7 @@ public class SessionVerticle extends AbstractVerticle implements SessionService 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		
-		XProxyHelper.registerService(SessionVerticle.class, vertx, this, SessionVerticle.SERVICE_ADDRESS);
+		XProxyHelper.registerService(SessionService.class, vertx, this, SessionService.SERVICE_ADDRESS);
 		
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
