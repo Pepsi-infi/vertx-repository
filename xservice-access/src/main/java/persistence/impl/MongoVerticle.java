@@ -35,6 +35,8 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 		String collection = json.getString("collection");
 		JsonObject doc = json.getJsonObject("data");
 
+		logger.info("saveData, json={}", json.encode());
+
 		client.save(collection, doc, mongoRes -> {
 			if (mongoRes.succeeded()) {
 				resultHandler.handle(Future.succeededFuture(new JsonObject().put("result", 0)));

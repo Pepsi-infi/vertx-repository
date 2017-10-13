@@ -23,7 +23,7 @@ public class Tester {
 		// vertx.deployVerticle(C2CVerticle.class.getName(),
 		// readBossOpts().setConfig(config()));
 
-		// vertx.deployVerticle(TCPTest.class.getName());
+		vertx.deployVerticle(TCPTest.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.
@@ -44,8 +44,9 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		vertx.deployVerticle(RestIMVerticle.class.getName());
-		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
+		// vertx.deployVerticle(RestIMVerticle.class.getName());
+		// vertx.deployVerticle(MongoVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(getMongo()));
 	}
 
 	private static JsonObject getMongo() {
