@@ -16,6 +16,7 @@ import io.vertx.ext.mongo.BulkOperation;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.mongo.MongoClientBulkWriteResult;
+import persistence.message.IMMongoMessage;
 
 public class MongoVerticle extends AbstractVerticle {
 
@@ -119,22 +120,23 @@ public class MongoVerticle extends AbstractVerticle {
 	 * 
 	 * @param json
 	 */
-	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
-		JsonObject result = new JsonObject();
+	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<List<JsonObject>>> resultHandler) {
+		List<JsonObject> recordList = new ArrayList<JsonObject>();
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
+		options.setSort(new JsonObject().put(IMMongoMessage.key_timeStamp, 1));
 		client.findBatchWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
+				r.result().forEach(j -> {
+					recordList.add((JsonObject) j.getValue());
+				});
 				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
-				result.put("status", 0);
-				result.put("data", r.result());
 
-				resultHandler.handle(Future.succeededFuture(result));
+				resultHandler.handle(Future.succeededFuture(recordList));
 			} else {
-				result.put("status", 1);
 
-				resultHandler.handle(Future.succeededFuture(result));
+				resultHandler.handle(Future.succeededFuture(recordList));
 			}
 		});
 	}

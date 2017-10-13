@@ -23,7 +23,7 @@ public class Tester {
 		// vertx.deployVerticle(C2CVerticle.class.getName(),
 		// readBossOpts().setConfig(config()));
 
-		vertx.deployVerticle(TCPTest.class.getName());
+		// vertx.deployVerticle(TCPTest.class.getName());
 
 		/**
 		 * Instance should be 1 because of ehcache.
@@ -44,13 +44,12 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		// vertx.deployVerticle(RestIMVerticle.class.getName());
-		// vertx.deployVerticle(MongoVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(getMongo()));
+		vertx.deployVerticle(RestIMVerticle.class.getName());
+		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
 	}
 
 	private static JsonObject getMongo() {
-		String m = "{\"host\":\"10.10.10.178\",\"port\":27017,\"replicaSet\":\"foo\",\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"connectTimeoutMS\":300000,\"socketTimeoutMS\":100000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":300000,\"socketTimeoutMS\":100000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500,\"socket\":[{\"innerIP\":\"10.10.10.102\",\"node\":\"111.206.162.233:8088\"},{\"innerIP\":\"10.10.10.103\",\"node\":\"111.206.162.234:8088\"}]}";
+		String m = "{\"host\":\"10.10.10.178\",\"port\":27017,\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"db_name\":\"im-mc\",\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500,\"socket\":[{\"innerIP\":\"10.10.10.102\",\"node\":\"111.206.162.233:8088\"},{\"innerIP\":\"10.10.10.103\",\"node\":\"111.206.162.234:8088\"}]}";
 		return new JsonObject(m);
 	}
 

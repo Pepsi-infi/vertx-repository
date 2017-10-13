@@ -125,6 +125,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						mongoData.put(IMMongoMessage.key_content, body.getString(IMMessage.key_content));
 						mongoData.put(IMMongoMessage.key_msgType, body.getInteger(IMMessage.key_msgType));
 						mongoData.put(IMMongoMessage.key_cmdId, IMCmd.MSG_N);
+						mongoData.put(IMMongoMessage.key_timeStamp, ts);
 
 						mongoMsg.put("data", mongoData);
 
@@ -141,7 +142,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 								// 给FROM发A
 								JsonObject msgBody = new JsonObject();
 								msgBody.put(IMMessage.key_msgId, body.getString(IMMessage.key_msgId));
-								msgBody.put(IMMessage.key_timeStamp, System.currentTimeMillis());
+								msgBody.put(IMMessage.key_timeStamp, ts);
 								Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 										clientVersion, cmd + MessageBuilder.MSG_ACK_CMD_RADIX,
 										msgBody.toString().length());
