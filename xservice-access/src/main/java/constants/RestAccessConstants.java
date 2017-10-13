@@ -17,4 +17,11 @@ public class RestAccessConstants {
 	 * 
 	 */
 	public static final String SERVER = "/mc-im/server.json";
+
+	/**
+	 * 默认获得该订单最新100条消息，如果timestamp存在，则获得timestamp之前100条消息
+	 * 
+	 * param orderNo 订单号；timestamp
+	 */
+	public static final String GET_OFFLINE_MESSAGE = "/mc-im/message/offline/get.json";
 }

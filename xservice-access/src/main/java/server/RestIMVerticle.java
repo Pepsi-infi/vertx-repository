@@ -13,6 +13,7 @@ import io.vertx.core.shareddata.SharedData;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import persistence.MongoService;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
@@ -25,6 +26,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private LocalMap<String, String> sessionReverse; // handlerID -> uid
 	private ConsistentHashingService consistentHashingService;
 
+	private MongoService mongoService;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -34,11 +37,16 @@ public class RestIMVerticle extends RestAPIVerticle {
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
 		consistentHashingService = ConsistentHashingService.createProxy(vertx.getDelegate());
 
+		mongoService = MongoService.createProxy(vertx.getDelegate());
+
 		logger.info("Rest mc-access Verticle: Start...");
 
 		Router router = Router.router(vertx);
 		router.route(RestAccessConstants.ONLINE_NUMBER).handler(this::getOnlineNumber);
 		router.route(RestAccessConstants.SERVER).handler(this::getIMServer);
+
+		router.route(RestAccessConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
@@ -93,5 +101,25 @@ public class RestIMVerticle extends RestAPIVerticle {
 			context.response().putHeader("content-type", "application/json").end(Json.encode(response));
 		}
 
+	}
+
+	private void getOfflineMessage(RoutingContext context) {
+		String orderNo = context.request().getParam("orderNo");
+		String timestamp = context.request().getParam("timestamp");
+
+		JsonObject query = new JsonObject();
+		query.put("sceneId", orderNo);
+
+		JsonObject response = new JsonObject();
+
+		response.put("code", 0);
+		response.put("time", System.currentTimeMillis());
+
+		mongoService.findOffLineMessage(query, res -> {
+			if (res.succeeded()) {
+				JsonObject data = new JsonObject();
+				context.response().putHeader("content-type", "application/json").end(response.encode());
+			}
+		});
 	}
 }
