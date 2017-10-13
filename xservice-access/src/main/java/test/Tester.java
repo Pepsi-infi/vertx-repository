@@ -5,8 +5,8 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import logic.impl.C2CVerticle;
-import logic.impl.SessionVerticle;
-import server.RestServerVerticle;
+import logic.impl.IMSessionVerticle;
+import server.RestIMVerticle;
 import server.IMServerVerticle;
 
 public class Tester {

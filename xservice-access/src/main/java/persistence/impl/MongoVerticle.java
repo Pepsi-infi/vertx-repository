@@ -23,15 +23,11 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 
 	private MongoClient client;
 
-	private List<BulkOperation> opList;
-
 	@Override
 	public void start() throws Exception {
 		client = MongoClient.createShared(vertx, config());
 
 		XProxyHelper.registerService(MongoService.class, vertx, this, MongoService.SERVICE_ADDRESS);
-
-		opList = new ArrayList<BulkOperation>();
 	}
 
 	@Override
@@ -52,6 +48,8 @@ public class MongoVerticle extends AbstractVerticle implements MongoService {
 	public void saveDataBatch(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler) {
 		String collection = json.getString("collection");
 		JsonObject doc = json.getJsonObject("data");
+
+		List<BulkOperation> opList = new ArrayList<BulkOperation>();
 		opList.add(BulkOperation.createInsert(doc));
 
 		if (opList.size() == 100) {

@@ -1,7 +1,6 @@
 package logic.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -18,8 +17,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
-import logic.IMSessionService;
 import persistence.MongoService;
+import persistence.message.IMMongoMessage;
+import protocol.IMCmd;
+import protocol.IMMessage;
 import protocol.MessageBuilder;
 import utils.IPUtil;
 
@@ -29,15 +30,15 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 	private EventBus eb;
 
-	// private SharedData sharedData;
-	// private LocalMap<String, String> sessionMap;// uid -> handlerID
-	// private LocalMap<String, String> sessionReverse; // handlerID -> uid
-
 	private MongoService mongoService;
 
-	private IMSessionService sessionService;
-
 	private static final String MONGO_COLLECTION = "message";
+
+	public interface method {
+
+		public static final String sendMessage = "sendMessage";
+
+	}
 
 	@Override
 	public void start() throws Exception {
@@ -48,7 +49,6 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		XProxyHelper.registerService(C2CService.class, vertx, this, C2CService.SERVICE_ADDRESS);
 
 		mongoService = MongoService.createProxy(vertx);
-		sessionService = IMSessionService.createProxy(vertx);
 
 		String innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
@@ -86,10 +86,10 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 			if (StringUtils.isNotEmpty(to)) {
 
 				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", "getHandlerIDByUid");
+				option.addHeader("action", IMSessionVerticle.method.getHandlerIDByUid);
 				option.setSendTimeout(3000);
 				JsonObject p = new JsonObject().put("to", to);
-				eb.<JsonObject>send(IMSessionService.SERVICE_ADDRESS + "10.10.10.193", p, option, res -> {
+				eb.<JsonObject>send(IMSessionVerticle.class.getName() + "10.10.10.193", p, option, res -> {
 					logger.info("sendMessage, {}", res.result());
 					if (res.succeeded()) {
 						JsonObject res11 = res.result().body();
@@ -99,14 +99,10 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						long ts = System.currentTimeMillis();
 						int clientVersion = header.getInteger("clientVersion");
 						int cmd = header.getInteger("cmd");
-//						body.put("msgId", ts);
-						body.put("cmd", 2003);
-						body.put("timeStamp", ts);
-						body.put("date", LocalDate.now().toString());
-						body.put("status", cmd);// 已发送，未确认
-
-						body.put("fromTel", body.getString("from"));
-						body.put("toTel", body.getString("to"));
+						body.put(IMMessage.key_msgId, body.getString(IMMessage.key_msgId));
+						body.put(IMMessage.key_timeStamp, ts);
+						body.put(IMMessage.key_fromTel, body.getString("from"));
+						body.put(IMMessage.key_toTel, body.getString("to"));
 
 						int bodyLength = 0;
 						try {
@@ -119,19 +115,43 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 								clientVersion, cmd, bodyLength);
 						logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
-						eb.send(toHandlerID, headerBuffer.appendString(body.toString()).appendString("\001"));
+						eb.send(toHandlerID, headerBuffer.appendString(body.toString())
+								.appendString(MessageBuilder.IM_MSG_SEPARATOR));
+
+						JsonObject mongoMsg = new JsonObject();
+						mongoMsg.put("collection", MONGO_COLLECTION);
+
+						JsonObject mongoData = new JsonObject();
+						mongoData.put(IMMongoMessage.key_msgId, body.getString(IMMessage.key_msgId));
+						mongoData.put(IMMongoMessage.key_sceneType, body.getString(IMMessage.key_sceneType));
+						mongoData.put(IMMongoMessage.key_sceneId, body.getString(IMMessage.key_sceneId));
+						mongoData.put(IMMongoMessage.key_content, body.getString(IMMessage.key_content));
+						mongoData.put(IMMongoMessage.key_msgType, body.getString(IMMessage.key_msgType));
+						mongoData.put(IMMongoMessage.key_cmdId, IMCmd.MSG_N);
+
+						mongoMsg.put("data", mongoData);
 
 						/**
 						 * mongo message data: message body + msgId + timeStamp + date
 						 */
-						mongoService.saveDataBatch(body, mongo -> {
+
+						mongoService.saveData(mongoMsg, mongoRes -> {
+							if (mongoRes.succeeded()) {
+								// 给FROM发A
+								JsonObject msgBody = new JsonObject();
+								msgBody.put(IMMessage.key_msgId, body.getString(IMMessage.key_msgId));
+								msgBody.put(IMMessage.key_timeStamp, System.currentTimeMillis());
+								Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
+										clientVersion, cmd + MessageBuilder.MSG_ACK_CMD_RADIX,
+										msgBody.toString().length());
+								eb.send(header.getString("fromHandlerID"), aMsgHeader.appendString(msgBody.toString())
+										.appendString(MessageBuilder.IM_MSG_SEPARATOR));
+							}
 						});
 					} else {
 						logger.error("sendMessage error.", res.cause());
 					}
-
 				});
-
 			} else {
 				result = 1;
 			}
@@ -143,9 +163,5 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	@Override
 	public void doWithFileUpload(JsonObject msg, Handler<AsyncResult<JsonObject>> resultHandler) {
 		//  gei to fa msg, xiao xi ru ku
-	}
-
-	public static void main(String[] args) {
-		System.out.println(LocalDate.now().toString());
 	}
 }

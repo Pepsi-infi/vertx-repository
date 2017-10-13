@@ -3,7 +3,6 @@ package server;
 import org.apache.commons.lang.StringUtils;
 
 import cluster.ConsistentHashingService;
-import constants.IMCmdConstants;
 import constants.IMMessageConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -17,9 +16,12 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
-import logic.IMSessionService;
 import logic.impl.C2CVerticle;
+import logic.impl.IMSessionVerticle;
 import persistence.MongoService;
+import persistence.message.IMMongoMessage;
+import protocol.IMCmd;
+import protocol.IMMessage;
 import protocol.MessageBuilder;
 import util.ByteUtil;
 
@@ -59,26 +61,26 @@ public class IMServerVerticle extends AbstractVerticle {
 
 				Buffer bufferBody = null;
 				switch (cmd) {
-				case IMCmdConstants.HEART_BEAT:
+				case IMCmd.HEART_BEAT:
 					heartBeat(socket.writeHandlerID(), clientVersion, cmd);
 
 					break;
-				case IMCmdConstants.LOGIN:
+				case IMCmd.LOGIN:
 					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
 
 					break;
-				case IMCmdConstants.LOGOUT:
+				case IMCmd.LOGOUT:
 					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
 
 					break;
-				case IMCmdConstants.MSG_R:
+				case IMCmd.MSG_R:
 					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
 
 					break;
-				case IMCmdConstants.ACK_N:
+				case IMCmd.ACK_N:
 					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					msgAck(socket.writeHandlerID(), clientVersion, cmd, bufferBody);
 
@@ -108,7 +110,8 @@ public class IMServerVerticle extends AbstractVerticle {
 					String msgId = jsonBody.getString("msgId");
 					// {collection: "", data: {}}
 
-					JsonObject data = new JsonObject().put("msgId", msgId).put("status", cmd);
+					JsonObject data = new JsonObject().put(IMMongoMessage.key_msgId, msgId)
+							.put(IMMongoMessage.key_cmdId, IMCmd.MSG_A);
 					JsonObject update = new JsonObject().put("collection", "message").put("data", data);
 
 					mongoService.updateData(update, mongo -> {
@@ -124,11 +127,12 @@ public class IMServerVerticle extends AbstractVerticle {
 	}
 
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion, cmd + 100, 0);
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
+				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 		logger.info("heartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 
 		// 1、心跳消息确认
-		eb.send(writeHandlerID, aMsgHeader.appendString("\001"));
+		eb.send(writeHandlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
 	}
 
 	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
@@ -143,14 +147,14 @@ public class IMServerVerticle extends AbstractVerticle {
 			try {
 				jsonBody = bufferBody.toJsonObject();
 				if (jsonBody != null) {
-					from = jsonBody.getString("userTel");
+					from = jsonBody.getString(IMMessage.key_userTel);
 					if (StringUtils.isNotEmpty(from)) {
 						DeliveryOptions option = new DeliveryOptions();
-						option.addHeader("action", "setUserSocket");
+						option.addHeader("action", IMSessionVerticle.method.setUserSocket);
 						option.setSendTimeout(3000);
 						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
 						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
-						eb.send(IMSessionService.SERVICE_ADDRESS + "10.10.10.193", msg, option);
+						eb.send(IMSessionVerticle.class.getName() + "10.10.10.193", msg, option);
 
 						// 1、给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
@@ -160,10 +164,10 @@ public class IMServerVerticle extends AbstractVerticle {
 								clientVersion, cmd, bodyLength);
 						eb.send(handlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
 
-						String sceneId = jsonBody.getString("sceneId");
+						String sceneId = jsonBody.getString(IMMessage.key_sceneId);
 						if (StringUtils.isNotEmpty(sceneId)) {
 							// 2、发送离线消息
-							JsonObject query = new JsonObject().put("cmd", 2003).put("toTel", from)
+							JsonObject query = new JsonObject().put("cmd", IMCmd.MSG_N).put("toTel", from)
 									.put("sceneId", sceneId)
 									.put("timeStamp", new JsonObject().put("$lte", System.currentTimeMillis()));
 							mongoService.findOffLineMessage(query, mongo -> {
@@ -193,7 +197,7 @@ public class IMServerVerticle extends AbstractVerticle {
 						option.addHeader("action", "delUserSocket");
 						option.setSendTimeout(3000);
 						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-						eb.send(IMSessionService.SERVICE_ADDRESS, msg, option);
+						eb.send(IMSessionVerticle.class.getName(), msg, option);
 
 						// 给FROM发A
 						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
@@ -216,14 +220,14 @@ public class IMServerVerticle extends AbstractVerticle {
 				jsonBody = bufferBody.toJsonObject();
 				if (jsonBody != null) {
 					logger.info("msgRequest, json={}", jsonBody);
-					String from = jsonBody.getString("fromTel");
-					String to = jsonBody.getString("toTel");
+					String from = jsonBody.getString(IMMessage.key_fromTel);
+					String to = jsonBody.getString(IMMessage.key_toTel);
 					if (StringUtils.isNotEmpty(from) && StringUtils.isNotEmpty(to)) {
-						String msgId = jsonBody.getString("msgId");
-						String sceneId = jsonBody.getString("sceneId");
-						int sceneType = jsonBody.getInteger("sceneType");
-						int msgType = jsonBody.getInteger("msgType");
-						String content = jsonBody.getString("content");
+						String msgId = jsonBody.getString(IMMessage.key_msgId);
+						String sceneId = jsonBody.getString(IMMessage.key_sceneId);
+						int sceneType = jsonBody.getInteger(IMMessage.key_sceneType);
+						int msgType = jsonBody.getInteger(IMMessage.key_msgType);
+						String content = jsonBody.getString(IMMessage.key_content);
 
 						//
 						Future<String> hashFuture = Future.future();
@@ -237,6 +241,7 @@ public class IMServerVerticle extends AbstractVerticle {
 								JsonObject header = new JsonObject();
 								header.put("clientVersion", clientVersion);
 								header.put("cmd", cmd);
+								header.put("fromHandlerID", handlerID);
 
 								JsonObject body = new JsonObject().put("from", from).put("to", to)
 										.put("sceneId", sceneId).put("sceneType", sceneType).put("msgType", msgType)
@@ -246,19 +251,12 @@ public class IMServerVerticle extends AbstractVerticle {
 								param.put("body", body);
 
 								DeliveryOptions option = new DeliveryOptions();
-								option.addHeader("action", "sendMessage");
+								option.addHeader("action", C2CVerticle.method.sendMessage);
 								option.setSendTimeout(1000);
 								eb.send(C2CVerticle.SERVICE_ADDRESS + res.result().split(":")[0], param, option);
 							}
 						});
 
-						// 给FROM发A
-						JsonObject msgBody = new JsonObject();
-						msgBody.put("msgId", msgId);
-						msgBody.put("timeStamp", System.currentTimeMillis());
-						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-								clientVersion, cmd + 100, msgBody.toString().length());
-						eb.send(handlerID, aMsgHeader.appendString(msgBody.toString()).appendString("\001"));
 					}
 				}
 			} catch (Exception e) {
@@ -273,9 +271,9 @@ public class IMServerVerticle extends AbstractVerticle {
 		logger.info("socket.close handlerID={}", handlerID);
 
 		DeliveryOptions option = new DeliveryOptions();
-		option.addHeader("action", "delUserSocket");
+		option.addHeader("action", IMSessionVerticle.method.delUserSocket);
 		option.setSendTimeout(3000);
 		JsonObject msg = new JsonObject().put("handlerID", handlerID);
-		eb.publish("session-eb-service", msg, option);
+		eb.publish(IMSessionVerticle.class.getName(), msg, option);
 	}
 }

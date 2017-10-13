@@ -12,9 +12,9 @@ import io.vertx.serviceproxy.ProxyHelper;
 @VertxGen
 public interface MongoService {
 
-	public static final String SERVICE_NAME = "persistence.MongoService";
+	public static final String SERVICE_NAME = MongoService.class.getName();
 
-	public static final String SERVICE_ADDRESS = "persistence.MongoService";
+	public static final String SERVICE_ADDRESS = MongoService.class.getName();
 
 	static MongoService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(MongoService.class, vertx, SERVICE_ADDRESS);

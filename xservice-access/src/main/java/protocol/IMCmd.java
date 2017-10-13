@@ -1,6 +1,6 @@
-package constants;
+package protocol;
 
-public class IMCmdConstants {
+public class IMCmd {
 
 	/**
 	 * heart beat

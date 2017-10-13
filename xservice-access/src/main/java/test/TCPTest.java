@@ -4,6 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
+import util.ByteUtil;
 
 public class TCPTest extends AbstractVerticle {
 
@@ -17,8 +18,15 @@ public class TCPTest extends AbstractVerticle {
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(socket -> {
-			socket.handler(RecordParser.newDelimited("\001", output -> {
-				System.out.println(output);
+			socket.handler(RecordParser.newDelimited("\001", buffer -> {
+				
+				System.out.println(buffer.length());
+				
+				int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
+
+				int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
+				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
+				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
 			}));
 
 			socket.closeHandler(v -> {

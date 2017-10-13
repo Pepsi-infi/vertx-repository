@@ -6,9 +6,9 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.impl.C2CVerticle;
-import logic.impl.SessionVerticle;
+import logic.impl.IMSessionVerticle;
 import persistence.impl.MongoVerticle;
-import server.RestServerVerticle;
+import server.RestIMVerticle;
 import server.IMServerVerticle;
 
 public class StartVerticle extends AbstractVerticle {
@@ -18,7 +18,7 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(RestServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(MongoVerticle.class.getName());
@@ -26,7 +26,7 @@ public class StartVerticle extends AbstractVerticle {
 		/**
 		 * Instance should be 1 because of ehcache.
 		 */
-		vertx.deployVerticle(SessionVerticle.class.getName());
+		vertx.deployVerticle(IMSessionVerticle.class.getName());
 	};
 
 	public static DeploymentOptions readBossOpts() {

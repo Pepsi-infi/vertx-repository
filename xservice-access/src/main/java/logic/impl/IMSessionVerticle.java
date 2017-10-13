@@ -8,7 +8,6 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 
-import helper.XProxyHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -18,23 +17,27 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import logic.C2CService;
-import logic.IMSessionService;
 import utils.IPUtil;
 
-public class SessionVerticle extends AbstractVerticle implements IMSessionService {
+public class IMSessionVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(SessionVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(IMSessionVerticle.class);
 
 	private EventBus eb;
 	private Cache<String, String> sessionMap;// uid -> handlerID
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
+	public interface method {
+
+		public static final String setUserSocket = "setUserSocket";
+
+		public static final String delUserSocket = "delUserSocket";
+
+		public static final String getHandlerIDByUid = "getHandlerIDByUid";
+	}
+
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		
-		XProxyHelper.registerService(IMSessionService.class, vertx, this, IMSessionService.SERVICE_ADDRESS);
-		
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
@@ -46,9 +49,11 @@ public class SessionVerticle extends AbstractVerticle implements IMSessionServic
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
 
 		String innerIP = IPUtil.getInnerIP();
+
 		logger.info("innerIP={}", innerIP);
+
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(IMSessionService.SERVICE_ADDRESS + innerIP, res -> {
+		eb.<JsonObject>consumer(IMSessionVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
@@ -58,13 +63,13 @@ public class SessionVerticle extends AbstractVerticle implements IMSessionServic
 				String to = body.getString("to");
 				logger.info("from={}action={}innerIP={}", from, action, innerIP);
 				switch (action) {
-				case "setUserSocket":
+				case method.setUserSocket:
 					res.reply(setUserSocket(from, handlerID));
 					break;
-				case "delUserSocket":
+				case method.delUserSocket:
 					res.reply(delUserSocket(from, handlerID));
 					break;
-				case "getHandlerIDByUid":
+				case method.getHandlerIDByUid:
 					res.reply(getHandlerIDByUid(to));
 					break;
 				default:
@@ -74,7 +79,7 @@ public class SessionVerticle extends AbstractVerticle implements IMSessionServic
 			}
 		});
 
-		eb.<JsonObject>consumer(IMSessionService.SERVICE_ADDRESS, res -> {
+		eb.<JsonObject>consumer(IMSessionVerticle.class.getName(), res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
@@ -116,17 +121,6 @@ public class SessionVerticle extends AbstractVerticle implements IMSessionServic
 		}
 
 		return 0;
-	}
-
-	@Override
-	public void getHandlerIDByUid(String uid, Handler<AsyncResult<String>> resultHandler) {
-		logger.info("getHandlerIDByUid, uid={}handlerID={}", uid, sessionMap.get(uid));
-		resultHandler.handle(Future.succeededFuture(sessionMap.get(uid)));
-	}
-
-	@Override
-	public void getUidByHandlerId(String handlerId, Handler<AsyncResult<String>> resultHandler) {
-		resultHandler.handle(Future.succeededFuture(sessionReverse.get(handlerId)));
 	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
