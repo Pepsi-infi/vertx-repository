@@ -50,11 +50,15 @@ public class MongoVerticle extends AbstractVerticle {
 				logger.info("action={}", action);
 				switch (action) {
 				case "saveData":
-					res.reply(saveData(param));
+					saveData(param, r -> {
+						res.reply(r.result());
+					});
 					break;
 
 				case "findOffLineMessage":
-					res.reply(findOffLineMessage(param));
+					findOffLineMessage(param, r -> {
+						res.reply(r.result());
+					});
 					break;
 
 				default:
@@ -65,7 +69,7 @@ public class MongoVerticle extends AbstractVerticle {
 		});
 	}
 
-	public JsonObject saveData(JsonObject json) {
+	public void saveData(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler) {
 		JsonObject result = new JsonObject();
 		String collection = json.getString("collection");
 		JsonObject doc = json.getJsonObject("data");
@@ -76,13 +80,15 @@ public class MongoVerticle extends AbstractVerticle {
 			if (mongoRes.succeeded()) {
 				logger.info("mongoRes={}", mongoRes.result());
 				result.put("status", 0);
+
+				resultHandler.handle(Future.succeededFuture(result));
 			} else {
 				logger.error("mongoRes={}", mongoRes.cause().getMessage());
 				result.put("status", 1);
+
+				resultHandler.handle(Future.succeededFuture(result));
 			}
 		});
-
-		return result;
 	}
 
 	public void saveDataBatch(JsonObject json, Handler<AsyncResult<JsonObject>> resultHandler) {
@@ -113,22 +119,24 @@ public class MongoVerticle extends AbstractVerticle {
 	 * 
 	 * @param json
 	 */
-	public JsonObject findOffLineMessage(JsonObject query) {
+	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
 		JsonObject result = new JsonObject();
 
 		FindOptions options = new FindOptions();
-		options.setLimit(50);
+		options.setLimit(100);
 		client.findBatchWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
 				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
 				result.put("status", 0);
 				result.put("data", r.result());
+
+				resultHandler.handle(Future.succeededFuture(result));
 			} else {
 				result.put("status", 1);
+
+				resultHandler.handle(Future.succeededFuture(result));
 			}
 		});
-
-		return result;
 	}
 
 	public void updateData(JsonObject json) {
