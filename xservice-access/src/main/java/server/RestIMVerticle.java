@@ -4,6 +4,9 @@ import org.apache.commons.lang.StringUtils;
 
 import cluster.ConsistentHashingService;
 import constants.RestAccessConstants;
+import dto.OffLineMsgDto;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
@@ -12,10 +15,13 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.shareddata.LocalMap;
 import io.vertx.core.shareddata.SharedData;
+import io.vertx.ext.mongo.FindOptions;
+import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import persistence.impl.MongoVerticle;
+import persistence.message.IMMongoMessage;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
@@ -29,12 +35,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private ConsistentHashingService consistentHashingService;
 
 	private EventBus eb;
+	private MongoClient client;
 
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
+		client = MongoClient.createShared(vertx.getDelegate(), config());
 
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");
@@ -51,7 +59,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		Future<Void> voidFuture = Future.future();
 
-		String serverHost = this.getServerHost();
+		String serverHost = "127.0.0.1";// this.getServerHost();
 		createHttpServer(router, serverHost, RestAccessConstants.HTTP_PORT)
 				.compose(serverCreated -> publishHttpEndpoint(RestAccessConstants.SERVICE_NAME, serverHost,
 						RestAccessConstants.HTTP_PORT, RestAccessConstants.SERVICE_ROOT))
@@ -105,34 +113,41 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	}
 
-	private void getOfflineMessage(RoutingContext context) {
+	public void getOfflineMessage(RoutingContext context) {
 		String orderNo = context.request().getParam("orderNo");
 		String timestamp = context.request().getParam("timestamp");
+
+		JsonObject response = new JsonObject();
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
 
-		JsonObject response = new JsonObject();
+		FindOptions options = new FindOptions();
+		options.setLimit(100);
+		options.setSort(new JsonObject().put(IMMongoMessage.key_timeStamp, 1));
 
-		response.put("time", System.currentTimeMillis());
+		JsonObject fields = new JsonObject();
+		fields.put("_id", 0);
+		fields.put("msgId", 1);
+		fields.put("sceneType", 1);
+		fields.put("sceneId", 1);
+		fields.put("content", 1);
+		fields.put("msgType", 1);
+		fields.put("cmdId", 1);
+		options.setFields(fields);
 
-		DeliveryOptions mongoOp = new DeliveryOptions();
-		mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
-		mongoOp.setSendTimeout(3000);
-
-		eb.<JsonObject>send(MongoVerticle.class.getName(), query, mongoOp, mongoRes -> {
-			if (mongoRes.succeeded()) {
-
-				JsonObject data = new JsonObject();
-
+		client.findWithOptions("message", query, options, r -> {
+			if (r.succeeded()) {
+				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
 				response.put("code", 0);
-				response.put("data", mongoRes.result().body());
-				context.response().putHeader("content-type", "application/json").end(response.encode());
+				response.put("time", System.currentTimeMillis());
+				response.put("data", r.result());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(response.encode());
 			} else {
 				response.put("code", 1);
-
-				context.response().putHeader("content-type", "application/json").end(response.encode());
-				logger.error(mongoRes.cause().getMessage());
+				response.put("time", System.currentTimeMillis());
+				response.put("message", r.cause().getMessage());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(response.encode());
 			}
 		});
 	}

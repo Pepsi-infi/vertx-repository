@@ -120,23 +120,21 @@ public class MongoVerticle extends AbstractVerticle {
 	 * 
 	 * @param json
 	 */
-	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<List<JsonObject>>> resultHandler) {
-		List<JsonObject> recordList = new ArrayList<JsonObject>();
-
+	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
+		JsonObject result = new JsonObject();
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
 		options.setSort(new JsonObject().put(IMMongoMessage.key_timeStamp, 1));
-		client.findBatchWithOptions("message", query, options, r -> {
+		client.findWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
-				r.result().forEach(j -> {
-					recordList.add((JsonObject) j.getValue());
-				});
 				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
-
-				resultHandler.handle(Future.succeededFuture(recordList));
+				result.put("data", r.result());
+				result.put("status", 0);
+				resultHandler.handle(Future.succeededFuture(result));
 			} else {
-
-				resultHandler.handle(Future.succeededFuture(recordList));
+				result.put("status", 1);
+				result.put("message", r.cause().getMessage());
+				resultHandler.handle(Future.succeededFuture(null));
 			}
 		});
 	}
