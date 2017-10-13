@@ -1,7 +1,6 @@
 {
 	"host": "10.10.10.178",
 	"port": 27017,
-	"replicaSet": "foo",
 	"serverSelectionTimeoutMS": 30000,
 	"maxPoolSize": 50,
 	"minPoolSize": 25,
@@ -14,6 +13,7 @@
 	"username": "im-mc",
 	"password": "im-mc",
 	"authSource": "im-mc",
+	"db_name": "im-mc",
 	"connectTimeoutMS": 300000,
 	"socketTimeoutMS": 100000,
 	"sendBufferSize": 8192,
