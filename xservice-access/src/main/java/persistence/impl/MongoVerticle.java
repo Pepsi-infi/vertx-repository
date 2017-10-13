@@ -120,6 +120,7 @@ public class MongoVerticle extends AbstractVerticle {
 		options.setLimit(50);
 		client.findBatchWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
+				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
 				result.put("status", 0);
 				result.put("data", r.result());
 			} else {
