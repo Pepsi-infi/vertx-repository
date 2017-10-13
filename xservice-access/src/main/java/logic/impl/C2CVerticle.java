@@ -17,7 +17,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import logic.C2CService;
-import persistence.MongoService;
+import persistence.impl.MongoVerticle;
 import persistence.message.IMMongoMessage;
 import protocol.IMCmd;
 import protocol.IMMessage;
@@ -29,8 +29,6 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 	private static final Logger logger = LoggerFactory.getLogger(C2CVerticle.class);
 
 	private EventBus eb;
-
-	private MongoService mongoService;
 
 	private static final String MONGO_COLLECTION = "message";
 
@@ -47,8 +45,6 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		// sessionReverse = sharedData.getLocalMap("sessionReverse");
 
 		XProxyHelper.registerService(C2CService.class, vertx, this, C2CService.SERVICE_ADDRESS);
-
-		mongoService = MongoService.createProxy(vertx);
 
 		String innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
@@ -136,7 +132,11 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						 * mongo message data: message body + msgId + timeStamp + date
 						 */
 
-						mongoService.saveData(mongoMsg, mongoRes -> {
+						DeliveryOptions mongoOp = new DeliveryOptions();
+						mongoOp.addHeader("action", MongoVerticle.method.saveData);
+						mongoOp.setSendTimeout(3000);
+
+						eb.<JsonObject>send(MongoVerticle.class.getName(), mongoMsg, mongoOp, mongoRes -> {
 							if (mongoRes.succeeded()) {
 								// 给FROM发A
 								JsonObject msgBody = new JsonObject();

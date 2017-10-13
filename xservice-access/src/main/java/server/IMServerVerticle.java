@@ -18,7 +18,7 @@ import io.vertx.core.parsetools.RecordParser;
 import logic.C2CService;
 import logic.impl.C2CVerticle;
 import logic.impl.IMSessionVerticle;
-import persistence.MongoService;
+import persistence.impl.MongoVerticle;
 import persistence.message.IMMongoMessage;
 import protocol.IMCmd;
 import protocol.IMMessage;
@@ -30,7 +30,6 @@ public class IMServerVerticle extends AbstractVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(IMServerVerticle.class);
 
 	private C2CService c2cService;
-	private MongoService mongoService;
 	private EventBus eb;
 	private ConsistentHashingService consistentHashingService;
 
@@ -40,7 +39,6 @@ public class IMServerVerticle extends AbstractVerticle {
 		eb = vertx.eventBus();
 
 		c2cService = C2CService.createProxy(vertx);
-		mongoService = MongoService.createProxy(vertx);
 		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
@@ -114,9 +112,19 @@ public class IMServerVerticle extends AbstractVerticle {
 							.put(IMMongoMessage.key_cmdId, IMCmd.MSG_A);
 					JsonObject update = new JsonObject().put("collection", "message").put("data", data);
 
-					mongoService.updateData(update, mongo -> {
-
-					});
+					// TODO
+					// DeliveryOptions mongoOp = new DeliveryOptions();
+					// mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
+					// mongoOp.setSendTimeout(3000);
+					//
+					// eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes
+					// -> {
+					// if (mongoRes.succeeded()) {
+					// eb.send(handlerID, mongoRes.result());
+					// } else {
+					// logger.error(mongoRes.cause().getMessage());
+					// }
+					// });
 				}
 			} catch (Exception e) {
 				logger.error("Msg body parse error, buffer={}", bufferBody, e);
@@ -170,8 +178,17 @@ public class IMServerVerticle extends AbstractVerticle {
 							JsonObject query = new JsonObject().put("cmd", IMCmd.MSG_N).put("toTel", from)
 									.put("sceneId", sceneId)
 									.put("timeStamp", new JsonObject().put("$lte", System.currentTimeMillis()));
-							mongoService.findOffLineMessage(query, mongo -> {
-								eb.send(handlerID, mongo.result());
+
+							DeliveryOptions mongoOp = new DeliveryOptions();
+							mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
+							mongoOp.setSendTimeout(3000);
+
+							eb.<JsonObject>send(MongoVerticle.class.getName(), query, mongoOp, mongoRes -> {
+								if (mongoRes.succeeded()) {
+									eb.send(handlerID, mongoRes.result());
+								} else {
+									logger.error(mongoRes.cause().getMessage());
+								}
 							});
 						}
 					}

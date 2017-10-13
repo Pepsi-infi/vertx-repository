@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 
 import cluster.ConsistentHashingService;
 import constants.RestAccessConstants;
+import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -13,7 +15,7 @@ import io.vertx.core.shareddata.SharedData;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import persistence.MongoService;
+import persistence.impl.MongoVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
@@ -26,18 +28,18 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private LocalMap<String, String> sessionReverse; // handlerID -> uid
 	private ConsistentHashingService consistentHashingService;
 
-	private MongoService mongoService;
+	private EventBus eb;
 
 	@Override
 	public void start() throws Exception {
 		super.start();
 
+		eb = vertx.getDelegate().eventBus();
+
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
 		consistentHashingService = ConsistentHashingService.createProxy(vertx.getDelegate());
-
-		mongoService = MongoService.createProxy(vertx.getDelegate());
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -115,11 +117,18 @@ public class RestIMVerticle extends RestAPIVerticle {
 		response.put("code", 0);
 		response.put("time", System.currentTimeMillis());
 
-		mongoService.findOffLineMessage(query, res -> {
-			if (res.succeeded()) {
+		DeliveryOptions mongoOp = new DeliveryOptions();
+		mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
+		mongoOp.setSendTimeout(3000);
+
+		eb.<JsonObject>send(MongoVerticle.class.getName(), query, mongoOp, mongoRes -> {
+			if (mongoRes.succeeded()) {
+
 				JsonObject data = new JsonObject();
 
 				context.response().putHeader("content-type", "application/json").end(response.encode());
+			} else {
+				logger.error(mongoRes.cause().getMessage());
 			}
 		});
 	}
