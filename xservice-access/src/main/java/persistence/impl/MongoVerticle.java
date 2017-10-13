@@ -35,6 +35,9 @@ public class MongoVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
+
+		logger.info("config={}", config().encode());
+
 		client = MongoClient.createShared(vertx, config());
 
 		eb = vertx.eventBus();
@@ -71,8 +74,10 @@ public class MongoVerticle extends AbstractVerticle {
 
 		client.save(collection, doc, mongoRes -> {
 			if (mongoRes.succeeded()) {
+				logger.info("mongoRes={}", mongoRes.result());
 				result.put("status", 0);
 			} else {
+				logger.error("mongoRes={}", mongoRes.cause().getMessage());
 				result.put("status", 1);
 			}
 		});
