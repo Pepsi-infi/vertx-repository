@@ -21,7 +21,7 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
 
-		vertx.deployVerticle(MongoVerticle.class.getName());
+		vertx.deployVerticle(MongoVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		/**
 		 * Instance should be 1 because of ehcache.
