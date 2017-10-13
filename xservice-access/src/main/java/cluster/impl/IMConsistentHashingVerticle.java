@@ -17,21 +17,20 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.servicediscovery.Record;
 import xservice.BaseServiceVerticle;
 
-public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
+public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(SocketConsistentHashingVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(IMConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
-
-	// 虚拟Socket节点信息
-	private TreeMap<Long, String> virtualNodes;
+	// 虚拟节点信息
+	private TreeMap<Long, String> virtualIMNodes;
 
 	// 虚拟内网ip
 	private TreeMap<Long, String> virtualInnerNodes;
 
 	// 真实节点信息
-	private List<String> realSocketNodes;
+	private List<String> realIMNodes;
 
 	private List<String> realInnerNodes;
 
@@ -42,30 +41,31 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		super.start();
 
 		logger.info("start ... ");
-		this.realSocketNodes = new ArrayList<String>();
+
+		this.realIMNodes = new ArrayList<String>();
 		this.realInnerNodes = new ArrayList<String>();
 
 		getNodesFromDiscovery();
-		initSocketNodes();
+		initIMNodes();
 		initInnerNodes();
 
 		vertx.setPeriodic(3000, handler -> {
 			getNodesFromDiscovery();
-			initSocketNodes();
+			initIMNodes();
 			initInnerNodes();
 		});
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(IMConsistentHashingVerticle.class.getName(), res -> {
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
 				String key = null;
 				switch (action) {
-				case "getSocketNode":
+				case "getIMNode":
 					key = param.getString("userId");
-					res.reply(getNode(key));
+					res.reply(getIMNode(key));
 					break;
 				case "getInnerNode":
 					key = param.getString("userId");
@@ -80,22 +80,21 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	}
 
 	private void getNodesFromDiscovery() {
-		JsonObject filter = new JsonObject().put("type", "socket-server");
+		JsonObject filter = new JsonObject().put("type", "im-server");
 		discovery.getRecords(filter, result -> {
 			if (result.succeeded()) {
 				List<Record> records = result.result();
 				for (Record r : records) {
 					String publicAddress = r.getMetadata().getString("publicAddress");
 					String innerIP = r.getMetadata().getString("innerIP");
-					if (!realSocketNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
-						realSocketNodes.add(publicAddress);
+					if (!realIMNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
+						realIMNodes.add(publicAddress);
 					}
 					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
 						realInnerNodes.add(innerIP);
 					}
 				}
-				logger.info("realSocketNodes={}realInnerNodes={}", realSocketNodes.toString(),
-						realInnerNodes.toString());
+				logger.info("realSocketNodes={}realInnerNodes={}", realIMNodes.toString(), realInnerNodes.toString());
 			}
 		});
 	}
@@ -103,17 +102,17 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	/**
 	 * 初始化虚拟节点
 	 */
-	private void initSocketNodes() {
-		virtualNodes = new TreeMap<Long, String>();
-		for (int i = 0; i < realSocketNodes.size(); i++) {
+	private void initIMNodes() {
+		virtualIMNodes = new TreeMap<Long, String>();
+		for (int i = 0; i < realIMNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
-				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
+				virtualIMNodes.put(hash("aa" + i + j), realIMNodes.get(i));
 			}
 		}
 	}
 
 	/**
-	 * 初始化虚拟内网IP
+	 * 初始化虚拟节点
 	 */
 	private void initInnerNodes() {
 		virtualInnerNodes = new TreeMap<Long, String>();
@@ -171,17 +170,17 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	}
 
 	/**
+	 * 获取一个结点
 	 * 
-	 * @param key
-	 * @param nodes
-	 * @param resultHandler
+	 * @param uid
+	 * @return
 	 */
-	public JsonObject getNode(String key) {
+	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
-		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
+		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			result.put("host", virtualNodes.firstEntry().getValue());
+			result.put("host", virtualIMNodes.firstEntry().getValue());
 		} else {
 			result.put("host", en.getValue());
 		}
@@ -190,10 +189,10 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	}
 
 	/**
+	 * 获取一个结点
 	 * 
-	 * @param key
-	 * @param nodes
-	 * @param resultHandler
+	 * @param uid
+	 * @return
 	 */
 	public JsonObject getInnerNode(String key) {
 		JsonObject result = new JsonObject();

@@ -1,6 +1,5 @@
 package test;
 
-import cluster.ConsistentHashingService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
@@ -18,7 +17,6 @@ public class ValidateServerVerticle extends AbstractVerticle {
 
 	private C2CService c2cService;
 	private EventBus eb;
-	private ConsistentHashingService consistentHashingService;
 	private int header = -1;
 	private int msgLength = 4;
 	private RecordParser parser;

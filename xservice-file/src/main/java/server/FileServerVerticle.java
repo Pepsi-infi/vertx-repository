@@ -3,13 +3,14 @@ package server;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import api.RestConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.file.FileProps;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.http.HttpMethod;
@@ -18,6 +19,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import protocol.IMMessage;
 
 public class FileServerVerticle extends AbstractVerticle {
 
@@ -39,7 +41,6 @@ public class FileServerVerticle extends AbstractVerticle {
 		HttpServer httpServer = vertx.createHttpServer();
 
 		// c2cService = C2CService.createProxy(vertx);
-		// consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		logger.info("config uploadFilePathPrefix " + uploadFilePathPrefix);
@@ -89,70 +90,50 @@ public class FileServerVerticle extends AbstractVerticle {
 					request.uploadHandler(upload -> {
 						upload.streamToFileSystem(uploadPath + uuid).endHandler(a -> {
 
-							String from = request.getFormAttribute("from");
-							String to = request.getFormAttribute("to");
-							String id = request.getFormAttribute("id");
-							String orderId = request.getFormAttribute("orderId");
-							String type = request.getFormAttribute("type");
-							String clientVersion = request.getFormAttribute("clientVersion");
+							String from = request.getFormAttribute(IMMessage.key_fromTel);
+							String to = request.getFormAttribute(IMMessage.key_toTel);
+							String msgId = request.getFormAttribute(IMMessage.key_msgId);
+							String sceneId = request.getFormAttribute(IMMessage.key_sceneId);
+							String msgType = request.getFormAttribute(IMMessage.key_msgType);
+							String sceneType = request.getFormAttribute(IMMessage.key_sceneType);
 							// content 文件地址 + ts 服务器时间戳 发给 to 的handler
 
-							Future<String> consistentHashFuture = Future.future();
-							// consistentHashingService.getNode(to, consistentHashFuture.completer());
-
-//							DeliveryOptions option = new DeliveryOptions();
-//							option.setSendTimeout(3000);
-//							option.addHeader("action", "getNode");
-
-//							JsonObject param = new JsonObject();
-//							param.put("handlerID", );
-
-//							eb.<JsonObject>send(ConsistentHashingService.SERVICE_ADDRESS + "", param, option,
-//									reply -> {
-//
-//									});
-
-//							Future<Message<JsonObject>> sessionFuture = Future.future();
-							// 根据to去session查出对应handlerID
-//							consistentHashFuture.setHandler(res -> {
-//								if (res.succeeded()) {
-//									DeliveryOptions option = new DeliveryOptions();
-//									option.addHeader("action", "getHandlerIDByUid");
-//									option.setSendTimeout(3000);
-//									JsonObject rMsg = new JsonObject().put("to", to);
-//									eb.send("session-eb-service" + res.result(), rMsg, option,
-//											sessionFuture.completer());
-//								} else {
-//									logger.error("Consistent Hash ", res.cause());
-//								}
-//							});
-							
-							
+							Future<Message<JsonObject>> hashFuture = Future.future();
 							DeliveryOptions option = new DeliveryOptions();
-							option.addHeader("action", "getHandlerIDByUid");
 							option.setSendTimeout(3000);
-							JsonObject p = new JsonObject().put("to", to);
-//							eb.<JsonObject>send("" + "10.10.10.193", p, option, res -> {
-//								
-//							});
+							option.addHeader("action", "getInnerNode");
 
-							Future<JsonObject> c2cFuture = Future.future();
-//							sessionFuture.setHandler(res -> {
-//								if (res.succeeded()) {
-//									JsonObject result = res.result().body();
-//									String toHandlerID = result.getString("handlerID");
-//
-//									JsonObject msgBody = new JsonObject();
-//									msgBody.put("from", from);
-//									msgBody.put("id", id);
-//									msgBody.put("type", type);
-//									JsonObject rMsg = new JsonObject().put("clientVersion", clientVersion)
-//											.put("body", msgBody).put("toHandlerID", toHandlerID);
-//									c2cService.doWithFileUpload(rMsg, c2cFuture.completer());
-//								} else {
-//									logger.error("Session ", res.cause());
-//								}
-//							});
+							JsonObject message = new JsonObject();
+							message.put("userId", to);
+							if (StringUtils.isNotEmpty(to)) {
+								eb.<JsonObject>send("cluster.impl.IMConsistentHashingVerticle", message, option,
+										hashFuture.completer());
+							} else {
+
+							}
+
+							hashFuture.setHandler(res -> {
+								logger.info("msgRequest, hashFuture={}", res.result());
+								if (res.succeeded()) {
+									JsonObject param = new JsonObject();
+
+									JsonObject header = new JsonObject();
+
+									JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
+											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
+											.put(IMMessage.key_sceneType, sceneType).put(IMMessage.key_msgType, msgType)
+											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
+
+									param.put("header", header);
+									param.put("body", body);
+
+									DeliveryOptions c2cOption = new DeliveryOptions();
+									c2cOption.addHeader("action", "sendMessage");
+									c2cOption.setSendTimeout(1000);
+									eb.send("logic.C2CService" + res.result().body().getString("host"), param,
+											c2cOption);
+								}
+							});
 
 							JsonObject response = new JsonObject();
 							response.put("code", 0);

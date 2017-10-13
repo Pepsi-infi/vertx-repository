@@ -1,6 +1,6 @@
 package api;
 
-import cluster.impl.ConsistentHashingVerticle;
+import cluster.impl.IMConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
@@ -17,7 +17,7 @@ public class StartVerticle extends AbstractVerticle {
 
 	public void start() throws Exception {
 		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(ConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(IMConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
 

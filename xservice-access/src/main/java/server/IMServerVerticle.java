@@ -1,21 +1,22 @@
 package server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
-import cluster.ConsistentHashingService;
 import constants.IMMessageConstant;
-import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
-import logic.C2CService;
 import logic.impl.C2CVerticle;
 import logic.impl.IMSessionVerticle;
 import persistence.impl.MongoVerticle;
@@ -24,22 +25,33 @@ import protocol.IMCmd;
 import protocol.IMMessage;
 import protocol.MessageBuilder;
 import util.ByteUtil;
+import utils.IPUtil;
+import xservice.BaseServiceVerticle;
 
-public class IMServerVerticle extends AbstractVerticle {
+public class IMServerVerticle extends BaseServiceVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(IMServerVerticle.class);
 
-	private C2CService c2cService;
 	private EventBus eb;
-	private ConsistentHashingService consistentHashingService;
+
+	private String innerIP;
+	private Map<String, String> ipMap = new HashMap<String, String>();
 
 	@Override
 	public void start() throws Exception {
+		super.start();
+
+		JsonArray socketNodes = config().getJsonArray("im");
+		for (Object object : socketNodes) {
+			JsonObject node = JsonObject.mapFrom(object);
+			ipMap.put(node.getString("innerIP"), node.getString("node"));
+		}
+		innerIP = IPUtil.getInnerIP();
+		publishIMService(IMServerVerticle.class.getName(), innerIP,
+				new JsonObject().put("publicAddress", ipMap.get(innerIP)).put("innerIP", innerIP));
+
 		logger.info("start ... ");
 		eb = vertx.eventBus();
-
-		c2cService = C2CService.createProxy(vertx);
-		consistentHashingService = ConsistentHashingService.createProxy(vertx);
 
 		NetServerOptions options = new NetServerOptions().setPort(4321);
 		// options.setSsl(true).setPemKeyCertOptions(
@@ -248,7 +260,6 @@ public class IMServerVerticle extends AbstractVerticle {
 
 						//
 						Future<String> hashFuture = Future.future();
-						consistentHashingService.getNode(to, hashFuture.completer());
 
 						hashFuture.setHandler(res -> {
 							logger.info("msgRequest, hashFuture={}", res.result());
@@ -271,7 +282,7 @@ public class IMServerVerticle extends AbstractVerticle {
 								DeliveryOptions option = new DeliveryOptions();
 								option.addHeader("action", C2CVerticle.method.sendMessage);
 								option.setSendTimeout(1000);
-								eb.send(C2CVerticle.SERVICE_ADDRESS + res.result().split(":")[0], param, option);
+								eb.send(C2CVerticle.SERVICE_ADDRESS + "10.10.10.193", param, option);
 							}
 						});
 

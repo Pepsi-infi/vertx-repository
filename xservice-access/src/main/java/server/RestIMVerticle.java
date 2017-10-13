@@ -2,12 +2,7 @@ package server;
 
 import org.apache.commons.lang.StringUtils;
 
-import cluster.ConsistentHashingService;
 import constants.RestAccessConstants;
-import dto.OffLineMsgDto;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -20,7 +15,6 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import persistence.impl.MongoVerticle;
 import persistence.message.IMMongoMessage;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -32,7 +26,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private SharedData sharedData;
 	private LocalMap<String, String> sessionMap;// uid -> handlerID
 	private LocalMap<String, String> sessionReverse; // handlerID -> uid
-	private ConsistentHashingService consistentHashingService;
 
 	private EventBus eb;
 	private MongoClient client;
@@ -47,7 +40,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");
 		sessionReverse = sharedData.getLocalMap("sessionReverse");
-		consistentHashingService = ConsistentHashingService.createProxy(vertx.getDelegate());
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -88,7 +80,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 		JsonObject response = new JsonObject();
 		if (StringUtils.isNotEmpty(userTel)) {
 			Future<String> hashFuture = Future.future();
-			consistentHashingService.getNode(userTel, hashFuture.completer());
 			hashFuture.setHandler(res -> {
 				if (res.succeeded()) {
 					JsonObject data = new JsonObject();

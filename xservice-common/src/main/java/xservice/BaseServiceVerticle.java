@@ -143,7 +143,14 @@ public class BaseServiceVerticle extends AbstractVerticle {
 		vertx.eventBus().publish(LOG_EVENT_ADDRESS, msg);
 	}
 
-	protected Future<Void> publishTCPService(String name, String address, JsonObject metadata) {
+	protected Future<Void> publishIMService(String name, String address, JsonObject metadata) {
+		Record record = new Record().setType("im-server").setName(name)
+				.setLocation(new JsonObject().put(Record.ENDPOINT, address)).setMetadata(metadata);
+
+		return publish(record);
+	}
+
+	protected Future<Void> publishSocketService(String name, String address, JsonObject metadata) {
 		Record record = new Record().setType("socket-server").setName(name)
 				.setLocation(new JsonObject().put(Record.ENDPOINT, address)).setMetadata(metadata);
 

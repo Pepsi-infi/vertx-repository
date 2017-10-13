@@ -1,6 +1,6 @@
 package test;
 
-import cluster.impl.ConsistentHashingVerticle;
+import cluster.impl.IMConsistentHashingVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
