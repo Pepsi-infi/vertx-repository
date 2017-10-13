@@ -118,6 +118,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		mongoService.findOffLineMessage(query, res -> {
 			if (res.succeeded()) {
 				JsonObject data = new JsonObject();
+
 				context.response().putHeader("content-type", "application/json").end(response.encode());
 			}
 		});

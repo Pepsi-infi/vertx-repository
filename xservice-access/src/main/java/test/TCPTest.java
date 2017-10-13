@@ -11,7 +11,8 @@ public class TCPTest extends AbstractVerticle {
 	@Override
 	public void start() throws Exception {
 
-		NetServerOptions options = new NetServerOptions().setPort(4321);
+		NetServerOptions options = new NetServerOptions().setPort(4321).setReceiveBufferSize(204800)
+				.setSendBufferSize(204800);
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
 		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
@@ -19,9 +20,9 @@ public class TCPTest extends AbstractVerticle {
 
 		server.connectHandler(socket -> {
 			socket.handler(RecordParser.newDelimited("\001", buffer -> {
-				
+
 				System.out.println(buffer.length());
-				
+
 				int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
 
 				int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
