@@ -124,10 +124,10 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 
 						JsonObject mongoData = new JsonObject();
 						mongoData.put(IMMongoMessage.key_msgId, body.getString(IMMessage.key_msgId));
-						mongoData.put(IMMongoMessage.key_sceneType, body.getString(IMMessage.key_sceneType));
+						mongoData.put(IMMongoMessage.key_sceneType, body.getInteger(IMMessage.key_sceneType));
 						mongoData.put(IMMongoMessage.key_sceneId, body.getString(IMMessage.key_sceneId));
 						mongoData.put(IMMongoMessage.key_content, body.getString(IMMessage.key_content));
-						mongoData.put(IMMongoMessage.key_msgType, body.getString(IMMessage.key_msgType));
+						mongoData.put(IMMongoMessage.key_msgType, body.getInteger(IMMessage.key_msgType));
 						mongoData.put(IMMongoMessage.key_cmdId, IMCmd.MSG_N);
 
 						mongoMsg.put("data", mongoData);
