@@ -260,9 +260,10 @@ public class IMServerVerticle extends AbstractVerticle {
 								header.put("cmd", cmd);
 								header.put("fromHandlerID", handlerID);
 
-								JsonObject body = new JsonObject().put("from", from).put("to", to)
-										.put("sceneId", sceneId).put("sceneType", sceneType).put("msgType", msgType)
-										.put("content", content);
+								JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
+										.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
+										.put(IMMessage.key_sceneType, sceneType).put(IMMessage.key_msgType, msgType)
+										.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
 
 								param.put("header", header);
 								param.put("body", body);

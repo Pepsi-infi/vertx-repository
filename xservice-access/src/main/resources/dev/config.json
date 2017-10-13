@@ -14,14 +14,14 @@
 	"password": "im-mc",
 	"authSource": "im-mc",
 	"db_name": "im-mc",
-	"connectTimeoutMS": 300000,
-	"socketTimeoutMS": 100000,
+	"connectTimeoutMS": 3000,
+	"socketTimeoutMS": 3000,
 	"sendBufferSize": 8192,
 	"receiveBufferSize": 8192,
 	"keepAlive": true,
 	"heartbeat.socket": {
-		"connectTimeoutMS": 300000,
-		"socketTimeoutMS": 100000,
+		"connectTimeoutMS": 3000,
+		"socketTimeoutMS": 3000,
 		"sendBufferSize": 8192,
 		"receiveBufferSize": 8192,
 		"keepAlive": true

@@ -114,7 +114,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		JsonObject response = new JsonObject();
 
-		response.put("code", 0);
 		response.put("time", System.currentTimeMillis());
 
 		DeliveryOptions mongoOp = new DeliveryOptions();
@@ -126,8 +125,13 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 				JsonObject data = new JsonObject();
 
+				response.put("code", 0);
+				response.put("data", mongoRes.result().body());
 				context.response().putHeader("content-type", "application/json").end(response.encode());
 			} else {
+				response.put("code", 1);
+
+				context.response().putHeader("content-type", "application/json").end(response.encode());
 				logger.error(mongoRes.cause().getMessage());
 			}
 		});

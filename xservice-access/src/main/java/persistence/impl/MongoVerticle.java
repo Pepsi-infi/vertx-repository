@@ -54,7 +54,7 @@ public class MongoVerticle extends AbstractVerticle {
 					break;
 
 				case "findOffLineMessage":
-					findOffLineMessage(param);
+					res.reply(findOffLineMessage(param));
 					break;
 
 				default:
@@ -113,7 +113,7 @@ public class MongoVerticle extends AbstractVerticle {
 	 * 
 	 * @param json
 	 */
-	public void findOffLineMessage(JsonObject query) {
+	public JsonObject findOffLineMessage(JsonObject query) {
 		JsonObject result = new JsonObject();
 
 		FindOptions options = new FindOptions();
@@ -121,10 +121,13 @@ public class MongoVerticle extends AbstractVerticle {
 		client.findBatchWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
 				result.put("status", 0);
+				result.put("data", r.result());
 			} else {
 				result.put("status", 1);
 			}
 		});
+
+		return result;
 	}
 
 	public void updateData(JsonObject json) {
