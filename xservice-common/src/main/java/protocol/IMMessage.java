@@ -2,6 +2,17 @@ package protocol;
 
 public class IMMessage {
 
+	public interface header {
+		
+		public static final String key_HeaderLength = "HeaderLength";
+
+		public static final String key_ClientVersion = "ClientVersion";
+
+		public static final String key_CmdId = "CmdId";
+
+		public static final String key_Bodylength = "Bodylength";
+	}
+
 	/**
 	 * 用户手机号
 	 */

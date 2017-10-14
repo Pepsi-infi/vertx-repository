@@ -93,8 +93,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						JsonObject header = msg.getJsonObject("header");
 						JsonObject body = msg.getJsonObject("body");
 						long ts = System.currentTimeMillis();
-						int clientVersion = header.getInteger("clientVersion");
-						int cmd = header.getInteger("cmd");
+						int clientVersion = header.getInteger(IMMessage.header.key_ClientVersion);
+						int cmd = header.getInteger(IMMessage.header.key_CmdId);
 						body.put(IMMessage.key_msgId, body.getString(IMMessage.key_msgId));
 						body.put(IMMessage.key_timeStamp, ts);
 						body.put(IMMessage.key_fromTel, body.getString(IMMessage.key_fromTel));

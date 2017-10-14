@@ -119,10 +119,10 @@ public class FileServerVerticle extends AbstractVerticle {
 									JsonObject param = new JsonObject();
 
 									JsonObject header = new JsonObject();
-									header.put("HeaderLength", 12);
-									header.put("ClientVersion", 800);
-									header.put("CmdId", 2001);
-									
+									header.put(IMMessage.header.key_HeaderLength, 12);
+									header.put(IMMessage.header.key_ClientVersion, 800);
+									header.put(IMMessage.header.key_CmdId, 2003);
+
 									JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, sceneType).put(IMMessage.key_msgType, msgType)
@@ -130,7 +130,7 @@ public class FileServerVerticle extends AbstractVerticle {
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
 									header.put("CmdBodylengthId", bodyLength);
-									
+
 									param.put("header", header);
 									param.put("body", body);
 
