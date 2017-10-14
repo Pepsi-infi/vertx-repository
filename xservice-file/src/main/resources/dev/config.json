@@ -1,3 +1,4 @@
 {
-	"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/"
+	"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
+	"download.file.server.prefix": "http://10.10.10.193:9090/mc-file/im/download.json?file="
 }

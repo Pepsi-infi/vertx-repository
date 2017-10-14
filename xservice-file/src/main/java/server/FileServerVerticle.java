@@ -34,6 +34,7 @@ public class FileServerVerticle extends AbstractVerticle {
 	// private C2CService c2cService;
 	private EventBus eb;
 	private String uploadFilePathPrefix;
+	private String downloadFilePathPrefix;
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
@@ -44,6 +45,7 @@ public class FileServerVerticle extends AbstractVerticle {
 		// c2cService = C2CService.createProxy(vertx);
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
+		downloadFilePathPrefix = config().getString("download.file.server.prefix");
 		logger.info("config uploadFilePathPrefix " + uploadFilePathPrefix);
 
 		httpServer.requestHandler(request -> {
@@ -53,7 +55,6 @@ public class FileServerVerticle extends AbstractVerticle {
 				case RestConstant.Uri.DOWNLOAD_FILE_PATH:
 					String sysFile = uploadFilePathPrefix + file;
 					fs.exists(sysFile, res -> {
-						logger.info("fs.exist={}", res.result());
 						if (!res.result()) {
 							sendNotFound(request, sysFile);
 						} else {
@@ -99,7 +100,6 @@ public class FileServerVerticle extends AbstractVerticle {
 							String msgType = request.getFormAttribute(IMMessage.key_msgType);
 							String sceneType = request.getFormAttribute(IMMessage.key_sceneType);
 							String duration = request.getFormAttribute(IMMessage.key_duration);
-							// content 文件地址 + ts 服务器时间戳 发给 to 的handler
 
 							Future<Message<JsonObject>> hashFuture = Future.future();
 							DeliveryOptions option = new DeliveryOptions();
@@ -125,14 +125,15 @@ public class FileServerVerticle extends AbstractVerticle {
 									header.put(IMMessage.header.key_ClientVersion, 800);
 									header.put(IMMessage.header.key_CmdId, 2003);
 
-									JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
-											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
-											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
-											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
-											.put(IMMessage.key_content,
-													"http://10.10.10.193:9090/mc-file/im/download.json?file=" + content)
-											.put(IMMessage.key_msgId, msgId)
-											.put(IMMessage.key_duration, Integer.valueOf(duration));
+									JsonObject body = new JsonObject();
+									body.put(IMMessage.key_fromTel, from);
+									body.put(IMMessage.key_toTel, to);
+									body.put(IMMessage.key_sceneId, sceneId);
+									body.put(IMMessage.key_sceneType, Integer.valueOf(sceneType));
+									body.put(IMMessage.key_msgType, Integer.valueOf(msgType));
+									body.put(IMMessage.key_content, downloadFilePathPrefix + content);
+									body.put(IMMessage.key_msgId, msgId);
+									body.put(IMMessage.key_duration, Integer.valueOf(duration));
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
 									header.put("CmdBodylengthId", bodyLength);
@@ -151,7 +152,8 @@ public class FileServerVerticle extends AbstractVerticle {
 							JsonObject response = new JsonObject();
 							response.put("code", 0);
 							response.put("time", System.currentTimeMillis());
-							request.response().putHeader("content-type", "application/json").end(response.encode());
+							request.response().putHeader("content-type", "application/json; charset=utf-8")
+									.end(response.encode());
 						});
 					});
 
