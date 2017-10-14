@@ -71,4 +71,6 @@ public class IMMongoMessage {
 	 * 纬度
 	 */
 	public static final String key_lat = "lat";
+
+	public static final String key_duration = "duration";
 }

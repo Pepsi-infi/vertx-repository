@@ -99,7 +99,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						body.put(IMMessage.key_timeStamp, ts);
 						body.put(IMMessage.key_fromTel, body.getString(IMMessage.key_fromTel));
 						body.put(IMMessage.key_toTel, body.getString(IMMessage.key_toTel));
-						body.put(IMMessage.key_msgType, body.getString(IMMessage.key_msgType));
+						body.put(IMMessage.key_msgType, body.getInteger(IMMessage.key_msgType));
+						body.put(IMMessage.key_duration, body.getInteger(IMMessage.key_duration));
 
 						int bodyLength = 0;
 						try {
@@ -127,6 +128,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						mongoData.put(IMMongoMessage.key_msgType, body.getInteger(IMMessage.key_msgType));
 						mongoData.put(IMMongoMessage.key_cmdId, IMCmd.MSG_N);
 						mongoData.put(IMMongoMessage.key_timeStamp, ts);
+						mongoData.put(IMMongoMessage.key_duration, body.getInteger(IMMessage.key_duration));
 
 						mongoMsg.put("data", mongoData);
 

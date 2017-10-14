@@ -97,6 +97,7 @@ public class FileServerVerticle extends AbstractVerticle {
 							String sceneId = request.getFormAttribute(IMMessage.key_sceneId);
 							String msgType = request.getFormAttribute(IMMessage.key_msgType);
 							String sceneType = request.getFormAttribute(IMMessage.key_sceneType);
+							String duration = request.getFormAttribute(IMMessage.key_duration);
 							// content 文件地址 + ts 服务器时间戳 发给 to 的handler
 
 							Future<Message<JsonObject>> hashFuture = Future.future();
@@ -127,7 +128,8 @@ public class FileServerVerticle extends AbstractVerticle {
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
 											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
-											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
+											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId)
+											.put(IMMessage.key_duration, Integer.valueOf(duration));
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
 									header.put("CmdBodylengthId", bodyLength);
