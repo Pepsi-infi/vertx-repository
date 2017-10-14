@@ -110,7 +110,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
         return ar -> {
             if (ar.succeeded()) {
                 T res = ar.result();
-                context.response().putHeader("content-type", "application/json")
+                context.response().putHeader("content-type", "application/json; charset=utf-8")
                         .end(res == null ? "{}" : res.toString(), ENCODE);
             } else {
                 internalError(context, ar.cause());
@@ -136,7 +136,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                 if (res == null) {
                     serviceUnavailable(context, "invalid_result");
                 } else {
-                    context.response().putHeader("content-type", "application/json").end(converter.apply(res), ENCODE);
+                    context.response().putHeader("content-type", "application/json; charset=utf-8").end(converter.apply(res), ENCODE);
                 }
             } else {
                 internalError(context, ar.cause());
@@ -157,7 +157,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                 if (res == null) {
                     serviceUnavailable(context, "invalid_result");
                 } else {
-                    context.response().putHeader("content-type", "application/json").end(res.toString(), ENCODE);
+                    context.response().putHeader("content-type", "application/json; charset=utf-8").end(res.toString(), ENCODE);
                 }
             } else {
                 internalError(context, ar.cause());
@@ -179,7 +179,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                     } else {
                         result = Result.success(res);
                     }
-                    context.response().putHeader("content-type", "application/json").end(JsonUtil.encodePrettily(result), ENCODE);
+                    context.response().putHeader("content-type", "application/json; charset=utf-8").end(JsonUtil.encodePrettily(result), ENCODE);
                 }
             } else {
                 internalError(context, ar.cause());
@@ -204,7 +204,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
                 if (res == null) {
                     notFound(context);
                 } else {
-                    context.response().putHeader("content-type", "application/json").end(res.toString(), ENCODE);
+                    context.response().putHeader("content-type", "application/json; charset=utf-8").end(res.toString(), ENCODE);
                 }
             } else {
                 internalError(context, ar.cause());
@@ -250,7 +250,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
         return ar -> {
             if (ar.succeeded()) {
                 context.response().setStatusCode(status == 0 ? 200 : status)
-                        .putHeader("content-type", "application/json").end(result.encodePrettily(), ENCODE);
+                        .putHeader("content-type", "application/json; charset=utf-8").end(result.encodePrettily(), ENCODE);
             } else {
                 internalError(context, ar.cause());
                 ar.cause().printStackTrace();
@@ -262,7 +262,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
         return ar -> {
             if (ar.succeeded()) {
                 context.response().setStatusCode(status == 0 ? 200 : status)
-                        .putHeader("content-type", "application/json").end(null, ENCODE);
+                        .putHeader("content-type", "application/json; charset=utf-8").end(null, ENCODE);
             } else {
                 internalError(context, ar.cause());
                 ar.cause().printStackTrace();
@@ -282,7 +282,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     protected Handler<AsyncResult<Void>> deleteResultHandler(RoutingContext context) {
         return res -> {
             if (res.succeeded()) {
-                context.response().setStatusCode(204).putHeader("content-type", "application/json")
+                context.response().setStatusCode(204).putHeader("content-type", "application/json; charset=utf-8")
                         .end(new JsonObject().put("message", "delete_success").encodePrettily());
             } else {
                 internalError(context, res.cause());
@@ -294,7 +294,7 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     // helper method dealing with failure
 
     protected void badRequest(RoutingContext context, Throwable ex) {
-        context.response().setStatusCode(400).putHeader("content-type", "application/json")
+        context.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("error", ex.getMessage()).encodePrettily(), ENCODE);
     }
 
@@ -302,28 +302,28 @@ public class RestAPIVerticle extends BaseServiceVerticle {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("status", BaseResponse.RESPONSE_FAIL_CODE);
         jsonObject.put("errorMessage", msg);
-        context.response().setStatusCode(200).putHeader("content-type", "application/json")
+        context.response().setStatusCode(200).putHeader("content-type", "application/json; charset=utf-8")
                 .end(jsonObject.encodePrettily(), ENCODE);
     }
 
     protected void notFound(RoutingContext context) {
-        context.response().setStatusCode(404).putHeader("content-type", "application/json")
+        context.response().setStatusCode(404).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("message", "not_found").encodePrettily());
     }
 
     protected void internalError(RoutingContext context, Throwable ex) {
-        context.response().setStatusCode(500).putHeader("content-type", "application/json")
+        context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("error", ex.toString()).encodePrettily(), ENCODE);
     }
 
     protected void notImplemented(RoutingContext context) {
-        context.response().setStatusCode(501).putHeader("content-type", "application/json")
+        context.response().setStatusCode(501).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("message", "not_implemented").encodePrettily());
     }
 
     protected void badGateway(Throwable ex, RoutingContext context) {
         ex.printStackTrace();
-        context.response().setStatusCode(502).putHeader("content-type", "application/json")
+        context.response().setStatusCode(502).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("error", "bad_gateway")
                         // .put("message", ex.getMessage())
                         .encodePrettily());
@@ -334,12 +334,12 @@ public class RestAPIVerticle extends BaseServiceVerticle {
     }
 
     protected void serviceUnavailable(RoutingContext context, Throwable ex) {
-        context.response().setStatusCode(503).putHeader("content-type", "application/json")
+        context.response().setStatusCode(503).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("error", ex.getMessage()).encodePrettily(), ENCODE);
     }
 
     protected void serviceUnavailable(RoutingContext context, String cause) {
-        context.response().setStatusCode(503).putHeader("content-type", "application/json")
+        context.response().setStatusCode(503).putHeader("content-type", "application/json; charset=utf-8")
                 .end(new JsonObject().put("error", cause).encodePrettily(), ENCODE);
     }
 }
