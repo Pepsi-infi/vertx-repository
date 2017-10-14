@@ -97,9 +97,24 @@ public class FileServerVerticle extends AbstractVerticle {
 							String to = request.getFormAttribute(IMMessage.key_toTel);
 							String msgId = request.getFormAttribute(IMMessage.key_msgId);
 							String sceneId = request.getFormAttribute(IMMessage.key_sceneId);
-							String msgType = request.getFormAttribute(IMMessage.key_msgType);
+							Integer msgType = Integer.valueOf(request.getFormAttribute(IMMessage.key_msgType));
+
+							// msgType 消息类型<p>,1文本 2语音，content为语音下载地址 3定位 4图片 5视频
+							switch (msgType) {
+							case 1://
+
+								break;
+
+							default:
+								break;
+							}
+
 							String sceneType = request.getFormAttribute(IMMessage.key_sceneType);
 							String duration = request.getFormAttribute(IMMessage.key_duration);
+							String address = request.getFormAttribute(IMMessage.key_address);
+							String sAddress = request.getFormAttribute(IMMessage.key_sAddress);
+							String lon = request.getFormAttribute(IMMessage.key_lon);
+							String lat = request.getFormAttribute(IMMessage.key_lat);
 
 							Future<Message<JsonObject>> hashFuture = Future.future();
 							DeliveryOptions option = new DeliveryOptions();

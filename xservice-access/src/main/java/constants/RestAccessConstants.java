@@ -24,4 +24,19 @@ public class RestAccessConstants {
 	 * param orderNo 订单号；timestamp
 	 */
 	public static final String GET_OFFLINE_MESSAGE = "/mc-im/message/offline/get.json";
+
+	/**
+	 * param "identity" : 0, //身份标识， 0司机 1乘客 ;userId
+	 */
+	public static final String get_quick_phrase = "/mc-im/quick/phrase/get.json";
+
+	/**
+	 * content
+	 */
+	public static final String add_quick_phrase = "/mc-im/quick/phrase/add.json";
+
+	/**
+	 * id
+	 */
+	public static final String del_quick_phrase = "/mc-im/quick/phrase/del.json";
 }

@@ -3,6 +3,7 @@ package server;
 import org.apache.commons.lang.StringUtils;
 
 import constants.RestAccessConstants;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -15,6 +16,7 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import module.quickphrase.QuickPhraseVerticle;
 import persistence.message.IMMongoMessage;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -29,6 +31,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	private EventBus eb;
 	private MongoClient client;
+
+	private JsonObject httpResp = new JsonObject();
 
 	@Override
 	public void start() throws Exception {
@@ -48,6 +52,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.route(RestAccessConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestAccessConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+
+		router.route(RestAccessConstants.get_quick_phrase).handler(this::getQuickPhrase);
+		router.route(RestAccessConstants.add_quick_phrase).handler(this::addQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
 
@@ -142,4 +149,76 @@ public class RestIMVerticle extends RestAPIVerticle {
 			}
 		});
 	}
+
+	public void getQuickPhrase(RoutingContext context) {
+		String userId = context.request().getParam("userId");
+		String identity = context.request().getParam("identity");
+
+		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity)) {
+			DeliveryOptions op = new DeliveryOptions();
+			op.addHeader("action", "getQuickPhrase");
+
+			JsonObject message = new JsonObject();
+			message.put("userID", userId);
+			message.put("identity", identity);
+
+			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
+				if (res.succeeded()) {
+					httpResp.put("code", 0);
+
+					context.response().putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				} else {
+					httpResp.put("code", 1);
+					httpResp.put("msg", res.cause().getMessage());
+
+					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				}
+			});
+		} else {
+			// illegal param
+		}
+	}
+
+	public void addQuickPhrase(RoutingContext context) {
+		String userId = context.request().getParam("userId");
+		String identity = context.request().getParam("identity");
+		String content = context.request().getParam("content");
+
+		httpResp.clear();
+		httpResp.put("time", System.currentTimeMillis());
+
+		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity) && StringUtils.isNotEmpty(content)) {
+			DeliveryOptions op = new DeliveryOptions();
+			op.addHeader("action", "addQuickPhrase");
+
+			JsonObject message = new JsonObject();
+			message.put("userID", userId);
+			message.put("identity", identity);
+			message.put("content", content);
+
+			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
+				if (res.succeeded()) {
+					httpResp.put("code", 0);
+
+					context.response().putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				} else {
+					httpResp.put("code", 1);
+					httpResp.put("msg", res.cause().getMessage());
+
+					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				}
+			});
+		} else {
+			httpResp.put("code", 1);
+			httpResp.put("msg", "Illegal params!");
+
+			context.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
+					.end(httpResp.encode());
+		}
+	}
+
 }

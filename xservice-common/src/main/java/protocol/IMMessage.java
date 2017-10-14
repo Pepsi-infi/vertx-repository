@@ -3,7 +3,7 @@ package protocol;
 public class IMMessage {
 
 	public interface header {
-		
+
 		public static final String key_HeaderLength = "HeaderLength";
 
 		public static final String key_ClientVersion = "ClientVersion";
@@ -77,6 +77,19 @@ public class IMMessage {
 	 * 纬度
 	 */
 	public static final String key_lat = "lat";
-	
+
+	/**
+	 * 位置短地址
+	 */
+	public static final String key_sAddress = "sAddress";
+
+	/**
+	 * 位置长地址
+	 */
+	public static final String key_address = "address";
+
+	/**
+	 * 音频 时长，单位 秒
+	 */
 	public static final String key_duration = "duration";
 }
