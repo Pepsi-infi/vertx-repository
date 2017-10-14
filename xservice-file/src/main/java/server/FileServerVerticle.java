@@ -54,7 +54,7 @@ public class FileServerVerticle extends AbstractVerticle {
 					String sysFile = uploadFilePathPrefix + file;
 					fs.exists(sysFile, res -> {
 						if (!res.result()) {
-							sendNotFound(request);
+							sendNotFound(request, sysFile);
 						} else {
 							fs.props(sysFile, prop -> {
 								FileProps props = prop.result();
@@ -70,7 +70,7 @@ public class FileServerVerticle extends AbstractVerticle {
 
 					break;
 				default:
-					sendNotFound(request);
+					sendNotFound(request, null);
 					break;
 				}
 			} else {
@@ -128,7 +128,7 @@ public class FileServerVerticle extends AbstractVerticle {
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
 											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
-											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId)
+											.put(IMMessage.key_content, "" + content).put(IMMessage.key_msgId, msgId)
 											.put(IMMessage.key_duration, Integer.valueOf(duration));
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
@@ -154,17 +154,21 @@ public class FileServerVerticle extends AbstractVerticle {
 
 					break;
 				default:
-					sendNotFound(request);
+					sendNotFound(request, null);
 					break;
 				}
 			}
 		}).listen(RestConstant.Server.PORT);
 	}
 
-	private void sendNotFound(HttpServerRequest request) {
+	private void sendNotFound(HttpServerRequest request, String sysFile) {
 		JsonObject response = new JsonObject();
 		response.put("code", 1000);
-		response.put("msg", "Cannot not locate resource " + request.uri());
+		if (StringUtils.isNotEmpty(sysFile)) {
+			response.put("msg", "Cannot not locate resource " + sysFile);
+		} else {
+			response.put("msg", "Cannot not locate resource " + request.uri());
+		}
 		response.put("time", System.currentTimeMillis());
 		request.response().setStatusCode(404).putHeader("content-type", "application/json").end(response.encode());
 	}
