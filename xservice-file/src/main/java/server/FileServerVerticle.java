@@ -1,5 +1,6 @@
 package server;
 
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -118,12 +119,18 @@ public class FileServerVerticle extends AbstractVerticle {
 									JsonObject param = new JsonObject();
 
 									JsonObject header = new JsonObject();
-
+									header.put("HeaderLength", 12);
+									header.put("ClientVersion", 800);
+									header.put("CmdId", 2001);
+									
 									JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, sceneType).put(IMMessage.key_msgType, msgType)
 											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
 
+									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
+									header.put("CmdBodylengthId", bodyLength);
+									
 									param.put("header", header);
 									param.put("body", body);
 
