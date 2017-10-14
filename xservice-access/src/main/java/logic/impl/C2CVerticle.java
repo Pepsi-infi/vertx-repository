@@ -146,7 +146,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 								Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
 										clientVersion, cmd + MessageBuilder.MSG_ACK_CMD_RADIX,
 										msgBody.toString().length());
-								eb.send(header.getString("fromHandlerID"), aMsgHeader.appendString(msgBody.toString())
+								eb.send(toHandlerID, aMsgHeader.appendString(msgBody.toString())
 										.appendString(MessageBuilder.IM_MSG_SEPARATOR));
 							} else {
 								logger.error(mongoRes.cause().getMessage());
