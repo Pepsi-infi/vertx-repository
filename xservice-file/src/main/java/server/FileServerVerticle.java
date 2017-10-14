@@ -128,7 +128,7 @@ public class FileServerVerticle extends AbstractVerticle {
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
 											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
-											.put(IMMessage.key_content, "" + content).put(IMMessage.key_msgId, msgId)
+											.put(IMMessage.key_content, uploadFilePathPrefix + content).put(IMMessage.key_msgId, msgId)
 											.put(IMMessage.key_duration, Integer.valueOf(duration));
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
