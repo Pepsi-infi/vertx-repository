@@ -73,7 +73,7 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 		if (msg != null) {
 			String to = null;
 			try {
-				to = msg.getJsonObject("body").getString("to");
+				to = msg.getJsonObject("body").getString(IMMessage.key_toTel);
 				logger.info("send to={}", to);
 			} catch (Exception e) {
 				result = 1;
