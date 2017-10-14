@@ -53,6 +53,7 @@ public class FileServerVerticle extends AbstractVerticle {
 				case RestConstant.Uri.DOWNLOAD_FILE_PATH:
 					String sysFile = uploadFilePathPrefix + file;
 					fs.exists(sysFile, res -> {
+						logger.info("fs.exist={}", res.result());
 						if (!res.result()) {
 							sendNotFound(request, sysFile);
 						} else {
@@ -128,7 +129,9 @@ public class FileServerVerticle extends AbstractVerticle {
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
 											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
 											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
-											.put(IMMessage.key_content, uploadFilePathPrefix + content).put(IMMessage.key_msgId, msgId)
+											.put(IMMessage.key_content,
+													"http://10.10.10.193:9090/mc-file/im/download.json?file=" + content)
+											.put(IMMessage.key_msgId, msgId)
 											.put(IMMessage.key_duration, Integer.valueOf(duration));
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
