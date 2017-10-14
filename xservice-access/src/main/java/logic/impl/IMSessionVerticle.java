@@ -127,6 +127,7 @@ public class IMSessionVerticle extends AbstractVerticle {
 		JsonObject jo = new JsonObject();
 		jo.put("handlerID", sessionMap.get(uid));
 
+		logger.info("getHandlerIDByUid, uid={} result={}", uid, jo.encode());
 		return jo;
 	}
 }
