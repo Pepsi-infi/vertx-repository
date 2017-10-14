@@ -125,7 +125,8 @@ public class FileServerVerticle extends AbstractVerticle {
 
 									JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
 											.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
-											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType)).put(IMMessage.key_msgType, msgType)
+											.put(IMMessage.key_sceneType, Integer.valueOf(sceneType))
+											.put(IMMessage.key_msgType, Integer.valueOf(msgType))
 											.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
 
 									int bodyLength = body.encode().getBytes(Charset.defaultCharset()).length;
