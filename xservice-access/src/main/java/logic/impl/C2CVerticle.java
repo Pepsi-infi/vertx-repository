@@ -97,8 +97,8 @@ public class C2CVerticle extends AbstractVerticle implements C2CService {
 						int cmd = header.getInteger("cmd");
 						body.put(IMMessage.key_msgId, body.getString(IMMessage.key_msgId));
 						body.put(IMMessage.key_timeStamp, ts);
-						body.put(IMMessage.key_fromTel, body.getString("from"));
-						body.put(IMMessage.key_toTel, body.getString("to"));
+						body.put(IMMessage.key_fromTel, body.getString(IMMessage.key_fromTel));
+						body.put(IMMessage.key_toTel, body.getString(IMMessage.key_toTel));
 
 						int bodyLength = 0;
 						try {
