@@ -44,6 +44,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			if (headers != null) {
 				String action = headers.get("action");
 				String userId = body.getString("userID");
+				logger.info("start ... body={}", body.encode());
 				switch (action) {
 				case "addQuickPhrase":
 
@@ -132,6 +133,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
 				params.add(userId);
+				logger.info("getQickPhrase, params={}", params.encode());
 				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
 						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());

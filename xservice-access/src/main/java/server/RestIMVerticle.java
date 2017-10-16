@@ -158,6 +158,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", "getQuickPhrase");
+			op.setSendTimeout(3000);
 
 			JsonObject message = new JsonObject();
 			message.put("userID", userId);
@@ -195,6 +196,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity) && StringUtils.isNotEmpty(content)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", "addQuickPhrase");
+			op.setSendTimeout(3000);
 
 			JsonObject message = new JsonObject();
 			message.put("userID", userId);
