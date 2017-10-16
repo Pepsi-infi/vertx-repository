@@ -9,13 +9,11 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
-import logic.C2CService;
 
 public class ValidateServerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(ValidateServerVerticle.class);
 
-	private C2CService c2cService;
 	private EventBus eb;
 	private int header = -1;
 	private int msgLength = 4;
