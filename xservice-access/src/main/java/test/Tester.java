@@ -3,12 +3,8 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import module.c2c.C2CVerticle;
-import module.hash.IMConsistentHashingVerticle;
-import module.persistence.MongoVerticle;
-import module.session.IMSessionVerticle;
+import module.quickphrase.QuickPhraseVerticle;
 import server.RestIMVerticle;
-import server.IMServerVerticle;
 
 public class Tester {
 
@@ -45,11 +41,14 @@ public class Tester {
 		// }
 
 		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
-//		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
+		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
+
+		// vertx.deployVerticle(MongoVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(getMongo()));
 	}
 
 	private static JsonObject getMongo() {
-		String m = "{\"host\":\"10.10.10.178\",\"port\":27017,\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"db_name\":\"im-mc\",\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500,\"socket\":[{\"innerIP\":\"10.10.10.102\",\"node\":\"111.206.162.233:8088\"},{\"innerIP\":\"10.10.10.103\",\"node\":\"111.206.162.234:8088\"}]}";
+		String m = "{\"mongo\":{\"host\":\"10.10.10.178\",\"port\":27017,\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"db_name\":\"im-mc\",\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500},\"mysql\":{},\"im\":[{\"innerIP\":\"10.10.10.193\",\"node\":\"111.206.162.233:4321\"}],\"file\":{\"upload.file.path.prefix\":\"/u01/projectCAR/xservice/xservice-file/\",\"download.file.server.prefix\":\":9090/mc-file/im/download.json?file=\"}}";
 		return new JsonObject(m);
 	}
 

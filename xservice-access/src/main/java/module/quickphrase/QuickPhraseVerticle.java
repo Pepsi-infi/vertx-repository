@@ -44,7 +44,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				switch (action) {
 				case "addQuickPhrase":
 
-					int identity = body.getInteger("identity").intValue();
+					int identity = Integer.valueOf(body.getString("identity")).intValue();
 					String content = body.getString("content");
 					addQuickPhrase(userId, identity, content, resultHandler -> {
 						res.reply(resultHandler.result());
