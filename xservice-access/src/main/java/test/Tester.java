@@ -4,6 +4,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import module.persistence.MongoVerticle;
+import module.quickphrase.QuickPhraseVerticle;
 import server.RestIMVerticle;
 
 public class Tester {
@@ -41,8 +42,7 @@ public class Tester {
 		// }
 
 		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
-		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 
 		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
 	}

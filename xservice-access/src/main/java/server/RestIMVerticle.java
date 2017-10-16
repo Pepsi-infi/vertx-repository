@@ -1,6 +1,7 @@
 package server;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import constants.RestIMConstants;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -111,13 +112,13 @@ public class RestIMVerticle extends RestAPIVerticle {
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
 		if (StringUtils.isNotEmpty(timestamp)) {
-			query.put("timeStamp", new JsonObject().put("$lt", timestamp));
+			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
 		}
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
 
-		options.setSort(new JsonObject().put("timeStamp", 1));
+		options.setSort(new JsonObject().put("timeStamp", -1));
 
 		JsonObject fields = new JsonObject();
 		fields.put("_id", 0);
@@ -130,6 +131,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		fields.put("fromTel", 1);
 		fields.put("toTel", 1);
 		fields.put("timeStamp", 1);
+		fields.put("identity", 1);
 		options.setFields(fields);
 
 		client.findWithOptions("message", query, options, r -> {

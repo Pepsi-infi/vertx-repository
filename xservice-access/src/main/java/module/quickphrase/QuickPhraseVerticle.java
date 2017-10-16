@@ -41,8 +41,6 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		logger.info("mysql config={}", config().getJsonObject("mysql").getJsonObject("mc-im").encode());
 		mySQLClient = MySQLClient.createShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-im"));
 
-		logger.info("mysql client={}", mySQLClient);
-
 		eb.<JsonObject>consumer(QuickPhraseVerticle.class.getName(), res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
@@ -83,6 +81,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private void addQuickPhrase(String userId, int identity, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
+		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(content)) {
 			result.clear();// Must do clear before use it!
 			params.clear();// Must do clear before use it!
@@ -135,7 +134,6 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		params.clear();// Must do clear before use it!
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
-				logger.info("getConnection, {}", res.succeeded());
 				SQLConnection connection = res.result();
 				params.add(userId);
 				logger.info("getQickPhrase, params={}", params.encode());
