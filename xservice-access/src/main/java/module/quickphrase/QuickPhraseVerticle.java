@@ -120,7 +120,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		}).close();
 	}
 
-	private static final String sql_getQuickPhrase = "select () from quick_phrase where userId = ?";
+	private static final String sql_getQuickPhrase = "select (id, userId, identity, content, createTime) from quick_phrase where userId = ?";
 
 	private void getQuickPhrase(String userId, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
@@ -129,8 +129,9 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
 				params.add(userId);
-				connection.updateWithParams(sql_getQuickPhrase, params, SQLRes -> {
+				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
+						logger.info("getQickPhrase, result={}", SQLRes.result());
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					} else {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
