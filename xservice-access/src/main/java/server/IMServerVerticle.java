@@ -185,28 +185,30 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
 		//
-		Future<String> hashFuture = Future.future();
+		// Future<String> hashFuture = Future.future();
+		//
+		// hashFuture.setHandler(res -> {
+		// logger.info("msgRequest, hashFuture={}", res.result());
+		// if (res.succeeded()) {}
+		// });
 
-		hashFuture.setHandler(res -> {
-			logger.info("msgRequest, hashFuture={}", res.result());
-			if (res.succeeded()) {
-				JsonObject param = new JsonObject();
+		JsonObject param = new JsonObject();
 
-				JsonObject header = new JsonObject();
-				header.put("clientVersion", clientVersion);
-				header.put("cmd", cmd);
-				header.put("fromHandlerID", handlerID);
+		JsonObject header = new JsonObject();
+		header.put("clientVersion", clientVersion);
+		header.put("cmd", cmd);
+		header.put("fromHandlerID", handlerID);
 
-				param.put("header", header);
-				param.put("body", Json.encode(imMessage));
+		param.put("header", header);
+		param.put("body", Json.encode(imMessage));
 
-				DeliveryOptions option = new DeliveryOptions();
-				option.addHeader("action", C2CVerticle.method.sendMessage);
-				option.setSendTimeout(1000);
+		DeliveryOptions option = new DeliveryOptions();
+		option.addHeader("action", C2CVerticle.method.sendMessage);
+		option.setSendTimeout(1000);
 
-				eb.send(C2CVerticle.class.getName() + "10.10.10.193", param.encode(), option);
-			}
-		});
+		logger.info("msgRequest, param={}", param.encode());
+		eb.send(C2CVerticle.class.getName() + "10.10.10.193", param.encode(), option);
+
 	}
 
 	private void socketClose(String handlerID) {
