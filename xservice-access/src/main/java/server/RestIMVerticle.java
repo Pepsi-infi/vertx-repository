@@ -56,6 +56,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
 		router.route(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
+		router.route(RestIMConstants.del_quick_phrase).handler(this::addQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
 
@@ -224,6 +225,10 @@ public class RestIMVerticle extends RestAPIVerticle {
 			context.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
 					.end(httpResp.encode());
 		}
+	}
+
+	public void delQuickPhrase(RoutingContext context) {
+		String id = context.request().getParam("id");
 	}
 
 }

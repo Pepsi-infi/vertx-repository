@@ -72,6 +72,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 					Buffer bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
 					SQIMBody imMessage = Json.decodeValue(bufferBody, SQIMBody.class);
+					logger.info("imMessage={}", imMessage.toString());
 					switch (cmd) {
 					case IMCmd.HEART_BEAT:
 						heartBeat(socket.writeHandlerID(), clientVersion, cmd);
