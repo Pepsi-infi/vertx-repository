@@ -2,6 +2,8 @@ package module.c2c;
 
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.lang.StringUtils;
+
 import constants.IMCmd;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
@@ -75,26 +77,30 @@ public class C2CVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				JsonObject res11 = res.result().body();
 				String toHandlerID = res11.getString("handlerID");
+				if (StringUtils.isNotEmpty(toHandlerID)) {
+					long ts = System.currentTimeMillis();
 
-				long ts = System.currentTimeMillis();
+					msg.setTimeStamp(ts);
+					String body = Json.encode(msg);
+					int bodyLength = 0;
+					try {
+						bodyLength = Json.encode(msg).getBytes("UTF-8").length;
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 
-				msg.setTimeStamp(ts);
-				String body = Json.encode(msg);
-				int bodyLength = 0;
-				try {
-					bodyLength = Json.encode(msg).getBytes("UTF-8").length;
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+							cmd, bodyLength);
+
+					logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
+
+					eb.send(toHandlerID, headerBuffer.appendString(body).appendString(MessageBuilder.IM_MSG_SEPARATOR));
+
+					saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
+				} else {
+					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
 				}
-
-				Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion, cmd,
-						bodyLength);
-				logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
-
-				eb.send(toHandlerID, headerBuffer.appendString(body).appendString(MessageBuilder.IM_MSG_SEPARATOR));
-
-				saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
 			} else {
 				logger.error("sendMessage error.", res.cause());
 			}
