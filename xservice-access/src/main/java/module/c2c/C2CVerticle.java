@@ -97,7 +97,10 @@ public class C2CVerticle extends AbstractVerticle {
 
 					eb.send(toHandlerID, headerBuffer.appendString(body));
 
-					saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
+					// 只有聊天消息入库
+					if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+						saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
+					}
 				} else {
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
 				}
@@ -114,11 +117,7 @@ public class C2CVerticle extends AbstractVerticle {
 		mongoMsg.put("collection", MONGO_COLLECTION);
 
 		IMData data = new IMData();
-		data.setBody(msg);
-		data.setHeaderLength(MessageBuilder.HEADER_LENGTH);
-		data.setClientVersion(clientVersion);
 		data.setCmdId(IMCmd.MSG_N);
-		data.setBodyLength(bodyLength);
 
 		mongoMsg.put("data", Json.encode(data));
 

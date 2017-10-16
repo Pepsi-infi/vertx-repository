@@ -1,5 +1,8 @@
 package constants;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class IMCmd {
 
 	/**
@@ -46,4 +49,18 @@ public class IMCmd {
 	 * ack:N
 	 */
 	public static final int ACK_N = 2103;
+
+	/**
+	 * 
+	 */
+	public static final int POSITION_SHARE_START = 4001;
+
+	public static final int POSITION_SHARE_END = 4002;
+
+	public static final int POSITION_SHARE_ING = 4003;
+
+	public static final Set<Integer> MONGO_CMD_SET = new HashSet<Integer>();
+	static {
+		MONGO_CMD_SET.add(MSG_R);
+	}
 }

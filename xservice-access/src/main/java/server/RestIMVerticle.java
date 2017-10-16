@@ -5,18 +5,17 @@ import org.apache.commons.lang.StringUtils;
 import constants.RestIMConstants;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.core.shareddata.LocalMap;
-import io.vertx.core.shareddata.SharedData;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
-import module.persistence.IMData;
+import module.hash.IMConsistentHashingVerticle;
 import module.quickphrase.QuickPhraseVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -25,14 +24,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(RestIMVerticle.class);
 
-	private SharedData sharedData;
-	private LocalMap<String, String> sessionMap;// uid -> handlerID
-	private LocalMap<String, String> sessionReverse; // handlerID -> uid
-
 	private EventBus eb;
 	private MongoClient client;
 
 	private JsonObject httpResp = new JsonObject();
+	private JsonObject message = new JsonObject();
 
 	@Override
 	public void start() throws Exception {
@@ -41,14 +37,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		eb = vertx.getDelegate().eventBus();
 		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
-		sharedData = vertx.getDelegate().sharedData();
-		sessionMap = sharedData.getLocalMap("session");
-		sessionReverse = sharedData.getLocalMap("sessionReverse");
-
 		logger.info("Rest mc-access Verticle: Start...");
 
 		Router router = Router.router(vertx);
-		router.route(RestIMConstants.ONLINE_NUMBER).handler(this::getOnlineNumber);
 		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
@@ -56,7 +47,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
 		router.route(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
-		router.route(RestIMConstants.del_quick_phrase).handler(this::addQuickPhrase);
+		router.route(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
 
@@ -71,44 +62,42 @@ public class RestIMVerticle extends RestAPIVerticle {
 		return StringUtils.isNotBlank(IPUtil.getInnerIP()) ? IPUtil.getInnerIP() : config().getString("service.host");
 	}
 
-	private void getOnlineNumber(RoutingContext context) {
-		JsonObject result = new JsonObject();
-		Response base = new Response();
-		base.setCode(0);
-		base.setTime(System.currentTimeMillis());
-		base.setData(result);
-		result.put("sessionMap", sessionMap.size());
-		result.put("sessionReverse", sessionReverse.size());
-
-		context.response().putHeader("content-type", "application/json").end(Json.encode(base));
-	}
-
 	private void getIMServer(RoutingContext context) {
 		String userTel = context.request().getParam("userTel");
 		logger.info("userTel={}", userTel);
-		JsonObject response = new JsonObject();
+		httpResp.clear();
 		if (StringUtils.isNotEmpty(userTel)) {
-			Future<String> hashFuture = Future.future();
-			hashFuture.setHandler(res -> {
+			DeliveryOptions chOption = new DeliveryOptions();
+			chOption.setSendTimeout(3000);
+			chOption.addHeader("action", "getInnerNode");
+
+			Future<Message<JsonObject>> chFuture = Future.future();
+
+			JsonObject message = new JsonObject();
+			message.put("userId", userTel);
+			eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+
+			chFuture.setHandler(res -> {
 				if (res.succeeded()) {
 					JsonObject data = new JsonObject();
-					data.put("server", res.result());
-					response.put("data", data);
-					response.put("code", 0);
-					response.put("time", System.currentTimeMillis());
-					context.response().putHeader("content-type", "application/json").end(Json.encode(response));
+					data.put("server", res.result().body().getString("host"));
+					httpResp.put("data", data);
+					httpResp.put("code", 0);
+					httpResp.put("time", System.currentTimeMillis());
+					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
 				} else {
-					response.put("code", 1);
-					response.put("msg", "Consistent Hash Error.");
-					response.put("time", System.currentTimeMillis());
-					context.response().putHeader("content-type", "application/json").end(Json.encode(response));
+					httpResp.put("code", 1);
+					httpResp.put("msg", "Consistent Hash Error.");
+					httpResp.put("time", System.currentTimeMillis());
+					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
+					logger.error("msgRequest, {}", res.cause().getMessage());
 				}
 			});
 		} else {
-			response.put("code", 1);
-			response.put("msg", "param userTel is null.");
-			response.put("time", System.currentTimeMillis());
-			context.response().putHeader("content-type", "application/json").end(Json.encode(response));
+			httpResp.put("code", 1);
+			httpResp.put("msg", "param userTel is null.");
+			httpResp.put("time", System.currentTimeMillis());
+			context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
 		}
 
 	}
@@ -117,7 +106,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		String orderNo = context.request().getParam("orderNo");
 		String timestamp = context.request().getParam("timestamp");// TODO
 
-		JsonObject response = new JsonObject();
+		httpResp.clear();
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
@@ -128,7 +117,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
 
-		options.setSort(new JsonObject().put(IMData.key_timeStamp, 1));
+		options.setSort(new JsonObject().put("timeStamp", 1));
 
 		JsonObject fields = new JsonObject();
 		fields.put("_id", 0);
@@ -146,15 +135,15 @@ public class RestIMVerticle extends RestAPIVerticle {
 		client.findWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
 				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
-				response.put("code", 0);
-				response.put("time", System.currentTimeMillis());
-				response.put("data", r.result());
-				context.response().putHeader("content-type", "application/json; charset=utf-8").end(response.encode());
+				httpResp.put("code", 0);
+				httpResp.put("time", System.currentTimeMillis());
+				httpResp.put("data", r.result());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
 			} else {
-				response.put("code", 1);
-				response.put("time", System.currentTimeMillis());
-				response.put("message", r.cause().getMessage());
-				context.response().putHeader("content-type", "application/json; charset=utf-8").end(response.encode());
+				httpResp.put("code", 1);
+				httpResp.put("time", System.currentTimeMillis());
+				httpResp.put("message", r.cause().getMessage());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
 			}
 		});
 	}
@@ -165,10 +154,10 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity)) {
 			DeliveryOptions op = new DeliveryOptions();
-			op.addHeader("action", "getQuickPhrase");
+			op.addHeader("action", QuickPhraseVerticle.method.getQuickPhrase);
 			op.setSendTimeout(3000);
 
-			JsonObject message = new JsonObject();
+			message.clear();
 			message.put("userID", userId);
 			message.put("identity", identity);
 
@@ -203,12 +192,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity) && StringUtils.isNotEmpty(content)) {
 			DeliveryOptions op = new DeliveryOptions();
-			op.addHeader("action", "addQuickPhrase");
+			op.addHeader("action", QuickPhraseVerticle.method.addQuickPhrase);
 			op.setSendTimeout(3000);
 
-			JsonObject message = new JsonObject();
+			message.clear();
 			message.put("userID", userId);
-			message.put("identity", identity);
+			message.put("identity", Integer.valueOf(identity));
 			message.put("content", content);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
@@ -236,6 +225,32 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	public void delQuickPhrase(RoutingContext context) {
 		String id = context.request().getParam("id");
+
+		httpResp.clear();
+		httpResp.put("time", System.currentTimeMillis());
+		if (StringUtils.isNotEmpty(id)) {
+			DeliveryOptions op = new DeliveryOptions();
+			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
+			op.setSendTimeout(3000);
+
+			message.clear();
+			message.put("id", Long.valueOf(id));
+
+			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
+				if (res.succeeded()) {
+					httpResp.put("code", 0);
+
+					context.response().putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				} else {
+					httpResp.put("code", 1);
+					httpResp.put("msg", res.cause().getMessage());
+
+					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
+							.end(httpResp.encode());
+				}
+			});
+		}
 	}
 
 }

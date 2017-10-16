@@ -1,6 +1,6 @@
-package constants;
+package api;
 
-public class RestConstant {
+public class RestFileConstant {
 
 	public interface Server {
 		static final int PORT = 9090;

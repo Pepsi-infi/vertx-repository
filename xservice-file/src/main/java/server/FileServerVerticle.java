@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
-import api.RestConstant;
+import api.RestFileConstant;
 import constants.IMCmd;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -36,8 +36,6 @@ public class FileServerVerticle extends AbstractVerticle {
 
 	private String lastCreated;
 
-	// private ConsistentHashingService consistentHashingService;
-	// private C2CService c2cService;
 	private EventBus eb;
 	private String uploadFilePathPrefix;
 	private String downloadFilePathPrefix;
@@ -60,7 +58,7 @@ public class FileServerVerticle extends AbstractVerticle {
 			if (request.method() == HttpMethod.GET) {
 				String file = request.getParam("file");
 				switch (request.path()) {
-				case RestConstant.Uri.DOWNLOAD_FILE_PATH:
+				case RestFileConstant.Uri.DOWNLOAD_FILE_PATH:
 					String sysFile = uploadFilePathPrefix + file;
 					fs.exists(sysFile, res -> {
 						if (!res.result()) {
@@ -85,7 +83,7 @@ public class FileServerVerticle extends AbstractVerticle {
 				}
 			} else {
 				switch (request.uri()) {
-				case RestConstant.Uri.UPLOAD_FILE_PATH:
+				case RestFileConstant.Uri.UPLOAD_FILE_PATH:
 					String uuid = UUID.randomUUID().toString();
 					request.setExpectMultipart(true);
 					LocalDate date = LocalDate.now();
@@ -161,7 +159,7 @@ public class FileServerVerticle extends AbstractVerticle {
 					break;
 				}
 			}
-		}).listen(RestConstant.Server.PORT);
+		}).listen(RestFileConstant.Server.PORT);
 	}
 
 	private SQIMBody buildIMBody(MultiMap attriMap) {

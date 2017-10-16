@@ -18,7 +18,8 @@ public class StartVerticle extends AbstractVerticle {
 
 	public void start() throws Exception {
 		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-//		vertx.deployVerticle(FileServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(FileServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
 		vertx.deployVerticle(IMConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));

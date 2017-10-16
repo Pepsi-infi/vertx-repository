@@ -55,12 +55,6 @@ public class MongoVerticle extends AbstractVerticle {
 					});
 					break;
 
-				case "findOffLineMessage":
-					findOffLineMessage(param, r -> {
-						res.reply(r.result());
-					});
-					break;
-
 				default:
 					res.reply(1);// Fail!
 					break;
@@ -112,30 +106,6 @@ public class MongoVerticle extends AbstractVerticle {
 			logger.info("saveDataBatch opList size={}", opList.size());
 			opList = new ArrayList<BulkOperation>();
 		}
-	}
-
-	/**
-	 * {"msgId":1111111,"cmd":111,"timeStamp":11111,"date":"2017-01-01","toTel":123123123,"sceneId":11111}
-	 * 
-	 * @param json
-	 */
-	public void findOffLineMessage(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
-		JsonObject result = new JsonObject();
-		FindOptions options = new FindOptions();
-		options.setLimit(100);
-		options.setSort(new JsonObject().put(IMData.key_timeStamp, 1));
-		client.findWithOptions("message", query, options, r -> {
-			if (r.succeeded()) {
-				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
-				result.put("data", r.result());
-				result.put("status", 0);
-				resultHandler.handle(Future.succeededFuture(result));
-			} else {
-				result.put("status", 1);
-				result.put("message", r.cause().getMessage());
-				resultHandler.handle(Future.succeededFuture(null));
-			}
-		});
 	}
 
 	public void updateData(JsonObject json) {

@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import constants.IMCmd;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -23,7 +22,6 @@ import io.vertx.core.parsetools.RecordParser;
 import module.c2c.C2CVerticle;
 import module.c2c.protocol.MessageBuilder;
 import module.c2c.protocol.SQIMBody;
-import module.persistence.IMData;
 import module.persistence.MongoVerticle;
 import module.session.IMSessionVerticle;
 import utils.ByteUtil;
@@ -70,7 +68,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				final RecordParser parser = RecordParser.newFixed(MessageBuilder.HEADER_LENGTH, null);
 				parser.setOutput(new Handler<Buffer>() {
 					private int bodyLength = -1;
-
 					private int clientVersion = -1;
 					private int cmd = -1;
 
@@ -94,7 +91,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 								break;
 							case IMCmd.LOGIN:
-
 								if (imMessage != null && StringUtils.isNotEmpty(imMessage.getUserTel())) {
 									login(handlerID, clientVersion, cmd, bodyLength, imMessage);
 								}
@@ -115,9 +111,24 @@ public class IMServerVerticle extends BaseServiceVerticle {
 								break;
 							case IMCmd.ACK_N:
 								if (imMessage != null) {
-									msgAck(handlerID, clientVersion, cmd, imMessage);
+									ackNCmd(handlerID, clientVersion, cmd, imMessage);
 								}
 
+								break;
+							case IMCmd.POSITION_SHARE_START:
+								if (imMessage != null) {
+									msgRequest(handlerID, clientVersion, cmd, bodyLength, imMessage);
+								}
+								break;
+							case IMCmd.POSITION_SHARE_END:
+								if (imMessage != null) {
+									msgRequest(handlerID, clientVersion, cmd, bodyLength, imMessage);
+								}
+								break;
+							case IMCmd.POSITION_SHARE_ING:
+								if (imMessage != null) {
+									msgRequest(handlerID, clientVersion, cmd, bodyLength, imMessage);
+								}
 								break;
 							default:
 								break;
@@ -205,11 +216,11 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		server.listen();
 	}
 
-	private void msgAck(String handlerID, int clientVersion, int cmd, SQIMBody imMessage) {
+	private void ackNCmd(String handlerID, int clientVersion, int cmd, SQIMBody imMessage) {
 		logger.info("msgAck, buffer={}", Json.encode(imMessage));
 		String msgId = imMessage.getMsgId();
 
-		JsonObject data = new JsonObject().put(IMData.key_msgId, msgId).put(IMData.key_cmdId, IMCmd.MSG_A);
+		JsonObject data = new JsonObject().put("msgId", msgId).put("cmdId", IMCmd.MSG_A);
 		JsonObject update = new JsonObject().put("collection", "message").put("data", data);
 
 		DeliveryOptions mongoOp = new DeliveryOptions();
@@ -261,25 +272,16 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			option.addHeader("action", "delUserSocket");
 			option.setSendTimeout(3000);
 			JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-			eb.send(IMSessionVerticle.class.getName(), msg, option);
+			eb.send(IMSessionVerticle.class.getName() + innerIP, msg, option);
 
 			// 给FROM发A
 			Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH,
 					msg.getInteger("clientVersion"), cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 			eb.send(handlerID, aMsgHeader);
 		}
-
 	}
 
 	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
-		//
-		// Future<String> hashFuture = Future.future();
-		//
-		// hashFuture.setHandler(res -> {
-		// logger.info("msgRequest, hashFuture={}", res.result());
-		// if (res.succeeded()) {}
-		// });
-
 		JsonObject param = new JsonObject();
 
 		JsonObject header = new JsonObject();
@@ -292,11 +294,10 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", C2CVerticle.method.sendMessage);
-		option.setSendTimeout(1000);
+		option.setSendTimeout(3000);
 
 		logger.info("msgRequest, param={}", param.encode());
-		eb.send(C2CVerticle.class.getName() + "10.10.10.193", param, option);
-
+		eb.send(C2CVerticle.class.getName() + innerIP, param, option);
 	}
 
 	private void socketClose(String handlerID) {

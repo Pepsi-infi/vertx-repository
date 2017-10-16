@@ -27,9 +27,14 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 	private JsonObject result = new JsonObject();
 	private JsonArray params = new JsonArray();
 
+	public static interface method {
+		public static final String addQuickPhrase = "addQuickPhrase";
+		public static final String delQuickPhrase = "delQuickPhrase";
+		public static final String getQuickPhrase = "getQuickPhrase";
+	}
+
 	@Override
 	public void start() throws Exception {
-		// TODO Auto-generated method stub
 		super.start();
 
 		eb = vertx.eventBus();
@@ -46,23 +51,22 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				String userId = body.getString("userID");
 				logger.info("start ... body={}", body.encode());
 				switch (action) {
-				case "addQuickPhrase":
-
-					int identity = Integer.valueOf(body.getString("identity")).intValue();
+				case method.addQuickPhrase:
+					int identity = body.getInteger("identity");
 					String content = body.getString("content");
 					addQuickPhrase(userId, identity, content, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
 					break;
 
-				case "delQuickPhrase":
+				case method.delQuickPhrase:
 					long id = body.getLong("id");
 					delQuickPhrase(id, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
 					break;
 
-				case "getQuickPhrase":
+				case method.getQuickPhrase:
 					getQuickPhrase(userId, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
