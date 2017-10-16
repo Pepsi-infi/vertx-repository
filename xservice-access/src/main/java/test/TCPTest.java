@@ -4,7 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
-import util.ByteUtil;
+import utils.ByteUtil;
 
 public class TCPTest extends AbstractVerticle {
 

@@ -1,14 +1,15 @@
 package api;
 
-import cluster.impl.IMConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import logic.impl.C2CVerticle;
-import logic.impl.IMSessionVerticle;
-import persistence.impl.MongoVerticle;
+import module.c2c.C2CVerticle;
+import module.hash.IMConsistentHashingVerticle;
+import module.persistence.MongoVerticle;
+import module.session.IMSessionVerticle;
 import server.RestIMVerticle;
+import server.FileServerVerticle;
 import server.IMServerVerticle;
 
 public class StartVerticle extends AbstractVerticle {
@@ -17,6 +18,7 @@ public class StartVerticle extends AbstractVerticle {
 
 	public void start() throws Exception {
 		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+//		vertx.deployVerticle(FileServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(IMConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));

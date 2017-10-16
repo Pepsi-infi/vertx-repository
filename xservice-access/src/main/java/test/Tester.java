@@ -1,12 +1,12 @@
 package test;
 
-import cluster.impl.IMConsistentHashingVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import logic.impl.C2CVerticle;
-import logic.impl.IMSessionVerticle;
-import persistence.impl.MongoVerticle;
+import module.c2c.C2CVerticle;
+import module.hash.IMConsistentHashingVerticle;
+import module.persistence.MongoVerticle;
+import module.session.IMSessionVerticle;
 import server.RestIMVerticle;
 import server.IMServerVerticle;
 

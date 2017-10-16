@@ -2,7 +2,7 @@ package server;
 
 import org.apache.commons.lang.StringUtils;
 
-import constants.RestAccessConstants;
+import constants.RestIMConstants;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
@@ -16,8 +16,8 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import module.persistence.IMData;
 import module.quickphrase.QuickPhraseVerticle;
-import persistence.message.IMMongoMessage;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
 
@@ -48,20 +48,20 @@ public class RestIMVerticle extends RestAPIVerticle {
 		logger.info("Rest mc-access Verticle: Start...");
 
 		Router router = Router.router(vertx);
-		router.route(RestAccessConstants.ONLINE_NUMBER).handler(this::getOnlineNumber);
-		router.route(RestAccessConstants.SERVER).handler(this::getIMServer);
+		router.route(RestIMConstants.ONLINE_NUMBER).handler(this::getOnlineNumber);
+		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
-		router.route(RestAccessConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
 
-		router.route(RestAccessConstants.get_quick_phrase).handler(this::getQuickPhrase);
-		router.route(RestAccessConstants.add_quick_phrase).handler(this::addQuickPhrase);
+		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
+		router.route(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
-		createHttpServer(router, serverHost, RestAccessConstants.HTTP_PORT)
-				.compose(serverCreated -> publishHttpEndpoint(RestAccessConstants.SERVICE_NAME, serverHost,
-						RestAccessConstants.HTTP_PORT, RestAccessConstants.SERVICE_ROOT))
+		createHttpServer(router, serverHost, RestIMConstants.HTTP_PORT)
+				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
+						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
 	}
 
@@ -71,7 +71,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	private void getOnlineNumber(RoutingContext context) {
 		JsonObject result = new JsonObject();
-		BaseDto base = new BaseDto();
+		Response base = new Response();
 		base.setCode(0);
 		base.setTime(System.currentTimeMillis());
 		base.setData(result);
@@ -118,11 +118,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 		JsonObject response = new JsonObject();
 
 		JsonObject query = new JsonObject();
-		query.put("sceneId", orderNo);
+		query.put("body.sceneId", orderNo);
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
-		options.setSort(new JsonObject().put(IMMongoMessage.key_timeStamp, 1));
+		options.setSort(new JsonObject().put(IMData.key_timeStamp, 1));
 
 		JsonObject fields = new JsonObject();
 		fields.put("_id", 0);

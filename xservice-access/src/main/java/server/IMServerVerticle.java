@@ -5,11 +5,12 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import constants.IMMessageConstant;
+import constants.IMCmd;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -17,14 +18,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
-import logic.impl.C2CVerticle;
-import logic.impl.IMSessionVerticle;
-import persistence.impl.MongoVerticle;
-import persistence.message.IMMongoMessage;
-import protocol.IMCmd;
-import protocol.IMMessage;
-import protocol.MessageBuilder;
-import util.ByteUtil;
+import module.c2c.C2CVerticle;
+import module.c2c.protocol.MessageBuilder;
+import module.c2c.protocol.SQIMBody;
+import module.persistence.IMData;
+import module.persistence.MongoVerticle;
+import module.session.IMSessionVerticle;
+import utils.ByteUtil;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
 
@@ -61,42 +61,50 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		server.connectHandler(socket -> {
 			socket.handler(RecordParser.newDelimited(MessageBuilder.IM_MSG_SEPARATOR, buffer -> {
-				int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
-				int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
-				int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
-				int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
+				if (buffer.length() > 2) {
+					int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
+					int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
+					int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
+					int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
 
-				logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
-						clientVersion, cmd, bodyLength);
+					logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
+							clientVersion, cmd, bodyLength);
 
-				Buffer bufferBody = null;
-				switch (cmd) {
-				case IMCmd.HEART_BEAT:
-					heartBeat(socket.writeHandlerID(), clientVersion, cmd);
+					Buffer bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
+					SQIMBody imMessage = Json.decodeValue(bufferBody, SQIMBody.class);
+					switch (cmd) {
+					case IMCmd.HEART_BEAT:
+						heartBeat(socket.writeHandlerID(), clientVersion, cmd);
 
-					break;
-				case IMCmd.LOGIN:
-					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-					login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
+						break;
+					case IMCmd.LOGIN:
+						if (imMessage != null && StringUtils.isNotEmpty(imMessage.getUserTel())) {
+							login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, imMessage);
+						}
 
-					break;
-				case IMCmd.LOGOUT:
-					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-					logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
+						break;
+					case IMCmd.LOGOUT:
+						if (imMessage != null && StringUtils.isNotEmpty(imMessage.getUserTel())) {
+							logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, imMessage);
+						}
 
-					break;
-				case IMCmd.MSG_R:
-					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-					msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength, bufferBody);
+						break;
+					case IMCmd.MSG_R:
+						if (imMessage != null && StringUtils.isNotEmpty(imMessage.getFromTel())
+								&& StringUtils.isNotEmpty(imMessage.getToTel())) {
+							msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength, imMessage);
+						}
 
-					break;
-				case IMCmd.ACK_N:
-					bufferBody = buffer.getBuffer(headerLength, headerLength + bodyLength);
-					msgAck(socket.writeHandlerID(), clientVersion, cmd, bufferBody);
+						break;
+					case IMCmd.ACK_N:
+						if (imMessage != null) {
+							msgAck(socket.writeHandlerID(), clientVersion, cmd, imMessage);
+						}
 
-					break;
-				default:
-					break;
+						break;
+					default:
+						break;
+					}
 				}
 			}));
 
@@ -108,46 +116,29 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		server.listen();
 	}
 
-	private void msgAck(String handlerID, int clientVersion, int cmd, Buffer bufferBody) {
+	private void msgAck(String handlerID, int clientVersion, int cmd, SQIMBody imMessage) {
+		logger.info("msgAck, buffer={}", Json.encode(imMessage));
+		String msgId = imMessage.getMsgId();
 
-		logger.info("msgAck, buffer={}", bufferBody);
+		JsonObject data = new JsonObject().put(IMData.key_msgId, msgId).put(IMData.key_cmdId, IMCmd.MSG_A);
+		JsonObject update = new JsonObject().put("collection", "message").put("data", data);
 
-		if (bufferBody != null && bufferBody.length() != 0) {
-			JsonObject jsonBody = null;
-			try {
-				jsonBody = bufferBody.toJsonObject();
-				if (jsonBody != null) {
-					String msgId = jsonBody.getString("msgId");
-					// {collection: "", data: {}}
+		DeliveryOptions mongoOp = new DeliveryOptions();
+		mongoOp.addHeader("action", MongoVerticle.method.saveData);
+		mongoOp.setSendTimeout(3000);
 
-					JsonObject data = new JsonObject().put(IMMongoMessage.key_msgId, msgId)
-							.put(IMMongoMessage.key_cmdId, IMCmd.MSG_A);
-					JsonObject update = new JsonObject().put("collection", "message").put("data", data);
-
-					// TODO
-					// DeliveryOptions mongoOp = new DeliveryOptions();
-					// mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
-					// mongoOp.setSendTimeout(3000);
-					//
-					// eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes
-					// -> {
-					// if (mongoRes.succeeded()) {
-					// eb.send(handlerID, mongoRes.result());
-					// } else {
-					// logger.error(mongoRes.cause().getMessage());
-					// }
-					// });
-				}
-			} catch (Exception e) {
-				logger.error("Msg body parse error, buffer={}", bufferBody, e);
+		eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes -> {
+			if (mongoRes.succeeded()) {
+				eb.send(handlerID, mongoRes.result());
+			} else {
+				logger.error(mongoRes.cause().getMessage());
 			}
-		} else {
-			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
-		}
+		});
+
 	}
 
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH, clientVersion,
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 		logger.info("heartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 
@@ -155,145 +146,66 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		eb.send(writeHandlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
 	}
 
-	private void ackNotify(String writeHandlerID, int clientVersion, String msgId, JsonObject jsonBody, String to) {
-		// TODO Auto-generated method stub
+	private void login(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
+		String from = imMessage.getUserTel();
+
+		DeliveryOptions option = new DeliveryOptions();
+		option.addHeader("action", IMSessionVerticle.method.setUserSocket);
+		option.setSendTimeout(3000);
+		JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+		logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
+		eb.send(IMSessionVerticle.class.getName() + innerIP, msg, option);
+
+		// 1、给FROM发A
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
+
+		logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID, clientVersion, cmd,
+				bodyLength);
+		eb.send(handlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
+	}
+
+	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
+		String from = imMessage.getUserTel();
+		if (StringUtils.isNotEmpty(from)) {
+			DeliveryOptions option = new DeliveryOptions();
+			option.addHeader("action", "delUserSocket");
+			option.setSendTimeout(3000);
+			JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
+			eb.send(IMSessionVerticle.class.getName(), msg, option);
+
+			// 给FROM发A
+			Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH,
+					msg.getInteger("clientVersion"), cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
+			eb.send(handlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
+		}
 
 	}
 
-	private void login(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
-		if (bufferBody != null && bufferBody.length() != 0) {
-			JsonObject jsonBody = null;
-			String from = null;
-			try {
-				jsonBody = bufferBody.toJsonObject();
-				if (jsonBody != null) {
-					from = jsonBody.getString(IMMessage.key_userTel);
-					if (StringUtils.isNotEmpty(from)) {
-						DeliveryOptions option = new DeliveryOptions();
-						option.addHeader("action", IMSessionVerticle.method.setUserSocket);
-						option.setSendTimeout(3000);
-						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-						logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
-						eb.send(IMSessionVerticle.class.getName() + "10.10.10.193", msg, option);
+	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
+		//
+		Future<String> hashFuture = Future.future();
 
-						// 1、给FROM发A
-						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-								clientVersion, cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
+		hashFuture.setHandler(res -> {
+			logger.info("msgRequest, hashFuture={}", res.result());
+			if (res.succeeded()) {
+				JsonObject param = new JsonObject();
 
-						logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID,
-								clientVersion, cmd, bodyLength);
-						eb.send(handlerID, aMsgHeader.appendString(MessageBuilder.IM_MSG_SEPARATOR));
+				JsonObject header = new JsonObject();
+				header.put("clientVersion", clientVersion);
+				header.put("cmd", cmd);
+				header.put("fromHandlerID", handlerID);
 
-						String sceneId = jsonBody.getString(IMMessage.key_sceneId);
-						if (StringUtils.isNotEmpty(sceneId)) {
-							// 2、发送离线消息
-							JsonObject query = new JsonObject().put("cmd", IMCmd.MSG_N).put("toTel", from)
-									.put("sceneId", sceneId)
-									.put("timeStamp", new JsonObject().put("$lte", System.currentTimeMillis()));
+				param.put("header", header);
+				param.put("body", Json.encode(imMessage));
 
-							DeliveryOptions mongoOp = new DeliveryOptions();
-							mongoOp.addHeader("action", MongoVerticle.method.findOffLineMessage);
-							mongoOp.setSendTimeout(3000);
+				DeliveryOptions option = new DeliveryOptions();
+				option.addHeader("action", C2CVerticle.method.sendMessage);
+				option.setSendTimeout(1000);
 
-							eb.<JsonObject>send(MongoVerticle.class.getName(), query, mongoOp, mongoRes -> {
-								if (mongoRes.succeeded()) {
-									eb.send(handlerID, mongoRes.result());
-								} else {
-									logger.error(mongoRes.cause().getMessage());
-								}
-							});
-						}
-					}
-				}
-			} catch (Exception e) {
-				logger.error("Msg body parse error, buffer={}", bufferBody, e);
+				eb.send(C2CVerticle.class.getName() + "10.10.10.193", param.encode(), option);
 			}
-		} else {
-			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
-		}
-	}
-
-	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
-		if (bufferBody != null && bufferBody.length() != 0) {
-			JsonObject jsonBody = null;
-			String from = null;
-			try {
-				jsonBody = bufferBody.toJsonObject();
-				if (jsonBody != null) {
-					from = jsonBody.getString("userTel");
-					if (StringUtils.isNotEmpty(from)) {
-						DeliveryOptions option = new DeliveryOptions();
-						option.addHeader("action", "delUserSocket");
-						option.setSendTimeout(3000);
-						JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-						eb.send(IMSessionVerticle.class.getName(), msg, option);
-
-						// 给FROM发A
-						Buffer aMsgHeader = MessageBuilder.buildMsgHeader(IMMessageConstant.HEADER_LENGTH,
-								msg.getInteger("clientVersion"), cmd + 100, 0);
-						eb.send(handlerID, aMsgHeader.appendString("\001"));
-					}
-				}
-			} catch (Exception e) {
-				logger.error("logout, buffer={} e={}", bufferBody, e.getCause().getMessage());
-			}
-		} else {
-			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
-		}
-	}
-
-	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, Buffer bufferBody) {
-		if (bufferBody != null && bufferBody.length() != 0) {
-			JsonObject jsonBody = null;
-			try {
-				jsonBody = bufferBody.toJsonObject();
-				if (jsonBody != null) {
-					logger.info("msgRequest, json={}", jsonBody);
-					String from = jsonBody.getString(IMMessage.key_fromTel);
-					String to = jsonBody.getString(IMMessage.key_toTel);
-					if (StringUtils.isNotEmpty(from) && StringUtils.isNotEmpty(to)) {
-						String msgId = jsonBody.getString(IMMessage.key_msgId);
-						String sceneId = jsonBody.getString(IMMessage.key_sceneId);
-						int sceneType = jsonBody.getInteger(IMMessage.key_sceneType);
-						int msgType = jsonBody.getInteger(IMMessage.key_msgType);
-						String content = jsonBody.getString(IMMessage.key_content);
-
-						//
-						Future<String> hashFuture = Future.future();
-
-						hashFuture.setHandler(res -> {
-							logger.info("msgRequest, hashFuture={}", res.result());
-							if (res.succeeded()) {
-								JsonObject param = new JsonObject();
-
-								JsonObject header = new JsonObject();
-								header.put("clientVersion", clientVersion);
-								header.put("cmd", cmd);
-								header.put("fromHandlerID", handlerID);
-
-								JsonObject body = new JsonObject().put(IMMessage.key_fromTel, from)
-										.put(IMMessage.key_toTel, to).put(IMMessage.key_sceneId, sceneId)
-										.put(IMMessage.key_sceneType, sceneType).put(IMMessage.key_msgType, msgType)
-										.put(IMMessage.key_content, content).put(IMMessage.key_msgId, msgId);
-
-								param.put("header", header);
-								param.put("body", body);
-
-								DeliveryOptions option = new DeliveryOptions();
-								option.addHeader("action", C2CVerticle.method.sendMessage);
-								option.setSendTimeout(1000);
-								eb.send(C2CVerticle.SERVICE_ADDRESS + "10.10.10.193", param, option);
-							}
-						});
-
-					}
-				}
-			} catch (Exception e) {
-				logger.error("msgRequest, buffer={} e={}", bufferBody, e.getMessage());
-			}
-		} else {
-			logger.warn("Msg body is Null. ClientVersion={}CMD={}", clientVersion, cmd);
-		}
+		});
 	}
 
 	private void socketClose(String handlerID) {
