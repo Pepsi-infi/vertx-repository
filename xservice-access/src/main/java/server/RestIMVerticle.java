@@ -60,7 +60,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
-		// String serverHost = "127.0.0.1";
 		createHttpServer(router, serverHost, RestIMConstants.HTTP_PORT)
 				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
 						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
