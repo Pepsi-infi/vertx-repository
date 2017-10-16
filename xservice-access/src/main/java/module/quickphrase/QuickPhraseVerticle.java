@@ -131,6 +131,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		params.clear();// Must do clear before use it!
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
+				logger.info("getConnection, {}", res.succeeded());
 				SQLConnection connection = res.result();
 				params.add(userId);
 				logger.info("getQickPhrase, params={}", params.encode());
@@ -139,10 +140,12 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result().getRows())));
 					} else {
+						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					}
 				});
 			} else {
+				logger.error("getConnection, {}", res.cause().getMessage());
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
 		}).close();
