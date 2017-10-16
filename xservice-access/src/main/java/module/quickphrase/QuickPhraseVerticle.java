@@ -33,7 +33,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		super.start();
 
 		eb = vertx.eventBus();
-		mySQLClient = MySQLClient.createShared(vertx, config());
+		mySQLClient = MySQLClient.createShared(vertx, config().getJsonObject("mysql"));
 
 		eb.<JsonObject>consumer(QuickPhraseVerticle.class.getName(), res -> {
 			MultiMap headers = res.headers();
