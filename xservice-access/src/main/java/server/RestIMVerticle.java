@@ -59,8 +59,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		Future<Void> voidFuture = Future.future();
 
-		String serverHost = this.getServerHost();
-//		String serverHost = "127.0.0.1";
+		// String serverHost = this.getServerHost();
+		String serverHost = "127.0.0.1";
 		createHttpServer(router, serverHost, RestIMConstants.HTTP_PORT)
 				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
 						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
@@ -164,9 +164,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("userID", userId);
 			message.put("identity", identity);
 
-			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
+			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
+					logger.info("getQuickPhrase, result={}", res.result().body().encode());
+					httpResp.put("data", res.result().body().getJsonArray("result"));
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());

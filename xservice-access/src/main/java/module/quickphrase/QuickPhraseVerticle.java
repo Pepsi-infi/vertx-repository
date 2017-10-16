@@ -131,8 +131,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				params.add(userId);
 				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
-						logger.info("getQickPhrase, result={}", SQLRes.result());
-						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
+						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result().getRows())));
 					} else {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					}

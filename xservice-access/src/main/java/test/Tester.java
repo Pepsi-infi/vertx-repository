@@ -40,8 +40,8 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
-		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
+		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 
 		// vertx.deployVerticle(MongoVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(getMongo()));
@@ -53,7 +53,7 @@ public class Tester {
 	}
 
 	private static JsonObject config() {
-		String prop = "{\"service.host\":\"127.0.0.1\", \"db_name\":\"im-mc\", \"connection_string\":\"mongodb://10.10.10.178:27017\", \"username\":\"im-mc\", \"password\":\"im-mc\", \"authMechanism\":\"SCRAM-SHA-1\"}";
+		String prop = "{\"mongo\":{\"host\":\"10.10.10.178\",\"port\":27017,\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"db_name\":\"im-mc\",\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500},\"mysql\":{\"mc-im\":{\"host\":\"10.10.10.178\",\"port\":3306,\"maxPoolSize\":100,\"username\":\"sqyc_message\",\"password\":\"sqyc_message@01zhuanche.com\",\"database\":\"mc_admin\",\"charset\":\"UTF-8\",\"queryTimeout\":3000}},\"im\":[{\"innerIP\":\"10.10.10.193\",\"node\":\"111.206.162.233:4321\"}],\"file\":{\"upload.file.path.prefix\":\"/u01/projectCAR/xservice/xservice-file/\",\"download.file.server.prefix\":\":9090/mc-file/im/download.json?file=\"}}";
 
 		JsonObject jsonObject = new JsonObject(prop);
 		return jsonObject;
