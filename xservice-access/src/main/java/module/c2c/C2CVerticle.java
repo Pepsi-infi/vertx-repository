@@ -95,7 +95,7 @@ public class C2CVerticle extends AbstractVerticle {
 
 					logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
 
-					eb.send(toHandlerID, headerBuffer.appendString(body).appendString(MessageBuilder.IM_MSG_SEPARATOR));
+					eb.send(toHandlerID, headerBuffer.appendString(body));
 
 					saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
 				} else {
@@ -147,7 +147,7 @@ public class C2CVerticle extends AbstractVerticle {
 				// 给FROM发A
 				Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 						cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
-				eb.send(toHandlerID, aMsgHeader.appendString(ackMsgStr).appendString(MessageBuilder.IM_MSG_SEPARATOR));
+				eb.send(toHandlerID, aMsgHeader.appendString(ackMsgStr));
 			} else {
 				logger.error(mongoRes.cause().getMessage());
 			}

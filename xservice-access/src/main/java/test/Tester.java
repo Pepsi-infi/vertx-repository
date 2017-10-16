@@ -3,7 +3,7 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import module.quickphrase.QuickPhraseVerticle;
+import module.persistence.MongoVerticle;
 import server.RestIMVerticle;
 
 public class Tester {
@@ -41,10 +41,10 @@ public class Tester {
 		// }
 
 		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
-		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(config()));
 
-		// vertx.deployVerticle(MongoVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(getMongo()));
+		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
 	}
 
 	private static JsonObject getMongo() {

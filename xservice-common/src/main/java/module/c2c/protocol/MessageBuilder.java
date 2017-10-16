@@ -5,10 +5,10 @@ import utils.ByteUtil;
 
 public class MessageBuilder {
 
-	public static final String IM_MSG_SEPARATOR = "\001";
+	// public static final String IM_MSG_SEPARATOR = "\001";
 
 	public static final int MSG_ACK_CMD_RADIX = 100;
-	
+
 	public static final int HEADER_LENGTH = 12;
 
 	public static Buffer buildMsgHeader(int headerLength, int clientVersion, int cmdId, int bodyLength) {

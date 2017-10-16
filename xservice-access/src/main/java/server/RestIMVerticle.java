@@ -115,15 +115,19 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 	public void getOfflineMessage(RoutingContext context) {
 		String orderNo = context.request().getParam("orderNo");
-		String timestamp = context.request().getParam("timestamp");
+		String timestamp = context.request().getParam("timestamp");// TODO
 
 		JsonObject response = new JsonObject();
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
+		if (StringUtils.isNotEmpty(timestamp)) {
+			query.put("timeStamp", new JsonObject().put("$lt", timestamp));
+		}
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
+
 		options.setSort(new JsonObject().put(IMData.key_timeStamp, 1));
 
 		JsonObject fields = new JsonObject();
@@ -134,6 +138,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		fields.put("content", 1);
 		fields.put("msgType", 1);
 		fields.put("cmdId", 1);
+		fields.put("fromTel", 1);
+		fields.put("toTel", 1);
+		fields.put("timeStamp", 1);
 		options.setFields(fields);
 
 		client.findWithOptions("message", query, options, r -> {
