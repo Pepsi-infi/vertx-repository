@@ -24,6 +24,8 @@ public class RestIMConstants {
 	 * param orderNo 订单号；timestamp
 	 */
 	public static final String GET_OFFLINE_MESSAGE = "/mc-im/message/offline/get.json";
+	
+	public static final String GET_OFFLINE_MESSAGE_4_KF = "/mc-im/kf/message/offline/get.json";
 
 	/**
 	 * param "identity" : 0, //身份标识， 0司机 1乘客 ;userId

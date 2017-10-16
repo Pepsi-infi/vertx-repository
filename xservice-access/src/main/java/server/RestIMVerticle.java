@@ -52,6 +52,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+		router.route(RestIMConstants.GET_OFFLINE_MESSAGE_4_KF).handler(this::getOfflineMessage);
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
 		router.route(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
