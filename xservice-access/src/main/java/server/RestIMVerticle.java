@@ -39,7 +39,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		client = MongoClient.createShared(vertx.getDelegate(), config());
+		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		sharedData = vertx.getDelegate().sharedData();
 		sessionMap = sharedData.getLocalMap("session");

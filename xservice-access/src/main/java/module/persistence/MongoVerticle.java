@@ -38,7 +38,7 @@ public class MongoVerticle extends AbstractVerticle {
 
 		logger.info("config={}", config().encode());
 
-		client = MongoClient.createShared(vertx, config());
+		client = MongoClient.createShared(vertx, config().getJsonObject("mongo"));
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(MongoVerticle.class.getName(), res -> {
