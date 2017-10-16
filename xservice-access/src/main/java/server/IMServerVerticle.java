@@ -200,14 +200,14 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		header.put("fromHandlerID", handlerID);
 
 		param.put("header", header);
-		param.put("body", Json.encode(imMessage));
+		param.put("body", JsonObject.mapFrom(imMessage));
 
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", C2CVerticle.method.sendMessage);
 		option.setSendTimeout(1000);
 
 		logger.info("msgRequest, param={}", param.encode());
-		eb.send(C2CVerticle.class.getName() + "10.10.10.193", param.encode(), option);
+		eb.send(C2CVerticle.class.getName() + "10.10.10.193", param, option);
 
 	}
 
