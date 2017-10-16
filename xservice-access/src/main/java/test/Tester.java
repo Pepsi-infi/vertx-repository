@@ -45,7 +45,7 @@ public class Tester {
 		// }
 
 		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
-		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
+//		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(getMongo()));
 	}
 
 	private static JsonObject getMongo() {
