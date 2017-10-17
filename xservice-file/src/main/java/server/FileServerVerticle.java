@@ -134,6 +134,7 @@ public class FileServerVerticle extends AbstractVerticle {
 								DeliveryOptions tsOption = new DeliveryOptions();
 								tsOption.setSendTimeout(3000);
 								tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
+								logger.info("send msg to TranscodingVerticle, file={}", uploadPath + uuid);
 								eb.send(TranscodingVerticle.class.getName() + innerIP, uploadPath + uuid, tsOption);
 							}
 
