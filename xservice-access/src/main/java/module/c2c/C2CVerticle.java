@@ -79,7 +79,6 @@ public class C2CVerticle extends AbstractVerticle {
 				JsonObject res11 = res.result().body();
 				String toHandlerID = res11.getString("handlerID");
 				if (StringUtils.isNotEmpty(toHandlerID)) {
-
 					if (StringUtils.isNotEmpty(msg.getContent())) {
 						DeliveryOptions swOption = new DeliveryOptions();
 						swOption.addHeader("action", SensitiveWordsVerticle.method.filterSensitiveWords);
@@ -107,11 +106,6 @@ public class C2CVerticle extends AbstractVerticle {
 								logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
 
 								eb.send(toHandlerID, headerBuffer.appendString(body));
-
-								// 只有聊天消息入库
-								if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-									saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
-								}
 							} else {
 								logger.error("filterSensitiveWords, error={}", swRes.cause().getMessage());
 							}
@@ -119,6 +113,11 @@ public class C2CVerticle extends AbstractVerticle {
 					}
 				} else {
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
+				}
+
+				// 只有聊天消息入库
+				if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+					saveData2Mongo(toHandlerID, clientVersion, cmd, msg);
 				}
 			} else {
 				logger.error("sendMessage error.", res.cause());
@@ -128,7 +127,7 @@ public class C2CVerticle extends AbstractVerticle {
 		return result;
 	}
 
-	private void saveData2Mongo(String toHandlerID, int clientVersion, int cmd, int bodyLength, SQIMBody msg) {
+	private void saveData2Mongo(String toHandlerID, int clientVersion, int cmd, SQIMBody msg) {
 		JsonObject mongoMsg = new JsonObject();
 		mongoMsg.put("collection", MONGO_COLLECTION);
 
