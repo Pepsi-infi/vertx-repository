@@ -56,7 +56,8 @@ public class TranscodingVerticle extends AbstractVerticle {
 	public void amrToMp3(String sourcePath) {
 		logger.info("amrToMp3, sourcePath={}", sourcePath);
 		String targetPath = uploadFilePathPrefix + "mp3/" + sourcePath + ".mp3";
-		File source = new File(sourcePath);
+		String filePath = uploadFilePathPrefix + sourcePath;
+		File source = new File(filePath);
 		File target = new File(targetPath);
 		AudioAttributes audio = new AudioAttributes();
 		Encoder encoder = new Encoder();
