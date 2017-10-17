@@ -128,11 +128,13 @@ public class FileServerVerticle extends AbstractVerticle {
 
 							}
 
-							// transcoding
-							DeliveryOptions tsOption = new DeliveryOptions();
-							tsOption.setSendTimeout(3000);
-							tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
-							eb.send(TranscodingVerticle.class.getName() + innerIP, uploadPath + uuid, tsOption);
+							// amr->mp3 transcoding
+							if (msgBody.getMsgType() == 2) {
+								DeliveryOptions tsOption = new DeliveryOptions();
+								tsOption.setSendTimeout(3000);
+								tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
+								eb.send(TranscodingVerticle.class.getName() + innerIP, uploadPath + uuid, tsOption);
+							}
 
 							hashFuture.setHandler(res -> {
 								logger.info("msgRequest, hashFuture={}", res.result());
