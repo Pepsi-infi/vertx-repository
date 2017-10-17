@@ -205,6 +205,7 @@ public class FileServerVerticle extends AbstractVerticle {
 		msgBody.setIdentity(identity);
 		msgBody.setToTel(toTel);
 		msgBody.setMsgId(msgId);
+		msgBody.setMsgType(msgType);
 		msgBody.setSceneType(sceneType);
 		msgBody.setSceneId(sceneId);
 
