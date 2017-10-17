@@ -47,13 +47,14 @@ public class C2CVerticle extends AbstractVerticle {
 			SQIMBody imMessage = Json.decodeValue(resBody.getJsonObject("body").encode(), SQIMBody.class);
 			JsonObject msgHeader = resBody.getJsonObject("header");
 			int clientVersion = msgHeader.getInteger("clientVersion");
+			String fromHandlerID = msgHeader.getString("fromHandlerID");
 			int cmd = msgHeader.getInteger("cmd");
 			if (headers != null) {
 				String action = headers.get("action");
 				logger.info("action={}", action);
 				switch (action) {
 				case "sendMessage":
-					res.reply(sendMessage(clientVersion, cmd, imMessage));
+					res.reply(sendMessage(fromHandlerID, clientVersion, cmd, imMessage));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -63,7 +64,7 @@ public class C2CVerticle extends AbstractVerticle {
 		});
 	}
 
-	private int sendMessage(int clientVersion, int cmd, SQIMBody msg) {
+	private int sendMessage(String fromHandlerID, int clientVersion, int cmd, SQIMBody msg) {
 		logger.info("send start ... ");
 		int result = 0;
 
@@ -117,7 +118,7 @@ public class C2CVerticle extends AbstractVerticle {
 
 				// 只有聊天消息入库
 				if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-					saveData2Mongo(toHandlerID, clientVersion, cmd, msg);
+					saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
 				}
 			} else {
 				logger.error("sendMessage error.", res.cause());

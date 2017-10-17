@@ -154,65 +154,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			}
 		});
 
-		// server.connectHandler(socket -> {
-		// socket.handler(RecordParser.newDelimited(MessageBuilder.IM_MSG_SEPARATOR,
-		// buffer -> {
-		// if (buffer.length() > 2) {
-		// int headerLength = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(0, 2));
-		// int clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
-		// int cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
-		// int bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
-		//
-		// logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}",
-		// headerLength,
-		// clientVersion, cmd, bodyLength);
-		//
-		// Buffer bufferBody = buffer.getBuffer(headerLength, headerLength +
-		// bodyLength);
-		// SQIMBody imMessage = Json.decodeValue(bufferBody, SQIMBody.class);
-		// logger.info("imMessage={}", imMessage.toString());
-		// switch (cmd) {
-		// case IMCmd.HEART_BEAT:
-		// heartBeat(socket.writeHandlerID(), clientVersion, cmd);
-		//
-		// break;
-		// case IMCmd.LOGIN:
-		// if (imMessage != null && StringUtils.isNotEmpty(imMessage.getUserTel())) {
-		// login(socket.writeHandlerID(), clientVersion, cmd, bodyLength, imMessage);
-		// }
-		//
-		// break;
-		// case IMCmd.LOGOUT:
-		// if (imMessage != null && StringUtils.isNotEmpty(imMessage.getUserTel())) {
-		// logout(socket.writeHandlerID(), clientVersion, cmd, bodyLength, imMessage);
-		// }
-		//
-		// break;
-		// case IMCmd.MSG_R:
-		// if (imMessage != null && StringUtils.isNotEmpty(imMessage.getFromTel())
-		// && StringUtils.isNotEmpty(imMessage.getToTel())) {
-		// msgRequest(socket.writeHandlerID(), clientVersion, cmd, bodyLength,
-		// imMessage);
-		// }
-		//
-		// break;
-		// case IMCmd.ACK_N:
-		// if (imMessage != null) {
-		// msgAck(socket.writeHandlerID(), clientVersion, cmd, imMessage);
-		// }
-		//
-		// break;
-		// default:
-		// break;
-		// }
-		// }
-		// }));
-		//
-		// socket.closeHandler(v -> {
-		// socketClose(socket.writeHandlerID());
-		// });
-		// });
-
 		server.listen();
 	}
 
