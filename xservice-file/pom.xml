@@ -19,11 +19,8 @@
 			<artifactId>xservice-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>it.sauronsoftware</groupId>
-			<artifactId>jave</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+		<!-- <dependency> <groupId>it.sauronsoftware</groupId> <artifactId>jave</artifactId> 
+			<version>1.0.2</version> </dependency> -->
 	</dependencies>
 
 	<repositories>
