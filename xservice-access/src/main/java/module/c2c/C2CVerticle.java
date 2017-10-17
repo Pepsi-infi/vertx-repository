@@ -133,8 +133,17 @@ public class C2CVerticle extends AbstractVerticle {
 
 		IMData data = new IMData();
 		data.setCmdId(IMCmd.MSG_N);
+		data.setFromTel(msg.getFromTel());
+		data.setToTel(msg.getToTel());
+		data.setIdentity(msg.getIdentity());
+		data.setMsgId(msg.getMsgId());
+		data.setSceneId(msg.getSceneId());
+		data.setSceneType(msg.getSceneType());
+		data.setMsgType(msg.getMsgType());
+		data.setContent(msg.getContent());
+		data.setTimeStamp(msg.getTimeStamp());
 
-		mongoMsg.put("data", Json.encode(data));
+		mongoMsg.put("data", JsonObject.mapFrom(data));
 
 		/**
 		 * mongo message data: message body + msgId + timeStamp + date
