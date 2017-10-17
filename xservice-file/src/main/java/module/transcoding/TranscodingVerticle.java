@@ -22,17 +22,20 @@ public class TranscodingVerticle extends AbstractVerticle {
 
 	private String uploadFilePathPrefix;
 
-	private static String FFMPEG_PATH;
+	private static final String FFMPEG_PATH;
 
 	public static interface method {
 		public static final String amrToMp3 = "amrToMp3";
+	}
+
+	static {
+		FFMPEG_PATH = TranscodingVerticle.class.getResource("ffmpeg").getFile();
 	}
 
 	@Override
 	public void start() throws Exception {
 		super.start();
 		innerIP = IPUtil.getInnerIP();
-		FFMPEG_PATH = TranscodingVerticle.class.getResource("ffmpeg").getFile();
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		if (!uploadFilePathPrefix.endsWith("/")) {
@@ -94,7 +97,7 @@ public class TranscodingVerticle extends AbstractVerticle {
 				logger.error("amr2mp3, fail!");
 			}
 		} catch (IOException e) {
-
+			logger.error("amr2mp3, e={}", e.getMessage());
 		}
 	}
 }
