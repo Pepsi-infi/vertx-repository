@@ -10,7 +10,6 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import util.AudioUtils;
 import utils.IPUtil;
 
 public class TranscodingVerticle extends AbstractVerticle {
@@ -23,6 +22,8 @@ public class TranscodingVerticle extends AbstractVerticle {
 
 	private String uploadFilePathPrefix;
 
+	private String FFMPEG_PATH;
+
 	public static interface method {
 		public static final String amrToMp3 = "amrToMp3";
 	}
@@ -31,6 +32,10 @@ public class TranscodingVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 		innerIP = IPUtil.getInnerIP();
+
+		ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
+		FFMPEG_PATH = ctxClsLoader.getResource("ffmpeg").getPath();
+		logger.info("FFMPEG_PATH " + FFMPEG_PATH);
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		if (!uploadFilePathPrefix.endsWith("/")) {
@@ -54,35 +59,25 @@ public class TranscodingVerticle extends AbstractVerticle {
 		});
 	}
 
-	// public void amrToMp3(String sourcePath) {
-	// logger.info("amrToMp3, sourcePath={}", sourcePath);
-	// String targetPath = uploadFilePathPrefix + "mp3/" + sourcePath + ".mp3";
-	// String filePath = uploadFilePathPrefix + sourcePath;
-	// File source = new File(filePath);
-	// File target = new File(targetPath);
-	// AudioAttributes audio = new AudioAttributes();
-	// Encoder encoder = new Encoder();
-	//
-	// audio.setCodec("libmp3lame");
-	// EncodingAttributes attrs = new EncodingAttributes();
-	// attrs.setFormat("mp3");
-	// attrs.setAudioAttributes(audio);
-	//
-	// try {
-	// encoder.encode(source, target, attrs);
-	// } catch (Exception e) {
-	// logger.error("amrToMp3, e={}", e.getMessage());
-	// }
-	// }
-
 	public void amr2mp3(String sourcePath) {
 		String mp3FileName = uploadFilePathPrefix + "mp3/" + sourcePath + ".mp3";
 		String filePath = uploadFilePathPrefix + sourcePath;
 
+		Runtime runtime = Runtime.getRuntime();
+		Process process;
 		try {
-			AudioUtils.amr2mp3(filePath, mp3FileName);
-		} catch (IOException e1) {
-			logger.error("amr2mp3, e={}", e1.getMessage());
+			process = runtime.exec(FFMPEG_PATH + " -i " + filePath + " -ar 8000 -ac 1 -y -ab 12.4k " + mp3FileName);
+			InputStream in = process.getErrorStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				logger.error("amr2mp3, {}", line);
+			}
+			if (process.exitValue() != 0) {
+				logger.error("amr2mp3, fail!");
+			}
+		} catch (IOException e) {
+			logger.error("amr2mp3, e={}", e.getMessage());
 		}
 	}
 }

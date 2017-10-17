@@ -35,4 +35,11 @@ public class AudioUtils {
 			throw new RuntimeException("转换失败！");
 		}
 	}
+
+	public static void main(String[] args) throws IOException {
+		System.out.println(AudioUtils.class.getResource("ffmpeg").getFile());
+
+		AudioUtils.amr2mp3("/Users/wanglonghu/Downloads/150795936986821.amr",
+				"/Users/wanglonghu/Downloads/150795936986821.mp3");
+	}
 }
