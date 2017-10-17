@@ -1,15 +1,15 @@
 package module.transcoding;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import it.sauronsoftware.jave.AudioAttributes;
+import it.sauronsoftware.jave.Encoder;
+import it.sauronsoftware.jave.EncodingAttributes;
 import utils.IPUtil;
 
 public class TranscodingVerticle extends AbstractVerticle {
@@ -22,8 +22,6 @@ public class TranscodingVerticle extends AbstractVerticle {
 
 	private String uploadFilePathPrefix;
 
-	private String FFMPEG_PATH;
-
 	public static interface method {
 		public static final String amrToMp3 = "amrToMp3";
 	}
@@ -32,10 +30,6 @@ public class TranscodingVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 		innerIP = IPUtil.getInnerIP();
-
-		ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
-		FFMPEG_PATH = ctxClsLoader.getResource("ffmpeg").getPath();
-		logger.info("FFMPEG_PATH " + FFMPEG_PATH);
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		if (!uploadFilePathPrefix.endsWith("/")) {
@@ -63,20 +57,17 @@ public class TranscodingVerticle extends AbstractVerticle {
 		String mp3FileName = uploadFilePathPrefix + "mp3/" + sourcePath + ".mp3";
 		String filePath = uploadFilePathPrefix + sourcePath;
 
-		Runtime runtime = Runtime.getRuntime();
-		Process process;
+		File source = new File(filePath);
+		File target = new File(mp3FileName);
+		AudioAttributes audio = new AudioAttributes();
+		Encoder encoder = new Encoder();
+		audio.setCodec("libmp3lame");
+		EncodingAttributes attrs = new EncodingAttributes();
+		attrs.setFormat("mp3");
+		attrs.setAudioAttributes(audio);
 		try {
-			process = runtime.exec(FFMPEG_PATH + " -i " + filePath + " -ar 8000 -ac 1 -y -ab 12.4k " + mp3FileName);
-			InputStream in = process.getErrorStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				logger.error("amr2mp3, {}", line);
-			}
-			if (process.exitValue() != 0) {
-				logger.error("amr2mp3, fail!");
-			}
-		} catch (IOException e) {
+			encoder.encode(source, target, attrs);
+		} catch (Exception e) {
 			logger.error("amr2mp3, e={}", e.getMessage());
 		}
 	}
