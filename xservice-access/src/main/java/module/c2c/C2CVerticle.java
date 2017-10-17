@@ -102,7 +102,7 @@ public class C2CVerticle extends AbstractVerticle {
 								}
 
 								Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH,
-										clientVersion, cmd, bodyLength);
+										clientVersion, IMCmd.MSG_N, bodyLength);
 
 								logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
 

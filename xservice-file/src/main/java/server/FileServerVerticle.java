@@ -135,7 +135,7 @@ public class FileServerVerticle extends AbstractVerticle {
 									header.setBodyLength(bodyLength);
 
 									param.put("header", Json.encode(header));
-									param.put("body", Json.encode(msgBody));
+									param.put("body", JsonObject.mapFrom(msgBody));
 
 									DeliveryOptions c2cOption = new DeliveryOptions();
 									c2cOption.addHeader("action", "sendMessage");
