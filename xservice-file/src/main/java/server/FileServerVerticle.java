@@ -129,7 +129,7 @@ public class FileServerVerticle extends AbstractVerticle {
 							}
 
 							// amr->mp3 transcoding
-							if (msgBody.getMsgType() == 2) {
+							if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
 								DeliveryOptions tsOption = new DeliveryOptions();
 								tsOption.setSendTimeout(3000);
 								tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
