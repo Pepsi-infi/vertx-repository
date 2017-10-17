@@ -113,6 +113,7 @@ public class FileServerVerticle extends AbstractVerticle {
 					request.uploadHandler(upload -> {
 						upload.streamToFileSystem(uploadPath + uuid).endHandler(a -> {
 							SQIMBody msgBody = buildIMBody(request.formAttributes());
+							logger.info("msgBody={}", msgBody.toString());
 
 							Future<Message<JsonObject>> hashFuture = Future.future();
 							DeliveryOptions option = new DeliveryOptions();
