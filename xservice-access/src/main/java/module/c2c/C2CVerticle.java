@@ -18,6 +18,7 @@ import module.c2c.protocol.MessageBuilder;
 import module.c2c.protocol.SQIMBody;
 import module.persistence.IMData;
 import module.persistence.MongoVerticle;
+import module.sensitivewords.SensitiveWordsVerticle;
 import module.session.IMSessionVerticle;
 import utils.IPUtil;
 
@@ -72,34 +73,49 @@ public class C2CVerticle extends AbstractVerticle {
 		option.addHeader("action", IMSessionVerticle.method.getHandlerIDByUid);
 		option.setSendTimeout(3000);
 		JsonObject p = new JsonObject().put("to", to);
-		eb.<JsonObject>send(IMSessionVerticle.class.getName() + "10.10.10.193", p, option, res -> {
+		eb.<JsonObject>send(IMSessionVerticle.class.getName() + innerIP, p, option, res -> {
 			logger.info("sendMessage, {}", res.result());
 			if (res.succeeded()) {
 				JsonObject res11 = res.result().body();
 				String toHandlerID = res11.getString("handlerID");
 				if (StringUtils.isNotEmpty(toHandlerID)) {
-					long ts = System.currentTimeMillis();
 
-					msg.setTimeStamp(ts);
-					String body = Json.encode(msg);
-					int bodyLength = 0;
-					try {
-						bodyLength = Json.encode(msg).getBytes("UTF-8").length;
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					if (StringUtils.isNotEmpty(msg.getContent())) {
+						DeliveryOptions swOption = new DeliveryOptions();
+						swOption.addHeader("action", SensitiveWordsVerticle.method.filterSensitiveWords);
+						swOption.setSendTimeout(3000);
 
-					Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-							cmd, bodyLength);
+						eb.<String>send(SensitiveWordsVerticle.class.getName(), msg.getContent(), swOption, swRes -> {
+							if (swRes.succeeded()) {
+								msg.setContent(swRes.result().body());
 
-					logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
+								long ts = System.currentTimeMillis();
+								msg.setTimeStamp(ts);
 
-					eb.send(toHandlerID, headerBuffer.appendString(body));
+								String body = Json.encode(msg);
+								int bodyLength = 0;
+								try {
+									bodyLength = Json.encode(msg).getBytes("UTF-8").length;
+								} catch (UnsupportedEncodingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 
-					// 只有聊天消息入库
-					if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-						saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
+								Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH,
+										clientVersion, cmd, bodyLength);
+
+								logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
+
+								eb.send(toHandlerID, headerBuffer.appendString(body));
+
+								// 只有聊天消息入库
+								if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+									saveData2Mongo(toHandlerID, clientVersion, cmd, bodyLength, msg);
+								}
+							} else {
+								logger.error("filterSensitiveWords, error={}", swRes.cause().getMessage());
+							}
+						});
 					}
 				} else {
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
