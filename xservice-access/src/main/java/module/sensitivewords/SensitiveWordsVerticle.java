@@ -32,7 +32,7 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 		trie = Trie.builder().addKeyword("日").addKeyword("我曹").build();
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(QuickPhraseVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(SensitiveWordsVerticle.class.getName(), res -> {
 			MultiMap headers = res.headers();
 			JsonObject body = res.body();
 			if (headers != null) {
