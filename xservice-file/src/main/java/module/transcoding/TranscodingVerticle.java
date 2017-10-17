@@ -69,7 +69,7 @@ public class TranscodingVerticle extends AbstractVerticle {
 		try {
 			encoder.encode(source, target, attrs);
 		} catch (Exception e) {
-			logger.error("amrToMp3, e={}", e.getCause().getMessage());
+			logger.error("amrToMp3, e={}", e.getMessage());
 		}
 	}
 }
