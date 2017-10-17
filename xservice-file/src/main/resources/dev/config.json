@@ -1,4 +1,10 @@
 {
 	"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
-	"download.file.server.prefix": "/mc-file/im/download.json?file="
+	"download.file.server.prefix": "/mc-file/im/download.json?file=",
+	"file": [
+		{
+			"innerIP": "10.10.10.193",
+			"node": "111.206.162.233:9090"
+		}
+	]
 }

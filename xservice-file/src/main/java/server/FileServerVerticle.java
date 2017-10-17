@@ -1,6 +1,8 @@
 package server;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,12 +22,14 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import module.c2c.protocol.MessageBuilder;
 import module.c2c.protocol.SQIMBody;
 import module.c2c.protocol.SQIMHeader;
+import module.transcoding.TranscodingVerticle;
 import utils.IPUtil;
 
 public class FileServerVerticle extends AbstractVerticle {
@@ -42,6 +46,8 @@ public class FileServerVerticle extends AbstractVerticle {
 
 	private String innerIP;
 
+	private Map<String, String> nodeMap = new HashMap<String, String>();
+
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		fs = vertx.fileSystem();
@@ -49,6 +55,14 @@ public class FileServerVerticle extends AbstractVerticle {
 		HttpServer httpServer = vertx.createHttpServer();
 
 		innerIP = IPUtil.getInnerIP();
+		JsonArray fileNodes = config().getJsonArray("file");
+
+		for (Object node : fileNodes) {
+			JsonObject nodeJson = JsonObject.mapFrom(node);
+			nodeMap.put(nodeJson.getString("innerIP"), nodeJson.getString("node"));
+		}
+
+		logger.info("nodeMap={}", nodeMap.toString());
 
 		uploadFilePathPrefix = config().getString("upload.file.path.prefix");
 		downloadFilePathPrefix = config().getString("download.file.server.prefix");
@@ -113,6 +127,12 @@ public class FileServerVerticle extends AbstractVerticle {
 							} else {
 
 							}
+
+							// transcoding
+							DeliveryOptions tsOption = new DeliveryOptions();
+							tsOption.setSendTimeout(3000);
+							tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
+							eb.send(TranscodingVerticle.class.getName() + innerIP, uploadPath + uuid, tsOption);
 
 							hashFuture.setHandler(res -> {
 								logger.info("msgRequest, hashFuture={}", res.result());
@@ -187,11 +207,11 @@ public class FileServerVerticle extends AbstractVerticle {
 
 		switch (msgType) {
 		case 2:// 1文本 2语音，content为语音下载地址 3定位 4图片 5视频
-			msgBody.setContent("http://" + innerIP + downloadFilePathPrefix + content);
+			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + content);
 			msgBody.setDuration(duration);
 			break;
 		case 3:
-			msgBody.setContent("http://" + innerIP + downloadFilePathPrefix + content);
+			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + content);
 			msgBody.setLat(lat);
 			msgBody.setLon(lon);
 			msgBody.setAddress(address);
