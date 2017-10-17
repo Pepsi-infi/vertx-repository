@@ -10,6 +10,7 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import util.AudioUtils;
 import utils.IPUtil;
 
 public class TranscodingVerticle extends AbstractVerticle {
@@ -22,14 +23,8 @@ public class TranscodingVerticle extends AbstractVerticle {
 
 	private String uploadFilePathPrefix;
 
-	private static final String FFMPEG_PATH;
-
 	public static interface method {
 		public static final String amrToMp3 = "amrToMp3";
-	}
-
-	static {
-		FFMPEG_PATH = TranscodingVerticle.class.getResource("ffmpeg").getFile();
 	}
 
 	@Override
@@ -81,23 +76,13 @@ public class TranscodingVerticle extends AbstractVerticle {
 	// }
 
 	public void amr2mp3(String sourcePath) {
-		Runtime runtime = Runtime.getRuntime();
 		String mp3FileName = uploadFilePathPrefix + "mp3/" + sourcePath + ".mp3";
 		String filePath = uploadFilePathPrefix + sourcePath;
+
 		try {
-			Process process = runtime
-					.exec(FFMPEG_PATH + " -i " + filePath + " -ar 8000 -ac 1 -y -ab 12.4k " + mp3FileName);
-			InputStream in = process.getErrorStream();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				logger.error("amr2mp3, error stream={}", line);
-			}
-			if (process.exitValue() != 0) {
-				logger.error("amr2mp3, fail!");
-			}
-		} catch (IOException e) {
-			logger.error("amr2mp3, e={}", e.getMessage());
+			AudioUtils.amr2mp3(filePath, mp3FileName);
+		} catch (IOException e1) {
+			logger.error("amr2mp3, e={}", e1.getMessage());
 		}
 	}
 }
