@@ -8,6 +8,7 @@ import module.c2c.C2CVerticle;
 import module.hash.IMConsistentHashingVerticle;
 import module.persistence.MongoVerticle;
 import module.quickphrase.QuickPhraseVerticle;
+import module.sensitivewords.SensitiveWordsVerticle;
 import module.session.IMSessionVerticle;
 import server.IMServerVerticle;
 import server.RestIMVerticle;
@@ -24,6 +25,7 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(RestIMVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(SensitiveWordsVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(MongoVerticle.class.getName(), readBossOpts().setConfig(config()));
 

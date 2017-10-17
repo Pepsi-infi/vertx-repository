@@ -12,7 +12,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import module.quickphrase.QuickPhraseVerticle;
-import module.quickphrase.QuickPhraseVerticle.method;
 
 public class SensitiveWordsVerticle extends AbstractVerticle {
 
