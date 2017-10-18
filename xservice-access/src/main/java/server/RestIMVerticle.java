@@ -144,7 +144,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		client.findWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
-				logger.info("findOffLineMessage, query={}r={}", query.encode(), r.result());
+				logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
 				httpResp.put("code", 0);
 				httpResp.put("time", System.currentTimeMillis());
 				httpResp.put("data", r.result());
