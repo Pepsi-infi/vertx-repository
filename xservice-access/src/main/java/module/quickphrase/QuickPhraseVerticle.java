@@ -46,12 +46,14 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				Integer userId = body.getInteger("userID");
-				int identity = body.getInteger("identity");
+				Integer userId = null;
+				int identity = 0;
 				logger.info("start ... body={}", body.encode());
 				switch (action) {
 				case method.addQuickPhrase:
+					userId = body.getInteger("userID");
 					String content = body.getString("content");
+					identity = body.getInteger("identity");
 					addQuickPhrase(userId, identity, content, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
@@ -65,6 +67,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					break;
 
 				case method.getQuickPhrase:
+					userId = body.getInteger("userID");
+					identity = body.getInteger("identity");
 					getQuickPhrase(userId, identity, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
