@@ -412,7 +412,6 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		chatMsgVO.put("msgBody", msg);
 		chatMsgVO.put("type", messageTypeEnum.getType());
 		chatMsgVO.put("otherParams", from);
-		chatMsgVO.put("from", from);
 
 		// 302(司机抢单)，306(今日在线时长)，309(司机状态)，310(圈里圈外),些消息列表不需要进行生发
 		if (isCanInbox(messageTypeEnum.getType())) {
@@ -456,7 +455,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			params.add(type);
 			params.add(0);
 			params.add(msgInfo);
-			return msgAsyncCall("sendDriverMsg", params);
+			return msgAsyncCall("sendmsg", params);
 		} finally {
 			clearData(msgInfo, params);
 		}
@@ -476,7 +475,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 			byte[] sendBuf = ByteUtils.objectToByte(params);
 			client = new DatagramSocket();
 			DatagramPacket sendPacket = new DatagramPacket(sendBuf, sendBuf.length, addr, port);
-			logger.info(method + " [] udp host:" + addr + " " + port + "  msg:" + new String(sendBuf, "UTF-8"));
+			logger.info(method + " [] udp host:" + addr.getHostAddress() + " " + port + "  msg:" + new String(sendBuf, "UTF-8"));
 			client.send(sendPacket);
 			sendFuture.complete("success");
 		} catch (Exception e) {
@@ -966,7 +965,7 @@ public class DriverMsgServiceImpl extends BaseServiceVerticle implements DriverM
 		news.put("isScreen", dto.getString("isShellsScreen"));//是否弹屏: 1-是   0-否
 		news.put("title", dto.getString("title"));//消息标题
 		news.put("detil", dto.getString("content"));//消息内容
-		news.put("linkAdd", dto.getString("jumpUrl"));//跳转url
+		news.put("linkAdd", StringUtil.isNullOrEmpty(dto.getString("jumpUrl"))?"":dto.getString("jumpUrl"));//跳转url
 		news.put("msgTime", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"));//消息发送时间
 		news.put("ifImport", dto.getString("isImportant"));//是否重要：1-是  0-否
 		news.put("userId", driver.getInteger("driverId") + "");//司机ID
