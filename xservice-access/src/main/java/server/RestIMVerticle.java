@@ -135,6 +135,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 		fields.put("toTel", 1);
 		fields.put("timeStamp", 1);
 		fields.put("identity", 1);
+		fields.put("lon", 1);
+		fields.put("lat", 1);
+		fields.put("sAddress", 1);
+		fields.put("address", 1);
+		fields.put("duration", 1);
 		options.setFields(fields);
 
 		client.findWithOptions("message", query, options, r -> {
