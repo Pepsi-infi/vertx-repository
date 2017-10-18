@@ -191,21 +191,21 @@ public class RestIMVerticle extends RestAPIVerticle {
 		JsonObject params = context.getBodyAsJson();
 		logger.info("addQuickPhrase, params=" + params.encode());
 
-		String userId = params.getString("userId");
-		String identity = params.getString("identity");
+		Integer userId = params.getInteger("userId");
+		Integer identity = params.getInteger("identity");
 		String content = params.getString("content");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
 
-		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity) && StringUtils.isNotEmpty(content)) {
+		if (userId != null && identity != null && StringUtils.isNotEmpty(content)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.addQuickPhrase);
 			op.setSendTimeout(3000);
 
 			message.clear();
 			message.put("userID", userId);
-			message.put("identity", Integer.valueOf(identity));
+			message.put("identity", identity);
 			message.put("content", content);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
@@ -234,17 +234,17 @@ public class RestIMVerticle extends RestAPIVerticle {
 	public void delQuickPhrase(RoutingContext context) {
 		JsonObject params = context.getBodyAsJson();
 		logger.info("delQuickPhrase, params=" + params.encode());
-		String id = params.getString("id");
+		Long id = params.getLong("id");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
-		if (StringUtils.isNotEmpty(id)) {
+		if (id != null) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
 			message.clear();
-			message.put("id", Long.valueOf(id));
+			message.put("id", id);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
