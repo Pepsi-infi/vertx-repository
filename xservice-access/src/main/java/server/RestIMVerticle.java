@@ -16,6 +16,7 @@ import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
+import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import module.hash.IMConsistentHashingVerticle;
 import module.quickphrase.QuickPhraseVerticle;
 import rxjava.RestAPIVerticle;
@@ -41,13 +42,15 @@ public class RestIMVerticle extends RestAPIVerticle {
 		logger.info("Rest mc-access Verticle: Start...");
 
 		Router router = Router.router(vertx);
+		router.route().handler(BodyHandler.create());
+
 		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE_4_KF).handler(this::getOfflineMessage);
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
-		router.route(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
+		router.post(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
 		router.route(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
@@ -185,9 +188,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 	}
 
 	public void addQuickPhrase(RoutingContext context) {
-		String userId = context.request().getParam("userId");
-		String identity = context.request().getParam("identity");
-		String content = context.request().getParam("content");
+		JsonObject params = context.getBodyAsJson();
+		logger.info("addQuickPhrase, params=" + params.encode());
+
+		String userId = params.getString("userId");
+		String identity = params.getString("identity");
+		String content = params.getString("content");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
@@ -226,7 +232,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 	}
 
 	public void delQuickPhrase(RoutingContext context) {
-		String id = context.request().getParam("id");
+		JsonObject params = context.getBodyAsJson();
+		logger.info("delQuickPhrase, params=" + params.encode());
+		String id = params.getString("id");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
