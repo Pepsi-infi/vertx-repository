@@ -208,10 +208,10 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("identity", identity);
 			message.put("content", content);
 
-			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
+			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
-
+					httpResp.put("data", res.result().body().getString("result"));
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
 				} else {
