@@ -64,7 +64,7 @@
     "socket.test.phone": "13621241006"
   },
   "rocketMq.config": {
-    "drive.namesrvAddr": "192.168.0.16:9876;192.168.0.17:9876",
+    "drive.namesrvAddr": "10.0.7.11:9876;10.0.7.12:9876",
     "drive.topic": "driver_info"
 
   },
