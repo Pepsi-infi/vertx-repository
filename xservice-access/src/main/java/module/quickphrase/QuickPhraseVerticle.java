@@ -46,7 +46,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			JsonObject body = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				String userId = body.getString("userID");
+				Integer userId = body.getInteger("userID");
 				logger.info("start ... body={}", body.encode());
 				switch (action) {
 				case method.addQuickPhrase:
@@ -79,10 +79,10 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime) values (?, ?, ?, ?)";
 
-	private void addQuickPhrase(String userId, int identity, String content,
+	private void addQuickPhrase(Integer userId, int identity, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
 		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
-		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(content)) {
+		if (userId != null && StringUtils.isNotEmpty(content)) {
 			result.clear();// Must do clear before use it!
 			params.clear();// Must do clear before use it!
 			mySQLClient.getConnection(res -> {
@@ -129,7 +129,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private static final String sql_getQuickPhrase = "select id, userId, identity, content, createTime from quick_phrase where userId = ?";
 
-	private void getQuickPhrase(String userId, Handler<AsyncResult<JsonObject>> resultHandler) {
+	private void getQuickPhrase(Integer userId, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
 		params.clear();// Must do clear before use it!
 		mySQLClient.getConnection(res -> {
