@@ -88,7 +88,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 			mySQLClient.getConnection(res -> {
 				if (res.succeeded()) {
 					SQLConnection connection = res.result();
-					params.add(userId).add(identity).add(content).add(System.currentTimeMillis());
+					long createTime = System.currentTimeMillis();
+					params.add(userId).add(identity).add(content).add(createTime);
 					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
 						if (SQLRes.succeeded()) {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
@@ -151,5 +152,9 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
 		}).close();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(System.currentTimeMillis());
 	}
 }
