@@ -1,7 +1,19 @@
 {
 	"mongo": {
-		"host": "10.10.10.178",
-		"port": 27017,
+		"hosts": [
+			{
+				"host": "10.20.10.100",
+				"port": 27017
+			},
+			{
+				"host": "10.20.10.101",
+				"port": 27017
+			},
+			{
+				"host": "10.20.10.102",
+				"port": 27017
+			}
+		],
 		"serverSelectionTimeoutMS": 30000,
 		"maxPoolSize": 50,
 		"minPoolSize": 25,

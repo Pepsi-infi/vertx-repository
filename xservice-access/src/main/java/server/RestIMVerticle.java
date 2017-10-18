@@ -163,8 +163,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 			op.setSendTimeout(3000);
 
 			message.clear();
-			message.put("userID", userId);
-			message.put("identity", identity);
+			message.put("userID", Integer.valueOf(userId));
+			message.put("identity", Integer.valueOf(identity));
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {

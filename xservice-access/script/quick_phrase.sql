@@ -11,7 +11,7 @@
  Target Server Version : 50626
  File Encoding         : utf-8
 
- Date: 10/18/2017 10:20:43 AM
+ Date: 10/18/2017 10:50:58 AM
 */
 
 SET NAMES utf8mb4;
@@ -25,9 +25,10 @@ CREATE TABLE `quick_phrase` (
   `id` int(16) NOT NULL AUTO_INCREMENT,
   `userId` int(16) DEFAULT NULL,
   `content` varchar(64) DEFAULT NULL,
-  `createTime` timestamp NULL DEFAULT NULL,
+  `createTime` bigint(16) DEFAULT NULL,
   `identity` int(2) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`,`identity`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
