@@ -70,6 +70,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
 			addFuture.setHandler(ar2 -> {
 				if (ar2.succeeded()) {
+					logger.info("add device:{} to db success",deviceDto);
 					result.handle(Future.succeededFuture(baseResponse));
 				} else {
 					logger.error("add device:{} to db error.", deviceDto, ar2.cause());
@@ -79,6 +80,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 			});
 			updateFuture.setHandler(ar3 -> {
 				if (ar3.succeeded()) {
+					logger.info("update device:{} from db success",deviceDto);
 					result.handle(Future.succeededFuture(baseResponse));
 				} else {
 					logger.error("update device:{} from db error.", deviceDto, ar3.cause());
