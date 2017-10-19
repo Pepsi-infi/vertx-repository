@@ -11,6 +11,7 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import service.AdMessagePushService;
 import service.ConfigService;
+import service.ImMessagePushService;
 import service.NonAdMessagePushService;
 import xservice.RestAPIVerticle;
 
@@ -25,6 +26,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private ConfigService configService;
 
 	private JsonObject config;
+	
+	private ImMessagePushService imMessagePushService;
 
 	@Override
 	public void start() throws Exception {
@@ -48,6 +51,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		router.route(config.getString("PUSH_MSG_NO_ADVER_URL")).handler(this::pushNonAdMsg);
 		// 获取senderId senderKey
 		router.route("/mc-push/message/getVerifyFromMsgCenter.json").handler(this::getVerifyFromMsgCenter);
+		// im消息推送
+		router.route("/mc-push/message-im/push.json").handler(this::pushImMsg);
 
 		httpServer.requestHandler(router::accept).listen(config.getInteger("PUSH_MSG_PORT"));
 
@@ -74,6 +79,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		logger.info("###pushNonAdMsg method end###");
 	}
 
+	private void pushImMsg(RoutingContext context) {
+		logger.info("###pushImMsg method start###");
+		HttpServerRequest request=context.request();
+		configService.getVerifyFromMsgCenter(request.getParam("senderId"),request.getParam("senderKey"),resultHandler(context));
+		logger.info("###pushImMsg method end###");
+	}
+	
 	private void getVerifyFromMsgCenter(RoutingContext context) {
 		logger.info("###getVerifyFromMsgCenter method start###");
 		HttpServerRequest request=context.request();

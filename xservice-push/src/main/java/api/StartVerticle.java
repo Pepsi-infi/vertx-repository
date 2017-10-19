@@ -9,8 +9,10 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
+import service.ImMessagePushService;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
+import service.impl.ImMessagePushServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
 import service.impl.RedisServiceImpl;
@@ -39,6 +41,7 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(ConfigServiceImpl.class.getName());
+		this.deployVerticle(ImMessagePushServiceImpl.class.getName());
 		// 提供其他非EventBus服务
 	}
 
