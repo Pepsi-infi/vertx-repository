@@ -175,7 +175,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				logger.error(mongoRes.cause().getMessage());
 			}
 		});
-
 	}
 
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {

@@ -62,5 +62,7 @@ public class IMCmd {
 	public static final Set<Integer> MONGO_CMD_SET = new HashSet<Integer>();
 	static {
 		MONGO_CMD_SET.add(MSG_R);
+		MONGO_CMD_SET.add(POSITION_SHARE_START);
+		MONGO_CMD_SET.add(POSITION_SHARE_END);
 	}
 }

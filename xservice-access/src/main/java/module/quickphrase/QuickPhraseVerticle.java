@@ -161,5 +161,16 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	public static void main(String[] args) {
 		System.out.println(System.currentTimeMillis());
+
+		JsonArray array = new JsonArray();
+		array.add(45);
+		array.add(76);
+
+		String a = "";
+		for (Object object : array) {
+			a = a + object;
+		}
+
+		System.out.println(a);
 	}
 }
