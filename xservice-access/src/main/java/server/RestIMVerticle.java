@@ -252,7 +252,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
-			String idParam = null;
+			String idParam = "";
 			for (Object id : ids) {
 				idParam = id + "," + idParam;
 			}
