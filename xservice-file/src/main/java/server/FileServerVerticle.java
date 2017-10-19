@@ -139,7 +139,7 @@ public class FileServerVerticle extends AbstractVerticle {
 							}
 
 							hashFuture.setHandler(res -> {
-								logger.info("msgRequest, hashFuture={}", res.result());
+								logger.info("msgRequest, hashFuture={}", res.result().body().encode());
 								if (res.succeeded()) {
 									JsonObject param = new JsonObject();
 
