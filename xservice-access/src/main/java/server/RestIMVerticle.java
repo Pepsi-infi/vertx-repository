@@ -163,7 +163,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 	public void getQuickPhrase(RoutingContext context) {
 		String userId = context.request().getParam("userId");
 		String identity = context.request().getParam("identity");
-
+		httpResp.clear();
 		if (StringUtils.isNotEmpty(userId) && StringUtils.isNotEmpty(identity)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.getQuickPhrase);
@@ -253,7 +253,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 			op.setSendTimeout(3000);
 
 			message.clear();
-			message.put("ids", ids);
+
+			String idsParam = "";
+			for (Object id : ids) {
+				idsParam = id + "," + idsParam;
+			}
+			message.put("ids", idsParam.substring(0, idsParam.length() - 1));
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
