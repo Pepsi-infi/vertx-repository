@@ -266,6 +266,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 							.end(httpResp.encode());
 				}
 			});
+		} else {
+			httpResp.put("code", 1);
+			httpResp.put("msg", "params is null");
+
+			context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
+					.end(httpResp.encode());
 		}
 	}
 

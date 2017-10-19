@@ -114,10 +114,13 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private void delQuickPhrase(JsonArray ids, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
+		params.clear();// Must do clear before use it!
+		logger.info("delQuickPhrase, ids={}", ids.encode());
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
-				connection.updateWithParams(sql_delQuickPhrase, ids, SQLRes -> {
+				params.add(ids);
+				connection.updateWithParams(sql_delQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					} else {
