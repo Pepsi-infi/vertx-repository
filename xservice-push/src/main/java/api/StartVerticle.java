@@ -9,7 +9,6 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
-import service.ImMessagePushService;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
 import service.impl.ImMessagePushServiceImpl;

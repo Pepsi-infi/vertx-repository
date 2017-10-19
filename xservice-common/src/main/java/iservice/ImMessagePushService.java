@@ -1,4 +1,4 @@
-package service;
+package iservice;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
