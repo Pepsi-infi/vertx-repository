@@ -6,20 +6,26 @@
 </head>
 <body>
 
-<form action="/mc-file/im/voice/upload.json" ENCTYPE="multipart/form-data" method="POST" name="wibble">
-    foo:<input type="text" name="foo"/><br>
-    bar:<input type="text" name="bar"/><br>
-    quux:<input type="text" name="quux"/><br>
+<form action="/mc-file/im/upload.json" ENCTYPE="multipart/form-data" method="POST" name="wibble">
+    fromTel:<input type="text" name="fromTel"/><br>
+    toTel:<input type="text" name="toTel"/><br>
+    msgId:<input type="text" name="msgId"/><br>
+    msgType:<input type="text" name="msgType"/><br>
+    sceneId:<input type="text" name="sceneId"/><br>
+    sceneType:<input type="text" name="sceneType"/><br>
+    duration:<input type="text" name="duration"/><br>
+    
     choose a file to upload:<input type="file" name="myfile"/><br>
+    
     <input type="submit"/>
 </form>
 
-<form action="/mc-file/im/voice/download.json" method="POST" name="wibble">
+<form action="/mc-file/im/download.json" method="POST" name="wibble">
     file:<input type="text" name="file"/><br>
     <input type="submit"/>
 </form>
 
-<form action="/mc-file/im/voice/download.json" ENCTYPE="multipart/form-data" method="POST" name="wibble">
+<form action="/mc-file/im/download.json" ENCTYPE="multipart/form-data" method="POST" name="wibble">
     foo:<input type="text" name="foo"/><br>
     bar:<input type="text" name="bar"/><br>
     quux:<input type="text" name="quux"/><br>
