@@ -7,36 +7,53 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import org.apache.commons.lang.StringUtils;
+
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.servicediscovery.Record;
+import xservice.BaseServiceVerticle;
 
-public class SocketConsistentHashingVerticle extends AbstractVerticle {
+public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocketConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
-	// 虚拟节点信息
+
+	// 虚拟Socket节点信息
 	private TreeMap<Long, String> virtualNodes;
+
+	// 虚拟内网ip
+	private TreeMap<Long, String> virtualInnerNodes;
+
 	// 真实节点信息
-	private List<String> realNodes;
+	private List<String> realSocketNodes;
+
+	private List<String> realInnerNodes;
 
 	private EventBus eb;
 
 	@Override
 	public void start() throws Exception {
-		logger.info("start ... ");
-		this.realNodes = new ArrayList<String>();
+		super.start();
 
-		this.realNodes.add("10.10.10.193");// TODO
-		init();
+		logger.info("start ... ");
+		this.realSocketNodes = new ArrayList<String>();
+		this.realInnerNodes = new ArrayList<String>();
+
+		getNodesFromDiscovery();
+		initSocketNodes();
+		initInnerNodes();
+
+		vertx.setPeriodic(3000, handler -> {
+			getNodesFromDiscovery();
+			initSocketNodes();
+			initInnerNodes();
+		});
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
@@ -44,10 +61,15 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 			JsonObject param = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
+				String key = null;
 				switch (action) {
-				case "getNode":
-					String key = param.getString("");
+				case "getSocketNode":
+					key = param.getString("userId");
 					res.reply(getNode(key));
+					break;
+				case "getInnerNode":
+					key = param.getString("userId");
+					res.reply(getInnerNode(key));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -57,14 +79,47 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 		});
 	}
 
+	private void getNodesFromDiscovery() {
+		JsonObject filter = new JsonObject().put("type", "socket-server");
+		discovery.getRecords(filter, result -> {
+			if (result.succeeded()) {
+				List<Record> records = result.result();
+				for (Record r : records) {
+					String publicAddress = r.getMetadata().getString("publicAddress");
+					String innerIP = r.getMetadata().getString("innerIP");
+					if (!realSocketNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
+						realSocketNodes.add(publicAddress);
+					}
+					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
+						realInnerNodes.add(innerIP);
+					}
+				}
+				logger.info("realSocketNodes={}realInnerNodes={}", realSocketNodes.toString(),
+						realInnerNodes.toString());
+			}
+		});
+	}
+
 	/**
 	 * 初始化虚拟节点
 	 */
-	private void init() {
+	private void initSocketNodes() {
 		virtualNodes = new TreeMap<Long, String>();
-		for (int i = 0; i < realNodes.size(); i++) {
+		for (int i = 0; i < realSocketNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
-				virtualNodes.put(hash("aa" + i + j), realNodes.get(i));
+				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
+			}
+		}
+	}
+
+	/**
+	 * 初始化虚拟内网IP
+	 */
+	private void initInnerNodes() {
+		virtualInnerNodes = new TreeMap<Long, String>();
+		for (int i = 0; i < realInnerNodes.size(); i++) {
+			for (int j = 0; j < length; j++) {
+				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
 			}
 		}
 	}
@@ -121,20 +176,35 @@ public class SocketConsistentHashingVerticle extends AbstractVerticle {
 	 * @param nodes
 	 * @param resultHandler
 	 */
-	public String getNode(String key) {
-		String result = null;
+	public JsonObject getNode(String key) {
+		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			result = virtualNodes.firstEntry().getValue();
+			result.put("host", virtualNodes.firstEntry().getValue());
 		} else {
-			result = en.getValue();
+			result.put("host", en.getValue());
 		}
 
 		return result;
 	}
 
-	public void getNodeWithNodeList(String key, List<String> nodes, Handler<AsyncResult<String>> resultHandler) {
+	/**
+	 * 
+	 * @param key
+	 * @param nodes
+	 * @param resultHandler
+	 */
+	public JsonObject getInnerNode(String key) {
+		JsonObject result = new JsonObject();
+		Long hashedKey = hash(key);
+		Entry<Long, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		if (en == null) {
+			result.put("host", virtualInnerNodes.firstEntry().getValue());
+		} else {
+			result.put("host", en.getValue());
+		}
 
+		return result;
 	}
 }

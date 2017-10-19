@@ -9,9 +9,7 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.MemoryUnit;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -27,14 +25,18 @@ public class SocketSessionVerticle extends AbstractVerticle {
 	private Cache<String, String> sessionMap;// uid -> handlerID
 	private Cache<String, String> sessionReverse;// handlerID -> uid
 
+	private long counter = 0;
+	private long recounter = 0;
+
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
-				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(50, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
+				.withCache("sessionReverse",
+						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
@@ -51,8 +53,6 @@ public class SocketSessionVerticle extends AbstractVerticle {
 				String userId = body.getString("userId");
 				String handlerID = body.getString("handlerID");
 
-				logger.info("consumer, userId={}action={}innerIP={}", userId, action, innerIP);
-
 				switch (action) {
 				case "setUserSocket":
 					res.reply(setUserSocket(userId, handlerID));
@@ -65,6 +65,9 @@ public class SocketSessionVerticle extends AbstractVerticle {
 					break;
 				case "getUidByHandlerID":
 					res.reply(getUidByHandlerID(handlerID));
+					break;
+				case "status":
+					res.reply(status(userId));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -111,10 +114,14 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 		long end = System.currentTimeMillis();
 		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
+
+		counter++;
+		recounter++;
+
 		return 0;
 	}
 
-	public int delUserSocket(String uid, String handlerId) {
+	public JsonObject delUserSocket(String uid, String handlerId) {
 		if (StringUtils.isNotEmpty(uid)) {
 			// logout
 			this.sessionMap.remove(uid);
@@ -128,7 +135,10 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			}
 		}
 
-		return 0;
+		counter--;
+		recounter--;
+
+		return new JsonObject().put("status", 0);
 	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
@@ -138,6 +148,8 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			if (StringUtils.isNotEmpty(handlerID)) {
 				jo = new JsonObject();
 				jo.put("handlerID", handlerID);
+
+				logger.info("getHandlerIDByUid, {}", jo.encode());
 			}
 		}
 
@@ -149,8 +161,19 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		JsonObject result = new JsonObject();
 		result.put("userId", sessionReverse.get(handlerID));
 
-		logger.info("getUidByHandlerID, {}", result.encode());
-
 		return result;
+	}
+
+	private Object status(String userId) {
+		JsonObject status = new JsonObject();
+		status.put("ip", IPUtil.getInnerIP());
+		status.put("sessionMap", counter);
+		status.put("sessionReverse", recounter);
+
+		if (StringUtils.isNotEmpty(userId)) {
+			status.put("status", sessionMap.get(userId));
+		}
+
+		return status;
 	}
 }

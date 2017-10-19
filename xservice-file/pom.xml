@@ -19,5 +19,21 @@
 			<artifactId>xservice-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>it.sauronsoftware</groupId>
+			<artifactId>jave</artifactId>
+			<version>1.0.2</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>thirdparty</id>
+			<url>http://192.168.0.7:8081/nexus/content/repositories/thirdparty/</url>
+		</repository>
+		<repository>
+			<id>nexus-releases-prod</id>
+			<url>http://syrepo.01zhuanche.com/nexus/content/repositories/thirdparty</url>
+		</repository>
+	</repositories>
 </project>

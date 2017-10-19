@@ -1,6 +1,5 @@
 package server;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -9,16 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.commons.lang.StringUtils;
 
-import io.vertx.core.AbstractVerticle;
+import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -26,13 +25,15 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
+import io.vertx.rxjava.core.Future;
 import logic.impl.SocketSessionVerticle;
 import test.HeartBeat;
 import tp.TpService;
 import util.ByteUtil;
 import utils.IPUtil;
+import xservice.BaseServiceVerticle;
 
-public class SocketServerVerticle extends AbstractVerticle {
+public class SocketServerVerticle extends BaseServiceVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(SocketServerVerticle.class);
 
@@ -42,12 +43,26 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 	private String innerIP;
 
+	private Map<String, String> ipMap = new HashMap<String, String>();
+
 	@Override
 	public void start() throws Exception {
+		super.start();
+
+		JsonArray socketNodes = config().getJsonArray("socket");
+		for (Object object : socketNodes) {
+			JsonObject node = JsonObject.mapFrom(object);
+			ipMap.put(node.getString("innerIP"), node.getString("node"));
+		}
+
 		eb = vertx.eventBus();
 		tpService = TpService.createProxy(vertx);
 		innerIP = IPUtil.getInnerIP();
-		logger.info("start...innerIP={}", innerIP);
+
+		publishSocketService(SocketServerVerticle.class.getName(), innerIP,
+				new JsonObject().put("publicAddress", ipMap.get(innerIP)).put("innerIP", innerIP));
+
+		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());
 
 		NetServerOptions options = new NetServerOptions().setPort(8088);
 		NetServer server = vertx.createNetServer(options);
@@ -72,7 +87,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 						if (buffer.toString().startsWith("get /mobile?")
 								|| buffer.toString().contains("get /mobile?")) {
-							logger.info("send login, ");
 							op = 1;
 						}
 
@@ -89,6 +103,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 							}
 
 							String userId = paramMap.get("user");
+							cHash(socket.localAddress().host(), userId, handlerID);
 							loginSocketSession(innerIP, handlerID, userId);
 							loginConfirm(handlerID, paramMap);
 							setClientOnline(userId);
@@ -96,8 +111,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 							break;
 						case 2:
 							op = 3;
-							logger.info("header, handlerID={} header={} op={}", handlerID, buffer.getInt(0), op);
-
 							int bodyLength = buffer.getInt(0);
 							parser.fixedSizeMode(bodyLength);
 
@@ -105,7 +118,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 						case 3:
 							op = 2;
 							parser.fixedSizeMode(4);
-							logger.info("body, handlerID={} body={} op={}", handlerID, buffer, op);
 
 							JsonObject message = buffer.toJsonObject();
 							int cmd = message.getInteger("cmd");
@@ -113,11 +125,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								logger.info("updateOnlineSimple, message={}", message);
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
-								logger.info("simpleHeartBeatCount, handlerID={}count={}", handlerID,
-										simpleHeartBeatCount);
 								if (simpleHeartBeatCount == 10) {
 									updateOnlineState(innerIP, handlerID, message);
 									simpleHeartBeatCount = 0;
@@ -143,11 +152,14 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 				socket.closeHandler(v -> {
 					setClientOffline(handlerID);
-					logger.info("closeHandler, handlerID={} close", handlerID);
+					sessionLogout(handlerID);
+					logger.info("closeHandler, handlerID={}", handlerID);
 				});
 
 				socket.exceptionHandler(t -> {
-					logger.info("exceptionHandler, handlerID={} close", handlerID);
+					setClientOffline(handlerID);
+					sessionLogout(handlerID);
+					logger.info("exceptionHandler, handlerID={}", handlerID);
 				});
 			}
 
@@ -177,7 +189,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 				try {
 					data = message.getJsonObject("data");
 				} catch (Exception e) {
-					logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
 					try {
 						HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
 								HeartBeat.class);
@@ -214,7 +225,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
 
@@ -225,7 +236,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 					try {
 						data = message.getJsonObject("data");
 					} catch (Exception e) {
-						logger.info("replace, {}", message.getString("data").replace("\\\\", ""));
 						try {
 							HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
 									HeartBeat.class);
@@ -350,15 +360,48 @@ public class SocketServerVerticle extends AbstractVerticle {
 		eb.send(handlerID, bf);
 	}
 
-	private void sendReLogin(String writeHandlerID) {
+	private void sendReLogin(String writeHandlerID, String socketNode) {
+		if (StringUtils.isEmpty(socketNode)) {
+			socketNode = "111.206.162.233:8088";
+		}
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
-		message.put("data", innerIP + ":4321");
+		message.put("data", socketNode);
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
 
-		logger.info("sendReLogin, bf={}", bf);
+		logger.info("sendReLogin, bf={}", bf.toString());
 
 		eb.send(writeHandlerID, bf);
+	}
+
+	private void cHash(String localhost, String userId, String handlerID) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getInnerNode");
+
+		Future<Message<JsonObject>> chFuture = Future.future();
+
+		JsonObject message = new JsonObject();
+		message.put("userId", userId);
+		if (StringUtils.isNotEmpty(userId)) {
+			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, chFuture.completer());
+		} else {
+
+		}
+
+		chFuture.setHandler(res -> {
+			if (res.succeeded()) {
+				JsonObject jsonRes = res.result().body();
+				String socketNode = jsonRes.getString("host");
+				logger.info("cHash, userId={}socketNode={}", userId, socketNode);
+				if (!socketNode.equalsIgnoreCase(localhost)) {
+					sendReLogin(handlerID, ipMap.get(socketNode));
+				}
+			} else {
+
+			}
+		});
+
 	}
 
 	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
@@ -367,9 +410,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 		String mid = paramMap.get("mid");
 		String cid = paramMap.get("cid");
 		String version = paramMap.get("ver");
-
-		logger.info("Params handlerID={} userId={} hash={} mid={} cid={} version={}", writeHandlerID, userId, hash, mid,
-				cid, version);
 
 		JsonObject param = new JsonObject();
 		param.put("userId", userId);
@@ -401,7 +441,8 @@ public class SocketServerVerticle extends AbstractVerticle {
 		message.put("data", data);
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().length())).appendString(message.encode());
-		logger.info("loginConfirm, handlerID={} bf={}", writeHandlerID, bf);
+		logger.info("loginConfirm, Params handlerID={} userId={} hash={} mid={} cid={} version={}, bf={}",
+				writeHandlerID, userId, hash, mid, cid, version, bf);
 		eb.send(writeHandlerID, bf);
 	}
 
@@ -422,12 +463,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(message.encode().getBytes().length))
 				.appendBytes(message.encode().getBytes());
-		int msgLength = message.encode().getBytes().length;
-		byte[] result = ByteUtil.intToBytes(msgLength);
-		logger.info("heart beat, byteLength={}", msgLength);
-
-		logger.info("heart beat, handlerID={} bf={} message={} length={}", writeHandlerID, bf, message.encode(),
-				message.encode().length());
 
 		eb.send(writeHandlerID, bf);
 	}
@@ -439,7 +474,7 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (result.succeeded()) {
 				logger.info("setClientOnline, result={}", result.result());
 			} else {
-				logger.error("setClientOnline, e={}", result.cause());
+				logger.error("setClientOnline, e={}", result.cause().getMessage());
 			}
 		});
 	}
@@ -456,7 +491,6 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
 
 				JsonObject clientOfflineParam = new JsonObject();
 				clientOfflineParam.put("userId", uid);
@@ -485,19 +519,19 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("subscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 					tpService.subscribe(subscribeParam, r -> {
 						if (r.succeeded()) {
-							logger.info("subscribe, result={}", r.result());
+							logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
 						} else {
-							logger.error("subscribe, e={}", r.cause());
+							logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
 						}
 					});
 				}
@@ -519,22 +553,39 @@ public class SocketServerVerticle extends AbstractVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("unsubscribe, handlerID={} userId={}", handlerID, uid);
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID);
+					sendReLogin(handlerID, null);
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 					tpService.unsubscribe(subscribeParam, r -> {
 						if (r.succeeded()) {
-							logger.info("unsubscribe, result={}", r.result());
+							logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
 						} else {
-							logger.error("unsubscribe, e={}", r.cause());
+							logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
 						}
 					});
 				}
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void sessionLogout(String handlerID) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "delUserSocket");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				logger.info("sessionLogout, {}", handlerID);
 			} else {
 				// TODO
 			}

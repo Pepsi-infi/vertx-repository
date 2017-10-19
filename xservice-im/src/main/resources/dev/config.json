@@ -27,5 +27,15 @@
 		"keepAlive": true
 	},
 	"heartbeatFrequencyMS": 1000,
-	"minHeartbeatFrequencyMS": 500
+	"minHeartbeatFrequencyMS": 500,
+	"socket": [
+		{
+			"innerIP": "10.10.10.102",
+			"node": "111.206.162.233:8088"
+		},
+		{
+			"innerIP": "10.10.10.103",
+			"node": "111.206.162.234:8088"
+		}
+	]
 }
