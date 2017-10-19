@@ -252,14 +252,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
-			String idParam = "";
-			for (Object id : ids) {
-				idParam = id + "," + idParam;
-			}
-			idParam = "(" + idParam.substring(0, idParam.length() - 1) + ")";
-
 			message.clear();
-			message.put("ids", idParam);
+			message.put("ids", ids);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
