@@ -112,7 +112,7 @@ public class FileServerVerticle extends AbstractVerticle {
 					}
 					request.uploadHandler(upload -> {
 						upload.streamToFileSystem(uploadPath + uuid).endHandler(a -> {
-							SQIMBody msgBody = buildIMBody(request.formAttributes());
+							SQIMBody msgBody = buildIMBody(request.formAttributes(), uploadPath + uuid);
 							logger.info("msgBody={}", msgBody.toString());
 
 							Future<Message<JsonObject>> hashFuture = Future.future();
@@ -130,13 +130,14 @@ public class FileServerVerticle extends AbstractVerticle {
 							}
 
 							// amr->mp3 transcoding
-//							if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
-//								DeliveryOptions tsOption = new DeliveryOptions();
-//								tsOption.setSendTimeout(3000);
-//								tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
-//								logger.info("send msg to TranscodingVerticle, file={}", uploadPath + uuid);
-//								eb.send(TranscodingVerticle.class.getName() + innerIP, date + "/" + uuid, tsOption);
-//							}
+							// if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
+							// DeliveryOptions tsOption = new DeliveryOptions();
+							// tsOption.setSendTimeout(3000);
+							// tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
+							// logger.info("send msg to TranscodingVerticle, file={}", uploadPath + uuid);
+							// eb.send(TranscodingVerticle.class.getName() + innerIP, date + "/" + uuid,
+							// tsOption);
+							// }
 
 							hashFuture.setHandler(res -> {
 								logger.info("msgRequest, hashFuture={}", res.result().body().encode());
@@ -186,7 +187,7 @@ public class FileServerVerticle extends AbstractVerticle {
 		}).listen(RestFileConstant.Server.PORT);
 	}
 
-	private SQIMBody buildIMBody(MultiMap attriMap) {
+	private SQIMBody buildIMBody(MultiMap attriMap, String file) {
 		int msgType = NumberUtils.toInt(attriMap.get("msgType"));
 		String fromTel = attriMap.get("fromTel");
 		int identity = NumberUtils.toInt(attriMap.get("identity"));
@@ -197,7 +198,6 @@ public class FileServerVerticle extends AbstractVerticle {
 		int duration = NumberUtils.toInt(attriMap.get("duration"));
 		String address = attriMap.get("address");
 		String sAddress = attriMap.get("sAddress");
-		String content = attriMap.get("content");
 		double lat = NumberUtils.toDouble(attriMap.get("lat"));
 		double lon = NumberUtils.toDouble(attriMap.get("lon"));
 
@@ -212,11 +212,11 @@ public class FileServerVerticle extends AbstractVerticle {
 
 		switch (msgType) {
 		case 2:// 1文本 2语音，content为语音下载地址 3定位 4图片 5视频
-			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + content);
+			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + file);
 			msgBody.setDuration(duration);
 			break;
 		case 3:
-			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + content);
+			msgBody.setContent("http://" + nodeMap.get(innerIP) + downloadFilePathPrefix + file);
 			msgBody.setLat(lat);
 			msgBody.setLon(lon);
 			msgBody.setAddress(address);
