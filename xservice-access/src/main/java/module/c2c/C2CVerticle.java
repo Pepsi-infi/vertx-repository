@@ -48,7 +48,7 @@ public class C2CVerticle extends AbstractVerticle {
 			JsonObject msgHeader = resBody.getJsonObject("header");
 			int clientVersion = msgHeader.getInteger("clientVersion");
 			String fromHandlerID = msgHeader.getString("fromHandlerID");
-			int cmd = msgHeader.getInteger("cmd");
+			int cmd = msgHeader.getInteger("cmdId").intValue();
 			if (headers != null) {
 				String action = headers.get("action");
 				logger.info("action={}", action);

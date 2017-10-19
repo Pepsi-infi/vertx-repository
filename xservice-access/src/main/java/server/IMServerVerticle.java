@@ -226,7 +226,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		JsonObject header = new JsonObject();
 		header.put("clientVersion", clientVersion);
-		header.put("cmd", cmd);
+		header.put("cmdId", cmd);
 		header.put("fromHandlerID", handlerID);
 
 		param.put("header", header);
