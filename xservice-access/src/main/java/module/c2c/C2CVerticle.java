@@ -112,9 +112,16 @@ public class C2CVerticle extends AbstractVerticle {
 							}
 						});
 					} else {
+						int bodyLength = 0;
+						try {
+							bodyLength = Json.encode(msg).getBytes("UTF-8").length;
+						} catch (UnsupportedEncodingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						// 服务器透传
 						Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-								cmd, 0);
+								cmd, bodyLength);
 						String body = Json.encode(msg);
 						eb.send(toHandlerID, headerBuffer.appendString(body));
 					}
