@@ -8,6 +8,7 @@ import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -239,17 +240,17 @@ public class RestIMVerticle extends RestAPIVerticle {
 	public void delQuickPhrase(RoutingContext context) {
 		JsonObject params = context.getBodyAsJson();
 		logger.info("delQuickPhrase, params=" + params.encode());
-		Long id = params.getLong("id");
+		JsonArray ids = params.getJsonArray("ids");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
-		if (id != null) {
+		if (ids != null) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
 			message.clear();
-			message.put("id", id);
+			message.put("ids", ids);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
