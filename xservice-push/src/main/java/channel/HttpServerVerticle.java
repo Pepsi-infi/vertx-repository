@@ -22,11 +22,11 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private AdMessagePushService adMessagePushService;
 
 	private NonAdMessagePushService nonAdMessagePushService;
-	
+
 	private ConfigService configService;
 
 	private JsonObject config;
-	
+
 	private ImMessagePushService imMessagePushService;
 
 	@Override
@@ -61,7 +61,7 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private void initService() {
 		adMessagePushService = AdMessagePushService.createProxy(vertx);
 		nonAdMessagePushService = NonAdMessagePushService.createProxy(vertx);
-		configService=ConfigService.createProxy(vertx);
+		configService = ConfigService.createProxy(vertx);
 	}
 
 	private void pushAdMsg(RoutingContext context) {
@@ -81,15 +81,17 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private void pushImMsg(RoutingContext context) {
 		logger.info("###pushImMsg method start###");
-		HttpServerRequest request=context.request();
-		configService.getVerifyFromMsgCenter(request.getParam("senderId"),request.getParam("senderKey"),resultHandler(context));
+		HttpServerRequest request = context.request();
+		imMessagePushService.pushMsg(request.getParam("senderId"), request.getParam("senderKey"),
+				request.getParam("body"), resultHandler(context));
 		logger.info("###pushImMsg method end###");
 	}
-	
+
 	private void getVerifyFromMsgCenter(RoutingContext context) {
 		logger.info("###getVerifyFromMsgCenter method start###");
-		HttpServerRequest request=context.request();
-		configService.getVerifyFromMsgCenter(request.getParam("senderId"),request.getParam("senderKey"),resultHandler(context));
+		HttpServerRequest request = context.request();
+		configService.getVerifyFromMsgCenter(request.getParam("senderId"), request.getParam("senderKey"),
+				resultHandler(context));
 		logger.info("###getVerifyFromMsgCenter method end###");
 	}
 }
