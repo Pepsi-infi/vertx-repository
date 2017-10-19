@@ -10,6 +10,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
 import service.impl.*;
 import util.HttpUtil;
+import service.impl.AdMessagePushServiceImpl;
+import service.impl.ConfigServiceImpl;
+import service.impl.ImMessagePushServiceImpl;
+import service.impl.MsgRecordServiceImpl;
+import service.impl.NonAdMessagePushServiceImpl;
+import service.impl.RedisServiceImpl;
+import xservice.HttpClientVerticle;
 
 public class StartVerticle extends AbstractVerticle {
 
@@ -41,6 +48,7 @@ public class StartVerticle extends AbstractVerticle {
 		// 未过期消息补发
 		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
 		this.deployVerticle(PassengerUnSendVerticle.class.getName());
+		this.deployVerticle(ImMessagePushServiceImpl.class.getName());
 		// 提供其他非EventBus服务
 	}
 

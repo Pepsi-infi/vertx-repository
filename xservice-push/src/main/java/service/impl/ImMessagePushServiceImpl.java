@@ -10,7 +10,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import channel.ApplePushService;
-import channel.SocketPushService;
 import channel.XiaoMiPushService;
 import constant.PushConsts;
 import domain.MsgRecord;
@@ -27,15 +26,13 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.client.WebClient;
 import iservice.DeviceService;
+import iservice.ImMessagePushService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
 import result.ResultData;
 import service.MsgRecordService;
-import service.NonAdMessagePushService;
-import service.PassengerUnSendService;
 import service.RedisService;
 import util.DateUtil;
 import util.Md5Util;
@@ -43,11 +40,9 @@ import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.RestAPIVerticle;
 
-public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService {
+public class ImMessagePushServiceImpl extends RestAPIVerticle implements ImMessagePushService {
 
-	private static final Logger logger = LoggerFactory.getLogger(NonAdMessagePushServiceImpl.class);
-
-	private SocketPushService socketPushService;
+	private static final Logger logger = LoggerFactory.getLogger(ImMessagePushServiceImpl.class);
 
 	private XiaoMiPushService xiaomiPushService;
 
@@ -61,29 +56,24 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	private ApplePushService applePushService;
 
-	private PassengerUnSendService passengerUnSendService;
-
 	private String token;
 	private Integer channel;
 
 	private JsonObject config;
 
 	@Override
-
 	public void start() throws Exception {
 
 		super.start();
 
-		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this,
-				NonAdMessagePushService.SERVICE_ADDRESS);
-		publishEventBusService(NonAdMessagePushService.SERVICE_NAME, NonAdMessagePushService.SERVICE_ADDRESS,
-				NonAdMessagePushService.class);
+		XProxyHelper.registerService(ImMessagePushService.class, vertx, this, ImMessagePushService.SERVICE_ADDRESS);
+		publishEventBusService(ImMessagePushService.SERVICE_NAME, ImMessagePushService.SERVICE_ADDRESS,
+				ImMessagePushService.class);
 
 		String ip = IPUtil.getInnerIP();
-		XProxyHelper.registerService(NonAdMessagePushService.class, vertx, this,
-				NonAdMessagePushService.getLocalAddress(ip));
-		publishEventBusService(NonAdMessagePushService.LOCAL_SERVICE_NAME, NonAdMessagePushService.getLocalAddress(ip),
-				NonAdMessagePushService.class);
+		XProxyHelper.registerService(ImMessagePushService.class, vertx, this, ImMessagePushService.getLocalAddress(ip));
+		publishEventBusService(ImMessagePushService.LOCAL_SERVICE_NAME, ImMessagePushService.getLocalAddress(ip),
+				ImMessagePushService.class);
 
 		// 初始化化服务
 		this.initService();
@@ -146,7 +136,6 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				saveUnSendMsg(receiveMsg);
 				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
 						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
@@ -163,27 +152,6 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			}
 		});
 
-	}
-
-	// 未推送成功的消息入库，用户上线继续推送
-	private void saveUnSendMsg(JsonObject srcMsg) {
-		try {
-			JsonObject param = new JsonObject();
-			param.put("msgId", srcMsg.getValue("msgId") + "");
-			param.put("phone", srcMsg.getString("phone"));
-			param.put("userId", srcMsg.getValue("customerId") + "");
-			Object expireTime = srcMsg.getValue("expireTime");
-			// 如果没传过期时间，就一天后过期
-			expireTime = (expireTime == null) ? System.currentTimeMillis() + 86400000 : expireTime;
-			param.put("expireTime", expireTime + "");
-			param.put("content", srcMsg.toString());
-			param.put("callFlag", "2");
-			param.put("senderId", srcMsg.getString("senderId"));
-			param.put("senderKey", srcMsg.getString("senderKey"));
-			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
-		} catch (Exception e) {
-			logger.error("保存未推送成功的消息失败" + e);
-		}
 	}
 
 	private void checkSender(String senderId, String senderKey, Handler<AsyncResult<Void>> handler) {
@@ -301,14 +269,11 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	private void initService() {
 		config = config().getJsonObject("push.config");
-		socketPushService = SocketPushService.createProxy(vertx);
 		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
-		// msgRecordService = MsgRecordService.createProxy(vertx);
 		redisService = RedisService.createProxy(vertx);
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
 		applePushService = ApplePushService.createProxy(vertx);
-		passengerUnSendService = PassengerUnSendService.createProxy(vertx);
 	}
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {
@@ -431,6 +396,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		param.put("phone", phone);
 		Future<List<DeviceDto>> deviceFuture = Future.future();
 		deviceService.queryDevices(param, deviceFuture.completer());
+
 		deviceFuture.setHandler(devRes -> {
 			if (devRes.succeeded()) {
 				List<DeviceDto> list = devRes.result();
@@ -438,47 +404,27 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 					// 库里load出来的token
 					String loadToken = list.get(0).getDeviceToken();
 					channel = list.get(0).getChannel();
-					// 如果渠道是ISO 并且token不为空，走APNS推送
 					if (PushTypeEnum.APNS.getSrcCode() == channel && !StringUtil.isNullOrEmpty(loadToken)) {
+						// 如果渠道是IOS 并且token不为空，走APNS推送
 						receiveMsg.put("apnsToken", loadToken);
 						this.pushByApns(receiveMsg, resultHandler);
+					} else if (PushTypeEnum.XIAOMI.getSrcCode() == channel && !StringUtil.isNullOrEmpty(loadToken)) {
+						// 如果渠道是XIAOMI 并且token不为空，走小米推送
+						pushMessage2AndroidDevice(loadToken, receiveMsg, resultHandler);
 					} else {
-						this.pushBySocketOrOther(loadToken, receiveMsg, resultHandler);
+						// device表没有查询到手机号对应的token 直接返回错误
+						logger.error("query token is null");
+						resultHandler.handle(Future.failedFuture("token is null"));
 					}
 				} else {
-					this.pushBySocketOrOther(null, receiveMsg, resultHandler);
+					logger.error("query device is null");
+					resultHandler.handle(Future.failedFuture("token is null"));
 				}
 			} else {
+				logger.error("query deviceToken error:", devRes.cause());
 				resultHandler.handle(Future.failedFuture(devRes.cause()));
 			}
 		});
-	}
-
-	/**
-	 * @param loadToken
-	 *            查出来的token
-	 * @param receiveMsg
-	 *            接收的消息
-	 * @param resultHandler
-	 */
-	private void pushBySocketOrOther(String loadToken, JsonObject receiveMsg,
-			Handler<AsyncResult<BaseResponse>> resultHandler) {
-		Integer customerId = receiveMsg.getInteger("customerId");
-		Map<String, String> params = new HashMap<>();
-		params.put("uid", customerId + "");
-
-		Future<Boolean> socketFuture = Future.future();
-		this.getSocketCheckResult(params, socketFuture.completer());
-
-		socketFuture.setHandler(socketHandler -> {
-			boolean isUseSocket = false;
-			if (socketHandler.succeeded()) {
-				isUseSocket = socketHandler.result();
-			}
-			// 推socket 或者 android
-			pushMessage2AndroidDevice(loadToken, receiveMsg, isUseSocket, resultHandler);
-		});
-
 	}
 
 	private void pushByApns(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
@@ -489,50 +435,14 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		applePushService.sendMsg(receiveMsg, resultHandler);
 	}
 
-	private void getSocketCheckResult(Map<String, String> params, Handler<AsyncResult<Boolean>> resultHandler) {
-
-		WebClient webClient = WebClient.create(vertx);
-		webClient.postAbs(config.getString("socket.valid.url"))
-				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-				.addQueryParam("uid", params.get("uid")).send(responseHandler -> {
-					if (responseHandler.succeeded()) {
-						JsonObject checkSocket = responseHandler.result().bodyAsJsonObject();
-						logger.info("socket状态检查返回结果：" + checkSocket);
-						if (checkSocket == null) {
-							resultHandler.handle(Future.succeededFuture(false));
-							return;
-						}
-						String returnCode = checkSocket.getString("returnCode");
-						String isValid = checkSocket.getString("isValid");
-						if ("0".equals(returnCode) && "1".equals(isValid)) {
-							resultHandler.handle(Future.succeededFuture(true));
-						} else {
-							logger.info("检测到socket未连接，" + Json.encode(checkSocket));
-							resultHandler.handle(Future.succeededFuture(false));
-						}
-					} else {
-						logger.error("sokcet状态检查异常" + responseHandler.cause());
-						resultHandler.handle(Future.succeededFuture(false));
-					}
-				});
-
-	}
-
 	/**
 	 * 选择推送渠道进行推送
 	 *
 	 * @param isSocket
 	 * @param resultHandler
 	 */
-	private void pushMessage2AndroidDevice(String loadToken, JsonObject receiveMsg, boolean isSocket,
+	private void pushMessage2AndroidDevice(String loadToken, JsonObject receiveMsg,
 			Handler<AsyncResult<BaseResponse>> resultHandler) {
-
-		if (isSocket) {
-			logger.info("开始走socket推送");
-			socketPushService.sendMsg(receiveMsg, resultHandler);
-			channel = PushTypeEnum.SOCKET.getSrcCode();
-			return;
-		}
 
 		// 接收到的消息中有传token
 		if (!StringUtils.isBlank(token)) {
@@ -559,39 +469,4 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 
 	}
 
-	/**
-	 * 推送成功的消息保存到redis中
-	 * 
-	 * @param expireTime
-	 *
-	 * @param resultHandler
-	 */
-	private void setMsgToRedis(String msgId, String customerId, Long expireTime,
-			Handler<AsyncResult<Void>> resultHandler) {
-		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
-		long expire = (expireTime - System.currentTimeMillis()) / 1000;
-		redisService.setEx(redisMsgKey, expire, msgId, res -> {
-			if (res.succeeded()) {
-				resultHandler.handle(Future.succeededFuture());
-			} else {
-				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
-				logger.error(errorMsg, res.cause());
-				resultHandler.handle(Future.failedFuture(res.cause()));
-			}
-		});
-	}
-
-	private void setMessageExpire2Redis(String redisMsgKey, Long expireTime, Handler<AsyncResult<Void>> resultHandler) {
-		long expire = (expireTime - System.currentTimeMillis()) / 1000;
-		redisService.expire(redisMsgKey, expire, res -> {
-			if (res.succeeded()) {
-				resultHandler.handle(Future.succeededFuture());
-			} else {
-				String errorMsg = "fail to set expire for message : key = " + redisMsgKey;
-				logger.error(errorMsg, res.cause());
-				resultHandler.handle(Future.failedFuture(res.cause()));
-			}
-		});
-
-	}
 }
