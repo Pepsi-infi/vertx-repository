@@ -256,7 +256,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			for (Object id : ids) {
 				idParam = id + "," + idParam;
 			}
-			idParam = idParam.substring(0, idParam.length() - 1);
+			idParam = "(" + idParam.substring(0, idParam.length() - 1) + ")";
 
 			message.clear();
 			message.put("ids", idParam);

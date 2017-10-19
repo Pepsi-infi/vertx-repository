@@ -110,7 +110,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		}
 	}
 
-	private static final String sql_delQuickPhrase = "delete from quick_phrase where id in ( ? )";
+	private static final String sql_delQuickPhrase = "delete from quick_phrase where id in ?";
 
 	private void delQuickPhrase(String ids, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
@@ -172,6 +172,6 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		}
 		a.substring(0, a.length() - 1);
 
-		System.out.println(a.substring(0, a.length() - 1));
+		System.out.println("(" + a.substring(0, a.length() - 1) + ")");
 	}
 }
