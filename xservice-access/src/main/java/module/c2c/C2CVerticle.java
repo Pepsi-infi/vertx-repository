@@ -80,7 +80,7 @@ public class C2CVerticle extends AbstractVerticle {
 				JsonObject res11 = res.result().body();
 				String toHandlerID = res11.getString("handlerID");
 				if (StringUtils.isNotEmpty(toHandlerID)) {
-					if (StringUtils.isNotEmpty(msg.getContent())) {
+					if (StringUtils.isNotEmpty(msg.getContent())) {// 敏感词过滤
 						DeliveryOptions swOption = new DeliveryOptions();
 						swOption.addHeader("action", SensitiveWordsVerticle.method.filterSensitiveWords);
 						swOption.setSendTimeout(3000);
@@ -111,6 +111,12 @@ public class C2CVerticle extends AbstractVerticle {
 								logger.error("filterSensitiveWords, error={}", swRes.cause().getMessage());
 							}
 						});
+					} else {
+						// 服务器透传
+						Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+								cmd, 0);
+						String body = Json.encode(msg);
+						eb.send(toHandlerID, headerBuffer.appendString(body));
 					}
 				} else {
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
