@@ -119,7 +119,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
-				params.add(ids);
+				params.addAll(ids);
 				connection.updateWithParams(sql_delQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
