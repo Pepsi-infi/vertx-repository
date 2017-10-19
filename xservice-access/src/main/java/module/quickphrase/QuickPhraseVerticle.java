@@ -60,7 +60,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					break;
 
 				case method.delQuickPhrase:
-					JsonArray ids = body.getJsonArray("ids");
+					String ids = body.getString("ids");
 					delQuickPhrase(ids, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
@@ -112,14 +112,14 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private static final String sql_delQuickPhrase = "delete from quick_phrase where id in ( ? )";
 
-	private void delQuickPhrase(JsonArray ids, Handler<AsyncResult<JsonObject>> resultHandler) {
+	private void delQuickPhrase(String ids, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
 		params.clear();// Must do clear before use it!
-		logger.info("delQuickPhrase, ids={}", ids.encode());
+		logger.info("delQuickPhrase, ids={}", ids);
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
-				params.addAll(ids);
+				params.add(ids);
 				connection.updateWithParams(sql_delQuickPhrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
@@ -168,9 +168,10 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 		String a = "";
 		for (Object object : array) {
-			a = a + object;
+			a = object + "," + a;
 		}
+		a.substring(0, a.length() - 1);
 
-		System.out.println(a);
+		System.out.println(a.substring(0, a.length() - 1));
 	}
 }

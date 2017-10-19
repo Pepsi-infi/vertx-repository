@@ -38,7 +38,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-//		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
+		// client = MongoClient.createShared(vertx.getDelegate(),
+		// config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -251,8 +252,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
+			String idParam = null;
+			for (Object id : ids) {
+				idParam = id + "," + idParam;
+			}
+			idParam = idParam.substring(0, idParam.length() - 1);
+
 			message.clear();
-			message.put("ids", ids);
+			message.put("ids", idParam);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
