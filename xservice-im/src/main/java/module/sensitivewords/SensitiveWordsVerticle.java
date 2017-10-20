@@ -5,13 +5,16 @@ import java.util.Collection;
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
 
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import module.quickphrase.QuickPhraseVerticle;
 
 public class SensitiveWordsVerticle extends AbstractVerticle {
 
@@ -47,6 +50,23 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 					break;
 				}
 			}
+		});
+
+		ConfigStoreOptions ebStore = new ConfigStoreOptions().setType("event-bus")
+				.setConfig(new JsonObject().put("address", "address-getting-the-conf"));
+
+		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setScanPeriod(3000).addStore(ebStore);
+
+		ConfigRetriever retriever = ConfigRetriever.create(Vertx.vertx(), options);
+		retriever.getConfig(json -> {
+			// Initial retrieval of the configuration
+		});
+
+		retriever.listen(change -> {
+			// Previous configuration
+			JsonObject previous = change.getPreviousConfiguration();
+			// New configuration
+			JsonObject conf = change.getNewConfiguration();
 		});
 	}
 
