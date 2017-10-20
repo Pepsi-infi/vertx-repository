@@ -3,7 +3,7 @@ package api;
 public class RestFileConstant {
 
 	public interface Server {
-		static final int PORT = 9090;
+		static final int PORT = 10000;
 	}
 
 	public interface Uri {

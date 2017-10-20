@@ -62,6 +62,21 @@ public class SQIMBody {
 	private String content;
 
 	/**
+	 * 通知图片宽度，单位px
+	 * 
+	 */
+	private Integer width;
+
+	/**
+	 * 通知图片高度，单位px
+	 */
+	private Integer height;
+	/**
+	 * 广告跳转URL
+	 */
+	private String jumpUrl;
+
+	/**
 	 * 时间戳(毫秒单位)
 	 */
 	private Long timeStamp;
@@ -90,14 +105,6 @@ public class SQIMBody {
 	 * 音频 时长，单位 秒
 	 */
 	private Integer duration;
-
-	@Override
-	public String toString() {
-		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
-				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
-				+ ", content=" + content + ", timeStamp=" + timeStamp + ", lon=" + lon + ", lat=" + lat + ", sAddress="
-				+ sAddress + ", address=" + address + ", duration=" + duration + "]";
-	}
 
 	public String getUserTel() {
 		return userTel;
@@ -218,4 +225,37 @@ public class SQIMBody {
 	public void setIdentity(Integer identity) {
 		this.identity = identity;
 	}
+
+	public String getJumpUrl() {
+		return jumpUrl;
+	}
+
+	public void setJumpUrl(String jumpUrl) {
+		this.jumpUrl = jumpUrl;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
+	}
+
+	public Integer getHeight() {
+		return height;
+	}
+
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+
+	@Override
+	public String toString() {
+		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
+				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
+				+ ", content=" + content + ", jumpUrl=" + jumpUrl + ", timeStamp=" + timeStamp + ", lon=" + lon
+				+ ", lat=" + lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
+	}
+
 }

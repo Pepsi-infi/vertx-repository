@@ -1,0 +1,14 @@
+{
+	"upload.file.path.prefix": "/u01/file",
+	"download.file.server.prefix": "/mc-file/im/download.json?file=",
+	"file": [
+		{
+			"innerIP": "10.0.8.29",
+			"node": "111.206.162.233:10000"
+		},
+		{
+			"innerIP": "10.0.8.30",
+			"node": "111.206.162.233:10000"
+		}
+	]
+}

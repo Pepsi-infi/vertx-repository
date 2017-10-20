@@ -50,6 +50,8 @@ public class IMCmd {
 	 */
 	public static final int ACK_N = 2103;
 
+	public static final int Notification = 3001;
+
 	/**
 	 * 
 	 */
