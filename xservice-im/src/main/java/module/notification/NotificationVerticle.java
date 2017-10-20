@@ -87,8 +87,8 @@ public class NotificationVerticle extends AbstractVerticle {
 
 		logger.info("sendAd, msg={}", noti.toString());
 
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion, IMCmd.adWithPic,
-				bodyLength);
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				IMCmd.Notification, bodyLength);
 
 		eb.send(handlerID, aMsgHeader.appendString(body));
 	}
