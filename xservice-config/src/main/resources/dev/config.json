@@ -1,16 +1,15 @@
 {
-  "mysql": {
-    "mc-admin": {
-      "host": "10.10.10.178",
-      "port": 3306,
-      "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
-      "database": "mc_admin",
-      "charset": "UTF-8",
-      "queryTimeout": 3000
-    }
-
-  },
-  "service.port":9200
+	"mysql": {
+		"mc-admin": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "mc_admin",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
+	},
+	"service.port": 9200
 }
