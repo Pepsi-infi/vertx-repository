@@ -20,7 +20,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 		eb.<JsonObject>consumer(SensitiveWordConfigVerticle.class.getName(), res -> {
 
 			logger.info("SensitiveWordConfigVerticle, ");
-			res.reply(new JsonObject().put("1", "test"));
+			res.reply(new JsonObject().put("1", System.currentTimeMillis()));
 		});
 	}
 }
