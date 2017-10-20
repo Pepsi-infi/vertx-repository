@@ -62,6 +62,11 @@ public class SQIMBody {
 	private String content;
 
 	/**
+	 * 广告跳转URL
+	 */
+	private String jump;
+
+	/**
 	 * 时间戳(毫秒单位)
 	 */
 	private Long timeStamp;
@@ -217,5 +222,13 @@ public class SQIMBody {
 
 	public void setIdentity(Integer identity) {
 		this.identity = identity;
+	}
+
+	public String getJump() {
+		return jump;
+	}
+
+	public void setJump(String jump) {
+		this.jump = jump;
 	}
 }
