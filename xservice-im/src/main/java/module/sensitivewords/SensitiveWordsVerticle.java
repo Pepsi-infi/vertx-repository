@@ -53,20 +53,25 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 		});
 
 		ConfigStoreOptions ebStore = new ConfigStoreOptions().setType("event-bus")
-				.setConfig(new JsonObject().put("address", "address-getting-the-conf"));
+				.setConfig(new JsonObject().put("address", "config.sensitivewords.SensitiveWordConfigVerticle"));
 
 		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setScanPeriod(3000).addStore(ebStore);
 
 		ConfigRetriever retriever = ConfigRetriever.create(Vertx.vertx(), options);
 		retriever.getConfig(json -> {
-			// Initial retrieval of the configuration
+			logger.info("SensitiveWordsVerticle, config={}", json.result());
 		});
 
 		retriever.listen(change -> {
 			// Previous configuration
 			JsonObject previous = change.getPreviousConfiguration();
+
+			logger.info("previous, config={}", previous.encode());
+
 			// New configuration
 			JsonObject conf = change.getNewConfiguration();
+
+			logger.info("conf, config={}", conf.encode());
 		});
 	}
 
