@@ -289,6 +289,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		noti.setMsgType(4);
 		noti.setSceneType(0);
 		noti.setSceneId("A123456789");
+		noti.setWidth(480);
+		noti.setHeight(720);
 
 		String body = Json.encode(noti);
 		int bodyLength = 0;

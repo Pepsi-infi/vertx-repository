@@ -62,6 +62,16 @@ public class SQIMBody {
 	private String content;
 
 	/**
+	 * 通知图片宽度，单位px
+	 * 
+	 */
+	private Integer width;
+
+	/**
+	 * 通知图片高度，单位px
+	 */
+	private Integer height;
+	/**
 	 * 广告跳转URL
 	 */
 	private String jumpUrl;
@@ -222,6 +232,22 @@ public class SQIMBody {
 
 	public void setJumpUrl(String jumpUrl) {
 		this.jumpUrl = jumpUrl;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
+	}
+
+	public Integer getHeight() {
+		return height;
+	}
+
+	public void setHeight(Integer height) {
+		this.height = height;
 	}
 
 	@Override
