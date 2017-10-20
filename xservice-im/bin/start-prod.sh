@@ -17,4 +17,4 @@ nohup java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=prod \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-access-fat.jar >> ${root_path}/nohup.out &
+-jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &

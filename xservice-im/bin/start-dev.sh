@@ -2,7 +2,7 @@
 set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
-pid=$(ps -ef | grep xservice-access | grep java | awk '{print $2}')
+pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
 if [ ! -z "$pid" ]
 then 
   kill -9 $pid
@@ -29,6 +29,6 @@ java \
 -Xdebug -Xrunjdwp:transport=dt_socket,address=52002,server=y,suspend=n \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-access-fat.jar >/dev/null 2>&1
+-jar ${root_path}/xservice-im-fat.jar >/dev/null 2>&1
 
 exit 0

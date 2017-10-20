@@ -2,7 +2,7 @@
 set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
-pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
+pid=$(ps -ef | grep xservice-socket | grep java | awk '{print $2}')
 if [ ! -z "$pid" ]
 then 
   kill -9 $pid
@@ -29,7 +29,7 @@ nohup /usr/local/jdk1.8/bin/java \
 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=7091 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
+-jar ${root_path}/xservice-socket-fat.jar >> ${root_path}/nohup.out &
 
 sleep 2s
 
