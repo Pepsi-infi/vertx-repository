@@ -259,6 +259,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		SQIMBody noti = new SQIMBody();
 		noti.setMsgId(UUID.randomUUID().toString());
 		noti.setContent("这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！");
+		noti.setMsgType(1);
 
 		String body = Json.encode(noti);
 		int bodyLength = 0;
@@ -283,6 +284,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		noti.setMsgId(UUID.randomUUID().toString());
 		noti.setContent("http://img3.redocn.com/tupian/20150430/mantenghuawenmodianshiliangbeijing_3924704.jpg");
 		noti.setJump("https://www.baidu.com/");
+		noti.setMsgType(4);
 
 		String body = Json.encode(noti);
 		int bodyLength = 0;
@@ -295,8 +297,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		logger.info("sendAd, msg={}", noti.toString());
 
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion, IMCmd.adWithPic,
-				bodyLength);
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				IMCmd.Notification, bodyLength);
 
 		eb.send(handlerID, aMsgHeader.appendString(body));
 	}

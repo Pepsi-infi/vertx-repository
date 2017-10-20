@@ -52,8 +52,6 @@ public class IMCmd {
 
 	public static final int Notification = 3001;
 
-	public static final int adWithPic = 3002;
-
 	/**
 	 * 
 	 */
