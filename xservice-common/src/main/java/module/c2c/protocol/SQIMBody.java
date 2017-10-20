@@ -96,14 +96,6 @@ public class SQIMBody {
 	 */
 	private Integer duration;
 
-	@Override
-	public String toString() {
-		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
-				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
-				+ ", content=" + content + ", timeStamp=" + timeStamp + ", lon=" + lon + ", lat=" + lat + ", sAddress="
-				+ sAddress + ", address=" + address + ", duration=" + duration + "]";
-	}
-
 	public String getUserTel() {
 		return userTel;
 	}
@@ -230,5 +222,13 @@ public class SQIMBody {
 
 	public void setJump(String jump) {
 		this.jump = jump;
+	}
+
+	@Override
+	public String toString() {
+		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
+				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
+				+ ", content=" + content + ", jump=" + jump + ", timeStamp=" + timeStamp + ", lon=" + lon + ", lat="
+				+ lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
 	}
 }

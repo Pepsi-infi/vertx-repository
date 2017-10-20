@@ -269,6 +269,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			e.printStackTrace();
 		}
 
+		logger.info("sendTextNotification, msg={}", noti.toString());
+
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				IMCmd.Notification, bodyLength);
 
@@ -290,6 +292,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		logger.info("sendAd, msg={}", noti.toString());
 
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion, IMCmd.adWithPic,
 				bodyLength);
