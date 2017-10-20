@@ -64,7 +64,7 @@ public class SQIMBody {
 	/**
 	 * 广告跳转URL
 	 */
-	private String jump;
+	private String jumpUrl;
 
 	/**
 	 * 时间戳(毫秒单位)
@@ -216,19 +216,20 @@ public class SQIMBody {
 		this.identity = identity;
 	}
 
-	public String getJump() {
-		return jump;
+	public String getJumpUrl() {
+		return jumpUrl;
 	}
 
-	public void setJump(String jump) {
-		this.jump = jump;
+	public void setJumpUrl(String jumpUrl) {
+		this.jumpUrl = jumpUrl;
 	}
 
 	@Override
 	public String toString() {
 		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
 				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
-				+ ", content=" + content + ", jump=" + jump + ", timeStamp=" + timeStamp + ", lon=" + lon + ", lat="
-				+ lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
+				+ ", content=" + content + ", jumpUrl=" + jumpUrl + ", timeStamp=" + timeStamp + ", lon=" + lon
+				+ ", lat=" + lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
 	}
+
 }

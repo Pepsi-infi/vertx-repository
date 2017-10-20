@@ -73,7 +73,7 @@ public class NotificationVerticle extends AbstractVerticle {
 		SQIMBody noti = new SQIMBody();
 		noti.setMsgId(UUID.randomUUID().toString());
 		noti.setContent("http://img3.redocn.com/tupian/20150430/mantenghuawenmodianshiliangbeijing_3924704.jpg");
-		noti.setJump("https://www.baidu.com/");
+		noti.setJumpUrl("https://www.baidu.com/");
 		noti.setMsgType(4);
 
 		String body = Json.encode(noti);
