@@ -14,6 +14,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
+import model.StatusCode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import service.dto.MsgStatResultDto;
@@ -161,6 +162,7 @@ public class MsgStatResultDaoImpl extends BaseDaoVerticle implements MsgStatResu
                 Long count = jsonObject.orElse(new JsonObject()).getLong("COUNT(*)");
                 MsgStatResultPageWrapper wrapper = new MsgStatResultPageWrapper();
                 MsgStatResultPage msgStatResultPage = new MsgStatResultPage(msgStatResultDtos, page, limit, count);
+                wrapper.setCode(StatusCode.SUCCESS.getCode());
                 wrapper.setData(msgStatResultPage);
                 resultHandler.handle(Future.succeededFuture(wrapper));
             } else {

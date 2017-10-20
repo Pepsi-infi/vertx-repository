@@ -2,7 +2,6 @@ package service.dto;
 
 import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
-import utils.BaseResponse;
 
 /**
  * Created by lufei
@@ -11,7 +10,13 @@ import utils.BaseResponse;
  */
 @DataObject(generateConverter = true)
 
-public class MsgStatResultPageWrapper extends BaseResponse {
+public class MsgStatResultPageWrapper {
+
+    private int code;
+
+    private String msg;
+
+    private long time;
 
     private MsgStatResultPage data;
 
@@ -36,5 +41,29 @@ public class MsgStatResultPageWrapper extends BaseResponse {
 
     public void setData(MsgStatResultPage data) {
         this.data = data;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 }

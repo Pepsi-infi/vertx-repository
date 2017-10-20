@@ -3,5 +3,8 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  server_base_url: '"http://127.0.0.1:9100"'
+  //统计中心domain
+  mc_statistic_baseURL: '"http://127.0.0.1:9100"',
+  //配置中心domain
+  mc_config_baseURL: '"http://127.0.0.1:9200"'
 })

@@ -9,13 +9,13 @@
  */
 
 import fetch from 'common/fetch'
-import {port_table} from 'common/port_uri'
+import {httpPost} from 'common/fetch'
 
 //数据列表
 export function list(params) {
   return fetch({
-    baseURL: process.env.mc_statistic_baseURL,
-    url: '/mc-statistic/v1/msgStats.json?caller=1001',
+    baseURL: process.env.mc_config_baseURL,
+    url: '/mc-config/v1/sensitiveWords.json',
     method: 'get',
     params
   })
@@ -24,34 +24,30 @@ export function list(params) {
 //根据id查询数据
 export function get(params) {
   return fetch({
-    url: port_table.get,
+    baseURL: process.env.mc_config_baseURL,
+    url: '/mc-config/v1/sensitiveWords/get.json',
     method: 'get',
     params
   })
 }
 
 //根据id删除数据
-export function del(data) {
+export function del(params) {
   return fetch({
-    url: port_table.del,
-    method: 'post',
-    data
+    baseURL: process.env.mc_config_baseURL,
+    url: '/mc-config/v1/sensitiveWords/del.json',
+    method: 'get',
+    params
   })
 }
 //添加或修改数据
 export function save(data) {
-  return fetch({
-    url: port_table.save,
+  return httpPost({
+    baseURL: process.env.mc_config_baseURL,
+    url: '/mc-config/v1/sensitiveWords.json',
     method: 'post',
     data
   })
 }
-//批量删除
-export function batch_del(data) {
-  return fetch({
-    url: port_table.batch_del,
-    method: 'post',
-    data
-  })
-}
+
 

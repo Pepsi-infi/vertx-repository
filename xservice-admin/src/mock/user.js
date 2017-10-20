@@ -16,7 +16,7 @@ Mock.mock(new RegExp(port_user.login), ({body}) => {
   const {username, password} = JSON.parse(body)
   if (username === 'admin' && password === 'admin') {
     return Mock.mock({
-      status: port_code.success,
+      code: 0,
       msg: "登录成功",
       data: {
         'name': 'admin',
