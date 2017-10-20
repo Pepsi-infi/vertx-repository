@@ -260,6 +260,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		noti.setMsgId(UUID.randomUUID().toString());
 		noti.setContent("这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！");
 		noti.setMsgType(1);
+		noti.setSceneType(0);
+		noti.setSceneId("A123456789");
 
 		String body = Json.encode(noti);
 		int bodyLength = 0;
@@ -285,6 +287,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		noti.setContent("http://img3.redocn.com/tupian/20150430/mantenghuawenmodianshiliangbeijing_3924704.jpg");
 		noti.setJump("https://www.baidu.com/");
 		noti.setMsgType(4);
+		noti.setSceneType(0);
+		noti.setSceneId("A123456789");
 
 		String body = Json.encode(noti);
 		int bodyLength = 0;
