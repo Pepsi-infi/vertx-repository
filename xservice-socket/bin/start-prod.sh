@@ -17,4 +17,4 @@ nohup java \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dconfig=mobile \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-channel-fat.jar >> ${root_path}/nohup.out &
+-jar ${root_path}/xservice-socket-fat.jar >> ${root_path}/nohup.out &

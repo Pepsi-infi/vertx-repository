@@ -38,8 +38,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		// client = MongoClient.createShared(vertx.getDelegate(),
-		// config().getJsonObject("mongo"));
+		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
