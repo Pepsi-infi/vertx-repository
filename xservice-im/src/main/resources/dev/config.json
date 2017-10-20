@@ -1,31 +1,68 @@
 {
-	"host": "10.10.10.178",
-	"port": 27017,
-	"replicaSet": "foo",
-	"serverSelectionTimeoutMS": 30000,
-	"maxPoolSize": 50,
-	"minPoolSize": 25,
-	"maxIdleTimeMS": 300000,
-	"maxLifeTimeMS": 3600000,
-	"waitQueueMultiple": 10,
-	"waitQueueTimeoutMS": 10000,
-	"maintenanceFrequencyMS": 2000,
-	"maintenanceInitialDelayMS": 500,
-	"username": "im-mc",
-	"password": "im-mc",
-	"authSource": "im-mc",
-	"connectTimeoutMS": 300000,
-	"socketTimeoutMS": 100000,
-	"sendBufferSize": 8192,
-	"receiveBufferSize": 8192,
-	"keepAlive": true,
-	"heartbeat.socket": {
-		"connectTimeoutMS": 300000,
-		"socketTimeoutMS": 100000,
+	"mongo": {
+		"hosts": [
+			{
+				"host": "10.20.10.100",
+				"port": 27017
+			},
+			{
+				"host": "10.20.10.101",
+				"port": 27017
+			},
+			{
+				"host": "10.20.10.102",
+				"port": 27017
+			}
+		],
+		"serverSelectionTimeoutMS": 30000,
+		"maxPoolSize": 50,
+		"minPoolSize": 25,
+		"maxIdleTimeMS": 300000,
+		"maxLifeTimeMS": 3600000,
+		"waitQueueMultiple": 10,
+		"waitQueueTimeoutMS": 10000,
+		"maintenanceFrequencyMS": 2000,
+		"maintenanceInitialDelayMS": 500,
+		"username": "im-mc",
+		"password": "im-mc",
+		"authSource": "im-mc",
+		"db_name": "im-mc",
+		"connectTimeoutMS": 3000,
+		"socketTimeoutMS": 3000,
 		"sendBufferSize": 8192,
 		"receiveBufferSize": 8192,
-		"keepAlive": true
+		"keepAlive": true,
+		"heartbeat.socket": {
+			"connectTimeoutMS": 3000,
+			"socketTimeoutMS": 3000,
+			"sendBufferSize": 8192,
+			"receiveBufferSize": 8192,
+			"keepAlive": true
+		},
+		"heartbeatFrequencyMS": 1000,
+		"minHeartbeatFrequencyMS": 500
 	},
-	"heartbeatFrequencyMS": 1000,
-	"minHeartbeatFrequencyMS": 500
+	"mysql": {
+		"mc-im": {
+			"host": "10.10.10.178",
+			"port": 3306,
+			"maxPoolSize": 100,
+			"username": "sqyc_message",
+			"password": "sqyc_message@01zhuanche.com",
+			"database": "mc_admin",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
+	},
+	"im": [
+		{
+			"innerIP": "10.10.10.193",
+			"node": "111.206.162.233:4321"
+		}
+	],
+	"file": {
+		"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
+		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
+	},
+	"service.host": "127.0.0.1"
 }

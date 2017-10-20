@@ -12,7 +12,8 @@
 		<module>xservice-statistic</module>
 		<module>xservice-push</module>
 		<module>xservice-im</module>
-		<module>xservice-access</module>
+		<module>xservice-socket</module>
+		<module>xservice-file</module>
 	</modules>
 
 	<!-- 配置变量 -->
@@ -115,6 +116,7 @@
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-unit</artifactId>
 			<version>${vertx-version}</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- Unit Test End -->
 
