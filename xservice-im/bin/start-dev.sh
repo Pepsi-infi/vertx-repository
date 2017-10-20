@@ -2,21 +2,20 @@
 set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
 
-pid=$(ps -ef | grep xservice-im | grep java | awk '{print $2}')
+pid=$(ps -ef | grep xservice-access | grep java | awk '{print $2}')
 if [ ! -z "$pid" ]
 then 
   kill -9 $pid
 fi
 
-sleep 5s
-
-nohup /usr/local/jdk1.8/bin/java \
+BUILD_ID=
+java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
 -XX:+PrintGCDetails \
 -Xms2g -Xmx2g -Xmn1380m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
--XX:MaxDirectMemorySize=6g \
+-XX:MaxDirectMemorySize=2560m \
 -XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
 -XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
@@ -26,11 +25,10 @@ nohup /usr/local/jdk1.8/bin/java \
 -Dlog.path=${root_path}/log \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
--Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=7091 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:+UnlockCommercialFeatures -XX:+FlightRecorder \
+-Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=10.10.10.193 \
+-Xdebug -Xrunjdwp:transport=dt_socket,address=52002,server=y,suspend=n \
 -Dconfig=dev \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-im-fat.jar >> ${root_path}/nohup.out &
-
-sleep 2s
+-jar ${root_path}/xservice-access-fat.jar >/dev/null 2>&1
 
 exit 0

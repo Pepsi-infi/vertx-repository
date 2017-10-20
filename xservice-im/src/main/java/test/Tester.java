@@ -1,135 +1,64 @@
 package test;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import cluster.impl.SocketConsistentHashingVerticle;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
-import io.vertx.core.json.Json;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.web.impl.Utils;
-import io.vertx.rxjava.core.MultiMap;
-import io.vertx.rxjava.core.Vertx;
-import io.vertx.rxjava.ext.web.client.HttpResponse;
-import io.vertx.rxjava.ext.web.client.WebClient;
-import io.vertx.rxjava.ext.web.codec.BodyCodec;
-import logic.impl.SocketSessionVerticle;
-import rx.Single;
-import server.RestSocketVerticle;
-import server.SocketServerVerticle;
+import module.persistence.MongoVerticle;
+import module.quickphrase.QuickPhraseVerticle;
+import server.RestIMVerticle;
 
 public class Tester {
-	
-	private static final Logger logger = LoggerFactory.getLogger(Tester.class);
 
-	public static void main(String[] args) throws UnsupportedEncodingException {
+	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		// vertx.deployVerticle(MongoVerticle.class.getName(), new
+		// vertx.deployVerticle(IMServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(RestServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(C2CVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+
+		// vertx.deployVerticle(TCPTest.class.getName());
+
+		/**
+		 * Instance should be 1 because of ehcache.
+		 */
+		// vertx.deployVerticle(SessionVerticle.class.getName());
+
+		/**
+		 * Instance should be 1 because of ehcache.
+		 */
+		// vertx.deployVerticle(SessionVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(config()));
-		// vertx.deployVerticle(ValidateServerVerticle.class.getName());
-		// ----------------------
-		// vertx.deployVerticle(SocketServerVerticle.class.getName());
-		// vertx.deployVerticle(TpServiceImpl.class.getName());
-		// vertx.deployVerticle(SocketSessionVerticle.class.getName());
-		// vertx.deployVerticle(UdpServerVerticle.class.getName());
-		// vertx.deployVerticle(TestUdpServerVerticle.class.getName());
 
-//		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName());
-//		vertx.deployVerticle(RestSocketVerticle.class.getName());
-//		vertx.deployVerticle(SocketSessionVerticle.class.getName());
-		
-		vertx.deployVerticle(SocketClientVerticle.class.getName(), new DeploymentOptions().setInstances(1000));
-		
+		// LoginMsgData t = new LoginMsgData();
+		// System.out.println(Json.encodePrettily(t));
 
-		// ----------------------
-		// vertx.deployVerticle(TestUdpServerVerticle.class.getName(), new
-		// DeploymentOptions().setInstances(1));
-
-		// MongoService service = MongoService.createProxy(vertx);
-		// JsonObject test = new JsonObject().put("collection", "message").put("data",
-		// new JsonObject().put("test", 1111));
-		// service.saveData(test, res -> {
-		// });
-
-		// vertx.setPeriodic(1000, handler -> {
-		// DatagramSocket socketSend = vertx.createDatagramSocket(new
-		// DatagramSocketOptions());
-		// JsonObject j = new JsonObject();
-		// j.put("key", "test");
-		// socketSend.send(j.encode(), 1101, "192.168.2.220", res -> {
-		//
-		// });
-		// });
-		//
-		WebClient webClient = WebClient.create(vertx);
-
-		MultiMap form = MultiMap.caseInsensitiveMultiMap();
-		form.add("uid", "13666098");
-
-		form.add("time", Utils.normalizePath("2017-09-29 05:44:59"));
-		form.add("msg", Utils.normalizePath("{\"lat\":39.920229,\"lon\":116.432982}").substring(1));
-
-		System.out.println(URLEncoder
-				.encode("{\"lon\":116.432981,\"lat\":39.920212,\"groupId\":\"34\",\"module\":5001}", "UTF-8"));
-		System.out.println(URLEncoder.encode("2017-09-29 05:44:59", "UTF-8"));
-
-		System.out.println(URLEncoder
-				.encode("{\"lon\":116.432981,\"lat\":39.920212,\"groupId\":\"34\",\"module\":5001}", "UTF-8"));
-		Single<HttpResponse<String>> httpRequest = webClient
-				.post(18080, "10.10.10.105", "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
-				.as(BodyCodec.string()).rxSendForm(form);
-
-		System.out.println(
-				Utils.normalizePath("{\"cmd\":14,\"data\":{\"lat\":39.920256,\"lon\":116.433006}}").substring(1));
-
-		// httpRequest.subscribe(resp -> {
-		// if (resp.statusCode() == 200) {
-		// System.out.println(resp.body());
-		// } else {
-		// System.out.println(resp.statusCode() + resp.statusMessage());
+		// byte[] s = ByteUtil.unsignedShortToByte2(44);
+		// for (byte b : s) {
+		// System.out.print(b);
 		// }
-		// });
 
-		String a = "a";
-		System.out.println(a);
+		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 
-		a = "abc";
-		System.out.println(a);
-
-		String b = "b";
-
-		try {
-			HeartBeat a1 = Json.mapper.readValue(
-					"{\"lat\":\"39.92042236328125\",\"lon\":\"116.4331694878472\"}".replace("\\\\", ""),
-					HeartBeat.class);
-
-			System.out.println(Json.encode(a1));
-			System.out.println(a1.toString());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		String a222 = "null";
-		logger.info("e={}", a222);
+		// vertx.deployVerticle(MongoVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(getMongo()));
 	}
 
-	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
+	private static JsonObject config() {
+		String prop = "{\"mongo\":{\"hosts\":[{\"host\":\"10.20.10.100\",\"port\":27017},{\"host\":\"10.20.10.101\",\"port\":27017},{\"host\":\"10.20.10.102\",\"port\":27017}],\"serverSelectionTimeoutMS\":30000,\"maxPoolSize\":50,\"minPoolSize\":25,\"maxIdleTimeMS\":300000,\"maxLifeTimeMS\":3600000,\"waitQueueMultiple\":10,\"waitQueueTimeoutMS\":10000,\"maintenanceFrequencyMS\":2000,\"maintenanceInitialDelayMS\":500,\"username\":\"im-mc\",\"password\":\"im-mc\",\"authSource\":\"im-mc\",\"db_name\":\"im-mc\",\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true,\"heartbeat.socket\":{\"connectTimeoutMS\":3000,\"socketTimeoutMS\":3000,\"sendBufferSize\":8192,\"receiveBufferSize\":8192,\"keepAlive\":true},\"heartbeatFrequencyMS\":1000,\"minHeartbeatFrequencyMS\":500},\"mysql\":{\"mc-im\":{\"host\":\"192.168.0.18\",\"port\":3306,\"maxPoolSize\":100,\"username\":\"sqyc_test\",\"password\":\"sqyc_test@01zhuanche.com\",\"database\":\"mc_im\",\"charset\":\"UTF-8\",\"queryTimeout\":3000}},\"im\":[{\"innerIP\":\"10.10.10.193\",\"node\":\"111.206.162.233:4321\"}],\"file\":{\"upload.file.path.prefix\":\"/u01/projectCAR/xservice/xservice-file/\",\"download.file.server.prefix\":\":9090/mc-file/im/download.json?file=\"},\"service.host\":\"127.0.0.1\"}";
 
+		JsonObject jsonObject = new JsonObject(prop);
+		return jsonObject;
 	}
 
-	// private static JsonObject config() {
-	// String prop = "{\"db_name\":\"im-mc\",
-	// \"connection_string\":\"mongodb://10.10.10.178:27017\",
-	// \"username\":\"im-mc\", \"password\":\"im-mc\",
-	// \"authMechanism\":\"SCRAM-SHA-1\"}";
-	//
-	// JsonObject jsonObject = new JsonObject(prop);
-	// return jsonObject;
-	// }
+	public static DeploymentOptions readBossOpts() {
+		DeploymentOptions options = new DeploymentOptions();
+		options.setInstances(Runtime.getRuntime().availableProcessors());
+
+		return options;
+	}
 }

@@ -12,7 +12,7 @@
 		<module>xservice-statistic</module>
 		<module>xservice-push</module>
 		<module>xservice-im</module>
-		<module>xservice-access</module>
+		<module>xservice-socket</module>
 		<module>xservice-file</module>
 	</modules>
 

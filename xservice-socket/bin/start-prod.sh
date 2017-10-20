@@ -1,34 +1,20 @@
 #!/bin/sh
-set -x
 root_path=$(cd "$(dirname "${0}")"; pwd)
-
-pid=$(ps -ef | grep xservice-access | grep java | awk '{print $2}')
-if [ ! -z "$pid" ]
-then 
-  kill -9 $pid
-fi
-
-BUILD_ID=
-java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
 -XX:+PrintGCDetails \
 -Xms2g -Xmx2g -Xmn1380m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
--XX:MaxDirectMemorySize=2560m \
 -XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
 -XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
 -XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
 -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
--Xloggc:${root_path}/gc.log \
--Dlog.path=${root_path}/log \
+-Xloggc:/letv/logs/mobile/channel/gc.log \
+-Dlog.path=/letv/logs/mobile/channel \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
--Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=10.10.10.193 \
--Xdebug -Xrunjdwp:transport=dt_socket,address=52002,server=y,suspend=n \
--Dconfig=dev \
+-Dconfig=mobile \
 -Dvertx.zookeeper.config=zookeeper-dev.json \
--jar ${root_path}/xservice-access-fat.jar >/dev/null 2>&1
-
-exit 0
+-jar ${root_path}/xservice-channel-fat.jar >> ${root_path}/nohup.out &
