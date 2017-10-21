@@ -51,7 +51,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 				logger.info("retriveSensitiveWord, params={}", params.encode());
 				connection.queryWithParams(retriveSensitiveWord, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
-						logger.info("retriveSensitiveWord, result={}", SQLRes.result().getRows());
+						logger.info("retriveSensitiveWord, result={}", SQLRes.result().getRows().size());
 
 						JsonObject message = new JsonObject();
 						message.put("result", SQLRes.result().getRows());
