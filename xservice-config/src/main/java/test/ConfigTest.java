@@ -40,7 +40,7 @@ public class ConfigTest {
 	}
 
 	private static JsonObject config() {
-		String conf = "{\"mysql\":{\"mc-config\":{\"host\":\"192.168.0.18\",\"port\":3306,\"maxPoolSize\":100,\"username\":\"sqyc_message\",\"password\":\"sqyc_message@01zhuanche.com\",\"database\":\"mc_admin\",\"charset\":\"UTF-8\",\"queryTimeout\":3000}},\"service.port\":9200}";
+		String conf = "{\"mysql\":{\"mc-config\":{\"host\":\"192.168.0.18\",\"port\":3306,\"maxPoolSize\":100,\"username\":\"sqyc_test\",\"password\":\"sqyc_test@01zhuanche.com\",\"database\":\"mc_admin\",\"charset\":\"UTF-8\",\"queryTimeout\":3000}},\"service.port\":9200}";
 		JsonObject jsonObject = new JsonObject(conf);
 
 		return jsonObject;

@@ -42,7 +42,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String retriveSensitiveWord = "select word from sensitive_word";
+	private static final String retriveSensitiveWord = "select word from sensitive_word where status = 5";
 
 	public void retriveSensitiveWord() {
 		mySQLClient.getConnection(res -> {

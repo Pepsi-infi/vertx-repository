@@ -48,7 +48,7 @@
             <el-button type="info" size="small" icon="edit" v-if="props.row.status === 1" @click="online(props.row)">
               上线
             </el-button>
-            <el-button type="info" size="small" icon="edit" v-if="props.row.status === 5" @click="online(props.row)">
+            <el-button type="info" size="small" icon="edit" v-if="props.row.status === 5" @click="offline(props.row)">
               下线
             </el-button>
           </template>
@@ -191,14 +191,31 @@
         var finalForm = {
           id: row.id,
           word: row.word,
-          status: row.status
+          status: 5
         };
 
         this.$fetch.api_sensitiveWord.save(finalForm)
           .then((resp) => {
             this.$message({
-              message: '上线成功！',
-              type: 'success'
+            message: '上线成功！',
+            type: 'success'
+            });
+            this.get_table_data();
+          });
+      },
+      //下线
+      offline(row){
+        var finalForm = {
+          id: row.id,
+          word: row.word,
+          status: 1
+        };
+
+        this.$fetch.api_sensitiveWord.save(finalForm)
+          .then((resp) => {
+            this.$message({
+            message: '下线成功！',
+            type: 'success'
             });
             this.get_table_data();
           });
