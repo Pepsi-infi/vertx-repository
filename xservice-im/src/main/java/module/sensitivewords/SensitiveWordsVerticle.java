@@ -1,9 +1,11 @@
 package module.sensitivewords;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+import org.ahocorasick.trie.Trie.TrieBuilder;
 
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -33,7 +35,8 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		trie = Trie.builder().addKeyword("日").addKeyword("我曹").build();
+		TrieBuilder builder = Trie.builder();
+		trie = Trie.builder().build();
 
 		eb = vertx.eventBus();
 		eb.<String>consumer(SensitiveWordsVerticle.class.getName(), res -> {
@@ -59,8 +62,17 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setScanPeriod(3000).addStore(ebStore);
 
 		ConfigRetriever retriever = ConfigRetriever.create(Vertx.vertx(), options);
-		retriever.getConfig(json -> {
-			logger.info("SensitiveWordsVerticle, config={}", json.result());
+		retriever.getConfig(res -> {
+			if (res.succeeded()) {
+				JsonObject swConfig = res.result();
+				@SuppressWarnings("unchecked")
+				List<String> keyWords = swConfig.getJsonArray("result").getList();
+				trie = builder.addKeywords(keyWords).build();
+				logger.info(keyWords.toString());
+			} else {
+				logger.error("SensitiveWordsConfigVerticle, res={}", res.cause().getMessage());
+			}
+			logger.info("SensitiveWordsVerticle, config={}", res.result());
 		});
 
 		retriever.listen(change -> {

@@ -28,7 +28,9 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		mySQLClient = MySQLClient.createShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-im"));
+		JsonObject mysqlConfig = config().getJsonObject("mysql").getJsonObject("mc-config");
+		logger.info("mysqlConfig={}", mysqlConfig.encode());
+		mySQLClient = MySQLClient.createShared(vertx, mysqlConfig);
 
 		eb = vertx.eventBus();
 		options = new DeliveryOptions();
