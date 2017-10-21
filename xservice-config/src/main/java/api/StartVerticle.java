@@ -2,7 +2,6 @@ package api;
 
 import config.sensitivewords.SensitiveWordConfigVerticle;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.impl.ImCommonLanguageServiceImpl;
@@ -19,39 +18,18 @@ public class StartVerticle extends BaseServiceVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		// 提供EventBus服务
-		deployEventBusService();
-
-		// 提供其他非EventBus服务
-		deployRestService();
-	}
-
-	private void deployRestService() {
-		this.deployVerticle(ImCommonLanguageServiceImpl.class.getName());
-		this.deployVerticle(SensitiveWordServiceImpl.class.getName());
-		this.deployVerticle(RestConfigVerticle.class.getName());
-		this.deployVerticle(SensitiveWordConfigVerticle.class.getName());
-	}
-
-	private void deployEventBusService() {
-
-	}
-
-	public void deployVerticle(String verticleName) {
-		Future<String> future = Future.future();
-		future.setHandler(ar -> logger.info(ar.succeeded() ? "success:" + ar.result() : "failed:" + ar.cause()));
-		vertx.deployVerticle(verticleName, readBossOpts().setConfig(config()), future.completer());
+		vertx.deployVerticle(ImCommonLanguageServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(SensitiveWordServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(RestConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(SensitiveWordConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
 	}
 
 	public static DeploymentOptions readBossOpts() {
 		DeploymentOptions options = new DeploymentOptions();
 		options.setInstances(Runtime.getRuntime().availableProcessors());
-		return options;
-	}
 
-	public static DeploymentOptions readWorkerOpts() {
-		DeploymentOptions options = new DeploymentOptions();
-		options.setWorker(true);
+		logger.info("Runtime.getRuntime().availableProcessors()={}", Runtime.getRuntime().availableProcessors());
+
 		return options;
 	}
 }
