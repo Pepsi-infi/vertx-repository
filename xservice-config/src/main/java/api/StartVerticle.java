@@ -21,6 +21,7 @@ public class StartVerticle extends BaseServiceVerticle {
 		vertx.deployVerticle(ImCommonLanguageServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(SensitiveWordServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(RestConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
+		
 		vertx.deployVerticle(SensitiveWordConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
 	}
 

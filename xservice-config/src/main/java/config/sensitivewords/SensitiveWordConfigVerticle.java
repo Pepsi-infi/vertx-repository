@@ -64,7 +64,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 			} else {
 				logger.error("retriveSensitiveWord, res={}", res.cause().getMessage());
 			}
-		});
+		}).close();
 	}
 
 }
