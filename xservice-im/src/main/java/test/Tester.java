@@ -44,7 +44,6 @@ public class Tester {
 		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(config()));
 
-		vertx.deployVerticle(SensitiveWordConfigVerticle.class.getName());
 		vertx.deployVerticle(SensitiveWordsVerticle.class.getName());
 
 		// vertx.deployVerticle(MongoVerticle.class.getName(), new

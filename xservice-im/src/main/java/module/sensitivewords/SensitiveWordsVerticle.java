@@ -15,6 +15,7 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import module.config.ConfigAddressConstant;
 
 public class SensitiveWordsVerticle extends AbstractVerticle {
 
@@ -53,7 +54,7 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 		});
 
 		ConfigStoreOptions ebStore = new ConfigStoreOptions().setType("event-bus")
-				.setConfig(new JsonObject().put("address", "config.sensitivewords.SensitiveWordConfigVerticle"));
+				.setConfig(new JsonObject().put("address", ConfigAddressConstant.sensitive_word));
 
 		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setScanPeriod(3000).addStore(ebStore);
 
