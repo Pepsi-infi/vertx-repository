@@ -14,6 +14,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -56,38 +57,13 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 			}
 		});
 
-		ConfigStoreOptions ebStore = new ConfigStoreOptions().setType("event-bus")
-				.setConfig(new JsonObject().put("address", ConfigAddressConstant.sensitive_word));
-
-		ConfigRetrieverOptions options = new ConfigRetrieverOptions().setScanPeriod(3000).addStore(ebStore);
-
-		ConfigRetriever retriever = ConfigRetriever.create(Vertx.vertx(), options);
-		retriever.getConfig(res -> {
-			if (res.succeeded()) {
-				JsonObject swConfig = res.result();
-				@SuppressWarnings("unchecked")
-				List<JsonObject> keyWords = swConfig.getJsonArray("result").getList();
-				for (JsonObject kw : keyWords) {
-					builder.addKeyword(kw.getString("word"));
-				}
-				trie = builder.build();
-				logger.info(keyWords.toString());
-			} else {
-				logger.error("SensitiveWordsConfigVerticle, res={}", res.cause().getMessage());
+		eb.<JsonObject>consumer(ConfigAddressConstant.sensitive_word, res -> {
+			JsonArray keyWords = res.body().getJsonArray("result");
+			for (Object object : keyWords) {
+				builder.addKeyword(JsonObject.mapFrom(object).getString("word"));
 			}
-			logger.info("SensitiveWordsVerticle, config={}", res.result());
-		});
-
-		retriever.listen(change -> {
-			// Previous configuration
-			JsonObject previous = change.getPreviousConfiguration();
-
-			logger.info("previous, config={}", previous.encode());
-
-			// New configuration
-			JsonObject conf = change.getNewConfiguration();
-
-			logger.info("conf, config={}", conf.encode());
+			trie = builder.build();
+			logger.info("keyWords={}", keyWords.toString());
 		});
 	}
 
