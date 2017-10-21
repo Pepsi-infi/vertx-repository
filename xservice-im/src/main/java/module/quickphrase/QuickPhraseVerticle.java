@@ -100,11 +100,11 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 						} else {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 						}
-					});
+					}).close();
 				} else {
 					resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 				}
-			}).close();
+			});
 		} else {
 			logger.error("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		}
@@ -123,11 +123,11 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					} else {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.succeeded())));
 					}
-				});
+				}).close();
 			} else {
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
 	private static final String sql_getQuickPhrase = "select id, userId, identity, content, createTime from quick_phrase where userId = ? and identity = ?";
@@ -148,29 +148,12 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					}
-				});
+				}).close();
 			} else {
 				logger.error("getConnection, {}", res.cause().getMessage());
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
-
-		JsonArray array = new JsonArray();
-		array.add(45);
-		array.add(76);
-
-		String a = "";
-		for (Object object : array) {
-			a = object + "," + a;
-		}
-		a.substring(0, a.length() - 1);
-
-		System.out.println("(" + a.substring(0, a.length() - 1) + ")");
-
-		System.out.println(array.getList());
-	}
 }
