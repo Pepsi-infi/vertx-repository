@@ -66,8 +66,11 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 			if (res.succeeded()) {
 				JsonObject swConfig = res.result();
 				@SuppressWarnings("unchecked")
-				List<String> keyWords = swConfig.getJsonArray("result").getList();
-				trie = builder.addKeywords(keyWords).build();
+				List<JsonObject> keyWords = swConfig.getJsonArray("result").getList();
+				for (JsonObject kw : keyWords) {
+					builder.addKeyword(kw.getString("word"));
+				}
+				trie = builder.build();
 				logger.info(keyWords.toString());
 			} else {
 				logger.error("SensitiveWordsConfigVerticle, res={}", res.cause().getMessage());
