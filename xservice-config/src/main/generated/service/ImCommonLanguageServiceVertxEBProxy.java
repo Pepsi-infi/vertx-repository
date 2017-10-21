@@ -137,13 +137,14 @@ public class ImCommonLanguageServiceVertxEBProxy implements ImCommonLanguageServ
     });
   }
 
-  public void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result) {
+  public void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
     _json.put("type", type);
+    _json.put("userId", userId);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
     _deliveryOptions.addHeader("action", "queryImCommonLanguage");
     _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {

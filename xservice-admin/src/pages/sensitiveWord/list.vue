@@ -191,7 +191,7 @@
         var finalForm = {
           id: row.id,
           word: row.word,
-          status: 5
+          status: row.status
         };
 
         this.$fetch.api_sensitiveWord.save(finalForm)

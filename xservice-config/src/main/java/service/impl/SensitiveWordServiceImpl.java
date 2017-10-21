@@ -43,10 +43,6 @@ public class SensitiveWordServiceImpl extends BaseDaoVerticle implements Sensiti
 		static final String GET_ONE_SENSITIVE_WORD = "SELECT * from sensitive_word where id=?";
 	}
 
-	public SensitiveWordServiceImpl() {
-
-	}
-
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
 		super.start(startFuture);
