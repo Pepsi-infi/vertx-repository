@@ -1,5 +1,7 @@
 package server;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -205,7 +207,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
 		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
-		String content = paramMap.get("content");
+		String content = null;
+		try {
+			content = URLDecoder.decode(paramMap.get("content"), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("addQuickPhrase, e={}", e.getMessage());
+		}
 		String title = paramMap.get("title");
 
 		httpResp.clear();
