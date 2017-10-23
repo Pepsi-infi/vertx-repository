@@ -41,7 +41,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
+		// client = MongoClient.createShared(vertx.getDelegate(),
+		// config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -304,12 +305,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		String[] arrSplit = null;
 
-		String strUrlParam = TruncateUrlPage(URL);
-		if (strUrlParam == null) {
-			return mapRequest;
-		}
-
-		arrSplit = strUrlParam.split("[&]");
+		arrSplit = URL.split("[&]");
 		for (String strSplit : arrSplit) {
 			String[] arrSplitEqual = null;
 			arrSplitEqual = strSplit.split("[=]");
@@ -327,31 +323,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 		}
 
 		return mapRequest;
-	}
-
-	/**
-	 * 去掉url中的路径，留下请求参数部分
-	 * 
-	 * @param strURL
-	 *            url地址
-	 * @return url请求参数部分
-	 */
-	private static String TruncateUrlPage(String strURL) {
-		String strAllParam = null;
-		String[] arrSplit = null;
-
-		strURL = strURL.trim().toLowerCase();
-
-		arrSplit = strURL.split("[?]");
-		if (strURL.length() > 1) {
-			if (arrSplit.length > 1) {
-				if (arrSplit[1] != null) {
-					strAllParam = arrSplit[1];
-				}
-			}
-		}
-
-		return strAllParam;
 	}
 
 }
