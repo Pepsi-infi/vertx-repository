@@ -54,7 +54,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					userId = body.getInteger("userID");
 					String content = body.getString("content");
 					identity = body.getInteger("identity");
-					addQuickPhrase(userId, identity, content, resultHandler -> {
+					String title = body.getString("title");
+					addQuickPhrase(userId, identity, title, content, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
 					break;
@@ -81,9 +82,9 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime) values (?, ?, ?, ?)";
+	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime, title) values (?, ?, ?, ?, ?)";
 
-	private void addQuickPhrase(Integer userId, int identity, String content,
+	private void addQuickPhrase(Integer userId, int identity, String title, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
 		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		if (userId != null && StringUtils.isNotEmpty(content)) {
@@ -93,7 +94,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				if (res.succeeded()) {
 					SQLConnection connection = res.result();
 					long createTime = System.currentTimeMillis();
-					params.add(userId).add(identity).add(content).add(createTime);
+					params.add(userId).add(identity).add(content).add(createTime).add(title);
 					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
 						if (SQLRes.succeeded()) {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
@@ -130,7 +131,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String sql_getQuickPhrase = "select id, userId, identity, content, createTime from quick_phrase where userId = ? and identity = ?";
+	private static final String sql_getQuickPhrase = "select id, userId, identity, title, content, createTime from quick_phrase where userId = ? and identity = ?";
 
 	private void getQuickPhrase(Integer userId, int identity, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!

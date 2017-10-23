@@ -7,6 +7,7 @@ import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
 import org.ahocorasick.trie.Trie.TrieBuilder;
 
+import constants.EventbusAddressConstant;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -18,7 +19,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import module.config.ConfigAddressConstant;
 
 public class SensitiveWordsVerticle extends AbstractVerticle {
 
@@ -57,7 +57,7 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 			}
 		});
 
-		eb.<JsonObject>consumer(ConfigAddressConstant.sensitive_word, res -> {
+		eb.<JsonObject>consumer(EventbusAddressConstant.sensitive_word, res -> {
 			JsonArray keyWords = res.body().getJsonArray("result");
 			for (Object object : keyWords) {
 				builder.addKeyword(JsonObject.mapFrom(object).getString("word"));

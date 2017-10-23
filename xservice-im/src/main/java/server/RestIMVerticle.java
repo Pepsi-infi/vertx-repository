@@ -1,5 +1,8 @@
 package server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -52,7 +55,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
 		router.post(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
-		router.route(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
+		router.post(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
 
 		Future<Void> voidFuture = Future.future();
 
@@ -194,12 +197,15 @@ public class RestIMVerticle extends RestAPIVerticle {
 	}
 
 	public void addQuickPhrase(RoutingContext context) {
-		JsonObject params = context.getBodyAsJson();
-		logger.info("addQuickPhrase, params=" + params.encode());
+		String body = context.getBodyAsString();
+		Map<String, String> paramMap = URLRequest(body);
 
-		Integer userId = params.getInteger("userId");
-		Integer identity = params.getInteger("identity");
-		String content = params.getString("content");
+		logger.info("addQuickPhrase, params=" + paramMap.toString());
+
+		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
+		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
+		String content = paramMap.get("content");
+		String title = paramMap.get("title");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
@@ -213,6 +219,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("userID", userId);
 			message.put("identity", identity);
 			message.put("content", content);
+			message.put("title", title);
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
@@ -238,11 +245,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 	}
 
 	public void delQuickPhrase(RoutingContext context) {
-		JsonObject params = context.getBodyAsJson();
-		logger.info("delQuickPhrase, params=" + params.encode());
-		Integer userId = params.getInteger("userId");
-		Integer identity = params.getInteger("identity");
-		JsonArray ids = params.getJsonArray("ids");
+		String body = context.getBodyAsString();
+		Map<String, String> paramMap = URLRequest(body);
+		logger.info("delQuickPhrase, params=" + paramMap.toString());
+
+		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
+		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
+
+		String[] ids = paramMap.get("ids").split(",");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
@@ -257,7 +267,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			for (Object id : ids) {
 				idsParam = id + "," + idsParam;
 			}
-			message.put("ids", idsParam.substring(0, idsParam.length() - 1));
+			message.put("ids", ids);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
@@ -280,6 +290,68 @@ public class RestIMVerticle extends RestAPIVerticle {
 			context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
 					.end(httpResp.encode());
 		}
+	}
+
+	/**
+	 * 解析出url参数中的键值对 如 "index.jsp?Action=del&id=123"，解析出Action:del,id:123存入map中
+	 * 
+	 * @param URL
+	 *            url地址
+	 * @return url请求参数部分
+	 */
+	public static Map<String, String> URLRequest(String URL) {
+		Map<String, String> mapRequest = new HashMap<String, String>();
+
+		String[] arrSplit = null;
+
+		String strUrlParam = TruncateUrlPage(URL);
+		if (strUrlParam == null) {
+			return mapRequest;
+		}
+
+		arrSplit = strUrlParam.split("[&]");
+		for (String strSplit : arrSplit) {
+			String[] arrSplitEqual = null;
+			arrSplitEqual = strSplit.split("[=]");
+
+			// 解析出键值
+			if (arrSplitEqual.length > 1) {
+				// 正确解析
+				mapRequest.put(arrSplitEqual[0], arrSplitEqual[1]);
+			} else {
+				if (arrSplitEqual[0] != "") {
+					// 只有参数没有值，不加入
+					mapRequest.put(arrSplitEqual[0], "");
+				}
+			}
+		}
+
+		return mapRequest;
+	}
+
+	/**
+	 * 去掉url中的路径，留下请求参数部分
+	 * 
+	 * @param strURL
+	 *            url地址
+	 * @return url请求参数部分
+	 */
+	private static String TruncateUrlPage(String strURL) {
+		String strAllParam = null;
+		String[] arrSplit = null;
+
+		strURL = strURL.trim().toLowerCase();
+
+		arrSplit = strURL.split("[?]");
+		if (strURL.length() > 1) {
+			if (arrSplit.length > 1) {
+				if (arrSplit[1] != null) {
+					strAllParam = arrSplit[1];
+				}
+			}
+		}
+
+		return strAllParam;
 	}
 
 }

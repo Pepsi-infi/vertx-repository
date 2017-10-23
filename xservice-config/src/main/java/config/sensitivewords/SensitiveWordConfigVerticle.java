@@ -1,5 +1,6 @@
 package config.sensitivewords;
 
+import constants.EventbusAddressConstant;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -10,7 +11,6 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
-import module.config.ConfigAddressConstant;
 
 public class SensitiveWordConfigVerticle extends AbstractVerticle {
 
@@ -55,7 +55,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 
 						JsonObject message = new JsonObject();
 						message.put("result", SQLRes.result().getRows());
-						eb.send(ConfigAddressConstant.sensitive_word, message, options);
+						eb.send(EventbusAddressConstant.sensitive_word, message, options);
 					} else {
 						logger.error("retriveSensitiveWord, result={}", SQLRes.cause().getMessage());
 					}
