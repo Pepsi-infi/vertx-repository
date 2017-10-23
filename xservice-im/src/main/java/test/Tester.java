@@ -3,7 +3,7 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import module.sensitivewords.SensitiveWordsVerticle;
+import module.quickphrase.QuickPhraseVerticle;
 import server.RestIMVerticle;
 
 public class Tester {
@@ -40,14 +40,10 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		// vertx.deployVerticle(RestIMVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(config()));
-		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 
 		// vertx.deployVerticle(SensitiveWordsVerticle.class.getName());
-
-		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 
 		// vertx.deployVerticle(MongoVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(getMongo()));

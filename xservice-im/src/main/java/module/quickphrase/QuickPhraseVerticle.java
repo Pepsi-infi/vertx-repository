@@ -94,7 +94,12 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				if (res.succeeded()) {
 					SQLConnection connection = res.result();
 					long createTime = System.currentTimeMillis();
-					params.add(userId).add(identity).add(content).add(createTime).add(title);
+					params.add(userId).add(identity).add(content).add(createTime);
+					if (StringUtils.isNotEmpty(title)) {
+						params.add(title);
+					} else {
+						params.addNull();
+					}
 					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
 						if (SQLRes.succeeded()) {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
