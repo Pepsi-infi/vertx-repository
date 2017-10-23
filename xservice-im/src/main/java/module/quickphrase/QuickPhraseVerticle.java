@@ -107,6 +107,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				}
 			});
 		} else {
+			resultHandler.handle(Future.succeededFuture(result.put("result", 1)));
 			logger.error("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		}
 	}
