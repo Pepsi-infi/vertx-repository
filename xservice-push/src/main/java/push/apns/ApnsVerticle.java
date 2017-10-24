@@ -4,6 +4,12 @@ import java.io.InputStream;
 
 import org.apache.commons.lang.StringUtils;
 
+import cn.teaey.apns4j.Apns4j;
+import cn.teaey.apns4j.network.ApnsChannelFactory;
+import cn.teaey.apns4j.network.ApnsGateway;
+import cn.teaey.apns4j.network.async.ApnsService;
+import cn.teaey.apns4j.network.async.PayloadSender;
+import cn.teaey.apns4j.protocol.ApnsPayload;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
@@ -17,9 +23,9 @@ public class ApnsVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApnsVerticle.class);
 
-	// private ApnsChannelFactory apnsChannelFactory;
-	//
-	// private PayloadSender<ApnsPayload> payloadSender;
+	private ApnsChannelFactory apnsChannelFactory;
+
+	private PayloadSender<ApnsPayload> payloadSender;
 
 	private int tryTimes = 1;// useless in aync sender
 
@@ -33,12 +39,10 @@ public class ApnsVerticle extends AbstractVerticle {
 
 		ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
 		InputStream is = ctxClsLoader.getResourceAsStream("dev/apns_developer.p12");
-		// apnsChannelFactory =
-		// Apns4j.newChannelFactoryBuilder().keyStoreMeta(is).keyStorePwd(APNS_KEYSTORE_PWD)
-		// .apnsGateway(ApnsGateway.DEVELOPMENT).build();
-		//
-		// payloadSender = new ApnsService(Runtime.getRuntime().availableProcessors(),
-		// apnsChannelFactory, tryTimes);
+		apnsChannelFactory = Apns4j.newChannelFactoryBuilder().keyStoreMeta(is).keyStorePwd(APNS_KEYSTORE_PWD)
+				.apnsGateway(ApnsGateway.DEVELOPMENT).build();
+
+		payloadSender = new ApnsService(Runtime.getRuntime().availableProcessors(), apnsChannelFactory, tryTimes);
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(ApnsVerticle.class.getName() + "local", res -> {
@@ -63,11 +67,10 @@ public class ApnsVerticle extends AbstractVerticle {
 	}
 
 	private void apnsSend(String deviceToken, String title, String body, Extend extend) {
-		// ApnsPayload apnsPayload =
-		// Apns4j.newPayload().alertTitle(title).alertBody(body).sound("default")
-		// .extend("msgbody", "{\\\"jumpPage\\\":8}");
-		//
-		// payloadSender.send(deviceToken, apnsPayload);
-		// System.out.println("11" + Json.encode(apnsPayload));
+		ApnsPayload apnsPayload = Apns4j.newPayload().alertTitle(title).alertBody(body).sound("default")
+				.extend("msgbody", "{\\\"jumpPage\\\":8}");
+
+		payloadSender.send(deviceToken, apnsPayload);
+		System.out.println("11" + Json.encode(apnsPayload));
 	}
 }
