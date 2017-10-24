@@ -1,17 +1,24 @@
 package module.sensitivewords;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;
+import org.ahocorasick.trie.Trie.TrieBuilder;
 
+import constants.EventbusAddressConstant;
+import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import module.quickphrase.QuickPhraseVerticle;
 
 public class SensitiveWordsVerticle extends AbstractVerticle {
 
@@ -29,7 +36,8 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		trie = Trie.builder().addKeyword("日").addKeyword("我曹").build();
+		TrieBuilder builder = Trie.builder();
+		trie = Trie.builder().build();
 
 		eb = vertx.eventBus();
 		eb.<String>consumer(SensitiveWordsVerticle.class.getName(), res -> {
@@ -47,6 +55,15 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 					break;
 				}
 			}
+		});
+
+		eb.<JsonObject>consumer(EventbusAddressConstant.sensitive_word, res -> {
+			JsonArray keyWords = res.body().getJsonArray("result");
+			for (Object object : keyWords) {
+				builder.addKeyword(JsonObject.mapFrom(object).getString("word"));
+			}
+			trie = builder.build();
+			logger.info("keyWords={}", keyWords.size());
 		});
 	}
 

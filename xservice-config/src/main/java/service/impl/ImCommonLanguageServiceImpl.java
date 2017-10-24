@@ -51,7 +51,7 @@ public class ImCommonLanguageServiceImpl extends BaseDaoVerticle implements ImCo
 		publishEventBusService(ImCommonLanguageService.SERVICE_NAME, ImCommonLanguageService.SERVICE_ADDRESS,
 				ImCommonLanguageService.class);
 
-		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-admin"));
+		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-config"));
 	}
 
 	@Override

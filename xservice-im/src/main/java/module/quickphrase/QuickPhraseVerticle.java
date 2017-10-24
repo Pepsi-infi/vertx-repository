@@ -54,7 +54,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					userId = body.getInteger("userID");
 					String content = body.getString("content");
 					identity = body.getInteger("identity");
-					addQuickPhrase(userId, identity, content, resultHandler -> {
+					String title = body.getString("title");
+					addQuickPhrase(userId, identity, title, content, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
 					break;
@@ -81,9 +82,9 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime) values (?, ?, ?, ?)";
+	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime, title) values (?, ?, ?, ?, ?)";
 
-	private void addQuickPhrase(Integer userId, int identity, String content,
+	private void addQuickPhrase(Integer userId, int identity, String title, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
 		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		if (userId != null && StringUtils.isNotEmpty(content)) {
@@ -94,18 +95,24 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					SQLConnection connection = res.result();
 					long createTime = System.currentTimeMillis();
 					params.add(userId).add(identity).add(content).add(createTime);
+					if (StringUtils.isNotEmpty(title)) {
+						params.add(title);
+					} else {
+						params.addNull();
+					}
 					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
 						if (SQLRes.succeeded()) {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 						} else {
 							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 						}
-					});
+					}).close();
 				} else {
 					resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 				}
-			}).close();
+			});
 		} else {
+			resultHandler.handle(Future.succeededFuture(result.put("result", 1)));
 			logger.error("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		}
 	}
@@ -123,14 +130,14 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					} else {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.succeeded())));
 					}
-				});
+				}).close();
 			} else {
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
-	private static final String sql_getQuickPhrase = "select id, userId, identity, content, createTime from quick_phrase where userId = ? and identity = ?";
+	private static final String sql_getQuickPhrase = "select id, userId, identity, title, content, createTime from quick_phrase where userId = ? and identity = ?";
 
 	private void getQuickPhrase(Integer userId, int identity, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
@@ -148,29 +155,12 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
 					}
-				});
+				}).close();
 			} else {
 				logger.error("getConnection, {}", res.cause().getMessage());
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
-
-		JsonArray array = new JsonArray();
-		array.add(45);
-		array.add(76);
-
-		String a = "";
-		for (Object object : array) {
-			a = object + "," + a;
-		}
-		a.substring(0, a.length() - 1);
-
-		System.out.println("(" + a.substring(0, a.length() - 1) + ")");
-
-		System.out.println(array.getList());
-	}
 }

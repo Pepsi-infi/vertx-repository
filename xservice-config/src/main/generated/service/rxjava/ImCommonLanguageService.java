@@ -26,9 +26,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * Created by lufei
- * Date : 2017/8/30 9:58
- * Description :
+ * Created by lufei Date : 2017/8/30 9:58 Description :
  *
  * <p/>
  * NOTE: This class has been automatically generated from the {@link service.ImCommonLanguageService original} non RX-ified interface using Vert.x codegen.
@@ -97,13 +95,13 @@ public class ImCommonLanguageService {
     }));
   }
 
-  public void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result) { 
-    delegate.queryImCommonLanguage(type, result);
+  public void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result) { 
+    delegate.queryImCommonLanguage(type, userId, result);
   }
 
-  public Single<List<JsonObject>> rxQueryImCommonLanguage(int type) { 
+  public Single<List<JsonObject>> rxQueryImCommonLanguage(int type, Integer userId) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      queryImCommonLanguage(type, fut);
+      queryImCommonLanguage(type, userId, fut);
     }));
   }
 

@@ -2,6 +2,7 @@ package test;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
+import module.c2c.protocol.MessageBuilder;
 import util.ByteUtil;
 
 public class ProtocalTest {
@@ -26,14 +27,17 @@ public class ProtocalTest {
 				.valueOf(ByteUtil.hexStringToBytes("00 00 00 18 00 00 27 11 00 00 07 D3 00 00 00 01 00 00 00 57")));
 
 		// 1、login user 111 action 1001 clientVersion 100
+
 		byte[] headerLength1 = ByteUtil.unsignedShortToByte2(12);
 		byte[] clientVersion1 = ByteUtil.unsignedShortToByte2(999);
 		byte[] cmdId1 = ByteUtil.intToBytes(1001);
 		JsonObject msgBody1 = new JsonObject().put("userTel", "111");
+
+		MessageBuilder.buildMsgHeader(12, 11, 1001, msgBody1.encode().length()).appendString(msgBody1.encode());
+
 		byte[] body1 = ByteUtil.intToBytes(msgBody1.toString().length());
-		System.out.println("1 " + ByteUtil.bytesToHexString(
-				Buffer.buffer().appendBytes(headerLength1).appendBytes(clientVersion1).appendBytes(cmdId1)
-						.appendBytes(body1).appendString(msgBody1.toString()).appendString("\001").getBytes()));
+		System.out.println("1 " + ByteUtil.bytesToHexString(MessageBuilder
+				.buildMsgHeader(12, 11, 1001, msgBody1.encode().length()).appendString(msgBody1.encode()).getBytes()));
 		// 2、login user 222 action 1001
 		byte[] headerLength2 = ByteUtil.unsignedShortToByte2(12);
 		byte[] clientVersion2 = ByteUtil.unsignedShortToByte2(999);

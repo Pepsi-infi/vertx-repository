@@ -126,6 +126,8 @@ public class C2CVerticle extends AbstractVerticle {
 						eb.send(toHandlerID, headerBuffer.appendString(body));
 					}
 				} else {
+					//ios - apns
+					
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
 				}
 

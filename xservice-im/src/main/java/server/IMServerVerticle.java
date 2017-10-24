@@ -1,7 +1,9 @@
 package server;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -203,6 +205,9 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID, clientVersion, cmd,
 				bodyLength);
 		eb.send(handlerID, aMsgHeader);
+
+		sendTextNotification(handlerID, clientVersion, cmd);
+		sendAd(handlerID, clientVersion, cmd);
 	}
 
 	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
@@ -248,5 +253,59 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		option.setSendTimeout(3000);
 		JsonObject msg = new JsonObject().put("handlerID", handlerID);
 		eb.publish(IMSessionVerticle.class.getName(), msg, option);
+	}
+
+	private void sendTextNotification(String handlerID, int clientVersion, int cmd) {
+		SQIMBody noti = new SQIMBody();
+		noti.setMsgId(UUID.randomUUID().toString());
+		noti.setContent("这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！这是系统通知！");
+		noti.setMsgType(1);
+		noti.setSceneType(0);
+		noti.setSceneId("A123456789");
+
+		String body = Json.encode(noti);
+		int bodyLength = 0;
+		try {
+			bodyLength = Json.encode(noti).getBytes("UTF-8").length;
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		logger.info("sendTextNotification, msg={}", noti.toString());
+
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				IMCmd.Notification, bodyLength);
+
+		eb.send(handlerID, aMsgHeader.appendString(body));
+
+	}
+
+	private void sendAd(String handlerID, int clientVersion, int cmd) {
+		SQIMBody noti = new SQIMBody();
+		noti.setMsgId(UUID.randomUUID().toString());
+		noti.setContent("http://img3.redocn.com/tupian/20150430/mantenghuawenmodianshiliangbeijing_3924704.jpg");
+		noti.setJumpUrl("https://www.baidu.com/");
+		noti.setMsgType(4);
+		noti.setSceneType(0);
+		noti.setSceneId("A123456789");
+		noti.setWidth(480);
+		noti.setHeight(720);
+
+		String body = Json.encode(noti);
+		int bodyLength = 0;
+		try {
+			bodyLength = Json.encode(noti).getBytes("UTF-8").length;
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		logger.info("sendAd, msg={}", noti.toString());
+
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				IMCmd.Notification, bodyLength);
+
+		eb.send(handlerID, aMsgHeader.appendString(body));
 	}
 }
