@@ -182,9 +182,18 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
-					httpResp.put("code", 0);
+
+					JsonObject resJson = res.result().body();
+					if(resJson.getBoolean("flag")){
+						httpResp.put("code", 0);
+						httpResp.put("data", res.result().body().getJsonArray("result"));
+						httpResp.put("msg", "成功");
+					}else{
+						httpResp.put("code",1);
+						httpResp.put("msg", resJson.getString("result"));
+					}
+
 					logger.info("getQuickPhrase, result={}", res.result().body().encode());
-					httpResp.put("data", res.result().body().getJsonArray("result"));
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
@@ -198,6 +207,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 			});
 		} else {
 			// illegal param
+			httpResp.put("code", 1);
+			httpResp.put("data", "Illegal params!");
+
+			context.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
+					.end(httpResp.encode());
 		}
 	}
 
@@ -236,16 +250,18 @@ public class RestIMVerticle extends RestAPIVerticle {
 					JsonObject resJson = res.result().body();
 					if(resJson.getBoolean("flag")){
 						httpResp.put("code", 0);
+						httpResp.put("msg", "成功");
 					}else{
 						httpResp.put("code",1);
+						httpResp.put("msg", resJson.getString("result"));
 					}
-					httpResp.put("data", resJson.getString("result"));
+
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
 				} else {
 					httpResp.put("code", 1);
 					//httpResp.put("msg", res.cause().getMessage());
-					httpResp.put("data", res.cause().getMessage());
+					httpResp.put("msg", res.cause().getMessage());
 
 					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
@@ -265,29 +281,23 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Map<String, String> paramMap = URLRequest(body);
 		logger.info("delQuickPhrase, params=" + paramMap.toString());
 
-		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
-		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
-
-		String[] ids = paramMap.get("ids").split(",");
+		String ids = paramMap.get("ids");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
-		if (ids != null) {
+		if (!StringUtils.isEmpty(ids)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
 			message.clear();
 
-			String idsParam = "";
-			for (Object id : ids) {
-				idsParam = id + "," + idsParam;
-			}
 			message.put("ids", ids);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
+					httpResp.put("msg","删除成功");
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());

@@ -103,7 +103,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					connection.updateWithParams(sql_addQuickPhrase, params, sqlRes -> {
 						JsonObject sqlResJson = new JsonObject();
 						if (sqlRes.succeeded()) {
-							sqlResJson.put("result", sqlRes.result());
+							logger.info("操作数据库条数="+sqlRes.result().getUpdated());
+							sqlResJson.put("result", sqlRes.result().getUpdated());
 							//设置标识数据库更新成功
 							sqlResJson.put("flag",true);
 							resultHandler.handle(Future.succeededFuture(sqlResJson));
@@ -157,12 +158,19 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				params.add(userId).add(identity);
 				logger.info("getQickPhrase, params={}", params.encode());
 				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
+					JsonObject sqlResJson = new JsonObject();
 					if (SQLRes.succeeded()) {
 						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
-						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result().getRows())));
+						//设置标识数据库查询成功
+						sqlResJson.put("flag",true);
+						sqlResJson.put("result", SQLRes.result().getRows());
+						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					} else {
 						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
-						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+						//设置标识数据库查询失败
+						sqlResJson.put("flag",false);
+						sqlResJson.put("result", SQLRes.cause().getMessage());
+						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					}
 				}).close();
 			} else {
