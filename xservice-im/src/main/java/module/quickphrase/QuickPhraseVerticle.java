@@ -86,7 +86,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private void addQuickPhrase(Integer userId, int identity, String title, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
-		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
+		logger.info("addQuickPhrase, userId={},identity={},content={},", userId, identity, content);
 		if (userId != null && StringUtils.isNotEmpty(content)) {
 			result.clear();// Must do clear before use it!
 			params.clear();// Must do clear before use it!
@@ -100,11 +100,20 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					} else {
 						params.addNull();
 					}
-					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
-						if (SQLRes.succeeded()) {
-							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+					connection.updateWithParams(sql_addQuickPhrase, params, sqlRes -> {
+						JsonObject sqlResJson = new JsonObject();
+						if (sqlRes.succeeded()) {
+							sqlResJson.put("result", sqlRes.result());
+							//设置标识数据库更新成功
+							sqlResJson.put("flag",true);
+							resultHandler.handle(Future.succeededFuture(sqlResJson));
 						} else {
-							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+							sqlRes.cause().printStackTrace();
+							sqlResJson.put("result", sqlRes.cause().getMessage());
+							//设置标识数据库更新失败
+							sqlResJson.put("flag",false);
+							resultHandler.handle(Future.succeededFuture(sqlResJson));
+							//resultHandler.handle(Future.failedFuture(SQLRes.cause()));
 						}
 					}).close();
 				} else {
