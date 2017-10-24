@@ -34,6 +34,6 @@ public interface ImCommonLanguageService {
 
 	void deleteImCommonLanguage(int id, Handler<AsyncResult<JsonObject>> result);
 
-	void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result);
+	void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result);
 
 }

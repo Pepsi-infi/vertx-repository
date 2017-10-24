@@ -34,12 +34,12 @@
 	},
 	"im": [
 		{
-			"innerIP": "10.0.4.20",
-			"node": "124.250.33.160:4321"
+			"innerIP": "10.0.7.52",
+			"node": "124.250.33.160:10001"
 		},
 		{
 			"innerIP": "10.0.4.21",
-			"node": "124.250.33.161:4321"
+			"node": "124.250.33.161:10001"
 		}
 	],
 	"file": {
@@ -47,5 +47,5 @@
 		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
 	},
 	"service.host": "127.0.0.1",
-	"im.tcp.port": 4321
+	"im.tcp.port": 10001
 }

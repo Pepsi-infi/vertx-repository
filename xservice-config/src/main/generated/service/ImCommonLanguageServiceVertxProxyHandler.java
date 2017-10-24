@@ -141,7 +141,7 @@ public class ImCommonLanguageServiceVertxProxyHandler extends ProxyHandler {
           break;
         }
         case "queryImCommonLanguage": {
-          service.queryImCommonLanguage(json.getValue("type") == null ? null : (json.getLong("type").intValue()), json.getValue("userId") == null ? null : (json.getLong("userId").intValue()), createListHandler(msg));
+          service.queryImCommonLanguage(json.getValue("type") == null ? null : (json.getLong("type").intValue()), createListHandler(msg));
           break;
         }
         default: {

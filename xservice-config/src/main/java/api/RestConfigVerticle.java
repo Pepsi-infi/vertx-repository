@@ -85,10 +85,8 @@ public class RestConfigVerticle extends RestAPIVerticle {
 
 	private void queryImCommonLanguage(RoutingContext context) {
 		String type = context.request().params().get("type");
-		String userId = context.request().params().get("userId");
 
-		imCommonLanguageService.queryImCommonLanguage(NumberUtils.toInt(type), Integer.valueOf(userId),
-				resultHandler(context, converter));
+		imCommonLanguageService.queryImCommonLanguage(NumberUtils.toInt(type), resultHandler(context, converter));
 	}
 
 	private void getImCommonLanguage(RoutingContext context) {

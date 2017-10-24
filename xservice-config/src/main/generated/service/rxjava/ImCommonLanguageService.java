@@ -95,13 +95,13 @@ public class ImCommonLanguageService {
     }));
   }
 
-  public void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result) { 
-    delegate.queryImCommonLanguage(type, userId, result);
+  public void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result) { 
+    delegate.queryImCommonLanguage(type, result);
   }
 
-  public Single<List<JsonObject>> rxQueryImCommonLanguage(int type, Integer userId) { 
+  public Single<List<JsonObject>> rxQueryImCommonLanguage(int type) { 
     return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
-      queryImCommonLanguage(type, userId, fut);
+      queryImCommonLanguage(type, fut);
     }));
   }
 
