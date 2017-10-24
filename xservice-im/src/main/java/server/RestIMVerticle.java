@@ -38,6 +38,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private JsonObject httpResp = new JsonObject();
 	private JsonObject message = new JsonObject();
 
+	private int imTCPPort;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -67,6 +69,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
 						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
+
+		imTCPPort = config().getInteger("im.tcp.port");
 	}
 
 	private String getServerHost() {
@@ -91,7 +95,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			chFuture.setHandler(res -> {
 				if (res.succeeded()) {
 					JsonObject data = new JsonObject();
-					data.put("server", res.result().body().getString("host"));
+					data.put("server", res.result().body().getString("host") + ":" + imTCPPort);
 					httpResp.put("data", data);
 					httpResp.put("code", 0);
 					httpResp.put("time", System.currentTimeMillis());

@@ -64,5 +64,6 @@
 		"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
 		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
 	},
-	"service.host": "127.0.0.1"
+	"service.host": "127.0.0.1",
+	"im.tcp.port": 4321
 }
