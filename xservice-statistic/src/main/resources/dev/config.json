@@ -1,7 +1,7 @@
 {
   "mysql": {
     "mc-device": {
-      "host": "10.20.10.100",
+      "host": "10.10.10.178",
       "port": 3306,
       "maxPoolSize": 100,
       "username": "sqyc_message",
@@ -21,7 +21,7 @@
       "queryTimeout": 3000
     },
     "mc-statistic": {
-      "host": "10.20.10.100",
+      "host": "10.10.10.178",
       "port": 3306,
       "maxPoolSize": 100,
       "username": "sqyc_message",
