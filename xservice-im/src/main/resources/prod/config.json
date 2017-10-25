@@ -1,7 +1,20 @@
 {
 	"mongo": {
-		"host": "10.10.10.178",
-		"port": 27017,
+		"hosts": [
+			{
+				"host": "10.0.10.56",
+				"port": 27017
+			},
+			{
+				"host": "10.0.10.27",
+				"port": 27017
+			},
+			{
+				"host": "10.0.10.26",
+				"port": 27017
+			}
+		],
+		"replicaSet": "im",
 		"serverSelectionTimeoutMS": 30000,
 		"maxPoolSize": 50,
 		"minPoolSize": 25,
@@ -11,10 +24,10 @@
 		"waitQueueTimeoutMS": 10000,
 		"maintenanceFrequencyMS": 2000,
 		"maintenanceInitialDelayMS": 500,
-		"username": "im-mc",
-		"password": "im-mc",
-		"authSource": "im-mc",
-		"db_name": "im-mc",
+		"username": "im",
+		"password": "w4637Q#yfWvgl5^8",
+		"authSource": "im",
+		"db_name": "im",
 		"connectTimeoutMS": 3000,
 		"socketTimeoutMS": 3000,
 		"sendBufferSize": 8192,
