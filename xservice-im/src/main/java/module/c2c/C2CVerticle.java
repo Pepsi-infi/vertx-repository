@@ -148,7 +148,7 @@ public class C2CVerticle extends AbstractVerticle {
 		mongoMsg.put("collection", MONGO_COLLECTION);
 
 		IMData data = new IMData();
-		data.setCmdId(IMCmd.MSG_N);
+		data.setCmdId(cmd);
 		data.setFromTel(msg.getFromTel());
 		data.setToTel(msg.getToTel());
 		data.setIdentity(msg.getIdentity());
