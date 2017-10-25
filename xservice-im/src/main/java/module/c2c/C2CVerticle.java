@@ -69,6 +69,9 @@ public class C2CVerticle extends AbstractVerticle {
 		int result = 0;
 
 		String to = msg.getToTel();
+		
+		long ts = System.currentTimeMillis();
+		msg.setTimeStamp(ts);
 
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", IMSessionVerticle.method.getHandlerIDByUid);
@@ -88,9 +91,6 @@ public class C2CVerticle extends AbstractVerticle {
 						eb.<String>send(SensitiveWordsVerticle.class.getName(), msg.getContent(), swOption, swRes -> {
 							if (swRes.succeeded()) {
 								msg.setContent(swRes.result().body());
-
-								long ts = System.currentTimeMillis();
-								msg.setTimeStamp(ts);
 
 								String body = Json.encode(msg);
 								int bodyLength = 0;
