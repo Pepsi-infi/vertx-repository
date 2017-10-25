@@ -44,7 +44,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		client = MongoClient.createShared(vertx.getDelegate(),config().getJsonObject("mongo"));
+		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -123,7 +123,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
-		if (StringUtils.isNotEmpty(timestamp)) {
+		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toInt(timestamp)) {
 			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
 		}
 
@@ -232,19 +232,19 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("title", title);
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
-				if (res.succeeded()) {//发送消息成功
+				if (res.succeeded()) {// 发送消息成功
 					JsonObject resJson = res.result().body();
-					if(resJson.getBoolean("flag")){
+					if (resJson.getBoolean("flag")) {
 						httpResp.put("code", 0);
-					}else{
-						httpResp.put("code",1);
+					} else {
+						httpResp.put("code", 1);
 					}
 					httpResp.put("data", resJson.getString("result"));
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
 				} else {
 					httpResp.put("code", 1);
-					//httpResp.put("msg", res.cause().getMessage());
+					// httpResp.put("msg", res.cause().getMessage());
 					httpResp.put("data", res.cause().getMessage());
 
 					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
