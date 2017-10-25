@@ -27,6 +27,7 @@ CREATE TABLE `quick_phrase` (
   `content` varchar(64) DEFAULT NULL,
   `createTime` bigint(16) DEFAULT NULL,
   `identity` int(2) DEFAULT NULL,
+  `title` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`,`identity`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
