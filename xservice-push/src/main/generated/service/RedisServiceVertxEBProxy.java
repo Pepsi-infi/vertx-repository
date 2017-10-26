@@ -82,6 +82,26 @@ public class RedisServiceVertxEBProxy implements RedisService {
     });
   }
 
+  public void setEx(String key, long expire, String value, Handler<AsyncResult<String>> result) {
+    if (closed) {
+      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("key", key);
+    _json.put("expire", expire);
+    _json.put("value", value);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "setEx");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        result.handle(Future.failedFuture(res.cause()));
+      } else {
+        result.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
   public void expire(String key, long expire, Handler<AsyncResult<Long>> result) {
     if (closed) {
       result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));

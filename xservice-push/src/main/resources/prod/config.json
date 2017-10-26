@@ -9,7 +9,9 @@
     "socket.valid.url": "http://10.0.200.54/webservice/passenger/webservice/chat/checkSocket",
     "PUSH_MSG_URL":"/mc-push/message/push.json",
     "PUSH_MSG_NO_ADVER_URL":"/mc-push/meesage-nonAdver/push.json",
-    "PUSH_MSG_PORT":8080
+    "PUSH_MSG_PORT":8080,
+    "push.apns.keyStorePwd":"01zhuanche",
+    "push.apns.keyStorePath":"D:\\DevKit\\static_resource\\apns.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "GofLOnz9FqY1YFgu",
