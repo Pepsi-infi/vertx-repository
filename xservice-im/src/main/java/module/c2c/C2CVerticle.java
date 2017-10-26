@@ -131,7 +131,6 @@ public class C2CVerticle extends AbstractVerticle {
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
 				}
 
-				logger.info("debug... cmd={} msg={}", cmd, msg.toString());
 				// 只有聊天消息入库
 				if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
 					saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);

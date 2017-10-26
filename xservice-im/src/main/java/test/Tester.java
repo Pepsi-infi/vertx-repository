@@ -3,21 +3,18 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import module.c2c.C2CVerticle;
+import module.persistence.MongoVerticle;
 import module.quickphrase.QuickPhraseVerticle;
+import server.IMServerVerticle;
 import server.RestIMVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		// vertx.deployVerticle(IMServerVerticle.class.getName(),
-		// readBossOpts().setConfig(config()));
-		// vertx.deployVerticle(ConsistentHashingVerticle.class.getName(),
-		// readBossOpts().setConfig(config()));
-		// vertx.deployVerticle(RestServerVerticle.class.getName(),
-		// readBossOpts().setConfig(config()));
-		// vertx.deployVerticle(C2CVerticle.class.getName(),
-		// readBossOpts().setConfig(config()));
+		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		// vertx.deployVerticle(TCPTest.class.getName());
 
@@ -45,8 +42,7 @@ public class Tester {
 
 		// vertx.deployVerticle(SensitiveWordsVerticle.class.getName());
 
-		// vertx.deployVerticle(MongoVerticle.class.getName(), new
-		// DeploymentOptions().setConfig(getMongo()));
+		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	}
 
 	private static JsonObject config() {
