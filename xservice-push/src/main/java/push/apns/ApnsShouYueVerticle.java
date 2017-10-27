@@ -42,7 +42,6 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 	 * 定义APNS密钥的存放路径
 	 */
 	private static final String KEY_STORE_PATH = "dev/apns_developer.p12";
-	//private static final String KEY_STORE_PATH = "D:/apnsCert/apns_developer.p12";
 
 
 	@Override
@@ -82,12 +81,16 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 	 * @param extend 其他
 	 */
 	private void apnsSend(String deviceToken, String title, String content, Extend extend)  {
+		if(webClient == null){
+			this.initWebClient();
+		}
 		//设置请求报文体
 		JsonObject reqJson = Payload.newPayload()
 									.alertBody(content)//设置alert内容
 									.alerTitle(title)//设置通知的标题，建议使用默认的应用标题
 									.sound()
 									.build();
+		logger.info("请求报文="+reqJson);
 		//设置请求的路径URL+TOKEN
 		HttpRequest<Buffer> request = webClient.post(443,APNS_REQ_URL_DEV,"/3/device/"+deviceToken);
 
