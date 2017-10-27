@@ -1,4 +1,4 @@
-package push.apns;
+package push.dto;
 
 public class Extend {
 

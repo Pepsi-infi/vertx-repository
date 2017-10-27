@@ -16,17 +16,17 @@ import io.vertx.ext.web.client.WebClientOptions;
 import org.apache.commons.lang.StringUtils;
 import push.apns.data.Payload;
 import push.apns.header.ApnsHeader;
+import push.dto.ApnsMsg;
+import push.dto.Extend;
 
 /**
  * @author jhmi
  * 通过服务证书向APNS请求消息推送服务
  * 另一种方式：通过服务Token向APNS请求，为确保安全性，APN需要定期生成新的令牌
  */
-public class ApnsShouYueVerticle extends AbstractVerticle {
+public class ApnsVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(ApnsShouYueVerticle.class);
-
-	private static final String APNS_KEYSTORE_PWD = "01zhuanche";
+	private static final Logger logger = LoggerFactory.getLogger(ApnsVerticle.class);
 
 	private EventBus eb;
 
@@ -37,11 +37,15 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 	/**
 	 * 定义APNS的开发环境URL
 	 */
-	private static final String APNS_REQ_URL_DEV = "api.development.push.apple.com";
+	private String apns_url = "";
 	/**
 	 * 定义APNS密钥的存放路径
 	 */
-	private static final String KEY_STORE_PATH = "dev/apns_developer.p12";
+	private String apns_key_path = "";
+	/**
+	 * 定义APNS pwd
+	 */
+	private String apns_pwd = "";
 
 
 	@Override
@@ -52,7 +56,7 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 		this.initWebClient();
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(ApnsShouYueVerticle.class.getName() + "local", res -> {
+		eb.<JsonObject>consumer(ApnsVerticle.class.getName(), res -> {
 			String action = res.headers().get("action");
 			if (StringUtils.isNotEmpty(action)) {
 				JsonObject body = res.body();
@@ -87,16 +91,14 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 		//设置请求报文体
 		JsonObject reqJson = Payload.newPayload()
 									.alertBody(content)//设置alert内容
-									.alerTitle(title)//设置通知的标题，建议使用默认的应用标题
-									.sound()
+									//.alerTitle(title)//设置通知的标题，仅限于APPLEWATCH
 									.build();
 		logger.info("请求报文="+reqJson);
 		//设置请求的路径URL+TOKEN
-		HttpRequest<Buffer> request = webClient.post(443,APNS_REQ_URL_DEV,"/3/device/"+deviceToken);
+		HttpRequest<Buffer> request = webClient.post(443,apns_url,"/3/device/"+deviceToken);
 
 		//设置请求的报文头
-		request.putHeader("apnsID", ApnsHeader.getApnsID());
-		request.putHeader("apnsExpiration", ApnsHeader.getApnsExpiration());
+		request = ApnsHeader.buildApnsHeader(request);
 		//发送请求
 		request.sendJsonObject(reqJson,res->{
 			if(res.succeeded()){
@@ -119,8 +121,14 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 
 	/**
 	 * 生成调用APNS-HTTP2的webclient
+	 * 初始化密钥
 	 */
 	public void initWebClient(){
+
+		apns_url = config().getJsonObject("push.config").getString("APNS_URL");
+		apns_key_path = config().getJsonObject("push.config").getString("APNS_KEY_PATH");
+		apns_pwd = config().getJsonObject("push.config").getString("APNS_PWD");
+
 		WebClientOptions webClientOptions = new WebClientOptions();
 		webClientOptions.setProtocolVersion(HttpVersion.HTTP_2);
 		webClientOptions.setSsl(true);
@@ -137,8 +145,8 @@ public class ApnsShouYueVerticle extends AbstractVerticle {
 		//PKCS＃12格式的密钥/证书（http://en.wikipedia.org/wiki/PKCS_12），通常使用.pfx 或.p12
 		PfxOptions pfxOptions = new PfxOptions();
 		//设置密钥和路径
-		pfxOptions.setPath(KEY_STORE_PATH);
-		pfxOptions.setPassword(APNS_KEYSTORE_PWD);
+		pfxOptions.setPath(apns_key_path);
+		pfxOptions.setPassword(apns_pwd);
 		//设置客户端信任证书
 		webClientOptions.setPfxKeyCertOptions(pfxOptions);
 		//另一种方式读取密钥

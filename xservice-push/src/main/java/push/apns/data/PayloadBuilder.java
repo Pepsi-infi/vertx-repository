@@ -41,6 +41,7 @@ public final class PayloadBuilder {
 
     /**
      * 设置消息提醒的标题
+     * Apple Watch将显示此字符串作为通知界面的一部分
      * @param title the text to appear to the user
      * @return this
      */
