@@ -224,12 +224,13 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
 		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
 		String content = null;
+		String title = null;
 		try {
 			content = URLDecoder.decode(paramMap.get("content"), "utf-8");
+			title = URLDecoder.decode(paramMap.get("title"), "utf-8");
 		} catch (UnsupportedEncodingException e) {
 			logger.error("addQuickPhrase, e={}", e.getMessage());
 		}
-		String title = paramMap.get("title");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
