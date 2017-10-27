@@ -251,6 +251,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 					if(resJson.getBoolean("flag")){
 						httpResp.put("code", 0);
 						httpResp.put("msg", "成功");
+						httpResp.put("id",resJson.getLong("result"));
 					}else{
 						httpResp.put("code",1);
 						httpResp.put("msg", resJson.getString("result"));
