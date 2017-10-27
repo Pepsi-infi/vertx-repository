@@ -16,6 +16,7 @@ import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
 
+
 public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(QuickPhraseVerticle.class);
@@ -104,7 +105,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 						JsonObject sqlResJson = new JsonObject();
 						if (sqlRes.succeeded()) {
 							logger.info("操作数据库条数="+sqlRes.result().getUpdated());
-							sqlResJson.put("result", sqlRes.result().getUpdated());
+							sqlResJson.put("result", sqlRes.result().getKeys().getLong(0));
 							//设置标识数据库更新成功
 							sqlResJson.put("flag",true);
 							resultHandler.handle(Future.succeededFuture(sqlResJson));

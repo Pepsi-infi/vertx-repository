@@ -82,7 +82,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userTel)) {
 			DeliveryOptions chOption = new DeliveryOptions();
 			chOption.setSendTimeout(3000);
-			chOption.addHeader("action", "getIMNode");
+			chOption.addHeader("action", "getInnerNode");
 
 			Future<Message<JsonObject>> chFuture = Future.future();
 
@@ -123,14 +123,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
-		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toInt(timestamp)) {
+		if (StringUtils.isNotEmpty(timestamp)) {
 			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
 		}
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
 
-		options.setSort(new JsonObject().put("timeStamp", 1));
+		options.setSort(new JsonObject().put("timeStamp", -1));
 
 		JsonObject fields = new JsonObject();
 		fields.put("_id", 0);
@@ -184,12 +184,12 @@ public class RestIMVerticle extends RestAPIVerticle {
 				if (res.succeeded()) {
 
 					JsonObject resJson = res.result().body();
-					if (resJson.getBoolean("flag")) {
+					if(resJson.getBoolean("flag")){
 						httpResp.put("code", 0);
 						httpResp.put("data", res.result().body().getJsonArray("result"));
 						httpResp.put("msg", "成功");
-					} else {
-						httpResp.put("code", 1);
+					}else{
+						httpResp.put("code",1);
 						httpResp.put("msg", resJson.getString("result"));
 					}
 
@@ -251,8 +251,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 					if (resJson.getBoolean("flag")) {
 						httpResp.put("code", 0);
 						httpResp.put("msg", "成功");
-					} else {
-						httpResp.put("code", 1);
+						httpResp.put("id",resJson.getLong("result"));
+					}else{
+						httpResp.put("code",1);
 						httpResp.put("msg", resJson.getString("result"));
 					}
 
@@ -296,7 +297,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
-					httpResp.put("msg", "删除成功");
+					httpResp.put("msg","删除成功");
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
