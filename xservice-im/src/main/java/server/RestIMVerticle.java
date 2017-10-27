@@ -82,7 +82,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userTel)) {
 			DeliveryOptions chOption = new DeliveryOptions();
 			chOption.setSendTimeout(3000);
-			chOption.addHeader("action", "getInnerNode");
+			chOption.addHeader("action", "getIMNode");
 
 			Future<Message<JsonObject>> chFuture = Future.future();
 
