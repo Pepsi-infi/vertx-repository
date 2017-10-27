@@ -60,5 +60,6 @@
 		"download.file.server.prefix": ":10001/mc-file/im/download.json?file="
 	},
 	"service.host": "127.0.0.1",
-	"im.tcp.port": 11000
+	"im.tcp.port": 11000,
+	"im.memory.size": 7680
 }
