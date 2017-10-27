@@ -48,17 +48,17 @@
 	"im": [
 		{
 			"innerIP": "10.0.7.52",
-			"node": "124.250.33.160:10001"
+			"node": "124.250.33.160:11000"
 		},
 		{
 			"innerIP": "10.0.4.21",
-			"node": "124.250.33.161:10001"
+			"node": "124.250.33.161:11000"
 		}
 	],
 	"file": {
 		"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
-		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
+		"download.file.server.prefix": ":10001/mc-file/im/download.json?file="
 	},
 	"service.host": "127.0.0.1",
-	"im.tcp.port": 10001
+	"im.tcp.port": 11000
 }

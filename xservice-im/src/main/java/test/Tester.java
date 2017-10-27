@@ -13,8 +13,10 @@ public class Tester {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(IMServerVerticle.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(C2CVerticle.class.getName(), readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(IMServerVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
+		// vertx.deployVerticle(C2CVerticle.class.getName(),
+		// readBossOpts().setConfig(config()));
 
 		// vertx.deployVerticle(TCPTest.class.getName());
 
@@ -37,12 +39,23 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
-		vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		// vertx.deployVerticle(RestIMVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(config()));
+		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(config()));
 
 		// vertx.deployVerticle(SensitiveWordsVerticle.class.getName());
 
-		vertx.deployVerticle(MongoVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		// vertx.deployVerticle(MongoVerticle.class.getName(), new
+		// DeploymentOptions().setConfig(config()));
+
+		vertx.deployVerticle(HealthCheckVerticle.class.getName(), res -> {
+			if (res.succeeded()) {
+				System.out.println(res.result());
+				vertx.undeploy(res.result());
+			}
+		});
+
 	}
 
 	private static JsonObject config() {
