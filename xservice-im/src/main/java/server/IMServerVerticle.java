@@ -172,7 +172,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes -> {
 			if (mongoRes.succeeded()) {
-				eb.send(handlerID, mongoRes.result());
+//				eb.send(handlerID, mongoRes.result());
 			} else {
 				logger.error(mongoRes.cause().getMessage());
 			}
