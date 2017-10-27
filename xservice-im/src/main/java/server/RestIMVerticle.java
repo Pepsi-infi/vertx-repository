@@ -44,7 +44,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		client = MongoClient.createShared(vertx.getDelegate(),config().getJsonObject("mongo"));
+		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -246,9 +246,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("title", title);
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
-				if (res.succeeded()) {//发送消息成功
+				if (res.succeeded()) {// 发送消息成功
 					JsonObject resJson = res.result().body();
-					if(resJson.getBoolean("flag")){
+					if (resJson.getBoolean("flag")) {
 						httpResp.put("code", 0);
 						httpResp.put("msg", "成功");
 						httpResp.put("id",resJson.getLong("result"));
@@ -261,7 +261,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 							.end(httpResp.encode());
 				} else {
 					httpResp.put("code", 1);
-					//httpResp.put("msg", res.cause().getMessage());
 					httpResp.put("msg", res.cause().getMessage());
 
 					context.response().setStatusCode(500).putHeader("content-type", "application/json; charset=utf-8")
