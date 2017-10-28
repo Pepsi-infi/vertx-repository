@@ -16,7 +16,6 @@ import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLConnection;
 
-
 public class QuickPhraseVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(QuickPhraseVerticle.class);
@@ -104,18 +103,18 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					connection.updateWithParams(sql_addQuickPhrase, params, sqlRes -> {
 						JsonObject sqlResJson = new JsonObject();
 						if (sqlRes.succeeded()) {
-							logger.info("操作数据库条数="+sqlRes.result().getUpdated());
+							logger.info("操作数据库条数=" + sqlRes.result().getUpdated());
 							sqlResJson.put("result", sqlRes.result().getKeys().getLong(0));
-							//设置标识数据库更新成功
-							sqlResJson.put("flag",true);
+							// 设置标识数据库更新成功
+							sqlResJson.put("flag", true);
 							resultHandler.handle(Future.succeededFuture(sqlResJson));
 						} else {
 							sqlRes.cause().printStackTrace();
 							sqlResJson.put("result", sqlRes.cause().getMessage());
-							//设置标识数据库更新失败
-							sqlResJson.put("flag",false);
+							// 设置标识数据库更新失败
+							sqlResJson.put("flag", false);
 							resultHandler.handle(Future.succeededFuture(sqlResJson));
-							//resultHandler.handle(Future.failedFuture(SQLRes.cause()));
+							// resultHandler.handle(Future.failedFuture(SQLRes.cause()));
 						}
 					}).close();
 				} else {
@@ -162,14 +161,11 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					JsonObject sqlResJson = new JsonObject();
 					if (SQLRes.succeeded()) {
 						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
-						//设置标识数据库查询成功
-						sqlResJson.put("flag",true);
 						sqlResJson.put("result", SQLRes.result().getRows());
 						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					} else {
 						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
-						//设置标识数据库查询失败
-						sqlResJson.put("flag",false);
+						// 设置标识数据库查询失败
 						sqlResJson.put("result", SQLRes.cause().getMessage());
 						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					}

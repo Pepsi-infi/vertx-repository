@@ -161,6 +161,8 @@ public class C2CVerticle extends AbstractVerticle {
 		data.setDuration(msg.getDuration());
 		data.setAddress(msg.getAddress());
 		data.setsAddress(msg.getsAddress());
+		data.setLat(msg.getLat());
+		data.setLon(msg.getLon());
 
 		mongoMsg.put("data", JsonObject.mapFrom(data));
 

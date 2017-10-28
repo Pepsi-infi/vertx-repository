@@ -1,6 +1,5 @@
 package server;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +7,13 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
+import constants.EventbusAddressConstant;
 import constants.RestIMConstants;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -182,16 +183,24 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
+					httpResp.put("code", 0);
+					JsonArray userQuickPhrase = res.result().body().getJsonArray("result");
+					if (userQuickPhrase.size() < 10) {
+						DeliveryOptions cOption = new DeliveryOptions();
+						cOption.setSendTimeout(3000);
+						cOption.addHeader("action", "retriveQuickPhrase");
 
-					JsonObject resJson = res.result().body();
-					if (resJson.getBoolean("flag")) {
-						httpResp.put("code", 0);
-						httpResp.put("data", res.result().body().getJsonArray("result"));
-						httpResp.put("msg", "成功");
-					} else {
-						httpResp.put("code", 1);
-						httpResp.put("msg", resJson.getString("result"));
+						JsonObject cMsg = new JsonObject();
+						cMsg.put("type", identity);
+						eb.send(EventbusAddressConstant.quick_phrase_config_verticle, cMsg, cOption, confRes -> {
+							if (confRes.succeeded()) {
+							} else {
+
+							}
+						});
 					}
+					httpResp.put("data", res.result().body().getJsonArray("result"));
+					httpResp.put("msg", "成功");
 
 					logger.info("getQuickPhrase, result={}", res.result().body().encode());
 
@@ -283,6 +292,13 @@ public class RestIMVerticle extends RestAPIVerticle {
 		logger.info("delQuickPhrase, params=" + paramMap.toString());
 
 		String ids = paramMap.get("ids");
+		if (StringUtils.isNotEmpty(ids)) {
+			try {
+				ids = URLDecoder.decode(ids, "utf-8");
+			} catch (Exception e) {
+				logger.error("delQuickPhrase, e={}", e.getMessage());
+			}
+		}
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());

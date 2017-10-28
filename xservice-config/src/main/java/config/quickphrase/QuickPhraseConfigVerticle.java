@@ -2,6 +2,7 @@ package config.quickphrase;
 
 import constants.EventbusAddressConstant;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
@@ -33,37 +34,47 @@ public class QuickPhraseConfigVerticle extends AbstractVerticle {
 		mySQLClient = MySQLClient.createShared(vertx, mysqlConfig);
 
 		eb = vertx.eventBus();
-		options = new DeliveryOptions();
+		eb.<JsonObject>consumer(QuickPhraseConfigVerticle.class.getName(), res -> {
+			MultiMap headers = res.headers();
+			JsonObject body = res.body();
+			if (headers != null) {
+				String action = headers.get("action");
+				switch (action) {
+				case "retriveQuickPhrase":
+					int type = body.getInteger("type").intValue();
+					retriveQuickPhrase(type);
+					break;
 
-		options.setSendTimeout(3000);
-
-		vertx.setPeriodic(10000, handler -> {
-			retriveQuickPhrase();
+				default:
+					break;
+				}
+			}
 		});
 	}
 
-	private static final String select_quick_phrase = "SELECT * FROM im_common_language WHERE type= ? ORDER BY weight";
+	private static final String select_quick_phrase = "SELECT content FROM im_common_language WHERE type = ? ORDER BY weight limit 10";
 
-	public void retriveQuickPhrase() {
+	public void retriveQuickPhrase(int type) {
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
-				logger.info("retriveSensitiveWord, params={}", params.encode());
-				connection.queryWithParams("", params, SQLRes -> {
+				params.clear();
+				params.add(type);
+				logger.info("retriveQuickPhrase, params={}", params.encode());
+				connection.queryWithParams(select_quick_phrase, params, SQLRes -> {
 					if (SQLRes.succeeded()) {
-						logger.info("retriveSensitiveWord, result={}", SQLRes.result().getRows().size());
+						logger.info("retriveQuickPhrase, result={}", SQLRes.result().getRows().size());
 
 						JsonObject message = new JsonObject();
 						message.put("result", SQLRes.result().getRows());
-						eb.send(EventbusAddressConstant.sensitive_word, message, options);
+						eb.send(EventbusAddressConstant.quick_phrase_verticle, message, options);
 					} else {
-						logger.error("retriveSensitiveWord, result={}", SQLRes.cause().getMessage());
+						logger.error("retriveQuickPhrase, result={}", SQLRes.cause().getMessage());
 					}
 				}).close();
 			} else {
-				logger.error("retriveSensitiveWord, res={}", res.cause().getMessage());
+				logger.error("retriveQuickPhrase, res={}", res.cause().getMessage());
 			}
 		});
-
 	}
 }
