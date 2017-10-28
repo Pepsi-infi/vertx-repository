@@ -295,6 +295,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(ids)) {
 			try {
 				ids = URLDecoder.decode(ids, "utf-8");
+				ids = ids.substring(1, ids.length() - 1);
 			} catch (Exception e) {
 				logger.error("delQuickPhrase, e={}", e.getMessage());
 			}
