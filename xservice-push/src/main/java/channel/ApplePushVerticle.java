@@ -3,6 +3,7 @@ package channel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import com.dbay.apns4j.IApnsService;
@@ -56,22 +57,36 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 	private void initApnsConfig() {
 
 		String keyStorePwd = config.getString("push.apns.keyStorePwd");
-		String keyStorePath = config.getString("push.apns.keyStorePath");
+		// String keyStorePath = config.getString("push.apns.keyStorePath");		
 
 		boolean devEnv = false;
+		
+		InputStream is = null;
 
 		if ("dev".equals(PushConsts.ENV_PATH)) {
 			devEnv = true;
+			is = this.getClass().getResourceAsStream("/dev/apns_developer.p12");
+		}
+
+		if ("test".equals(PushConsts.ENV_PATH)) {
+			devEnv = true;
+			is = this.getClass().getResourceAsStream("/test/apns_developer.p12");
 		}
 
 		if ("prod".equals(PushConsts.ENV_PATH)) {
 			devEnv = false;
+			is = this.getClass().getResourceAsStream("/prod/apns.p12");
 		}
-
+		
+		if(is==null){
+			logger.error("apns初始化失败 inputstream is null");
+			return;
+		}
+		
 		if (apnsService == null) {
 			try {
 				ApnsConfig config = new ApnsConfig();
-				InputStream is = new FileInputStream(new File(keyStorePath));
+				//InputStream is = new FileInputStream(new File(keyStorePath));
 				config.setKeyStore(is);
 				config.setDevEnv(devEnv);
 				config.setPassword(keyStorePwd);
@@ -81,6 +96,8 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 				logger.error("apns推送初始化失败", e);
 			}
 		}
+		
+		logger.info("apns初始化成功");
 
 		// String keyStorePwd = config.getString("push.apns.keyStorePwd");
 		// String keyStorePath = config.getString("push.apns.keyStorePath");
@@ -117,8 +134,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 	@Override
 	public void sendMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
-		// 测试专用，防止测试推错推到线上
-		// receiveMsg = testSendControl(receiveMsg);
 
 		logger.info("enter applePushService sendMsg method");
 
@@ -127,55 +142,9 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		String body = receiveMsg.getString("content");
 		String msgbody = receiveMsg.toString();
 
-		// Map<String, String> addQueryParam = new HashMap<>();
-		// addQueryParam.put("deviceToken", deviceToken);
-		// addQueryParam.put("title", title);
-		// addQueryParam.put("body", body);
-		// addQueryParam.put("msgbody", msgbody);
-
 		// apns推送逻辑
 		// sendApns(deviceToken, title, body, msgbody, resultHandler);
 		sendApnsByDbay(deviceToken, title, body, msgbody, resultHandler);
-
-		// String appleUrl =
-		// config().getJsonObject("push.config").getString("apple.push.url");
-		//
-		// if (StringUtil.isNullOrEmpty(appleUrl)) {
-		// resultHandler.handle(Future.failedFuture("Apple push host is null"));
-		// return;
-		// }
-		//
-		// WebClient webClient = WebClient.create(vertx);
-		//
-		// webClient.postAbs(appleUrl).putHeader("Content-Type",
-		// "application/x-www-form-urlencoded;charset=utf-8")
-		// .addQueryParam("deviceToken", deviceToken).addQueryParam("title",
-		// receiveMsg.getString("title"))
-		// .addQueryParam("body",
-		// receiveMsg.getString("content")).addQueryParam("msgbody",
-		// receiveMsg.toString())
-		// .send(responseHandler -> {
-		//
-		// if (responseHandler.succeeded()) {
-		// String result = responseHandler.result().bodyAsString();
-		// logger.info("apns推送返回结果deviceToken=" + deviceToken + ", result=" +
-		// result);
-		//
-		// if (StringUtil.isNullOrEmpty(result)) {
-		// logger.error("Apple push result is null deviceToken=" + deviceToken);
-		// resultHandler.handle(Future.failedFuture("Apple push result is
-		// null"));
-		// } else {
-		// resultHandler.handle(Future.succeededFuture(new BaseResponse()));
-		// }
-		// } else {
-		// logger.error("Apple push error deviceToken=" + deviceToken,
-		// responseHandler.cause());
-		// resultHandler.handle(Future.failedFuture("Apple push error" +
-		// responseHandler.cause()));
-		// }
-		//
-		// });
 
 	}
 
