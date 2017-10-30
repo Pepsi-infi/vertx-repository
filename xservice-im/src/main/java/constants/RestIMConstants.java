@@ -6,8 +6,6 @@ public class RestIMConstants {
 
 	public static final String SERVICE_ROOT = "/mc-im";
 
-	public static final int HTTP_PORT = 1100;
-
 	public static final String ONLINE_NUMBER = "/mc-im/online/number.json";
 
 	public static final String DISPATCH = "/mc-im/user/dispatch.json";
