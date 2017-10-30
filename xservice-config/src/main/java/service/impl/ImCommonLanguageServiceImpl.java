@@ -91,7 +91,7 @@ public class ImCommonLanguageServiceImpl extends BaseDaoVerticle implements ImCo
 	}
 
 	@Override
-	public void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result) {
+	public void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result) {
 		Future<List<JsonObject>> listFuture = retrieveMany(new JsonArray().add(type), Sql.QUERY_IM_COMMON_LANGUAGE);
 		listFuture.setHandler(res -> {
 			if (res.succeeded()) {

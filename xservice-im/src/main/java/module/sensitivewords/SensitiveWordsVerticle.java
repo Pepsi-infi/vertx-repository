@@ -63,7 +63,6 @@ public class SensitiveWordsVerticle extends AbstractVerticle {
 				builder.addKeyword(JsonObject.mapFrom(object).getString("word"));
 			}
 			trie = builder.build();
-			logger.info("keyWords={}", keyWords.size());
 		});
 	}
 

@@ -3,12 +3,12 @@
 	"download.file.server.prefix": "/mc-file/im/download.json?file=",
 	"file": [
 		{
-			"innerIP": "10.0.8.29",
-			"node": "111.206.162.233:10000"
+			"innerIP": "10.0.4.20",
+			"node": "124.250.33.160:10000"
 		},
 		{
-			"innerIP": "10.0.8.30",
-			"node": "111.206.162.233:10000"
+			"innerIP": "10.0.4.21",
+			"node": "124.250.33.161:10000"
 		}
 	]
 }

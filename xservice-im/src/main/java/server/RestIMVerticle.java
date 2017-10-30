@@ -1,6 +1,5 @@
 package server;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
+import constants.EventbusAddressConstant;
 import constants.RestIMConstants;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -38,13 +38,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private JsonObject httpResp = new JsonObject();
 	private JsonObject message = new JsonObject();
 
+	private int imTCPPort;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
-		// client = MongoClient.createShared(vertx.getDelegate(),
-		// config().getJsonObject("mongo"));
+		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
 
@@ -67,6 +68,8 @@ public class RestIMVerticle extends RestAPIVerticle {
 				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
 						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
+
+		imTCPPort = config().getInteger("im.tcp.port");
 	}
 
 	private String getServerHost() {
@@ -80,7 +83,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(userTel)) {
 			DeliveryOptions chOption = new DeliveryOptions();
 			chOption.setSendTimeout(3000);
-			chOption.addHeader("action", "getInnerNode");
+			chOption.addHeader("action", "getIMNode");
 
 			Future<Message<JsonObject>> chFuture = Future.future();
 
@@ -91,7 +94,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			chFuture.setHandler(res -> {
 				if (res.succeeded()) {
 					JsonObject data = new JsonObject();
-					data.put("server", res.result().body().getString("host"));
+					data.put("server", res.result().body().getString("host") + ":" + imTCPPort);
 					httpResp.put("data", data);
 					httpResp.put("code", 0);
 					httpResp.put("time", System.currentTimeMillis());
@@ -121,14 +124,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
-		if (StringUtils.isNotEmpty(timestamp)) {
+		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
 			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
 		}
 
 		FindOptions options = new FindOptions();
 		options.setLimit(100);
 
-		options.setSort(new JsonObject().put("timeStamp", -1));
+		options.setSort(new JsonObject().put("timeStamp", 1));
 
 		JsonObject fields = new JsonObject();
 		fields.put("_id", 0);
@@ -181,8 +184,25 @@ public class RestIMVerticle extends RestAPIVerticle {
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
-					logger.info("getQuickPhrase, result={}", res.result().body().encode());
+					JsonArray userQuickPhrase = res.result().body().getJsonArray("result");
+					if (userQuickPhrase.size() < 10) {
+						DeliveryOptions cOption = new DeliveryOptions();
+						cOption.setSendTimeout(3000);
+						cOption.addHeader("action", "retriveQuickPhrase");
+
+						JsonObject cMsg = new JsonObject();
+						cMsg.put("type", identity);
+						eb.send(EventbusAddressConstant.quick_phrase_config_verticle, cMsg, cOption, confRes -> {
+							if (confRes.succeeded()) {
+							} else {
+
+							}
+						});
+					}
 					httpResp.put("data", res.result().body().getJsonArray("result"));
+					httpResp.put("msg", "成功");
+
+					logger.info("getQuickPhrase, result={}", res.result().body().encode());
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
@@ -196,6 +216,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 			});
 		} else {
 			// illegal param
+			httpResp.put("code", 1);
+			httpResp.put("data", "Illegal params!");
+
+			context.response().setStatusCode(400).putHeader("content-type", "application/json; charset=utf-8")
+					.end(httpResp.encode());
 		}
 	}
 
@@ -208,12 +233,13 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
 		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
 		String content = null;
+		String title = null;
 		try {
 			content = URLDecoder.decode(paramMap.get("content"), "utf-8");
-		} catch (UnsupportedEncodingException e) {
+			title = URLDecoder.decode(paramMap.get("title"), "utf-8");
+		} catch (Exception e) {
 			logger.error("addQuickPhrase, e={}", e.getMessage());
 		}
-		String title = paramMap.get("title");
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
@@ -230,9 +256,17 @@ public class RestIMVerticle extends RestAPIVerticle {
 			message.put("title", title);
 
 			eb.<JsonObject>send(QuickPhraseVerticle.class.getName(), message, op, res -> {
-				if (res.succeeded()) {
-					httpResp.put("code", 0);
-					httpResp.put("data", res.result().body().getString("result"));
+				if (res.succeeded()) {// 发送消息成功
+					JsonObject resJson = res.result().body();
+					if (resJson.getBoolean("flag")) {
+						httpResp.put("code", 0);
+						httpResp.put("msg", "成功");
+						httpResp.put("id", resJson.getLong("result"));
+					} else {
+						httpResp.put("code", 1);
+						httpResp.put("msg", resJson.getString("result"));
+					}
+
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());
 				} else {
@@ -257,29 +291,31 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Map<String, String> paramMap = URLRequest(body);
 		logger.info("delQuickPhrase, params=" + paramMap.toString());
 
-		Integer userId = NumberUtils.toInt(paramMap.get("userId"));
-		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
-
-		String[] ids = paramMap.get("ids").split(",");
+		String ids = paramMap.get("ids");
+		if (StringUtils.isNotEmpty(ids)) {
+			try {
+				ids = URLDecoder.decode(ids, "utf-8");
+				ids = ids.substring(1, ids.length() - 1);
+			} catch (Exception e) {
+				logger.error("delQuickPhrase, e={}", e.getMessage());
+			}
+		}
 
 		httpResp.clear();
 		httpResp.put("time", System.currentTimeMillis());
-		if (ids != null) {
+		if (!StringUtils.isEmpty(ids)) {
 			DeliveryOptions op = new DeliveryOptions();
 			op.addHeader("action", QuickPhraseVerticle.method.delQuickPhrase);
 			op.setSendTimeout(3000);
 
 			message.clear();
 
-			String idsParam = "";
-			for (Object id : ids) {
-				idsParam = id + "," + idsParam;
-			}
 			message.put("ids", ids);
 
 			eb.send(QuickPhraseVerticle.class.getName(), message, op, res -> {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
+					httpResp.put("msg", "删除成功");
 
 					context.response().putHeader("content-type", "application/json; charset=utf-8")
 							.end(httpResp.encode());

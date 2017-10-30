@@ -222,6 +222,8 @@ public class FileServerVerticle extends AbstractVerticle {
 			msgBody.setLon(lon);
 			msgBody.setAddress(address);
 			msgBody.setsAddress(sAddress);
+			
+			break;
 		default:
 			break;
 		}

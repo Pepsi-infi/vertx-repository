@@ -47,7 +47,6 @@ public class MongoVerticle extends AbstractVerticle {
 			JsonObject param = res.body();
 			if (headers != null) {
 				String action = headers.get("action");
-				logger.info("action={}", action);
 				switch (action) {
 				case "saveData":
 					saveData(param, r -> {

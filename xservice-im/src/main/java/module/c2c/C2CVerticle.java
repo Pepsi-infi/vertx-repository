@@ -70,6 +70,9 @@ public class C2CVerticle extends AbstractVerticle {
 
 		String to = msg.getToTel();
 
+		long ts = System.currentTimeMillis();
+		msg.setTimeStamp(ts);
+
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", IMSessionVerticle.method.getHandlerIDByUid);
 		option.setSendTimeout(3000);
@@ -88,9 +91,6 @@ public class C2CVerticle extends AbstractVerticle {
 						eb.<String>send(SensitiveWordsVerticle.class.getName(), msg.getContent(), swOption, swRes -> {
 							if (swRes.succeeded()) {
 								msg.setContent(swRes.result().body());
-
-								long ts = System.currentTimeMillis();
-								msg.setTimeStamp(ts);
 
 								String body = Json.encode(msg);
 								int bodyLength = 0;
@@ -126,8 +126,8 @@ public class C2CVerticle extends AbstractVerticle {
 						eb.send(toHandlerID, headerBuffer.appendString(body));
 					}
 				} else {
-					//ios - apns
-					
+					// ios - apns
+
 					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
 				}
 
@@ -148,7 +148,7 @@ public class C2CVerticle extends AbstractVerticle {
 		mongoMsg.put("collection", MONGO_COLLECTION);
 
 		IMData data = new IMData();
-		data.setCmdId(IMCmd.MSG_N);
+		data.setCmdId(cmd);
 		data.setFromTel(msg.getFromTel());
 		data.setToTel(msg.getToTel());
 		data.setIdentity(msg.getIdentity());
@@ -158,6 +158,11 @@ public class C2CVerticle extends AbstractVerticle {
 		data.setMsgType(msg.getMsgType());
 		data.setContent(msg.getContent());
 		data.setTimeStamp(msg.getTimeStamp());
+		data.setDuration(msg.getDuration());
+		data.setAddress(msg.getAddress());
+		data.setsAddress(msg.getsAddress());
+		data.setLat(msg.getLat());
+		data.setLon(msg.getLon());
 
 		mongoMsg.put("data", JsonObject.mapFrom(data));
 
