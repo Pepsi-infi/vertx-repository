@@ -61,5 +61,6 @@
 	},
 	"service.host": "127.0.0.1",
 	"im.tcp.port": 11000,
-	"im.memory.size": 7680
+	"im.memory.size": 7680,
+	"im.http.port": 10001
 }

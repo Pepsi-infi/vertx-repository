@@ -39,6 +39,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private JsonObject message = new JsonObject();
 
 	private int imTCPPort;
+	private int imHTTPPort;
 
 	@Override
 	public void start() throws Exception {
@@ -48,6 +49,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
+
+		imHTTPPort = config().getInteger("im.http.port");
+		imTCPPort = config().getInteger("im.tcp.port");
 
 		Router router = Router.router(vertx);
 		router.route().handler(BodyHandler.create());
@@ -64,12 +68,10 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
-		createHttpServer(router, serverHost, RestIMConstants.HTTP_PORT)
-				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost,
-						RestIMConstants.HTTP_PORT, RestIMConstants.SERVICE_ROOT))
+		createHttpServer(router, serverHost, imHTTPPort)
+				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost, imHTTPPort,
+						RestIMConstants.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
-
-		imTCPPort = config().getInteger("im.tcp.port");
 	}
 
 	private String getServerHost() {
