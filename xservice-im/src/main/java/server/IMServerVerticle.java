@@ -55,7 +55,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
 
-		NetServerOptions options = new NetServerOptions().setPort(4321);
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"));
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
 		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
@@ -172,7 +172,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes -> {
 			if (mongoRes.succeeded()) {
-				eb.send(handlerID, mongoRes.result());
+//				eb.send(handlerID, mongoRes.result());
 			} else {
 				logger.error(mongoRes.cause().getMessage());
 			}

@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import api.RestFileConstant;
+import constants.EventbusAddressConstant;
 import constants.IMCmd;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -123,7 +124,7 @@ public class FileServerVerticle extends AbstractVerticle {
 							JsonObject message = new JsonObject();
 							message.put("userId", msgBody.getToTel());
 							if (StringUtils.isNotEmpty(msgBody.getToTel())) {
-								eb.<JsonObject>send("module.hash.IMConsistentHashingVerticle", message, option,
+								eb.<JsonObject>send(EventbusAddressConstant.im_consistent_hash_verticle, message, option,
 										hashFuture.completer());
 							} else {
 
@@ -165,8 +166,8 @@ public class FileServerVerticle extends AbstractVerticle {
 									DeliveryOptions c2cOption = new DeliveryOptions();
 									c2cOption.addHeader("action", "sendMessage");
 									c2cOption.setSendTimeout(1000);
-									eb.send("module.c2c.C2CVerticle" + res.result().body().getString("host"), param,
-											c2cOption);
+									eb.send(EventbusAddressConstant.c2c_verticle + res.result().body().getString("host"),
+											param, c2cOption);
 								}
 							});
 
@@ -221,6 +222,8 @@ public class FileServerVerticle extends AbstractVerticle {
 			msgBody.setLon(lon);
 			msgBody.setAddress(address);
 			msgBody.setsAddress(sAddress);
+			
+			break;
 		default:
 			break;
 		}

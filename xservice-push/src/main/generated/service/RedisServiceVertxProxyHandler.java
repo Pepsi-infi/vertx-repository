@@ -128,6 +128,10 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
           service.set((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("value"), createHandler(msg));
           break;
         }
+        case "setEx": {
+          service.setEx((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), (java.lang.String)json.getValue("value"), createHandler(msg));
+          break;
+        }
         case "expire": {
           service.expire((java.lang.String)json.getValue("key"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), createHandler(msg));
           break;

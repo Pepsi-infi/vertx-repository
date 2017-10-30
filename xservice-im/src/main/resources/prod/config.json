@@ -1,7 +1,20 @@
 {
 	"mongo": {
-		"host": "10.10.10.178",
-		"port": 27017,
+		"hosts": [
+			{
+				"host": "10.0.10.56",
+				"port": 27017
+			},
+			{
+				"host": "10.0.10.27",
+				"port": 27017
+			},
+			{
+				"host": "10.0.10.26",
+				"port": 27017
+			}
+		],
+		"replicaSet": "im",
 		"serverSelectionTimeoutMS": 30000,
 		"maxPoolSize": 50,
 		"minPoolSize": 25,
@@ -11,10 +24,10 @@
 		"waitQueueTimeoutMS": 10000,
 		"maintenanceFrequencyMS": 2000,
 		"maintenanceInitialDelayMS": 500,
-		"username": "im-mc",
-		"password": "im-mc",
-		"authSource": "im-mc",
-		"db_name": "im-mc",
+		"username": "im",
+		"password": "w4637Q#yfWvgl5^8",
+		"authSource": "im",
+		"db_name": "im",
 		"connectTimeoutMS": 3000,
 		"socketTimeoutMS": 3000,
 		"sendBufferSize": 8192,
@@ -34,12 +47,19 @@
 	},
 	"im": [
 		{
-			"innerIP": "10.10.10.193",
-			"node": "111.206.162.233:4321"
+			"innerIP": "10.0.7.52",
+			"node": "124.250.33.160"
+		},
+		{
+			"innerIP": "10.0.4.21",
+			"node": "124.250.33.161"
 		}
 	],
 	"file": {
 		"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
-		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
-	}
+		"download.file.server.prefix": ":10001/mc-file/im/download.json?file="
+	},
+	"service.host": "127.0.0.1",
+	"im.tcp.port": 11000,
+	"im.memory.size": 7680
 }

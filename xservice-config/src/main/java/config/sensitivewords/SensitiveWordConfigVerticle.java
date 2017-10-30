@@ -1,10 +1,16 @@
 package config.sensitivewords;
 
+import constants.EventbusAddressConstant;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.asyncsql.MySQLClient;
+import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLConnection;
 
 public class SensitiveWordConfigVerticle extends AbstractVerticle {
 
@@ -12,15 +18,52 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 
 	private EventBus eb;
 
+	private SQLClient mySQLClient;
+
+	private JsonArray params = new JsonArray();
+
+	private DeliveryOptions options;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
-		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SensitiveWordConfigVerticle.class.getName(), res -> {
+		JsonObject mysqlConfig = config().getJsonObject("mysql").getJsonObject("mc-config");
+		logger.info("mysqlConfig={}", mysqlConfig.encode());
+		mySQLClient = MySQLClient.createShared(vertx, mysqlConfig);
 
-			logger.info("SensitiveWordConfigVerticle, ");
-			res.reply(new JsonObject().put("1", "test"));
+		eb = vertx.eventBus();
+		options = new DeliveryOptions();
+
+		options.setSendTimeout(3000);
+
+		vertx.setPeriodic(10000, handler -> {
+			retriveSensitiveWord();
 		});
 	}
+
+	private static final String retriveSensitiveWord = "select word from sensitive_word where status = 5";
+
+	public void retriveSensitiveWord() {
+		mySQLClient.getConnection(res -> {
+			if (res.succeeded()) {
+				SQLConnection connection = res.result();
+				logger.info("retriveSensitiveWord, params={}", params.encode());
+				connection.queryWithParams(retriveSensitiveWord, params, SQLRes -> {
+					if (SQLRes.succeeded()) {
+						logger.info("retriveSensitiveWord, result={}", SQLRes.result().getRows().size());
+
+						JsonObject message = new JsonObject();
+						message.put("result", SQLRes.result().getRows());
+						eb.send(EventbusAddressConstant.sensitive_word, message, options);
+					} else {
+						logger.error("retriveSensitiveWord, result={}", SQLRes.cause().getMessage());
+					}
+				}).close();
+			} else {
+				logger.error("retriveSensitiveWord, res={}", res.cause().getMessage());
+			}
+		});
+	}
+
 }

@@ -32,7 +32,7 @@ public class StartVerticle extends AbstractVerticle {
 		/**
 		 * Instance should be 1 because of ehcache.
 		 */
-		vertx.deployVerticle(IMSessionVerticle.class.getName());
+		vertx.deployVerticle(IMSessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {

@@ -44,7 +44,7 @@
 	},
 	"mysql": {
 		"mc-im": {
-			"host": "10.10.10.178",
+			"host": "10.20.10.100",
 			"port": 3306,
 			"maxPoolSize": 100,
 			"username": "sqyc_message",
@@ -57,12 +57,14 @@
 	"im": [
 		{
 			"innerIP": "10.10.10.193",
-			"node": "111.206.162.233:4321"
+			"node": "111.206.162.233"
 		}
 	],
 	"file": {
 		"upload.file.path.prefix": "/u01/projectCAR/xservice/xservice-file/",
 		"download.file.server.prefix": ":9090/mc-file/im/download.json?file="
 	},
-	"service.host": "127.0.0.1"
+	"service.host": "127.0.0.1",
+	"im.tcp.port": 4321,
+	"im.memory.size": 50
 }

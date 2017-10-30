@@ -26,9 +26,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 
 /**
- * Created by lufei
- * Date : 2017/8/30 9:58
- * Description :
+ * Created by lufei Date : 2017/8/30 9:58 Description :
  *
  * <p/>
  * NOTE: This class has been automatically generated from the {@link service.ImCommonLanguageService original} non RX-ified interface using Vert.x codegen.

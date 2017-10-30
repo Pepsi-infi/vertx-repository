@@ -1,12 +1,12 @@
 {
   "mysql": {
-    "mc-admin": {
-      "host": "10.10.10.178",
-      "port": 3306,
+    "mc-config": {
+      "host": "10.0.10.211",
+      "port": 5310,
       "maxPoolSize": 100,
-      "username": "sqyc_message",
-      "password": "sqyc_message@01zhuanche.com",
-      "database": "mc_admin",
+      "username": "message_center",
+      "password": "BzkmQM%O^U7Dy8X3",
+      "database": "mc-config",
       "charset": "UTF-8",
       "queryTimeout": 3000
     }

@@ -54,7 +54,8 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					userId = body.getInteger("userID");
 					String content = body.getString("content");
 					identity = body.getInteger("identity");
-					addQuickPhrase(userId, identity, content, resultHandler -> {
+					String title = body.getString("title");
+					addQuickPhrase(userId, identity, title, content, resultHandler -> {
 						res.reply(resultHandler.result());
 					});
 					break;
@@ -81,11 +82,11 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime) values (?, ?, ?, ?)";
+	private static final String sql_addQuickPhrase = "insert into quick_phrase (userId, identity, content, createTime, title) values (?, ?, ?, ?, ?)";
 
-	private void addQuickPhrase(Integer userId, int identity, String content,
+	private void addQuickPhrase(Integer userId, int identity, String title, String content,
 			Handler<AsyncResult<JsonObject>> resultHandler) {
-		logger.info("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
+		logger.info("addQuickPhrase, userId={},identity={},content={},", userId, identity, content);
 		if (userId != null && StringUtils.isNotEmpty(content)) {
 			result.clear();// Must do clear before use it!
 			params.clear();// Must do clear before use it!
@@ -94,18 +95,34 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					SQLConnection connection = res.result();
 					long createTime = System.currentTimeMillis();
 					params.add(userId).add(identity).add(content).add(createTime);
-					connection.updateWithParams(sql_addQuickPhrase, params, SQLRes -> {
-						if (SQLRes.succeeded()) {
-							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+					if (StringUtils.isNotEmpty(title)) {
+						params.add(title);
+					} else {
+						params.addNull();
+					}
+					connection.updateWithParams(sql_addQuickPhrase, params, sqlRes -> {
+						JsonObject sqlResJson = new JsonObject();
+						if (sqlRes.succeeded()) {
+							logger.info("操作数据库条数=" + sqlRes.result().getUpdated());
+							sqlResJson.put("result", sqlRes.result().getKeys().getLong(0));
+							// 设置标识数据库更新成功
+							sqlResJson.put("flag", true);
+							resultHandler.handle(Future.succeededFuture(sqlResJson));
 						} else {
-							resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+							sqlRes.cause().printStackTrace();
+							sqlResJson.put("result", sqlRes.cause().getMessage());
+							// 设置标识数据库更新失败
+							sqlResJson.put("flag", false);
+							resultHandler.handle(Future.succeededFuture(sqlResJson));
+							// resultHandler.handle(Future.failedFuture(SQLRes.cause()));
 						}
-					});
+					}).close();
 				} else {
 					resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 				}
-			}).close();
+			});
 		} else {
+			resultHandler.handle(Future.succeededFuture(result.put("result", 1)));
 			logger.error("addQuickPhrase, userId={}identity={}content={}", userId, identity, content);
 		}
 	}
@@ -123,14 +140,14 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 					} else {
 						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.succeeded())));
 					}
-				});
+				}).close();
 			} else {
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
-	private static final String sql_getQuickPhrase = "select id, userId, identity, content, createTime from quick_phrase where userId = ? and identity = ?";
+	private static final String sql_getQuickPhrase = "select id, userId, identity, title, content, createTime from quick_phrase where userId = ? and identity = ?";
 
 	private void getQuickPhrase(Integer userId, int identity, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
@@ -141,36 +158,23 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				params.add(userId).add(identity);
 				logger.info("getQickPhrase, params={}", params.encode());
 				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
+					JsonObject sqlResJson = new JsonObject();
 					if (SQLRes.succeeded()) {
 						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
-						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result().getRows())));
+						sqlResJson.put("result", SQLRes.result().getRows());
+						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					} else {
 						logger.error("getQickPhrase, result={}", SQLRes.cause().getMessage());
-						resultHandler.handle(Future.succeededFuture(result.put("result", SQLRes.result())));
+						// 设置标识数据库查询失败
+						sqlResJson.put("result", SQLRes.cause().getMessage());
+						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					}
-				});
+				}).close();
 			} else {
 				logger.error("getConnection, {}", res.cause().getMessage());
 				resultHandler.handle(Future.succeededFuture(result.put("result", res.succeeded())));
 			}
-		}).close();
+		});
 	}
 
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
-
-		JsonArray array = new JsonArray();
-		array.add(45);
-		array.add(76);
-
-		String a = "";
-		for (Object object : array) {
-			a = object + "," + a;
-		}
-		a.substring(0, a.length() - 1);
-
-		System.out.println("(" + a.substring(0, a.length() - 1) + ")");
-
-		System.out.println(array.getList());
-	}
 }

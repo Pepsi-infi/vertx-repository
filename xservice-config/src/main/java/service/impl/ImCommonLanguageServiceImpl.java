@@ -51,7 +51,7 @@ public class ImCommonLanguageServiceImpl extends BaseDaoVerticle implements ImCo
 		publishEventBusService(ImCommonLanguageService.SERVICE_NAME, ImCommonLanguageService.SERVICE_ADDRESS,
 				ImCommonLanguageService.class);
 
-		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-admin"));
+		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-config"));
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class ImCommonLanguageServiceImpl extends BaseDaoVerticle implements ImCo
 	}
 
 	@Override
-	public void queryImCommonLanguage(int type, Integer userId, Handler<AsyncResult<List<JsonObject>>> result) {
+	public void queryImCommonLanguage(int type, Handler<AsyncResult<List<JsonObject>>> result) {
 		Future<List<JsonObject>> listFuture = retrieveMany(new JsonArray().add(type), Sql.QUERY_IM_COMMON_LANGUAGE);
 		listFuture.setHandler(res -> {
 			if (res.succeeded()) {

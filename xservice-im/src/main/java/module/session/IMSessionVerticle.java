@@ -36,12 +36,15 @@ public class IMSessionVerticle extends AbstractVerticle {
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
+		int memSize = config().getInteger("im.memory.size").intValue();
+		logger.info("im.memory.size={}", memSize);
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
-				.withCache("sessionReverse", CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class,
-						String.class, ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(20, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(memSize, MemoryUnit.MB)))
+				.withCache("sessionReverse",
+						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(memSize, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
@@ -98,13 +101,23 @@ public class IMSessionVerticle extends AbstractVerticle {
 	}
 
 	public int setUserSocket(String uid, String handlerId) {
+		long start = System.currentTimeMillis();
+
 		this.sessionMap.put(uid, handlerId);
 		this.sessionReverse.put(handlerId, uid);
 
+		long end = System.currentTimeMillis();
+
+		long cost = end - start;
+		if ((cost) > 20) {
+			logger.warn("setUserSocket, cost={}", cost);
+		}
 		return 0;
 	}
 
 	public int delUserSocket(String uid, String handlerId) {
+		long start = System.currentTimeMillis();
+
 		if (StringUtils.isNotEmpty(uid)) {
 			// logout
 			this.sessionMap.remove(uid);
@@ -118,13 +131,28 @@ public class IMSessionVerticle extends AbstractVerticle {
 			}
 		}
 
+		long end = System.currentTimeMillis();
+
+		long cost = end - start;
+		if ((cost) > 20) {
+			logger.warn("delUserSocket, cost={}", cost);
+		}
+
 		return 0;
 	}
 
 	private JsonObject getHandlerIDByUid(String uid) {
+		long start = System.currentTimeMillis();
+
 		JsonObject jo = new JsonObject();
 		jo.put("handlerID", sessionMap.get(uid));
 
+		long end = System.currentTimeMillis();
+
+		long cost = end - start;
+		if ((cost) > 20) {
+			logger.warn("getHandlerIDByUid, cost={}", cost);
+		}
 		logger.info("getHandlerIDByUid, uid={} result={}", uid, jo.encode());
 		return jo;
 	}
