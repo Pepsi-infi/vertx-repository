@@ -42,7 +42,6 @@ public class MongoVerticle extends AbstractVerticle {
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(MongoVerticle.class.getName(), res -> {
-			logger.info("MongoVerticle, {}", res.body().encode());
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {

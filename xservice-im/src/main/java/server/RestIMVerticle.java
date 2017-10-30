@@ -20,10 +20,13 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.rxjava.core.Future;
+import io.vertx.rxjava.core.shareddata.LocalMap;
+import io.vertx.rxjava.core.shareddata.SharedData;
 import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import module.hash.IMConsistentHashingVerticle;
+import module.health.HealthCheckHandler;
 import module.quickphrase.QuickPhraseVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -41,11 +44,18 @@ public class RestIMVerticle extends RestAPIVerticle {
 	private int imTCPPort;
 	private int imHTTPPort;
 
+	private SharedData sharedData;
+	private LocalMap<String, Integer> localMap;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		eb = vertx.getDelegate().eventBus();
+		sharedData = vertx.sharedData();
+		localMap = sharedData.getLocalMap("health");
+		localMap.put("health", 200);
+
 		client = MongoClient.createShared(vertx.getDelegate(), config().getJsonObject("mongo"));
 
 		logger.info("Rest mc-access Verticle: Start...");
@@ -65,6 +75,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.post(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
 		router.post(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
 
+//		router.route(RestIMConstants.lbs_health_check).handler(new HealthCheckHandler(localMap.get("health"))::handle);
+//		router.route(RestIMConstants.offline).handler(this::offline);
+
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = this.getServerHost();
@@ -72,6 +85,11 @@ public class RestIMVerticle extends RestAPIVerticle {
 				.compose(serverCreated -> publishHttpEndpoint(RestIMConstants.SERVICE_NAME, serverHost, imHTTPPort,
 						RestIMConstants.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
+	}
+
+	private void offline(RoutingContext context) {
+		localMap.put("health", 404);
+		context.response().setStatusCode(200).end();
 	}
 
 	private String getServerHost() {
