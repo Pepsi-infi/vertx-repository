@@ -9,7 +9,10 @@
     "socket.valid.url": "http://10.10.10.105:18080/webservice/passenger/webservice/chat/checkSocket",
     "PUSH_MSG_URL":"/mc-push/message/push.json",
     "PUSH_MSG_NO_ADVER_URL":"/mc-push/meesage-nonAdver/push.json",
-    "PUSH_MSG_PORT":8989
+    "PUSH_MSG_PORT":8989,
+    "APNS_PWD":"01zhuanche",
+    "APNS_URL":"api.development.push.apple.com",
+    "APNS_KEY_PATH":"dev/apns_developer.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",

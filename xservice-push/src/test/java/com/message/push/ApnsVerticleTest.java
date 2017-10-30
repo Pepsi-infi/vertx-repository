@@ -1,10 +1,15 @@
 package com.message.push;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import constant.PushConsts;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import push.apns.ApnsMsg;
 import push.apns.ApnsVerticle;
@@ -21,15 +26,8 @@ public class ApnsVerticleTest {
 
 		ApnsMsg msg = new ApnsMsg();
 		msg.setDeviceToken("564d6ea438cbbab366df45153c6bc0b8e34fa8f2c79e7fbdb29eebd643d254da");
-		// 9da57cd69196589bdfe93d12050f52613c84179338be2c8327eead94fc9fb12e
-		// 564d6ea438cbbab366df45153c6bc0b8e34fa8f2c79e7fbdb29eebd643d254da
-
-		// aff5175d8ad711399fc071c2bb7e98025e5037e1d911223faab298082dda3c89
-
-		// BwgJYcBIOpZj5A4HEHu2nXUeiIEGRLqGVW38hLaMCtj5v+bo2wOZYOfS2V14TdhI4RWUnQ==
-		// 959bfeab4ff644787a12fe72d640cab1ea1210562c7811712500095378c8293c
-		msg.setTitle("1");
-		msg.setBody(String.valueOf(System.currentTimeMillis()));
+		msg.setTitle("消息标题");
+		msg.setBody("test 发送消息内容");
 		Extend extend = new Extend();
 		extend.setJumpPage("8");
 		msg.setExtend(extend);
@@ -37,7 +35,29 @@ public class ApnsVerticleTest {
 		DeliveryOptions option = new DeliveryOptions();
 		option.addHeader("action", "apnsSend");
 
-		eb.send(ApnsVerticle.class.getName() + "local", JsonObject.mapFrom(msg), option);
+		options.setConfig(ApnsVerticleTest.getJsonConf("config.json"));
+		// 请注意：Worker Verticle 和 HTTP/2 不兼容
+		vertx.deployVerticle(ApnsVerticle.class.getName(), options.setWorker(false), res -> {
+			eb.send(ApnsVerticle.class.getName(), JsonObject.mapFrom(msg), option);
+		});
+
 	}
 
+	public static JsonObject getJsonConf(String configPath) {
+		configPath = PushConsts.ENV_PATH + "/" + configPath;
+		JsonObject conf = new JsonObject();
+		ClassLoader ctxClsLoader = Thread.currentThread().getContextClassLoader();
+		InputStream is = ctxClsLoader.getResourceAsStream(configPath);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
+		try {
+			String line;
+			StringBuilder sb = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+			conf = new JsonObject(sb.toString());
+		} catch (Exception e) {
+		}
+		return conf;
+	}
 }
