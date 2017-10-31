@@ -80,13 +80,13 @@ public class IMServerVerticle extends BaseServiceVerticle {
 							clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
 							cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
 							bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
-							logger.info("Msg header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
+							logger.info("imMessage header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
 									clientVersion, cmd, bodyLength);
 
 							parser.fixedSizeMode(bodyLength);
 						} else {
 							SQIMBody imMessage = Json.decodeValue(buffer, SQIMBody.class);
-							logger.info("imMessage={}", imMessage.toString());
+							logger.info("imMessage body={}", imMessage.toString());
 							switch (cmd) {
 							case IMCmd.HEART_BEAT:
 								heartBeat(handlerID, clientVersion, cmd);
@@ -160,7 +160,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	}
 
 	private void ackNCmd(String handlerID, int clientVersion, int cmd, SQIMBody imMessage) {
-		logger.info("msgAck, buffer={}", Json.encode(imMessage));
 		String msgId = imMessage.getMsgId();
 
 		JsonObject data = new JsonObject().put("msgId", msgId).put("cmdId", IMCmd.MSG_A);
@@ -172,7 +171,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 		eb.<JsonObject>send(MongoVerticle.class.getName(), update, mongoOp, mongoRes -> {
 			if (mongoRes.succeeded()) {
-//				eb.send(handlerID, mongoRes.result());
+				// eb.send(handlerID, mongoRes.result());
 			} else {
 				logger.error(mongoRes.cause().getMessage());
 			}
@@ -182,7 +181,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private void heartBeat(String writeHandlerID, int clientVersion, int cmd) {
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
-		logger.info("heartBeat,handlerId={} msgHeader={}", writeHandlerID, aMsgHeader);
 
 		// 1、心跳消息确认
 		eb.send(writeHandlerID, aMsgHeader);
@@ -195,15 +193,11 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		option.addHeader("action", IMSessionVerticle.method.setUserSocket);
 		option.setSendTimeout(3000);
 		JsonObject msg = new JsonObject().put("handlerID", handlerID).put("from", from);
-		logger.info("IMCmdConstants.LOGIN from={}cmd={}handlerID={}", from, cmd, handlerID);
 		eb.send(IMSessionVerticle.class.getName() + innerIP, msg, option);
 
 		// 1、给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
-
-		logger.info("DoWithLogin, handlerId={}clientVersion={}cmd={}bodyLength={}", handlerID, clientVersion, cmd,
-				bodyLength);
 		eb.send(handlerID, aMsgHeader);
 
 		sendTextNotification(handlerID, clientVersion, cmd);
@@ -241,7 +235,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		option.addHeader("action", C2CVerticle.method.sendMessage);
 		option.setSendTimeout(3000);
 
-		logger.info("msgRequest, param={}", param.encode());
 		eb.send(C2CVerticle.class.getName() + innerIP, param, option);
 	}
 
@@ -272,13 +265,10 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			e.printStackTrace();
 		}
 
-		logger.info("sendTextNotification, msg={}", noti.toString());
-
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				IMCmd.Notification, bodyLength);
 
 		eb.send(handlerID, aMsgHeader.appendString(body));
-
 	}
 
 	private void sendAd(String handlerID, int clientVersion, int cmd) {
@@ -300,8 +290,6 @@ public class IMServerVerticle extends BaseServiceVerticle {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		logger.info("sendAd, msg={}", noti.toString());
 
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				IMCmd.Notification, bodyLength);

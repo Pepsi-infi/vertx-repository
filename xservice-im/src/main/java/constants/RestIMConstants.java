@@ -6,8 +6,6 @@ public class RestIMConstants {
 
 	public static final String SERVICE_ROOT = "/mc-im";
 
-	public static final int HTTP_PORT = 1100;
-
 	public static final String ONLINE_NUMBER = "/mc-im/online/number.json";
 
 	public static final String DISPATCH = "/mc-im/user/dispatch.json";
@@ -24,7 +22,7 @@ public class RestIMConstants {
 	 * param orderNo 订单号；timestamp
 	 */
 	public static final String GET_OFFLINE_MESSAGE = "/mc-im/message/offline/get.json";
-	
+
 	public static final String GET_OFFLINE_MESSAGE_4_KF = "/mc-im/kf/message/offline/get.json";
 
 	/**
@@ -41,4 +39,8 @@ public class RestIMConstants {
 	 * id
 	 */
 	public static final String del_quick_phrase = "/mc-im/quick/phrase/del.json";
+
+	public static final String lbs_health_check = "/resouces/nginx.html";
+
+	public static final String offline = "/offline.json";
 }

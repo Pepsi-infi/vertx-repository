@@ -41,7 +41,6 @@ public class C2CVerticle extends AbstractVerticle {
 		innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(C2CVerticle.class.getName() + innerIP, res -> {
-			logger.info("C2CVerticle, {}", res.body().encode());
 			MultiMap headers = res.headers();
 			JsonObject resBody = res.body();
 			SQIMBody imMessage = Json.decodeValue(resBody.getJsonObject("body").encode(), SQIMBody.class);
@@ -51,7 +50,6 @@ public class C2CVerticle extends AbstractVerticle {
 			int cmd = msgHeader.getInteger("cmdId").intValue();
 			if (headers != null) {
 				String action = headers.get("action");
-				logger.info("action={}", action);
 				switch (action) {
 				case "sendMessage":
 					res.reply(sendMessage(fromHandlerID, clientVersion, cmd, imMessage));
@@ -65,7 +63,6 @@ public class C2CVerticle extends AbstractVerticle {
 	}
 
 	private int sendMessage(String fromHandlerID, int clientVersion, int cmd, SQIMBody msg) {
-		logger.info("send start ... ");
 		int result = 0;
 
 		String to = msg.getToTel();
@@ -78,7 +75,6 @@ public class C2CVerticle extends AbstractVerticle {
 		option.setSendTimeout(3000);
 		JsonObject p = new JsonObject().put("to", to);
 		eb.<JsonObject>send(IMSessionVerticle.class.getName() + innerIP, p, option, res -> {
-			logger.info("sendMessage, {}", res.result());
 			if (res.succeeded()) {
 				JsonObject res11 = res.result().body();
 				String toHandlerID = res11.getString("handlerID");
@@ -107,6 +103,11 @@ public class C2CVerticle extends AbstractVerticle {
 								logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
 
 								eb.send(toHandlerID, headerBuffer.appendString(body));
+
+								// 只有聊天消息入库
+								if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+									saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+								}
 							} else {
 								logger.error("filterSensitiveWords, error={}", swRes.cause().getMessage());
 							}
@@ -124,6 +125,11 @@ public class C2CVerticle extends AbstractVerticle {
 								cmd, bodyLength);
 						String body = Json.encode(msg);
 						eb.send(toHandlerID, headerBuffer.appendString(body));
+
+						// 只有聊天消息入库
+						if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+							saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+						}
 					}
 				} else {
 					// ios - apns
@@ -132,9 +138,9 @@ public class C2CVerticle extends AbstractVerticle {
 				}
 
 				// 只有聊天消息入库
-				if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-					saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
-				}
+				// if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+				// saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+				// }
 			} else {
 				logger.error("sendMessage error.", res.cause());
 			}
@@ -163,6 +169,11 @@ public class C2CVerticle extends AbstractVerticle {
 		data.setsAddress(msg.getsAddress());
 		data.setLat(msg.getLat());
 		data.setLon(msg.getLon());
+
+		if (cmd == IMCmd.POSITION_SHARE_START) {
+			data.setContent("我发起了位置共享");
+			data.setMsgType(1);// 文本，后面优化
+		}
 
 		mongoMsg.put("data", JsonObject.mapFrom(data));
 

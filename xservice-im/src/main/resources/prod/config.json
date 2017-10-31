@@ -44,6 +44,16 @@
 		"minHeartbeatFrequencyMS": 500
 	},
 	"mysql": {
+		"mc-im": {
+			"host": "10.0.10.211",
+			"port": 5310,
+			"maxPoolSize": 100,
+			"username": "message_center",
+			"password": "BzkmQM%O^U7Dy8X3",
+			"database": "mc_im",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
 	},
 	"im": [
 		{
@@ -61,5 +71,6 @@
 	},
 	"service.host": "127.0.0.1",
 	"im.tcp.port": 11000,
-	"im.memory.size": 7680
+	"im.memory.size": 7680,
+	"im.http.port": 10001
 }

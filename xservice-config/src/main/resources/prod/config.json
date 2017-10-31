@@ -1,16 +1,15 @@
 {
-  "mysql": {
-    "mc-config": {
-      "host": "10.0.10.211",
-      "port": 5310,
-      "maxPoolSize": 100,
-      "username": "message_center",
-      "password": "BzkmQM%O^U7Dy8X3",
-      "database": "mc-config",
-      "charset": "UTF-8",
-      "queryTimeout": 3000
-    }
-
-  },
-  "service.port":9200
+	"mysql": {
+		"mc-config": {
+			"host": "10.0.10.211",
+			"port": 5310,
+			"maxPoolSize": 100,
+			"username": "message_center",
+			"password": "BzkmQM%O^U7Dy8X3",
+			"database": "mc_config",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
+	},
+	"service.port": 9200
 }
