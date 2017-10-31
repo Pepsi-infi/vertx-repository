@@ -170,6 +170,11 @@ public class C2CVerticle extends AbstractVerticle {
 		data.setLat(msg.getLat());
 		data.setLon(msg.getLon());
 
+		if (cmd == IMCmd.POSITION_SHARE_START) {
+			data.setContent("我发起了位置共享");
+			data.setMsgType(1);// 文本，后面优化
+		}
+
 		mongoMsg.put("data", JsonObject.mapFrom(data));
 
 		/**

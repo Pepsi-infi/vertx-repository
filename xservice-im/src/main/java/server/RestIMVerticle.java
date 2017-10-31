@@ -258,7 +258,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			content = URLDecoder.decode(paramMap.get("content"), "utf-8");
 			title = URLDecoder.decode(paramMap.get("title"), "utf-8");
 		} catch (Exception e) {
-			logger.error("addQuickPhrase, e={}", e.getMessage());
+			logger.error("addQuickPhrase, e={}", e.getCause().getMessage());
 		}
 
 		httpResp.clear();
