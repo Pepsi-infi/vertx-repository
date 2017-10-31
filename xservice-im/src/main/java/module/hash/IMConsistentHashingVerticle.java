@@ -94,6 +94,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 						realInnerNodes.add(innerIP);
 					}
 				}
+				logger.info("realIMNodes={}realInnerNodes={}", realIMNodes.toString(), realInnerNodes.toString());
 			}
 		});
 	}
