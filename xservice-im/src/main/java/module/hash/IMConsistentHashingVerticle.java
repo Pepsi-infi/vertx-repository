@@ -170,6 +170,10 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 		h ^= h >>> r;
 
 		buf.order(byteOrder);
+
+		if (h < 0) {
+			h = Math.abs(h);
+		}
 		return h;
 	}
 
