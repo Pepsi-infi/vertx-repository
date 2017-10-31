@@ -44,6 +44,16 @@
 		"minHeartbeatFrequencyMS": 500
 	},
 	"mysql": {
+		"mc-im": {
+			"host": "10.0.10.211",
+			"port": 5310,
+			"maxPoolSize": 100,
+			"username": "message_center",
+			"password": "BzkmQM%O^U7Dy8X3",
+			"database": "mc_im",
+			"charset": "UTF-8",
+			"queryTimeout": 3000
+		}
 	},
 	"im": [
 		{
