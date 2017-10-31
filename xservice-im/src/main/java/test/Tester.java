@@ -3,6 +3,7 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import module.hash.IMConsistentHashingVerticle;
 import server.RestIMVerticle;
 
 public class Tester {
@@ -35,7 +36,9 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+//		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(IMConsistentHashingVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		
 		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
 		// DeploymentOptions().setConfig(config()));
 
