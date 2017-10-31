@@ -160,7 +160,6 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 				connection.queryWithParams(sql_getQuickPhrase, params, SQLRes -> {
 					JsonObject sqlResJson = new JsonObject();
 					if (SQLRes.succeeded()) {
-						logger.info("getQickPhrase, result={}", SQLRes.result().getRows());
 						sqlResJson.put("result", SQLRes.result().getRows());
 						resultHandler.handle(Future.succeededFuture(sqlResJson));
 					} else {

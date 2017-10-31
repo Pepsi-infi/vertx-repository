@@ -75,8 +75,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.post(RestIMConstants.add_quick_phrase).handler(this::addQuickPhrase);
 		router.post(RestIMConstants.del_quick_phrase).handler(this::delQuickPhrase);
 
-//		router.route(RestIMConstants.lbs_health_check).handler(new HealthCheckHandler(localMap.get("health"))::handle);
-//		router.route(RestIMConstants.offline).handler(this::offline);
+		// router.route(RestIMConstants.lbs_health_check).handler(new
+		// HealthCheckHandler(localMap.get("health"))::handle);
+		// router.route(RestIMConstants.offline).handler(this::offline);
 
 		Future<Void> voidFuture = Future.future();
 
@@ -254,11 +255,21 @@ public class RestIMVerticle extends RestAPIVerticle {
 		Integer identity = NumberUtils.toInt(paramMap.get("identity"));
 		String content = null;
 		String title = null;
-		try {
-			content = URLDecoder.decode(paramMap.get("content"), "utf-8");
-			title = URLDecoder.decode(paramMap.get("title"), "utf-8");
-		} catch (Exception e) {
-			logger.error("addQuickPhrase, e={}", e.getCause().getMessage());
+
+		if (StringUtils.isNotEmpty(title)) {
+			try {
+				title = URLDecoder.decode(paramMap.get("title"), "utf-8");
+			} catch (Exception e) {
+				logger.error("addQuickPhrase, e={}", e.getCause().getMessage());
+			}
+		}
+
+		if (StringUtils.isNotEmpty(content)) {
+			try {
+				content = URLDecoder.decode(paramMap.get("content"), "utf-8");
+			} catch (Exception e) {
+				logger.error("addQuickPhrase, e={}", e.getCause().getMessage());
+			}
 		}
 
 		httpResp.clear();
