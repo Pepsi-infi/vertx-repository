@@ -101,39 +101,47 @@ public class RestIMVerticle extends RestAPIVerticle {
 		String userTel = context.request().getParam("userTel");
 		logger.info("userTel={}", userTel);
 		httpResp.clear();
-		if (StringUtils.isNotEmpty(userTel)) {
-			DeliveryOptions chOption = new DeliveryOptions();
-			chOption.setSendTimeout(3000);
-			chOption.addHeader("action", "getIMNode");
-
-			Future<Message<JsonObject>> chFuture = Future.future();
-
-			JsonObject message = new JsonObject();
-			message.put("userId", userTel);
-			eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
-
-			chFuture.setHandler(res -> {
-				if (res.succeeded()) {
-					JsonObject data = new JsonObject();
-					data.put("server", res.result().body().getString("host") + ":" + imTCPPort);
-					httpResp.put("data", data);
-					httpResp.put("code", 0);
-					httpResp.put("time", System.currentTimeMillis());
-					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
-				} else {
-					httpResp.put("code", 1);
-					httpResp.put("msg", "Consistent Hash Error.");
-					httpResp.put("time", System.currentTimeMillis());
-					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
-					logger.error("msgRequest, {}", res.cause().getMessage());
-				}
-			});
-		} else {
-			httpResp.put("code", 1);
-			httpResp.put("msg", "param userTel is null.");
-			httpResp.put("time", System.currentTimeMillis());
-			context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
-		}
+		
+		JsonObject data = new JsonObject();
+		data.put("server", "124.250.33.162" + ":" + imTCPPort);
+		httpResp.put("data", data);
+		httpResp.put("code", 0);
+		httpResp.put("time", System.currentTimeMillis());
+		context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
+		
+//		if (StringUtils.isNotEmpty(userTel)) {
+//			DeliveryOptions chOption = new DeliveryOptions();
+//			chOption.setSendTimeout(3000);
+//			chOption.addHeader("action", "getIMNode");
+//
+//			Future<Message<JsonObject>> chFuture = Future.future();
+//
+//			JsonObject message = new JsonObject();
+//			message.put("userId", userTel);
+//			eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+//
+//			chFuture.setHandler(res -> {
+//				if (res.succeeded()) {
+//					JsonObject data = new JsonObject();
+//					data.put("server", res.result().body().getString("host") + ":" + imTCPPort);
+//					httpResp.put("data", data);
+//					httpResp.put("code", 0);
+//					httpResp.put("time", System.currentTimeMillis());
+//					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
+//				} else {
+//					httpResp.put("code", 1);
+//					httpResp.put("msg", "Consistent Hash Error.");
+//					httpResp.put("time", System.currentTimeMillis());
+//					context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
+//					logger.error("msgRequest, {}", res.cause().getMessage());
+//				}
+//			});
+//		} else {
+//			httpResp.put("code", 1);
+//			httpResp.put("msg", "param userTel is null.");
+//			httpResp.put("time", System.currentTimeMillis());
+//			context.response().putHeader("content-type", "application/json").end(Json.encode(httpResp));
+//		}
 
 	}
 
