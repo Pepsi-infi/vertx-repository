@@ -109,8 +109,6 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 				virtualIMNodes.put(hash("aa" + i + j), realIMNodes.get(i));
 			}
 		}
-
-		logger.info("virtualIMNodes={}", virtualIMNodes.toString());
 	}
 
 	/**
@@ -187,10 +185,8 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
 
 		if (en == null) {
-			logger.info("key={}hashedKey={}en=null", key, hashedKey);
 			result.put("host", virtualIMNodes.firstEntry().getValue());
 		} else {
-			logger.info("key={}hashedKey={}en={}", key, hashedKey, en.getValue());
 			result.put("host", en.getValue());
 		}
 
