@@ -29,10 +29,10 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
 	// 虚拟节点信息
-	private TreeMap<Long, String> virtualIMNodes;
+	private TreeMap<Integer, String> virtualIMNodes;
 
 	// 虚拟内网ip
-	private TreeMap<Long, String> virtualInnerNodes;
+	private TreeMap<Integer, String> virtualInnerNodes;
 
 	// 真实节点信息
 	private List<String> realIMNodes;
@@ -108,7 +108,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initIMNodes() {
-		virtualIMNodes = new TreeMap<Long, String>();
+		virtualIMNodes = new TreeMap<Integer, String>();
 		for (int i = 0; i < realIMNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualIMNodes.put(hash("aa" + i + j), realIMNodes.get(i));
@@ -120,7 +120,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initInnerNodes() {
-		virtualInnerNodes = new TreeMap<Long, String>();
+		virtualInnerNodes = new TreeMap<Integer, String>();
 		for (int i = 0; i < realInnerNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
@@ -133,11 +133,11 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 比传统的CRC32,MD5，SHA-1（这两个算法都是加密HASH算法，复杂度本身就很高，带来的性能上的损害也不可避免）
 	 * 等HASH算法要快很多，而且据说这个算法的碰撞率很低. http://murmurhash.googlepages.com/
 	 */
-	private long hash(String key) {
+	private int hash(String key) {
 		HashFunction hf = Hashing.murmur3_32();
 		HashCode hc = hf.newHasher().putString(key, Charsets.UTF_8).hash();
-		
-		return hc.asLong();
+
+		return hc.asInt();
 	}
 
 	/**
@@ -148,9 +148,9 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
-		long hashedKey = hash(key);
+		int hashedKey = hash(key);
 
-		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
+		Entry<Integer, String> en = virtualIMNodes.ceilingEntry(hashedKey);
 
 		if (en == null) {
 			result.put("host", virtualIMNodes.firstEntry().getValue());
@@ -169,8 +169,8 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getInnerNode(String key) {
 		JsonObject result = new JsonObject();
-		Long hashedKey = hash(key);
-		Entry<Long, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		int hashedKey = hash(key);
+		Entry<Integer, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
 		if (en == null) {
 			result.put("host", virtualInnerNodes.firstEntry().getValue());
 		} else {
