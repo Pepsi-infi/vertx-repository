@@ -15,6 +15,7 @@ public class Tester {
 		Thread.sleep(3000);
 
 		vertx.setPeriodic(1000, s -> {
+			System.out.println("aaaaaa");
 			vertx.eventBus().send("file.transcoding.Transcoding", "aaa");
 		});
 	}
