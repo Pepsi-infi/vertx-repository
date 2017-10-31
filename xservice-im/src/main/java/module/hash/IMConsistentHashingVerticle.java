@@ -46,8 +46,6 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 		this.realInnerNodes = new ArrayList<String>();
 
 		getNodesFromDiscovery();
-		initIMNodes();
-		initInnerNodes();
 
 		// vertx.setPeriodic(3000, handler -> {
 		// getNodesFromDiscovery();
@@ -94,6 +92,10 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 						realInnerNodes.add(innerIP);
 					}
 				}
+
+				initIMNodes();
+				initInnerNodes();
+
 				logger.info("realIMNodes={}realInnerNodes={}", realIMNodes.toString(), realInnerNodes.toString());
 			}
 		});
