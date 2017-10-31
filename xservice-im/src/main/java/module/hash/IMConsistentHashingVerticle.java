@@ -22,7 +22,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(IMConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
-	private int length = 160;
+	private int length = 5;
 	// 虚拟节点信息
 	private TreeMap<Long, String> virtualIMNodes;
 
