@@ -1,5 +1,5 @@
 {
-	"upload.file.path.prefix": "/u01/file",
+	"upload.file.path.prefix": "/u01/file/",
 	"download.file.server.prefix": "/mc-file/im/download.json?file=",
 	"file": [
 		{
