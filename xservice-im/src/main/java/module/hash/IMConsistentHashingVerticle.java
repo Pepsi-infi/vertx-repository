@@ -9,6 +9,11 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -22,7 +27,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	private static final Logger logger = LoggerFactory.getLogger(IMConsistentHashingVerticle.class);
 
 	// 真实节点对应的虚拟节点数量
-	private int length = 5;
+	private int length = 160;
 	// 虚拟节点信息
 	private TreeMap<Long, String> virtualIMNodes;
 
@@ -47,9 +52,9 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 
 		getNodesFromDiscovery();
 
-//		vertx.setPeriodic(5000, handler -> {
-//			getNodesFromDiscovery();
-//		});
+		// vertx.setPeriodic(5000, handler -> {
+		// getNodesFromDiscovery();
+		// });
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(IMConsistentHashingVerticle.class.getName(), res -> {
@@ -128,49 +133,11 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 比传统的CRC32,MD5，SHA-1（这两个算法都是加密HASH算法，复杂度本身就很高，带来的性能上的损害也不可避免）
 	 * 等HASH算法要快很多，而且据说这个算法的碰撞率很低. http://murmurhash.googlepages.com/
 	 */
-	private Long hash(String key) {
-		ByteBuffer buf = ByteBuffer.wrap(key.getBytes());
-		int seed = 0x1234ABCD;
-
-		ByteOrder byteOrder = buf.order();
-		buf.order(ByteOrder.LITTLE_ENDIAN);
-
-		long m = 0xc6a4a7935bd1e995L;
-		int r = 47;
-
-		long h = seed ^ (buf.remaining() * m);
-
-		long k;
-		while (buf.remaining() >= 8) {
-			k = buf.getLong();
-
-			k *= m;
-			k ^= k >>> r;
-			k *= m;
-
-			h ^= k;
-			h *= m;
-		}
-
-		if (buf.remaining() > 0) {
-			ByteBuffer finish = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
-			// for big-endian version, do this first:
-			// finish.position(8-buf.remaining());
-			finish.put(buf).rewind();
-			h ^= finish.getLong();
-			h *= m;
-		}
-
-		h ^= h >>> r;
-		h *= m;
-		h ^= h >>> r;
-
-		buf.order(byteOrder);
-
-		if (h < 0) {
-			h = Math.abs(h);
-		}
-		return h;
+	private long hash(String key) {
+		HashFunction hf = Hashing.murmur3_32();
+		HashCode hc = hf.newHasher().putString(key, Charsets.UTF_8).hash();
+		
+		return hc.asLong();
 	}
 
 	/**
@@ -181,7 +148,8 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
-		Long hashedKey = hash(key);
+		long hashedKey = hash(key);
+
 		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
 
 		if (en == null) {
