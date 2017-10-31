@@ -256,7 +256,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		String content = null;
 		String title = null;
 
-		if (StringUtils.isNotEmpty(title)) {
+		if (StringUtils.isNotEmpty(paramMap.get("title"))) {
 			try {
 				title = URLDecoder.decode(paramMap.get("title"), "utf-8");
 			} catch (Exception e) {
@@ -264,7 +264,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 			}
 		}
 
-		if (StringUtils.isNotEmpty(content)) {
+		if (StringUtils.isNotEmpty(paramMap.get("content"))) {
 			try {
 				content = URLDecoder.decode(paramMap.get("content"), "utf-8");
 			} catch (Exception e) {
