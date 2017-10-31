@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
@@ -179,14 +178,12 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
-
-		// 得到大于该Hash值的所有Map
-		SortedMap<Long, String> subMap = virtualIMNodes.tailMap(hashedKey);
-		// 第一个Key就是顺时针过去离node最近的那个结点
-		Long i = subMap.firstKey();
-		// 返回对应的虚拟节点名称，这里字符串稍微截取一下
-		String virtualNode = subMap.get(i);
-		result.put("host", virtualNode.substring(0, virtualNode.indexOf("&&")));
+		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
+		if (en == null) {
+			result.put("host", virtualIMNodes.firstEntry().getValue());
+		} else {
+			result.put("host", en.getValue());
+		}
 
 		return result;
 	}
@@ -200,16 +197,13 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	public JsonObject getInnerNode(String key) {
 		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
-
-		// 得到大于该Hash值的所有Map
-		SortedMap<Long, String> subMap = virtualInnerNodes.tailMap(hashedKey);
-		// 第一个Key就是顺时针过去离node最近的那个结点
-		Long i = subMap.firstKey();
-		// 返回对应的虚拟节点名称，这里字符串稍微截取一下
-		String virtualNode = subMap.get(i);
-		result.put("host", virtualNode.substring(0, virtualNode.indexOf("&&")));
+		Entry<Long, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		if (en == null) {
+			result.put("host", virtualInnerNodes.firstEntry().getValue());
+		} else {
+			result.put("host", en.getValue());
+		}
 
 		return result;
 	}
-
 }
