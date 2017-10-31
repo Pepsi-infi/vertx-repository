@@ -147,7 +147,7 @@ public class QuickPhraseVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String sql_getQuickPhrase = "select id, userId, identity, title, content, createTime from quick_phrase where userId = ? and identity = ?";
+	private static final String sql_getQuickPhrase = "select id, userId, identity, title, content, createTime from quick_phrase where userId = ? and identity = ? order by createTime desc limit 10";
 
 	private void getQuickPhrase(Integer userId, int identity, Handler<AsyncResult<JsonObject>> resultHandler) {
 		result.clear();// Must do clear before use it!
