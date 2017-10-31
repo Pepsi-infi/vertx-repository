@@ -138,9 +138,9 @@ public class C2CVerticle extends AbstractVerticle {
 				}
 
 				// 只有聊天消息入库
-				// if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-				// saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
-				// }
+				if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+					saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+				}
 			} else {
 				logger.error("sendMessage error.", res.cause());
 			}
