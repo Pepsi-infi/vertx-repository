@@ -47,9 +47,9 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 
 		getNodesFromDiscovery();
 
-		vertx.setPeriodic(5000, handler -> {
-			getNodesFromDiscovery();
-		});
+//		vertx.setPeriodic(5000, handler -> {
+//			getNodesFromDiscovery();
+//		});
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(IMConsistentHashingVerticle.class.getName(), res -> {
