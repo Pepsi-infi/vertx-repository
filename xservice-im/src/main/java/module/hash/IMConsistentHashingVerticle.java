@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
@@ -185,13 +186,15 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getInnerNode(String key) {
 		JsonObject result = new JsonObject();
-		int hashedKey = hash(key);
-		Entry<Integer, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
-		if (en == null) {
-			result.put("host", virtualInnerNodes.firstEntry().getValue());
-		} else {
-			result.put("host", en.getValue());
-		}
+		// int hashedKey = hash(key);
+		// Entry<Integer, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		// if (en == null) {
+		// result.put("host", virtualInnerNodes.firstEntry().getValue());
+		// } else {
+		// result.put("host", en.getValue());
+		// }
+		int i = (int) (NumberUtils.toLong(key) % 3);
+		result.put("host", realInnerNodes.get(i));
 
 		return result;
 	}
