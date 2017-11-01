@@ -104,10 +104,14 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 						realIMNodes.add(publicAddress);
 					}
 					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
-						realInnerNodes.add(innerIP);
+//						realInnerNodes.add(innerIP);
 					}
 				}
 
+				realInnerNodes.add("10.0.7.52");
+				realInnerNodes.add("10.0.7.70");
+				realInnerNodes.add("10.0.4.20");
+				
 				initIMNodes();
 				initInnerNodes();
 
