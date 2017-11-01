@@ -1,13 +1,13 @@
-def ffmpeg = "/u01/projectCAR/xservice/xservice-file/ffmpeg"
+import io.vertx.core.AbstractVerticle
 
-void vertxStart() {
-	def eb = vertx.eventBus()
-	eb.consumer("file.transcoding.Transcoding", { message ->
-		def file = message.body()
- 		Process p="ffmpeg  -i ${file}.amr ${file}.mp3".execute() 		
-	})
-}
+public class TranscodingVerticle extends AbstractVerticle {
 
-void vertxStop() {
-	println "stopping"
+	public void start() {
+		def eb = vertx.eventBus();
+
+		eb.consumer("file.transcoding.Transcoding", { message ->
+			def file = message.body()
+			Process p="ffmpeg -i ${file} ${file}.mp3".execute()
+		})
+	}
 }
