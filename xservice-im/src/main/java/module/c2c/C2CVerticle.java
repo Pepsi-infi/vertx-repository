@@ -184,7 +184,7 @@ public class C2CVerticle extends AbstractVerticle {
 		mongoOp.addHeader("action", MongoVerticle.method.saveData);
 		mongoOp.setSendTimeout(3000);
 
-		eb.<JsonObject>send(MongoVerticle.class.getName(), mongoMsg, mongoOp, mongoRes -> {
+		eb.<JsonObject>send(MongoVerticle.class.getName() + innerIP, mongoMsg, mongoOp, mongoRes -> {
 			if (mongoRes.succeeded()) {
 
 				SQIMBody ackMsg = new SQIMBody();
