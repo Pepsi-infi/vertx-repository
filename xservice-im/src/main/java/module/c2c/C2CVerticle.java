@@ -43,7 +43,7 @@ public class C2CVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		innerIP = IPUtil.getInnerIP();
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(C2CVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(C2CVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject resBody = res.body();
 			SQIMBody imMessage = Json.decodeValue(resBody.getJsonObject("body").encode(), SQIMBody.class);

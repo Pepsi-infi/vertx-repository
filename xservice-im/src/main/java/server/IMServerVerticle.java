@@ -12,6 +12,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -21,9 +22,11 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
+import io.vertx.rxjava.core.Future;
 import module.c2c.C2CVerticle;
 import module.c2c.protocol.MessageBuilder;
 import module.c2c.protocol.SQIMBody;
+import module.hash.IMConsistentHashingVerticle;
 import module.persistence.MongoVerticle;
 import module.session.IMSessionVerticle;
 import utils.ByteUtil;
@@ -235,7 +238,24 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		option.addHeader("action", C2CVerticle.method.sendMessage);
 		option.setSendTimeout(3000);
 
-		eb.send(C2CVerticle.class.getName(), param, option);
+		//
+		DeliveryOptions chOption = new DeliveryOptions();
+		chOption.setSendTimeout(3000);
+		chOption.addHeader("action", "getInnerNode");
+
+		Future<Message<JsonObject>> chFuture = Future.future();
+
+		JsonObject message = new JsonObject();
+		message.put("userId", imMessage.getToTel());
+		eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+
+		chFuture.setHandler(a -> {
+			if (a.succeeded()) {
+				String innerHost = a.result().body().getString("host");
+				eb.send(C2CVerticle.class.getName() + innerHost, param, option);
+			}
+		});
+		//
 
 		SQIMBody ackMsg = new SQIMBody();
 		ackMsg.setMsgId(imMessage.getMsgId());
