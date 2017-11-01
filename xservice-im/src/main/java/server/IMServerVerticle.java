@@ -80,8 +80,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 							clientVersion = ByteUtil.byte2ToUnsignedShort(buffer.getBytes(2, 4));
 							cmd = ByteUtil.bytesToInt(buffer.getBytes(4, 8));
 							bodyLength = ByteUtil.bytesToInt(buffer.getBytes(8, 12));
-							logger.info("imMessage header, headerLength={}clientVersion={}cmd={}bodyLength={}", headerLength,
-									clientVersion, cmd, bodyLength);
+							logger.info("imMessage header, headerLength={}clientVersion={}cmd={}bodyLength={}",
+									headerLength, clientVersion, cmd, bodyLength);
 
 							parser.fixedSizeMode(bodyLength);
 						} else {
@@ -235,7 +235,23 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		option.addHeader("action", C2CVerticle.method.sendMessage);
 		option.setSendTimeout(3000);
 
-		eb.send(C2CVerticle.class.getName() + innerIP, param, option);
+		eb.send(C2CVerticle.class.getName(), param, option);
+
+		SQIMBody ackMsg = new SQIMBody();
+		ackMsg.setMsgId(imMessage.getMsgId());
+		ackMsg.setTimeStamp(System.currentTimeMillis());
+
+		int ackMsgBodyLength = 0;
+		String ackMsgStr = Json.encode(ackMsg);
+		try {
+			ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		// 给FROM发A
+		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
+		eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
 	}
 
 	private void socketClose(String handlerID) {

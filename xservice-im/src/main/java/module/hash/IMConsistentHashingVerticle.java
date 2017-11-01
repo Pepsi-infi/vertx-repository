@@ -3,7 +3,9 @@ package module.hash;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -16,6 +18,7 @@ import com.google.common.hash.Hashing;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -41,20 +44,28 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private EventBus eb;
 
+	private Map<String, String> ipMap = new HashMap<String, String>();
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		logger.info("start ... ");
 
+		JsonArray socketNodes = config().getJsonArray("im");
+		for (Object object : socketNodes) {
+			JsonObject node = JsonObject.mapFrom(object);
+			ipMap.put(node.getString("innerIP"), node.getString("node"));
+		}
+
 		this.realIMNodes = new ArrayList<String>();
 		this.realInnerNodes = new ArrayList<String>();
 
 		getNodesFromDiscovery();
 
-//		vertx.setPeriodic(5000, handler -> {
-//			getNodesFromDiscovery();
-//		});
+		// vertx.setPeriodic(5000, handler -> {
+		// getNodesFromDiscovery();
+		// });
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(IMConsistentHashingVerticle.class.getName(), res -> {
@@ -148,15 +159,20 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
-		int hashedKey = hash(key);
+		// int hashedKey = hash(key);
+		//
+		// Entry<Integer, String> en = virtualIMNodes.ceilingEntry(hashedKey);
 
-		Entry<Integer, String> en = virtualIMNodes.ceilingEntry(hashedKey);
+		JsonObject innerJson = getInnerNode(key);
 
-		if (en == null) {
-			result.put("host", virtualIMNodes.firstEntry().getValue());
-		} else {
-			result.put("host", en.getValue());
-		}
+		// if (en == null) {
+		// result.put("host", virtualIMNodes.firstEntry().getValue());
+		// } else {
+		// result.put("host", en.getValue());
+		// }
+
+		logger.info("getIMNode, {}", innerJson.getString("host"));
+		result.put("host", ipMap.get(innerJson.getString("host")));
 
 		return result;
 	}
