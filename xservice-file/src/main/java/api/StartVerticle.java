@@ -19,7 +19,7 @@ public class StartVerticle extends AbstractVerticle {
 		// vertx.deployVerticle(TranscodingVerticle.class.getName(),
 		// readBossOpts().setConfig(config()));
 
-		vertx.deployVerticle("groovy:file/transcoding/Transcoding.groovy", new DeploymentOptions().setWorker(true));
+//		vertx.deployVerticle("groovy:file/transcoding/Transcoding.groovy", new DeploymentOptions().setWorker(true));
 	}
 
 	public static DeploymentOptions readBossOpts() {
