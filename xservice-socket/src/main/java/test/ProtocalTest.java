@@ -31,7 +31,7 @@ public class ProtocalTest {
 		byte[] headerLength1 = ByteUtil.unsignedShortToByte2(12);
 		byte[] clientVersion1 = ByteUtil.unsignedShortToByte2(999);
 		byte[] cmdId1 = ByteUtil.intToBytes(1001);
-		JsonObject msgBody1 = new JsonObject().put("userTel", "111");
+		JsonObject msgBody1 = new JsonObject().put("userTel", "123456");
 
 		MessageBuilder.buildMsgHeader(12, 11, 1001, msgBody1.encode().length()).appendString(msgBody1.encode());
 
