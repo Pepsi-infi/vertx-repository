@@ -271,6 +271,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		// 给FROM发A
 		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
+
+		logger.info("ACK, cmd={}ackMsgStr={}", cmd, ackMsgStr);
 		eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
 	}
 

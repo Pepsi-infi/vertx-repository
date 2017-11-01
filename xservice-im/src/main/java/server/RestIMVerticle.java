@@ -69,6 +69,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+		router.route(RestIMConstants.GET_RECENT_MESSAGE).handler(this::getRecentMessage);
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE_4_KF).handler(this::getOfflineMessage);
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
@@ -176,6 +177,58 @@ public class RestIMVerticle extends RestAPIVerticle {
 		client.findWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
 				logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
+				httpResp.put("code", 0);
+				httpResp.put("time", System.currentTimeMillis());
+				httpResp.put("data", r.result());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+			} else {
+				httpResp.put("code", 1);
+				httpResp.put("time", System.currentTimeMillis());
+				httpResp.put("message", r.cause().getMessage());
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+			}
+		});
+	}
+
+	public void getRecentMessage(RoutingContext context) {
+		String orderNo = context.request().getParam("orderNo");
+		String timestamp = context.request().getParam("timestamp");// TODO
+
+		httpResp.clear();
+
+		JsonObject query = new JsonObject();
+		query.put("sceneId", orderNo);
+		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
+			query.put("timeStamp", new JsonObject().put("$gt", NumberUtils.toLong(timestamp)));
+		}
+
+		FindOptions options = new FindOptions();
+		options.setLimit(100);
+
+		options.setSort(new JsonObject().put("timeStamp", 1));
+
+		JsonObject fields = new JsonObject();
+		fields.put("_id", 0);
+		fields.put("msgId", 1);
+		fields.put("sceneType", 1);
+		fields.put("sceneId", 1);
+		fields.put("content", 1);
+		fields.put("msgType", 1);
+		fields.put("cmdId", 1);
+		fields.put("fromTel", 1);
+		fields.put("toTel", 1);
+		fields.put("timeStamp", 1);
+		fields.put("identity", 1);
+		fields.put("lon", 1);
+		fields.put("lat", 1);
+		fields.put("sAddress", 1);
+		fields.put("address", 1);
+		fields.put("duration", 1);
+		options.setFields(fields);
+
+		client.findWithOptions("message", query, options, r -> {
+			if (r.succeeded()) {
+				logger.info("getRecentMessage, query={}size={}", query.encode(), r.result().size());
 				httpResp.put("code", 0);
 				httpResp.put("time", System.currentTimeMillis());
 				httpResp.put("data", r.result());
