@@ -1,4 +1,4 @@
-def ffmpeg = "/Users/wanglonghu/Downloads/ffmpeg-20171022-72c3d9a-macos64-static/bin/ffmpeg"
+def ffmpeg = "/u01/projectCAR/xservice/xservice-file/ffmpeg"
 
 void vertxStart() {
 	def eb = vertx.eventBus()
