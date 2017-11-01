@@ -93,6 +93,7 @@ public class C2CVerticle extends AbstractVerticle {
 		chFuture.setHandler(r -> {
 			if (r.succeeded()) {
 				String innerHost = r.result().body().getString("host");
+				logger.info("to host={}", innerHost);
 				eb.<JsonObject>send(IMSessionVerticle.class.getName() + innerHost, p, option, res -> {
 					if (res.succeeded()) {
 						JsonObject res11 = res.result().body();
