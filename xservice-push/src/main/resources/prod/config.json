@@ -13,6 +13,8 @@
     "APNS_PWD":"01zhuanche",
     "APNS_URL":"api.push.apple.com",
     "APNS_KEY_PATH":"prd/apns.p12"
+    "push.apns.keyStorePwd":"01zhuanche",
+    "push.apns.keyStorePath":"D:\\DevKit\\static_resource\\apns.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "GofLOnz9FqY1YFgu",
