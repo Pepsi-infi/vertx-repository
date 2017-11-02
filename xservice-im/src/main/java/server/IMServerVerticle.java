@@ -210,8 +210,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 		eb.send(handlerID, aMsgHeader);
 
-		sendTextNotification(handlerID, clientVersion, cmd);
-		sendAd(handlerID, clientVersion, cmd);
+//		sendTextNotification(handlerID, clientVersion, cmd);
+//		sendAd(handlerID, clientVersion, cmd);
 	}
 
 	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
