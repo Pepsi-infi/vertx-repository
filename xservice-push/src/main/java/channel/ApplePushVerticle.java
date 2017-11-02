@@ -1,9 +1,6 @@
 package channel;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 import com.dbay.apns4j.IApnsService;
@@ -57,10 +54,10 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 	private void initApnsConfig() {
 
 		String keyStorePwd = config.getString("push.apns.keyStorePwd");
-		// String keyStorePath = config.getString("push.apns.keyStorePath");		
+		// String keyStorePath = config.getString("push.apns.keyStorePath");
 
 		boolean devEnv = false;
-		
+
 		InputStream is = null;
 
 		if ("dev".equals(PushConsts.ENV_PATH)) {
@@ -77,16 +74,16 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			devEnv = false;
 			is = this.getClass().getResourceAsStream("/prod/apns.p12");
 		}
-		
-		if(is==null){
+
+		if (is == null) {
 			logger.error("apns初始化失败 inputstream is null");
 			return;
 		}
-		
+
 		if (apnsService == null) {
 			try {
 				ApnsConfig config = new ApnsConfig();
-				//InputStream is = new FileInputStream(new File(keyStorePath));
+				// InputStream is = new FileInputStream(new File(keyStorePath));
 				config.setKeyStore(is);
 				config.setDevEnv(devEnv);
 				config.setPassword(keyStorePwd);
@@ -96,7 +93,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 				logger.error("apns推送初始化失败", e);
 			}
 		}
-		
+
 		logger.info("apns初始化成功");
 
 		// String keyStorePwd = config.getString("push.apns.keyStorePwd");
