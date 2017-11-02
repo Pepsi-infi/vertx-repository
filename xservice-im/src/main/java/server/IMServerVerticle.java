@@ -86,7 +86,14 @@ public class IMServerVerticle extends BaseServiceVerticle {
 							logger.info("imMessage header, headerLength={}clientVersion={}cmd={}bodyLength={}",
 									headerLength, clientVersion, cmd, bodyLength);
 
-							parser.fixedSizeMode(bodyLength);
+							if (bodyLength != 0) {
+								parser.fixedSizeMode(bodyLength);
+							} else {
+								parser.fixedSizeMode(MessageBuilder.HEADER_LENGTH);
+								bodyLength = -1;
+
+								heartBeat(handlerID, clientVersion, cmd);
+							}
 						} else {
 							SQIMBody imMessage = Json.decodeValue(buffer, SQIMBody.class);
 							logger.info("imMessage body={}", imMessage.toString());
