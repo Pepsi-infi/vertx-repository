@@ -36,7 +36,7 @@ public class Tester {
 		// System.out.print(b);
 		// }
 
-//		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(RestIMVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 		vertx.deployVerticle(IMConsistentHashingVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 		
 		// vertx.deployVerticle(QuickPhraseVerticle.class.getName(), new
