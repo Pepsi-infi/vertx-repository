@@ -273,6 +273,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 								if(!jsonArray.isEmpty()){
 									userQuickPhrase.addAll(jsonArray);
 								}
+								logger.info("getQuickPhrase success");
+							}else{
+								logger.error("getQuickPhrase failed={}",confRes.cause().getMessage());
 							}
 							httpResp.put("data", userQuickPhrase);
 							httpResp.put("msg", "成功");
