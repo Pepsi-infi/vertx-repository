@@ -12,7 +12,7 @@
     "PUSH_MSG_PORT":8989,
     "APNS_PWD":"01zhuanche",
     "APNS_URL":"api.development.push.apple.com",
-    "APNS_KEY_PATH":"dev/apns_developer.p12"
+    "APNS_KEY_PATH":"dev/apns_developer.p12",
     "push.apns.keyStorePwd":"01zhuanche",
     "push.apns.keyStorePath":"D:\\DevKit\\static_resource\\apns_developer.p12"
   },
