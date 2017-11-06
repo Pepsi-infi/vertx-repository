@@ -33,10 +33,10 @@ public class SocketSessionVerticle extends AbstractVerticle {
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(256, MemoryUnit.MB)))
 				.withCache("sessionReverse",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(256, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
