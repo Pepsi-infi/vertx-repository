@@ -64,7 +64,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());
 
-		NetServerOptions options = new NetServerOptions().setPort(8088);
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("tcp.port"));
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(new Handler<NetSocket>() {

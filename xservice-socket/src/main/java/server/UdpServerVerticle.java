@@ -33,7 +33,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 		innerIP = IPUtil.getInnerIP();
 
 		DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		socket.listen(9099, innerIP, asyncResult -> {
+		socket.listen(config().getInteger("udp.port"), innerIP, asyncResult -> {
 			if (asyncResult.succeeded()) {
 				logger.info("UDP listening...");
 				socket.handler(packet -> {
