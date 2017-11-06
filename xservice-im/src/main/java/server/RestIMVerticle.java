@@ -26,7 +26,6 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import module.hash.IMConsistentHashingVerticle;
-import module.health.HealthCheckHandler;
 import module.quickphrase.QuickPhraseVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -259,6 +258,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
 					JsonArray userQuickPhrase = res.result().body().getJsonArray("result");
+					//如果用户配置的快捷短语少于10条，则用快捷短语模板补充
 					if (userQuickPhrase.size() < 10) {
 						DeliveryOptions cOption = new DeliveryOptions();
 						cOption.setSendTimeout(3000);
@@ -268,18 +268,22 @@ public class RestIMVerticle extends RestAPIVerticle {
 						cMsg.put("type", identity);
 						eb.send(EventbusAddressConstant.quick_phrase_config_verticle, cMsg, cOption, confRes -> {
 							if (confRes.succeeded()) {
-							} else {
-
+								JsonObject replyMsg = (JsonObject) confRes.result().body();
+								JsonArray jsonArray = replyMsg.getJsonArray("result");
+								if(!jsonArray.isEmpty()){
+									userQuickPhrase.addAll(jsonArray);
+								}
 							}
+							httpResp.put("data", userQuickPhrase);
+							httpResp.put("msg", "成功");
+
+							logger.info("getQuickPhrase, result={}", res.result().body().encode());
+
+							context.response().putHeader("content-type", "application/json; charset=utf-8")
+									.end(httpResp.encode());
 						});
 					}
-					httpResp.put("data", res.result().body().getJsonArray("result"));
-					httpResp.put("msg", "成功");
 
-					logger.info("getQuickPhrase, result={}", res.result().body().encode());
-
-					context.response().putHeader("content-type", "application/json; charset=utf-8")
-							.end(httpResp.encode());
 				} else {
 					httpResp.put("code", 1);
 					httpResp.put("msg", res.cause().getMessage());
