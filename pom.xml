@@ -15,6 +15,7 @@
 		<module>xservice-socket</module>
 		<module>xservice-file</module>
 		<module>xservice-config</module>
+		<module>xservice-proxy</module>
 	</modules>
 
 	<!-- 配置变量 -->
