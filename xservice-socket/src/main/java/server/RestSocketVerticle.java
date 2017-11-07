@@ -63,7 +63,11 @@ public class RestSocketVerticle extends RestAPIVerticle {
 				if (reply.succeeded()) {
 					result.put("code", 0);
 					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.result().body());
+					result.put("data", reply.result().body() + ":" + config().getInteger("tcp.port"));
+
+					logger.info("getSocketHost, userId={}node={}", userId,
+							reply.result().body() + ":" + config().getInteger("tcp.port"));
+
 					context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
 				} else {
 					result.put("code", 500);
