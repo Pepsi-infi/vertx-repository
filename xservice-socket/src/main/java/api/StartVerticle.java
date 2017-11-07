@@ -8,6 +8,7 @@ import server.MessageSendVerticle;
 import server.RestSocketVerticle;
 import server.SocketServerVerticle;
 import server.UdpServerVerticle;
+import tp.impl.DriverTpServiceImpl;
 import tp.impl.PassengerTpServiceImpl;
 
 public class StartVerticle extends AbstractVerticle {
@@ -18,6 +19,7 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(SocketServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(PassengerTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(DriverTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(MessageSendVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(RestSocketVerticle.class.getName(), readBossOpts().setConfig(config()));
