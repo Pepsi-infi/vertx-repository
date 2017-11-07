@@ -28,7 +28,8 @@ import io.vertx.core.parsetools.RecordParser;
 import io.vertx.rxjava.core.Future;
 import logic.impl.SocketSessionVerticle;
 import socket.heartbeat.HeartBeat;
-import tp.TpService;
+import tp.DriverTpService;
+import tp.PassengerTpService;
 import util.ByteUtil;
 import utils.IPUtil;
 import xservice.BaseServiceVerticle;
@@ -39,11 +40,14 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 	private EventBus eb;
 
-	private TpService tpService;
+	private PassengerTpService pTpService;
+	private DriverTpService dTpService;
 
 	private String innerIP;
 
 	private Map<String, String> ipMap = new HashMap<String, String>();
+
+	private String serverType;
 
 	@Override
 	public void start() throws Exception {
@@ -57,8 +61,11 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 			ipMap.put(node.getString("innerIP"), node.getString("node"));
 		}
 
+		serverType = config().getString("socket.server.type");
+
 		eb = vertx.eventBus();
-		tpService = TpService.createProxy(vertx);
+		pTpService = PassengerTpService.createProxy(vertx);
+		dTpService = DriverTpService.createProxy(vertx);
 		innerIP = IPUtil.getInnerIP();
 
 		publishSocketService(SocketServerVerticle.class.getName(), innerIP, config().getString("socket.server.type"),
@@ -198,13 +205,23 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					}
 				}
 
-				tpService.updateOnlineState(uid, date, data, result -> {
-					if (result.succeeded()) {
-						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
-					} else {
-						logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
-					}
-				});
+				if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+					dTpService.updateOnlineState(uid, date, data, result -> {
+						if (result.succeeded()) {
+							logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
+						} else {
+							logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
+						}
+					});
+				} else {
+					pTpService.updateOnlineState(uid, date, data, result -> {
+						if (result.succeeded()) {
+							logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
+						} else {
+							logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
+						}
+					});
+				}
 			} else {
 				// TODO
 			}
@@ -245,13 +262,24 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 						}
 					}
 
-					tpService.updateOnlineSimple(uid, date, data, result -> {
-						if (result.succeeded()) {
-							logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
-						} else {
-							logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
-						}
-					});
+					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+						dTpService.updateOnlineSimple(uid, date, data, result -> {
+							if (result.succeeded()) {
+								logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
+							} else {
+								logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
+							}
+						});
+					} else {
+						pTpService.updateOnlineSimple(uid, date, data, result -> {
+							if (result.succeeded()) {
+								logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
+							} else {
+								logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
+							}
+						});
+					}
+
 				}
 			} else {
 				// TODO
@@ -383,7 +411,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		JsonObject message = new JsonObject();
 		message.put("userId", userId);
 		if (StringUtils.isNotEmpty(userId)) {
-			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, chFuture.completer());
+			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option,
+					chFuture.completer());
 		} else {
 
 		}
@@ -416,13 +445,24 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		param.put("mid", mid);
 		param.put("cid", cid);
 		param.put("ver", version);
-		tpService.auth(param, res -> {
-			if (res.succeeded()) {
-				logger.info("Auth " + res.result());
-			} else {
-				logger.error("Auth " + res.cause());
-			}
-		});
+
+		if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+			dTpService.auth(param, res -> {
+				if (res.succeeded()) {
+					logger.info("Auth " + res.result());
+				} else {
+					logger.error("Auth " + res.cause());
+				}
+			});
+		} else {
+			pTpService.auth(param, res -> {
+				if (res.succeeded()) {
+					logger.info("Auth " + res.result());
+				} else {
+					logger.error("Auth " + res.cause());
+				}
+			});
+		}
 
 		JsonObject message = new JsonObject();
 		message.put("cmd", 54);
@@ -469,13 +509,24 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	private void setClientOnline(String userId) {
 		JsonObject clientOnlineParam = new JsonObject();
 		clientOnlineParam.put("userId", userId);
-		tpService.setClientOnline(clientOnlineParam, result -> {
-			if (result.succeeded()) {
-				logger.info("setClientOnline, result={}", result.result());
-			} else {
-				logger.error("setClientOnline, e={}", result.cause().getMessage());
-			}
-		});
+
+		if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+			dTpService.setClientOnline(clientOnlineParam, result -> {
+				if (result.succeeded()) {
+					logger.info("setClientOnline, result={}", result.result());
+				} else {
+					logger.error("setClientOnline, e={}", result.cause().getMessage());
+				}
+			});
+		} else {
+			pTpService.setClientOnline(clientOnlineParam, result -> {
+				if (result.succeeded()) {
+					logger.info("setClientOnline, result={}", result.result());
+				} else {
+					logger.error("setClientOnline, e={}", result.cause().getMessage());
+				}
+			});
+		}
 	}
 
 	private void setClientOffline(String handlerID) {
@@ -493,13 +544,24 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 				JsonObject clientOfflineParam = new JsonObject();
 				clientOfflineParam.put("userId", uid);
-				tpService.setClientOffline(clientOfflineParam, r -> {
-					if (r.succeeded()) {
-						logger.info("setClientOffline, result={}", r.result());
-					} else {
-						logger.error("setClientOffline, e={}", r.cause());
-					}
-				});
+
+				if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+					dTpService.setClientOffline(clientOfflineParam, r -> {
+						if (r.succeeded()) {
+							logger.info("setClientOffline, result={}", r.result());
+						} else {
+							logger.error("setClientOffline, e={}", r.cause());
+						}
+					});
+				} else {
+					pTpService.setClientOffline(clientOfflineParam, r -> {
+						if (r.succeeded()) {
+							logger.info("setClientOffline, result={}", r.result());
+						} else {
+							logger.error("setClientOffline, e={}", r.cause());
+						}
+					});
+				}
 			} else {
 				// TODO
 			}
@@ -525,14 +587,26 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
-					tpService.subscribe(subscribeParam, r -> {
-						if (r.succeeded()) {
-							logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
-						} else {
-							logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
-									r.cause().getMessage());
-						}
-					});
+
+					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+						dTpService.subscribe(subscribeParam, r -> {
+							if (r.succeeded()) {
+								logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
+							} else {
+								logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
+										r.cause().getMessage());
+							}
+						});
+					} else {
+						pTpService.subscribe(subscribeParam, r -> {
+							if (r.succeeded()) {
+								logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
+							} else {
+								logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
+										r.cause().getMessage());
+							}
+						});
+					}
 				}
 			} else {
 				// TODO
@@ -559,14 +633,28 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
-					tpService.unsubscribe(subscribeParam, r -> {
-						if (r.succeeded()) {
-							logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
-						} else {
-							logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
-									r.cause().getMessage());
-						}
-					});
+
+					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+						dTpService.unsubscribe(subscribeParam, r -> {
+							if (r.succeeded()) {
+								logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid,
+										r.result());
+							} else {
+								logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+										r.cause().getMessage());
+							}
+						});
+					} else {
+						pTpService.unsubscribe(subscribeParam, r -> {
+							if (r.succeeded()) {
+								logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid,
+										r.result());
+							} else {
+								logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+										r.cause().getMessage());
+							}
+						});
+					}
 				}
 			} else {
 				// TODO

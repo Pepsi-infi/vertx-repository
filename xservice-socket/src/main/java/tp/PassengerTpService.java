@@ -11,14 +11,14 @@ import io.vertx.serviceproxy.ProxyHelper;
 
 @ProxyGen
 @VertxGen
-public interface TpService {
+public interface PassengerTpService {
 
-	static final String SERVICE_NAME = TpService.class.getName();
+	static final String SERVICE_NAME = PassengerTpService.class.getName();
 
-	static final String SERVICE_ADDRESS = TpService.class.getName();
+	static final String SERVICE_ADDRESS = PassengerTpService.class.getName();
 
-	static TpService createProxy(Vertx vertx) {
-		return ProxyHelper.createProxy(TpService.class, vertx, SERVICE_ADDRESS,
+	static PassengerTpService createProxy(Vertx vertx) {
+		return ProxyHelper.createProxy(PassengerTpService.class, vertx, SERVICE_ADDRESS,
 				new DeliveryOptions().setSendTimeout(2000));
 	}
 

@@ -65,8 +65,8 @@ public class UdpServerVerticle extends AbstractVerticle {
 							JsonObject message = new JsonObject();
 							message.put("userId", userId);
 							if (StringUtils.isNotEmpty(userId)) {
-								eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option,
-										chFuture.completer());
+								eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message,
+										option, chFuture.completer());
 							} else {
 
 							}
@@ -76,13 +76,13 @@ public class UdpServerVerticle extends AbstractVerticle {
 							chFuture.setHandler(res -> {
 								if (res.succeeded()) {
 									JsonObject jsonRes = res.result().body();
-									String innerIP = jsonRes.getString("host");
+									String hostIP = jsonRes.getString("host");
 
 									DeliveryOptions msOption = new DeliveryOptions();
 									msOption.setSendTimeout(3000);
 									msOption.addHeader("action", "sendMsg");
 
-									logger.info("UDP userId={}innerIP={}", userId, innerIP);
+									logger.info("UDP userId={}innerIP={}", userId, hostIP);
 
 									JsonObject data = JsonObject.mapFrom(msgBody.get(3));
 
@@ -94,7 +94,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 									param.put("userId", userId);
 									param.put("msg", msg2Send);
 
-									eb.<JsonObject>send(MessageSendVerticle.class.getName() + innerIP, param, msOption,
+									eb.<JsonObject>send(MessageSendVerticle.class.getName() + hostIP, param, msOption,
 											ssFuture.completer());
 
 								} else {

@@ -24,11 +24,14 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 	private static final String ENCODE = "utf-8";
 
+	private String innerIP;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		eb = vertx.eventBus();
+		innerIP = IPUtil.getInnerIP();
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
@@ -60,7 +63,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		JsonObject message = new JsonObject();
 		message.put("userId", userId);
 		if (StringUtils.isNotEmpty(userId)) {
-			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, reply -> {
+			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option, reply -> {
 				if (reply.succeeded()) {
 					result.put("code", 0);
 					result.put("time", System.currentTimeMillis());

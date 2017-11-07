@@ -18,11 +18,11 @@ import io.vertx.rxjava.ext.web.client.HttpResponse;
 import io.vertx.rxjava.ext.web.client.WebClient;
 import io.vertx.rxjava.ext.web.codec.BodyCodec;
 import rx.Single;
-import tp.TpService;
+import tp.PassengerTpService;
 
-public class TpServiceImpl extends AbstractVerticle implements TpService {
+public class PassengerTpServiceImpl extends AbstractVerticle implements PassengerTpService {
 
-	private static final Logger logger = LoggerFactory.getLogger(TpServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(PassengerTpServiceImpl.class);
 
 	private CircuitBreaker circuitBreaker;
 
@@ -40,7 +40,7 @@ public class TpServiceImpl extends AbstractVerticle implements TpService {
 
 		webClient = WebClient.create(vertx);
 
-		XProxyHelper.registerService(TpService.class, vertx.getDelegate(), this, TpService.SERVICE_ADDRESS);
+		XProxyHelper.registerService(PassengerTpService.class, vertx.getDelegate(), this, PassengerTpService.SERVICE_ADDRESS);
 
 		CAR_API_HOST = config().getString("car-api-host");
 		CAR_API_PORT = config().getInteger("car-api-port");

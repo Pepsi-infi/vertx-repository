@@ -17,6 +17,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.servicediscovery.Record;
+import utils.IPUtil;
 import xservice.BaseServiceVerticle;
 
 public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
@@ -39,9 +40,13 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private EventBus eb;
 
+	private String innerIP;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
+
+		innerIP = IPUtil.getInnerIP();
 
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
@@ -58,7 +63,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		});
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {
