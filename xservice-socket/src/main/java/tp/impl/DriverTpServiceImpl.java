@@ -91,6 +91,7 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 
 	@Override
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
+		logger.info("updateOnlineSimple, uid={}content={}", uid, content.encode());
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);

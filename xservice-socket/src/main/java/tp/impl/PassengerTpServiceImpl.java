@@ -40,7 +40,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 
 		webClient = WebClient.create(vertx);
 
-		XProxyHelper.registerService(PassengerTpService.class, vertx.getDelegate(), this, PassengerTpService.SERVICE_ADDRESS);
+		XProxyHelper.registerService(PassengerTpService.class, vertx.getDelegate(), this,
+				PassengerTpService.SERVICE_ADDRESS);
 
 		CAR_API_HOST = config().getString("car-api-host");
 		CAR_API_PORT = config().getInteger("car-api-port");
@@ -92,6 +93,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 
 	@Override
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
+		logger.info("updateOnlineSimple, uid={}content={}", uid, content.encode());
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
