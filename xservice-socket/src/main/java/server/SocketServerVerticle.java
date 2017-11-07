@@ -352,8 +352,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				.appendString("Date: Thu, 07 Sep 2017 08:34:45 GMT").appendString("Content-Type: text/x-live-message")
 				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate");
 
-		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.getBytes().length)).appendBuffer(response)
-				.appendString("\r\n\r\n");// Android司机端代码判断是否包含 13101301
+		Buffer bf = response.appendString("\r\n\r\n");// Android司机端代码判断是否包含 13101301
 
 		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf.getBytes().toString());
 
