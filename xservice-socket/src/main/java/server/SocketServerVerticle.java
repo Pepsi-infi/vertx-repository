@@ -100,9 +100,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 
-							if (paramMap.get("mid").equalsIgnoreCase("iphone")) {
-								// sendValidateOK(handlerID);
-							}
+							sendValidateOK(handlerID);
 
 							String userId = paramMap.get("user");
 							cHash(socket.localAddress().host(), userId, handlerID);
