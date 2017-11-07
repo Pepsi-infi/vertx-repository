@@ -19,7 +19,7 @@ public interface DriverTpService {
 
 	static DriverTpService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(DriverTpService.class, vertx, SERVICE_ADDRESS,
-				new DeliveryOptions().setSendTimeout(5000));
+				new DeliveryOptions().setSendTimeout(3000));
 	}
 
 	void auth(JsonObject param, Handler<AsyncResult<String>> result);

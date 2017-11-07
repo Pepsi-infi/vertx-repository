@@ -496,7 +496,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 		JsonObject data = new JsonObject();
 		data.put("ping", "ok");
-		data.put("speed", "3000");
+		data.put("speed", "10000");
 
 		message.put("data", data);
 

@@ -92,10 +92,6 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 			if (result.succeeded()) {
 				List<Record> records = result.result();
 
-				records.forEach(r -> {
-					logger.info("getNodesFromDiscovery={}", r.toJson().encode());
-				});
-
 				List<Record> innerIpList = sortInnerIpAddress(records);
 				for (Record r : innerIpList) {
 					String innerIP = r.getMetadata().getString("innerIP");
@@ -111,9 +107,6 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 						realSocketNodes.add(publicAddress);
 					}
 				}
-
-				logger.info("realSocketNodes={}realInnerNodes={}", realSocketNodes.toString(),
-						realInnerNodes.toString());
 			}
 		});
 	}

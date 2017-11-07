@@ -50,7 +50,7 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 		JsonObject cbOptions = circuitObject != null ? circuitObject : new JsonObject();
 		CircuitBreakerOptions options = new CircuitBreakerOptions();
 		options.setMaxFailures(cbOptions.getInteger("max-failures", 3));
-		options.setTimeout(cbOptions.getLong("timeout", 3000L));
+		options.setTimeout(cbOptions.getLong("timeout", 5000L));
 		options.setFallbackOnFailure(true);
 		options.setResetTimeout(cbOptions.getLong("reset-timeout", 30000L));
 		String name = cbOptions.getString("name", "circuit-breaker");
@@ -91,7 +91,6 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 
 	@Override
 	public void updateOnlineSimple(String uid, String date, JsonObject content, Handler<AsyncResult<String>> result) {
-		logger.info("updateOnlineSimple, uid={}content={}", uid, content.encode());
 		circuitBreaker.<String>execute(future -> {
 			MultiMap form = MultiMap.caseInsensitiveMultiMap();
 			form.add("uid", uid);
@@ -101,8 +100,6 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/chat/updateSimpleOnlineState/")
 					.as(BodyCodec.string()).rxSendForm(form);
-			logger.info("updateOnlineSimple, {}",
-					CAR_API_HOST + CAR_API_PORT + "/webservice/chat/updateSimpleOnlineState/");
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid,
@@ -116,10 +113,10 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 				}
 			});
 		}).setHandler(ar -> {
-			logger.info("updateOnlineSimple, result={}", ar.result() + ar.cause().getMessage());
 			if (ar.succeeded()) {
 				result.handle(Future.succeededFuture(ar.result()));
 			} else {
+				logger.error("updateOnlineSimple, result={}", ar.cause().toString());
 				result.handle(Future.succeededFuture(null));
 			}
 		});
