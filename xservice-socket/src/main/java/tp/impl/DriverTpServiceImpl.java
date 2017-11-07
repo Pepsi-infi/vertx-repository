@@ -116,6 +116,7 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 				}
 			});
 		}).setHandler(ar -> {
+			logger.info("updateOnlineSimple, result={}", ar.result() + ar.cause().getMessage());
 			if (ar.succeeded()) {
 				result.handle(Future.succeededFuture(ar.result()));
 			} else {
