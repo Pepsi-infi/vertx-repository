@@ -353,7 +353,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				.appendString("Connection: keep-alive").appendString("Cache-Control: no-cache, must-revalidate");
 
 		Buffer bf = Buffer.buffer(ByteUtil.intToBytes(response.getBytes().length)).appendBuffer(response)
-				.appendString("\r\n");
+				.appendString("\r\n\r\n");// Android司机端代码判断是否包含 13101301
 
 		logger.info("sendValidateOK, handlerID={} bf={}", handlerID, bf.getBytes().toString());
 
