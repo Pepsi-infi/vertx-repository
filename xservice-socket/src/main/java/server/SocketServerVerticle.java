@@ -49,6 +49,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	public void start() throws Exception {
 		super.start();
 
+		logger.info("config={}", config().encode());
+
 		JsonArray socketNodes = config().getJsonArray("socket");
 		for (Object object : socketNodes) {
 			JsonObject node = JsonObject.mapFrom(object);
