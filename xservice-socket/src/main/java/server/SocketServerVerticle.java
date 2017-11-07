@@ -61,7 +61,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		tpService = TpService.createProxy(vertx);
 		innerIP = IPUtil.getInnerIP();
 
-		publishSocketService(SocketServerVerticle.class.getName(), innerIP,
+		publishSocketService(SocketServerVerticle.class.getName(), innerIP, config().getString("socket.server.type"),
 				new JsonObject().put("publicAddress", ipMap.get(innerIP)).put("innerIP", innerIP));
 
 		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());

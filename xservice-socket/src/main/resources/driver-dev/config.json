@@ -1,6 +1,7 @@
 {
 	"tcp.port": 8088,
 	"udp.port": 9098,
+	"socket.server.type": "driver-socket-server",
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
 	"updateOnlineState": "/webservice/chat/updateOnlineState/",

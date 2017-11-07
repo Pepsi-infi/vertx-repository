@@ -82,7 +82,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	}
 
 	private void getNodesFromDiscovery() {
-		JsonObject filter = new JsonObject().put("type", "socket-server");
+		JsonObject filter = new JsonObject().put("type", config().getString("socket.server.type"));
 		discovery.getRecords(filter, result -> {
 			if (result.succeeded()) {
 				List<Record> records = result.result();
