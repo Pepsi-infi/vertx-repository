@@ -1,6 +1,6 @@
 {
 	"tcp.port": 8088,
-	"udp.port": 9098,
+	"udp.port": 9099,
 	"socket.server.type": "driver-socket-server",
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
