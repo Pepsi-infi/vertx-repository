@@ -1,4 +1,5 @@
 {
+	"tcp.port": 8088,
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
 	"updateOnlineState": "/webservice/chat/updateOnlineState/",
@@ -6,5 +7,15 @@
 	"subscribe": "/webservice/chat/userMsgSubscribe/",
 	"unsubscribe": "/webservice/chat/userMsgUnsubscribe/",
 	"setClientOnline": "/webservice/chat/setclientonline/",
-	"setClientOffline": "/webservice/chat/setClientOffline/"
+	"setClientOffline": "/webservice/chat/setClientOffline/",
+	"socket": [
+		{
+			"innerIP": "10.10.10.102",
+			"node": "111.206.162.233"
+		},
+		{
+			"innerIP": "10.10.10.103",
+			"node": "111.206.162.234"
+		}
+	]
 }
