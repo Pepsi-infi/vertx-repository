@@ -194,9 +194,9 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			result.put("host", virtualNodes.firstEntry().getValue());
+			result.put("host", virtualNodes.firstEntry().getValue() + ":" + config().getInteger("tcp.port"));
 		} else {
-			result.put("host", en.getValue());
+			result.put("host", en.getValue() + ":" + config().getInteger("tcp.port"));
 		}
 
 		return result;

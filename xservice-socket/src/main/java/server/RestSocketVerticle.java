@@ -49,6 +49,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	private void getSocketHost(RoutingContext context) {
 
 		String userId = context.request().params().get("userId");
+		String identity = context.request().params().get("identity");
 
 		JsonObject result = new JsonObject();
 
@@ -63,10 +64,11 @@ public class RestSocketVerticle extends RestAPIVerticle {
 				if (reply.succeeded()) {
 					result.put("code", 0);
 					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.result().body() + ":" + config().getInteger("tcp.port"));
+					// TODO
+					// result.put("data", reply.result().body());
+					result.put("data", "111.206.162.232:8088");
 
-					logger.info("getSocketHost, userId={}node={}", userId,
-							reply.result().body() + ":" + config().getInteger("tcp.port"));
+					logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
 
 					context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
 				} else {
