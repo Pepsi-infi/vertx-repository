@@ -11,12 +11,12 @@
 	"setClientOffline": "/webservice/chat/setClientOffline/",
 	"socket": [
 		{
-			"innerIP": "10.10.10.102",
-			"node": "111.206.162.233"
+			"innerIP": "10.10.10.105",
+			"node": "111.206.162.232"
 		},
 		{
-			"innerIP": "10.10.10.103",
-			"node": "111.206.162.234"
+			"innerIP": "10.10.10.106",
+			"node": "111.206.162.235"
 		}
 	]
 }
