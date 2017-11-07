@@ -19,7 +19,7 @@ public interface PassengerTpService {
 
 	static PassengerTpService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(PassengerTpService.class, vertx, SERVICE_ADDRESS,
-				new DeliveryOptions().setSendTimeout(2000));
+				new DeliveryOptions().setSendTimeout(5000));
 	}
 
 	void auth(JsonObject param, Handler<AsyncResult<String>> result);

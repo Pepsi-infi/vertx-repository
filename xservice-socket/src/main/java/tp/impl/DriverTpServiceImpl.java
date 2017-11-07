@@ -101,6 +101,8 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 			Single<HttpResponse<String>> httpRequest = webClient
 					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/chat/updateSimpleOnlineState/")
 					.as(BodyCodec.string()).rxSendForm(form);
+			logger.info("updateOnlineSimple, {}",
+					CAR_API_HOST + CAR_API_PORT + "/webservice/chat/updateSimpleOnlineState/");
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid,
