@@ -14,7 +14,7 @@
     "APNS_URL":"api.development.push.apple.com",
     "APNS_KEY_PATH":"dev/apns_developer.p12",
     "push.apns.keyStorePwd":"01zhuanche",
-    "push.apns.keyStorePath":"D:\\DevKit\\static_resource\\apns_developer.p12"
+    "push.apns.keyStorePath":"dev/apns.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",

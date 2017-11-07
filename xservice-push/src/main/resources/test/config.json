@@ -11,7 +11,7 @@
     "PUSH_MSG_NO_ADVER_URL":"/mc-push/meesage-nonAdver/push.json",
     "PUSH_MSG_PORT":8989,
     "push.apns.keyStorePwd":"01zhuanche",
-    "push.apns.keyStorePath":"D:\\DevKit\\static_resource\\apns_developer.p12"
+    "push.apns.keyStorePath":"test/apns_developer.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",

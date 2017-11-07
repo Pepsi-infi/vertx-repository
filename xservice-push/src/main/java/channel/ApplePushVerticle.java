@@ -1,6 +1,9 @@
 package channel;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import com.dbay.apns4j.IApnsService;
@@ -54,26 +57,26 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 	private void initApnsConfig() {
 
 		String keyStorePwd = config.getString("push.apns.keyStorePwd");
-		// String keyStorePath = config.getString("push.apns.keyStorePath");
-
+		String keyStorePath = config.getString("push.apns.keyStorePath");
+		
 		boolean devEnv = false;
 
-		InputStream is = null;
+		InputStream is = this.getClass().getClassLoader().getResourceAsStream(keyStorePath);
 
-		if ("dev".equals(PushConsts.ENV_PATH)) {
-			devEnv = true;
-			is = this.getClass().getResourceAsStream("/dev/apns_developer.p12");
-		}
-
-		if ("test".equals(PushConsts.ENV_PATH)) {
-			devEnv = true;
-			is = this.getClass().getResourceAsStream("/test/apns_developer.p12");
-		}
-
-		if ("prod".equals(PushConsts.ENV_PATH)) {
-			devEnv = false;
-			is = this.getClass().getResourceAsStream("/prod/apns.p12");
-		}
+//		if ("dev".equals(PushConsts.ENV_PATH)) {
+//			devEnv = true;
+//			is = this.getClass().getResourceAsStream("/dev/apns.p12");
+//		}
+//
+//		if ("test".equals(PushConsts.ENV_PATH)) {
+//			devEnv = true;
+//			is = this.getClass().getResourceAsStream("/test/apns_developer.p12");
+//		}
+//
+//		if ("prod".equals(PushConsts.ENV_PATH)) {
+//			devEnv = false;
+//			is = this.getClass().getResourceAsStream("/prod/apns.p12");
+//		}
 
 		if (is == null) {
 			logger.error("apns初始化失败 inputstream is null");
@@ -83,7 +86,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		if (apnsService == null) {
 			try {
 				ApnsConfig config = new ApnsConfig();
-				// InputStream is = new FileInputStream(new File(keyStorePath));
+//				is = new FileInputStream(new File(keyStorePath));
 				config.setKeyStore(is);
 				config.setDevEnv(devEnv);
 				config.setPassword(keyStorePwd);
