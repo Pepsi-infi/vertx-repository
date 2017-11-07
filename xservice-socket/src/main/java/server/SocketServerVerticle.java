@@ -27,7 +27,7 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.parsetools.RecordParser;
 import io.vertx.rxjava.core.Future;
 import logic.impl.SocketSessionVerticle;
-import test.HeartBeat;
+import socket.heartbeat.HeartBeat;
 import tp.TpService;
 import util.ByteUtil;
 import utils.IPUtil;
