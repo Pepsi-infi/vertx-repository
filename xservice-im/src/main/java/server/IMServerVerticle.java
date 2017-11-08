@@ -42,6 +42,9 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private String innerIP;
 	private Map<String, String> ipMap = new HashMap<String, String>();
 
+	//TCP连接保活时间2个小时
+	private static final int KEEP_ALIVE_TIME_SECONDS = 7200;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -58,7 +61,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
 
-		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"));
+		NetServerOptions options = new NetServerOptions().setPort(4321);
+		options.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
 		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
@@ -68,6 +72,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 			@Override
 			public void handle(NetSocket event) {
+
 				String handlerID = event.writeHandlerID();
 
 				final RecordParser parser = RecordParser.newFixed(MessageBuilder.HEADER_LENGTH, null);
@@ -159,6 +164,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				event.handler(parser);
 				event.closeHandler(v -> {
 					socketClose(handlerID);
+					event.close();
 				});
 				event.exceptionHandler(t -> {
 					socketClose(handlerID);
