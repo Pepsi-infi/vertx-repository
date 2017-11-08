@@ -28,6 +28,7 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 		innerIP = IPUtil.getInnerIP();
 		updPort = config().getInteger("udp.port");
 		oldUDPServer = new ArrayList<String>();
+		newUDPServer = new ArrayList<String>();
 		count = 0;
 
 		logger.info("config={}", config().encode());
