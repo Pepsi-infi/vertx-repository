@@ -9,7 +9,7 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 
 		// Just one instance because of port conflicts.
-		vertx.deployVerticle(UdpProxyServerVerticle.class.getName());
+		vertx.deployVerticle(UdpProxyServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {

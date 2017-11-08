@@ -1,5 +1,8 @@
 package proxy.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
@@ -13,23 +16,49 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 
 	private String innerIP;
 
+	private int updPort;
+
+	private List<String> oldUDPServer;
+	private List<String> newUDPServer;
+
+	private int count;
+
 	@Override
 	public void start() throws Exception {
 		innerIP = IPUtil.getInnerIP();
+		updPort = config().getInteger("udp.port");
+		oldUDPServer = new ArrayList<String>();
+		count = 0;
 
-		DatagramSocket sender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
+		logger.info("config={}", config().encode());
+
+		oldUDPServer.addAll(config().getJsonArray("udp.server").getList());
+		newUDPServer.addAll(config().getJsonArray("new.udp.server").getList());
+
+		DatagramSocket oldSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
+		DatagramSocket newSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 
 		DatagramSocket receiver = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		receiver.listen(9099, innerIP, asyncResult -> {
+		receiver.listen(updPort, innerIP, asyncResult -> {
 			if (asyncResult.succeeded()) {
 				logger.info("UDP listening...");
 				receiver.handler(packet -> {
+					count++;
 					logger.info("UDP packet " + packet.data());
-					sender.send(packet.data(), 9, "", handler -> {
-						if (handler.succeeded()) {
+					oldSender.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count % oldUDPServer.size())),
+							handler -> {
+								if (handler.succeeded()) {
+
+								} else {
+									logger.error(handler.cause().getMessage());
+								}
+							});
+
+					newSender.send(packet.data(), 9099, newUDPServer.get(Math.abs(count % newUDPServer.size())), r -> {
+						if (r.succeeded()) {
 
 						} else {
-							logger.error(handler.cause().getMessage());
+							logger.error(r.cause().getMessage());
 						}
 					});
 				});
