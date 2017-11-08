@@ -108,12 +108,13 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 	public int setUserSocket(String userId, String handlerId) {
 		long start = System.currentTimeMillis();
-		logger.info("setUserSocket, handlerID={} userId={}", handlerId, userId);
 		this.sessionMap.put(userId, handlerId);
 		this.sessionReverse.put(handlerId, userId);
 
 		long end = System.currentTimeMillis();
-		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
+		if ((end - start) > 10) {
+			logger.warn("setUserSocket, handlerID={} userId={} waste={}", handlerId, userId, end - start);
+		}
 
 		counter++;
 		recounter++;

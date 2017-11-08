@@ -101,9 +101,6 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 								}
 							});
-
-							logger.info("UDP userId={}", userId);
-
 						} catch (Exception e2) {
 							logger.error("Get userId error ", e2);
 						}

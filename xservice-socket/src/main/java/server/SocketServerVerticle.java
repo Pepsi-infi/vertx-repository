@@ -92,8 +92,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 					@Override
 					public void handle(Buffer buffer) {
-						logger.info("buffer, handlerID={} buffer={} op={}", handlerID, buffer, op);
-
 						if (buffer.toString().startsWith("get /mobile?")
 								|| buffer.toString().contains("get /mobile?")) {
 							op = 1;
@@ -126,6 +124,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							op = 2;
 							parser.fixedSizeMode(4);
 
+							logger.info("body, handlerID={} buffer={} ", handlerID, buffer);
 							JsonObject message = buffer.toJsonObject();
 							int cmd = message.getInteger("cmd");
 							switch (cmd) {
@@ -187,7 +186,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 			if (reply.succeeded()) {
 				JsonObject res = reply.result().body();
 				String uid = res.getString("userId");
-				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
 
 				LocalDateTime now = LocalDateTime.now();
 				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
@@ -244,8 +242,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					// uid is null, relogin.
 					sendReLogin(handlerID, null);
 				} else {
-					logger.info("getUidByHandlerID, handlerID={} userId={}", handlerID, uid);
-
 					LocalDateTime now = LocalDateTime.now();
 					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 					String date = now.format(format);
@@ -265,6 +261,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
 						dTpService.updateOnlineSimple(uid, date, data, result -> {
 							if (result.succeeded()) {
+								// TODO
 								logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
 							} else {
 								logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
