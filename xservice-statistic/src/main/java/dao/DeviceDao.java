@@ -44,4 +44,6 @@ public interface DeviceDao {
 
     void queryDevices(Map<String, String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler);
 
+	void updateDeviceByDeviceId(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
+
 }

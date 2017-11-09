@@ -41,7 +41,7 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(ConfigServiceImpl.class.getName());
 		//部署APNS Verticle
-		this.deployVerticle(ApnsVerticle.class.getName());
+		//this.deployVerticle(ApnsVerticle.class.getName());
 
 		// 提供其他非EventBus服务
 	}

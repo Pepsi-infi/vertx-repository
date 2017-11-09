@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dao.DeviceDao;
 import helper.XProxyHelper;
+import io.netty.util.internal.StringUtil;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -58,8 +59,16 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 					if (dbDevice == null) {
 						deviceDao.addDevice(deviceDto, addFuture.completer());
 					} else {
-						copyDevice(dbDevice, deviceDto);
-						deviceDao.updateDevice(dbDevice, updateFuture.completer());
+
+						if (!StringUtil.isNullOrEmpty(deviceDto.getDeviceToken())) {
+							copyDevice(dbDevice, deviceDto);
+							deviceDao.updateDevice(dbDevice, updateFuture.completer());
+						} else {
+							logger.error("request params is error:deviceToken is null");
+							buildErrorBaseResponse(baseResponse, "deviceToken is null");
+							result.handle(Future.succeededFuture(baseResponse));
+						}
+
 					}
 				} else {
 					logger.error(ar1.cause());
@@ -148,5 +157,119 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 		if (null != src.getUid()) {
 			dest.setUid(src.getUid());
 		}
+		if (null != src.getDeviceId()) {
+			dest.setDeviceId(src.getDeviceId());
+		}
+	}
+
+	@Override
+	public void reportDeviceByAddDeviceId(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> result) {
+		BaseResponse baseResponse = new BaseResponse();
+		if (StringUtils.isBlank(deviceDto.getDeviceId())) {
+			logger.error("the deviceId is null");
+			buildErrorBaseResponse(baseResponse, "the deviceId is null");
+			result.handle(Future.succeededFuture(baseResponse));
+		} else {
+			Future<DeviceDto> antFingerprintFuture = Future.future();
+			Future<DeviceDto> deviceIdFuture = Future.future();
+			Map<String, String> params = Maps.newHashMap();
+			params.put("deviceId", deviceDto.getDeviceId());
+			// params.put("antFingerprint", deviceDto.getAntFingerprint());
+			deviceDao.getDevice(params, deviceIdFuture.completer());
+
+			Future<BaseResponse> addFuture = Future.future();
+			Future<BaseResponse> updateFuture = Future.future();
+
+			deviceIdFuture.setHandler(ar1 -> {
+				if (ar1.succeeded()) {
+					DeviceDto dbDevice = ar1.result();
+					if (dbDevice == null) {
+						// 按照deviceId查询数据为空，说明该条数据可能是历史数据，则按照antFingerprint再进行一次查询
+						logger.info("the device data is not exist,deviceId=" + deviceDto.getDeviceId());
+						params.remove("deviceId");
+						params.put("antFingerprint", deviceDto.getAntFingerprint());
+						deviceDao.getDevice(params, antFingerprintFuture.completer());
+
+						dealAntFingerprintFuture(antFingerprintFuture, addFuture, updateFuture, result,deviceDto,baseResponse);
+
+					} else {
+
+						if (!StringUtil.isNullOrEmpty(deviceDto.getDeviceToken())) {
+							copyDevice(dbDevice, deviceDto);
+							deviceDao.updateDeviceByDeviceId(dbDevice, updateFuture.completer());
+						} else {
+							logger.error("request params is error:deviceToken is null");
+							buildErrorBaseResponse(baseResponse, "deviceToken is null");
+							result.handle(Future.succeededFuture(baseResponse));
+						}
+
+					}
+
+				} else {
+					logger.error("query device by deviceId error:",ar1.cause());
+					buildErrorBaseResponse(baseResponse, ar1.cause().toString());
+					result.handle(Future.succeededFuture(baseResponse));
+				}
+			});
+
+			addFuture.setHandler(ar2 -> {
+				if (ar2.succeeded()) {
+					result.handle(Future.succeededFuture(baseResponse));
+				} else {
+					logger.error("add device:" + deviceDto + " to db error.", ar2.cause());
+					buildErrorBaseResponse(baseResponse, ar2.cause().toString());
+					result.handle(Future.succeededFuture(baseResponse));
+				}
+			});
+			updateFuture.setHandler(ar3 -> {
+				if (ar3.succeeded()) {
+					result.handle(Future.succeededFuture(baseResponse));
+				} else {
+					logger.error("update device:" + deviceDto + " from db error.", ar3.cause());
+					buildErrorBaseResponse(baseResponse, ar3.cause().toString());
+					result.handle(Future.succeededFuture(baseResponse));
+				}
+			});
+		}
+
+	}
+
+	private void dealAntFingerprintFuture(Future<DeviceDto> antFingerprintFuture, Future<BaseResponse> addFuture,
+			Future<BaseResponse> updateFuture, Handler<AsyncResult<BaseResponse>> result, DeviceDto deviceDto, BaseResponse baseResponse) {
+		antFingerprintFuture.setHandler(handler -> {
+			DeviceDto dbDevice = handler.result();
+			if (handler.succeeded()) {
+				if (dbDevice == null) {
+					//蚂蚁指纹查询设备结果也为空，说明设备在数据库确实不存在，执行更新操作
+					logger.info("add new device 2 db");
+					deviceDao.addDevice(deviceDto, addFuture.completer());
+				} else {
+
+					if (StringUtil.isNullOrEmpty(dbDevice.getDeviceId())) {
+						// 说明该数据是历史数据,按照蚂蚁指纹将deviceId更新到库表中
+						copyDevice(dbDevice, deviceDto);
+						deviceDao.updateDevice(dbDevice, updateFuture.completer());
+					} else {
+						// 说明已经是新的数据，按照设备deviceId对数据库表进行更新操作
+						if (!StringUtil.isNullOrEmpty(deviceDto.getDeviceToken())) {
+							copyDevice(dbDevice, deviceDto);
+							deviceDao.updateDeviceByDeviceId(dbDevice, updateFuture.completer());
+						} else {
+							logger.error("request params is error:deviceToken is null");
+							buildErrorBaseResponse(baseResponse, "deviceToken is null");
+							result.handle(Future.succeededFuture(baseResponse));
+						}
+
+					}
+
+				}
+			} else {
+				logger.error("query device by AntFingerprint error: ",handler.cause());
+				buildErrorBaseResponse(baseResponse, handler.cause().toString());
+				result.handle(Future.succeededFuture(baseResponse));
+			}
+
+		});
+
 	}
 }

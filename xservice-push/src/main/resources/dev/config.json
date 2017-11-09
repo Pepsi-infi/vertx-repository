@@ -14,7 +14,7 @@
     "APNS_URL":"api.development.push.apple.com",
     "APNS_KEY_PATH":"dev/apns_developer.p12",
     "push.apns.keyStorePwd":"01zhuanche",
-    "push.apns.keyStorePath":"dev/apns.p12"
+    "push.apns.keyStorePath":"dev/apns_developer.p12"
   },
   "redis.config": {
   	"redis.cluster.password": "lbstest",
@@ -49,7 +49,7 @@
     "tcpNoDelay": "true"
   },
   "mysql.config": {
-    "host": "10.10.10.178",
+    "host": "10.20.10.100",
     "port": 3306,
     "maxPoolSize": 100,
     "username": "sqyc_message",

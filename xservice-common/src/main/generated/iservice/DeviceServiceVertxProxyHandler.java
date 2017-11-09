@@ -154,6 +154,20 @@ public class DeviceServiceVertxProxyHandler extends ProxyHandler {
          });
           break;
         }
+        case "reportDeviceByAddDeviceId": {
+          service.reportDeviceByAddDeviceId(json.getJsonObject("userDeviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("userDeviceDto")), res -> {
+            if (res.failed()) {
+              if (res.cause() instanceof ServiceException) {
+                msg.reply(res.cause());
+              } else {
+                msg.reply(new ServiceException(-1, res.cause().getMessage()));
+              }
+            } else {
+              msg.reply(res.result() == null ? null : res.result().toJson());
+            }
+         });
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }

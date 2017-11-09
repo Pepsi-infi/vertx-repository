@@ -95,6 +95,26 @@ public class DeviceService {
     }));
   }
 
+  /**
+   * 增加设备号，按照该方式进行上报
+   * @param userDeviceDto 
+   * @param resultHandler 
+   */
+  public void reportDeviceByAddDeviceId(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.reportDeviceByAddDeviceId(userDeviceDto, resultHandler);
+  }
+
+  /**
+   * 增加设备号，按照该方式进行上报
+   * @param userDeviceDto 
+   * @return 
+   */
+  public Single<BaseResponse> rxReportDeviceByAddDeviceId(DeviceDto userDeviceDto) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      reportDeviceByAddDeviceId(userDeviceDto, fut);
+    }));
+  }
+
 
   public static  DeviceService newInstance(iservice.DeviceService arg) {
     return arg != null ? new DeviceService(arg) : null;
