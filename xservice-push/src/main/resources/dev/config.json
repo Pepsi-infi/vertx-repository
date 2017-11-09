@@ -13,12 +13,12 @@
 		"city.url": "http://10.10.10.177:8085/api/v1/region/list",
 		"provider.url": "http://10.10.10.177:8085/api/v1/common/supplier/list",
 		"UDP_HOSTS": "10.10.10.106:9099,10.10.10.105:9099",
-    	"PUSH_MSG_NO_ADVER_URL":"/mc-push/meesage-nonAdver/push.json",
-    	"APNS_PWD":"01zhuanche",
-    	"APNS_URL":"api.development.push.apple.com",
-    	"APNS_KEY_PATH":"dev/apns_developer.p12",
-    	"push.apns.keyStorePwd":"01zhuanche",
-    	"push.apns.keyStorePath":"dev/apns.p12"
+		"PUSH_MSG_NO_ADVER_URL": "/mc-push/meesage-nonAdver/push.json",
+		"APNS_PWD": "01zhuanche",
+		"APNS_URL": "api.development.push.apple.com",
+		"APNS_KEY_PATH": "dev/apns_developer.p12",
+		"push.apns.keyStorePwd": "01zhuanche",
+		"push.apns.keyStorePath": "dev/apns.p12"
 	},
 	"redis.config": {
 		"redis.cluster.password": "lbstest",
