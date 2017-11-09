@@ -96,6 +96,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 					.add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
 					.add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
 					.add(CalendarUtil.format(new Date()))
+					.add(deviceDto.getDeviceId() != null ? deviceDto.getDeviceId() : "")
 					.add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "");
 			execute(jsonArray, Sql.UPDATE_USER_DEVICE, new BaseResponse(), resultHandler);
 		}
