@@ -16,7 +16,7 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 
 	private String innerIP;
 
-	private int updPort;
+	private int udpPort;
 
 	private List<String> oldUDPServer;
 	private List<String> newUDPServer;
@@ -26,12 +26,12 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 	@Override
 	public void start() throws Exception {
 		innerIP = IPUtil.getInnerIP();
-		updPort = config().getInteger("udp.port");
+		udpPort = config().getInteger("udp.port");
 		oldUDPServer = new ArrayList<String>();
 		newUDPServer = new ArrayList<String>();
 		count = 0;
 
-		logger.info("innerIP={}updPort={}config={}", config().encode());
+		logger.info("innerIP={}updPort={}config={}", innerIP, udpPort, config().encode());
 
 		oldUDPServer.addAll(config().getJsonArray("udp.server").getList());
 		newUDPServer.addAll(config().getJsonArray("new.udp.server").getList());
@@ -40,7 +40,7 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 		DatagramSocket newSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 
 		DatagramSocket receiver = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		receiver.listen(updPort, innerIP, asyncResult -> {
+		receiver.listen(udpPort, innerIP, asyncResult -> {
 			if (asyncResult.succeeded()) {
 				logger.info("UDP listening...");
 				receiver.handler(packet -> {
