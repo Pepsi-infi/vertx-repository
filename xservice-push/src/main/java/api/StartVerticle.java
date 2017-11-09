@@ -8,15 +8,18 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
-import service.impl.*;
-import util.HttpUtil;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
+import service.impl.DriverMsgServiceImpl;
+import service.impl.DriverServiceImpl;
 import service.impl.ImMessagePushServiceImpl;
+import service.impl.MessagePushServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
+import service.impl.PassengerServiceImpl;
+import service.impl.PassengerUnSendServiceImpl;
 import service.impl.RedisServiceImpl;
-import xservice.HttpClientVerticle;
+import util.HttpUtil;
 
 public class StartVerticle extends AbstractVerticle {
 
@@ -49,6 +52,9 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
 		this.deployVerticle(PassengerUnSendVerticle.class.getName());
 		this.deployVerticle(ImMessagePushServiceImpl.class.getName());
+		//部署APNS Verticle
+		//this.deployVerticle(ApnsVerticle.class.getName());
+
 		// 提供其他非EventBus服务
 	}
 

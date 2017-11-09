@@ -42,6 +42,9 @@ public class DeviceDtoConverter {
     if (json.getValue("createTime") instanceof String) {
       obj.setCreateTime((String)json.getValue("createTime"));
     }
+    if (json.getValue("deviceId") instanceof String) {
+      obj.setDeviceId((String)json.getValue("deviceId"));
+    }
     if (json.getValue("deviceToken") instanceof String) {
       obj.setDeviceToken((String)json.getValue("deviceToken"));
     }
@@ -86,6 +89,9 @@ public class DeviceDtoConverter {
     }
     if (obj.getCreateTime() != null) {
       json.put("createTime", obj.getCreateTime());
+    }
+    if (obj.getDeviceId() != null) {
+      json.put("deviceId", obj.getDeviceId());
     }
     if (obj.getDeviceToken() != null) {
       json.put("deviceToken", obj.getDeviceToken());

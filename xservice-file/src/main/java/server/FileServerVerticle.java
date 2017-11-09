@@ -124,21 +124,20 @@ public class FileServerVerticle extends AbstractVerticle {
 							JsonObject message = new JsonObject();
 							message.put("userId", msgBody.getToTel());
 							if (StringUtils.isNotEmpty(msgBody.getToTel())) {
-								eb.<JsonObject>send(EventbusAddressConstant.im_consistent_hash_verticle, message, option,
-										hashFuture.completer());
+								eb.<JsonObject>send(EventbusAddressConstant.im_consistent_hash_verticle, message,
+										option, hashFuture.completer());
 							} else {
 
 							}
 
 							// amr->mp3 transcoding
-							// if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
-							// DeliveryOptions tsOption = new DeliveryOptions();
-							// tsOption.setSendTimeout(3000);
-							// tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
-							// logger.info("send msg to TranscodingVerticle, file={}", uploadPath + uuid);
-							// eb.send(TranscodingVerticle.class.getName() + innerIP, date + "/" + uuid,
-							// tsOption);
-							// }
+//							if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
+//								DeliveryOptions tsOption = new DeliveryOptions();
+//								tsOption.setSendTimeout(3000);
+//								tsOption.addHeader("action", TranscodingVerticle.method.amrToMp3);
+//								logger.info("send msg to TranscodingVerticle, file={}", uploadPath + uuid);
+//								eb.send("file.transcoding.Transcoding", date + "/" + uuid, tsOption);
+//							}
 
 							hashFuture.setHandler(res -> {
 								logger.info("msgRequest, hashFuture={}", res.result().body().encode());
@@ -166,8 +165,8 @@ public class FileServerVerticle extends AbstractVerticle {
 									DeliveryOptions c2cOption = new DeliveryOptions();
 									c2cOption.addHeader("action", "sendMessage");
 									c2cOption.setSendTimeout(1000);
-									eb.send(EventbusAddressConstant.c2c_verticle + res.result().body().getString("host"),
-											param, c2cOption);
+									eb.send(EventbusAddressConstant.c2c_verticle
+											+ res.result().body().getString("host"), param, c2cOption);
 								}
 							});
 
@@ -222,7 +221,7 @@ public class FileServerVerticle extends AbstractVerticle {
 			msgBody.setLon(lon);
 			msgBody.setAddress(address);
 			msgBody.setsAddress(sAddress);
-			
+
 			break;
 		default:
 			break;

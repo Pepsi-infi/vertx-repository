@@ -1,17 +1,16 @@
 package iservice;
 
+import java.util.List;
+import java.util.Map;
+
 import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.serviceproxy.ProxyHelper;
 import iservice.dto.DeviceDto;
 import utils.BaseResponse;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei
@@ -42,4 +41,11 @@ public interface DeviceService {
      * @param result
      */
     void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result);
+
+    /**
+     * 增加设备号，按照该方式进行上报
+     * @param userDeviceDto
+     * @param resultHandler
+     */
+	void reportDeviceByAddDeviceId(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
 }

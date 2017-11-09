@@ -12,7 +12,13 @@
 		"PUSH_MSG_PORT": 8989,
 		"city.url": "http://10.10.10.177:8085/api/v1/region/list",
 		"provider.url": "http://10.10.10.177:8085/api/v1/common/supplier/list",
-		"UDP_HOSTS": "10.10.10.106:9099,10.10.10.105:9099"
+		"UDP_HOSTS": "10.10.10.106:9099,10.10.10.105:9099",
+    	"PUSH_MSG_NO_ADVER_URL":"/mc-push/meesage-nonAdver/push.json",
+    	"APNS_PWD":"01zhuanche",
+    	"APNS_URL":"api.development.push.apple.com",
+    	"APNS_KEY_PATH":"dev/apns_developer.p12",
+    	"push.apns.keyStorePwd":"01zhuanche",
+    	"push.apns.keyStorePath":"dev/apns.p12"
 	},
 	"redis.config": {
 		"redis.cluster.password": "lbstest",
@@ -47,14 +53,14 @@
 		"tcpNoDelay": "true"
 	},
 	"mysql.config": {
-		"host": "10.10.10.178",
-		"port": 3306,
-		"maxPoolSize": 100,
-		"username": "sqyc_message",
-		"password": "sqyc_message@01zhuanche.com",
-		"database": "message_center",
-		"charset": "UTF-8",
-		"queryTimeout": 3000
+		"host": "10.20.10.100",
+    	"port": 3306,
+    	"maxPoolSize": 100,
+    	"username": "sqyc_message",
+    	"password": "sqyc_message@01zhuanche.com",
+    	"database": "message_center",
+    	"charset": "UTF-8",
+    	"queryTimeout": 3000
 	},
 	"test.config": {
 		"xiaomi.test.phone": "18810616483",
@@ -99,3 +105,4 @@
 		"minHeartbeatFrequencyMS": 500
 	}
 }
+

@@ -65,6 +65,16 @@
 		<!-- <dependency> <groupId>cn.teaey.apns4j</groupId> <artifactId>apns4j</artifactId> 
 			<version>1.1.4</version> </dependency> -->
 		<dependency>
+			<groupId>com.zhuanche.thirdparty.apns</groupId>
+			<artifactId>apns4j</artifactId>
+			<version>1.1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dbay.apns4j</groupId>
+			<artifactId>dbay-apns4j</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
