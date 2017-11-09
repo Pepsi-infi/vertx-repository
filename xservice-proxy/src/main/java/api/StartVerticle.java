@@ -4,7 +4,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import proxy.server.UdpProxyServerVerticle;
+import proxy.server.UdpCopyServerVerticle;
 
 public class StartVerticle extends AbstractVerticle {
 
@@ -13,7 +13,7 @@ public class StartVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 
 		// Just one instance because of port conflicts.
-		vertx.deployVerticle(UdpProxyServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()),
+		vertx.deployVerticle(UdpCopyServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()),
 				res -> {
 					if (res.succeeded()) {
 						logger.info("UdpProxyServerVerticle={}", res.result());

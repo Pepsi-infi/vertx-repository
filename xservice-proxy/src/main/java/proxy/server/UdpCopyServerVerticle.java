@@ -10,9 +10,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import utils.IPUtil;
 
-public class UdpProxyServerVerticle extends AbstractVerticle {
+public class UdpCopyServerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(UdpProxyServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(UdpCopyServerVerticle.class);
 
 	private String innerIP;
 
@@ -25,7 +25,6 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 
 	@Override
 	public void start() throws Exception {
-		logger.info("start ...");
 		innerIP = IPUtil.getInnerIP();
 		udpPort = config().getInteger("udp.port");
 		oldUDPServer = new ArrayList<String>();
@@ -41,30 +40,28 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 		DatagramSocket newSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 
 		DatagramSocket receiver = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		receiver.listen(9299, "10.10.10.106", asyncResult -> {
+		receiver.listen(udpPort, innerIP, asyncResult -> {
 			if (asyncResult.succeeded()) {
 				logger.info("UDP listening...");
 				receiver.handler(packet -> {
 					count++;
 					logger.info("UDP packet " + packet.data());
-					// receiver.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count %
-					// oldUDPServer.size())),
-					// handler -> {
-					// if (handler.succeeded()) {
-					//
-					// } else {
-					// logger.error(handler.cause().getMessage());
-					// }
-					// });
-					//
-					// receiver.send(packet.data(), 9099, newUDPServer.get(Math.abs(count %
-					// newUDPServer.size())), r -> {
-					// if (r.succeeded()) {
-					//
-					// } else {
-					// logger.error(r.cause().getMessage());
-					// }
-					// });
+					receiver.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count % oldUDPServer.size())),
+							handler -> {
+								if (handler.succeeded()) {
+
+								} else {
+									logger.error(handler.cause().getMessage());
+								}
+							});
+
+					receiver.send(packet.data(), 9099, newUDPServer.get(Math.abs(count % newUDPServer.size())), r -> {
+						if (r.succeeded()) {
+
+						} else {
+							logger.error(r.cause().getMessage());
+						}
+					});
 				});
 			} else {
 				logger.error("UDP", asyncResult.cause());
