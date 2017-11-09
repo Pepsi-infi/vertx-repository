@@ -46,7 +46,7 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 				receiver.handler(packet -> {
 					count++;
 					logger.info("UDP packet " + packet.data());
-					oldSender.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count % oldUDPServer.size())),
+					receiver.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count % oldUDPServer.size())),
 							handler -> {
 								if (handler.succeeded()) {
 
@@ -55,7 +55,7 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 								}
 							});
 
-					newSender.send(packet.data(), 9099, newUDPServer.get(Math.abs(count % newUDPServer.size())), r -> {
+					receiver.send(packet.data(), 9099, newUDPServer.get(Math.abs(count % newUDPServer.size())), r -> {
 						if (r.succeeded()) {
 
 						} else {
