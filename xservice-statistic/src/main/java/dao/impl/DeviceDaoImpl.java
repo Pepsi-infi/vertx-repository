@@ -35,10 +35,13 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 	private static final Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 
 	public interface Sql {
-		static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush,createTime,updateTime) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		static final String ADD_USER_DEVICE = "insert into device (uid,phone,deviceType,channel,deviceToken,osType,osVersion,appCode,appVersion,antFingerprint,isAcceptPush,createTime,updateTime,deviceId) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		static final String UPDATE_USER_DEVICE = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?,"
-				+ "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=? " + "WHERE antFingerprint=?";
+				+ "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=?,deviceId=? " + "WHERE antFingerprint=?";
+
+		static final String UPDATE_USER_DEVICE_BY_DEVICEID = "UPDATE device SET uid=?,phone=?,deviceType=?,channel=?,deviceToken=?,osType=?,"
+				+ "osVersion=?,appCode=?,appVersion=?,isAcceptPush=?,updateTime=?,antFingerprint=? " + "WHERE deviceId=?";
 
 		static final String QUERY_USER_DEVICE = "SELECT * FROM device WHERE 1=1 %s ORDER BY updateTime DESC limit 1";
 
@@ -113,6 +116,10 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		if (StringUtils.isNotBlank(phone)) {
 			sb.append(" and phone = '").append(phone).append("'");
 		}
+		String deviceId = MapUtils.getString(params, "deviceId");
+		if (StringUtils.isNotBlank(deviceId)) {
+			sb.append(" and deviceId = '").append(deviceId).append("'");
+		}
 		sql = String.format(sql, sb.toString());
 		Future<List<JsonObject>> future = retrieveAll(sql);
 		future.setHandler(result -> {
@@ -166,5 +173,34 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				resultHandler.handle(Future.failedFuture(result.cause()));
 			}
 		});
+	}
+
+	/**
+	 * add by ylf
+	 */
+	@Override
+	public void updateDeviceByDeviceId(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
+		if (StringUtils.isBlank(deviceDto.getDeviceId())) {
+			logger.error("[updateDevice] the deviceId is null");
+			resultHandler.handle(Future.failedFuture("the deviceId is null"));
+		} else {
+			JsonArray jsonArray = new JsonArray();
+			// (uid,phone,deviceType,miToken,imei,osType,osVersion,appCode,appVersion,antFingerprint)
+			jsonArray.add(deviceDto.getUid() != null ? deviceDto.getUid() : "")
+					.add(deviceDto.getPhone() != null ? deviceDto.getPhone() : "")
+					.add(deviceDto.getDeviceType() != null ? deviceDto.getDeviceType() : "")
+					.add(deviceDto.getChannel() != null ? deviceDto.getChannel() : 0)
+					.add(deviceDto.getDeviceToken() != null ? deviceDto.getDeviceToken() : "")
+					.add(deviceDto.getOsType() != null ? deviceDto.getOsType() : -1)
+					.add(deviceDto.getOsVersion() != null ? deviceDto.getOsVersion() : "")
+					.add(deviceDto.getAppCode() != null ? deviceDto.getAppCode() : 0)
+					.add(deviceDto.getAppVersion() != null ? deviceDto.getAppVersion() : "")
+					.add(deviceDto.getIsAcceptPush() != null ? deviceDto.getIsAcceptPush() : 0)
+					.add(CalendarUtil.format(new Date()))
+					.add(deviceDto.getAntFingerprint() != null ? deviceDto.getAntFingerprint() : "")
+					.add(deviceDto.getDeviceId() != null ? deviceDto.getDeviceId() : "");
+			execute(jsonArray, Sql.UPDATE_USER_DEVICE_BY_DEVICEID, new BaseResponse(), resultHandler);
+		}
+
 	}
 }

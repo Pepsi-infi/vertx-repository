@@ -3,14 +3,23 @@ package module.hash;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -24,10 +33,10 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	// 真实节点对应的虚拟节点数量
 	private int length = 160;
 	// 虚拟节点信息
-	private TreeMap<Long, String> virtualIMNodes;
+	private TreeMap<Integer, String> virtualIMNodes;
 
 	// 虚拟内网ip
-	private TreeMap<Long, String> virtualInnerNodes;
+	private TreeMap<Integer, String> virtualInnerNodes;
 
 	// 真实节点信息
 	private List<String> realIMNodes;
@@ -36,24 +45,28 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private EventBus eb;
 
+	private Map<String, String> ipMap = new HashMap<String, String>();
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		logger.info("start ... ");
 
+		JsonArray socketNodes = config().getJsonArray("im");
+		for (Object object : socketNodes) {
+			JsonObject node = JsonObject.mapFrom(object);
+			ipMap.put(node.getString("innerIP"), node.getString("node"));
+		}
+
 		this.realIMNodes = new ArrayList<String>();
 		this.realInnerNodes = new ArrayList<String>();
 
 		getNodesFromDiscovery();
-		initIMNodes();
-		initInnerNodes();
 
-		vertx.setPeriodic(3000, handler -> {
-			getNodesFromDiscovery();
-			initIMNodes();
-			initInnerNodes();
-		});
+		// vertx.setPeriodic(5000, handler -> {
+		// getNodesFromDiscovery();
+		// });
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(IMConsistentHashingVerticle.class.getName(), res -> {
@@ -91,9 +104,17 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 						realIMNodes.add(publicAddress);
 					}
 					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
-						realInnerNodes.add(innerIP);
+//						realInnerNodes.add(innerIP);
 					}
 				}
+
+				realInnerNodes.add("10.0.7.52");
+				realInnerNodes.add("10.0.7.70");
+				realInnerNodes.add("10.0.4.20");
+				
+				initIMNodes();
+				initInnerNodes();
+
 				logger.info("realIMNodes={}realInnerNodes={}", realIMNodes.toString(), realInnerNodes.toString());
 			}
 		});
@@ -103,7 +124,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initIMNodes() {
-		virtualIMNodes = new TreeMap<Long, String>();
+		virtualIMNodes = new TreeMap<Integer, String>();
 		for (int i = 0; i < realIMNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualIMNodes.put(hash("aa" + i + j), realIMNodes.get(i));
@@ -115,7 +136,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initInnerNodes() {
-		virtualInnerNodes = new TreeMap<Long, String>();
+		virtualInnerNodes = new TreeMap<Integer, String>();
 		for (int i = 0; i < realInnerNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
@@ -128,45 +149,11 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 比传统的CRC32,MD5，SHA-1（这两个算法都是加密HASH算法，复杂度本身就很高，带来的性能上的损害也不可避免）
 	 * 等HASH算法要快很多，而且据说这个算法的碰撞率很低. http://murmurhash.googlepages.com/
 	 */
-	private Long hash(String key) {
-		ByteBuffer buf = ByteBuffer.wrap(key.getBytes());
-		int seed = 0x1234ABCD;
+	private int hash(String key) {
+		HashFunction hf = Hashing.murmur3_32();
+		HashCode hc = hf.newHasher().putString(key, Charsets.UTF_8).hash();
 
-		ByteOrder byteOrder = buf.order();
-		buf.order(ByteOrder.LITTLE_ENDIAN);
-
-		long m = 0xc6a4a7935bd1e995L;
-		int r = 47;
-
-		long h = seed ^ (buf.remaining() * m);
-
-		long k;
-		while (buf.remaining() >= 8) {
-			k = buf.getLong();
-
-			k *= m;
-			k ^= k >>> r;
-			k *= m;
-
-			h ^= k;
-			h *= m;
-		}
-
-		if (buf.remaining() > 0) {
-			ByteBuffer finish = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
-			// for big-endian version, do this first:
-			// finish.position(8-buf.remaining());
-			finish.put(buf).rewind();
-			h ^= finish.getLong();
-			h *= m;
-		}
-
-		h ^= h >>> r;
-		h *= m;
-		h ^= h >>> r;
-
-		buf.order(byteOrder);
-		return h;
+		return hc.asInt();
 	}
 
 	/**
@@ -177,13 +164,20 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getIMNode(String key) {
 		JsonObject result = new JsonObject();
-		Long hashedKey = hash(key);
-		Entry<Long, String> en = virtualIMNodes.ceilingEntry(hashedKey);
-		if (en == null) {
-			result.put("host", virtualIMNodes.firstEntry().getValue());
-		} else {
-			result.put("host", en.getValue());
-		}
+		// int hashedKey = hash(key);
+		//
+		// Entry<Integer, String> en = virtualIMNodes.ceilingEntry(hashedKey);
+
+		JsonObject innerJson = getInnerNode(key);
+
+		// if (en == null) {
+		// result.put("host", virtualIMNodes.firstEntry().getValue());
+		// } else {
+		// result.put("host", en.getValue());
+		// }
+
+		logger.info("getIMNode, {}", innerJson.getString("host"));
+		result.put("host", ipMap.get(innerJson.getString("host")));
 
 		return result;
 	}
@@ -196,13 +190,15 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 	 */
 	public JsonObject getInnerNode(String key) {
 		JsonObject result = new JsonObject();
-		Long hashedKey = hash(key);
-		Entry<Long, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
-		if (en == null) {
-			result.put("host", virtualInnerNodes.firstEntry().getValue());
-		} else {
-			result.put("host", en.getValue());
-		}
+		// int hashedKey = hash(key);
+		// Entry<Integer, String> en = virtualInnerNodes.ceilingEntry(hashedKey);
+		// if (en == null) {
+		// result.put("host", virtualInnerNodes.firstEntry().getValue());
+		// } else {
+		// result.put("host", en.getValue());
+		// }
+		int i = (int) (NumberUtils.toLong(key) % 3);
+		result.put("host", realInnerNodes.get(i));
 
 		return result;
 	}

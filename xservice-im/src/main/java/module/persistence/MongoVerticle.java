@@ -13,9 +13,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.BulkOperation;
-import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.mongo.MongoClientBulkWriteResult;
+import utils.IPUtil;
 
 public class MongoVerticle extends AbstractVerticle {
 
@@ -24,6 +24,8 @@ public class MongoVerticle extends AbstractVerticle {
 	private MongoClient client;
 
 	private EventBus eb;
+
+	private String innerIP;
 
 	public interface method {
 
@@ -38,10 +40,12 @@ public class MongoVerticle extends AbstractVerticle {
 
 		logger.info("config={}", config().encode());
 
+		innerIP = IPUtil.getInnerIP();
+
 		client = MongoClient.createShared(vertx, config().getJsonObject("mongo"));
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(MongoVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(MongoVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {

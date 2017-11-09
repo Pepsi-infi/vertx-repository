@@ -11,7 +11,12 @@
 		"PUSH_MSG_URL": "/mc-push/message/push.json",
 		"city.url": "http://mp.01zhuanche.com/api/v1/region/list",
 		"provider.url": "http://mp.01zhuanche.com/api/v1/common/supplier/list",
-		"UDP_HOSTS": "10.0.200.14:9099"
+		"UDP_HOSTS": "10.0.200.14:9099",
+		"APNS_PWD": "01zhuanche",
+		"APNS_URL": "api.push.apple.com",
+		"APNS_KEY_PATH": "prd/apns.p12",
+		"push.apns.keyStorePwd": "01zhuanche",
+		"push.apns.keyStorePath": "dev/apns.p12"
 	},
 	"redis.config": {
 		"redis.cluster.password": "GofLOnz9FqY1YFgu",

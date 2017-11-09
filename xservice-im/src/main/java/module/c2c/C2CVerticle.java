@@ -10,12 +10,15 @@ import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.rxjava.core.Future;
 import module.c2c.protocol.MessageBuilder;
 import module.c2c.protocol.SQIMBody;
+import module.hash.IMConsistentHashingVerticle;
 import module.persistence.IMData;
 import module.persistence.MongoVerticle;
 import module.sensitivewords.SensitiveWordsVerticle;
@@ -74,21 +77,66 @@ public class C2CVerticle extends AbstractVerticle {
 		option.addHeader("action", IMSessionVerticle.method.getHandlerIDByUid);
 		option.setSendTimeout(3000);
 		JsonObject p = new JsonObject().put("to", to);
-		eb.<JsonObject>send(IMSessionVerticle.class.getName() + innerIP, p, option, res -> {
-			if (res.succeeded()) {
-				JsonObject res11 = res.result().body();
-				String toHandlerID = res11.getString("handlerID");
-				if (StringUtils.isNotEmpty(toHandlerID)) {
-					if (StringUtils.isNotEmpty(msg.getContent())) {// 敏感词过滤
-						DeliveryOptions swOption = new DeliveryOptions();
-						swOption.addHeader("action", SensitiveWordsVerticle.method.filterSensitiveWords);
-						swOption.setSendTimeout(3000);
 
-						eb.<String>send(SensitiveWordsVerticle.class.getName(), msg.getContent(), swOption, swRes -> {
-							if (swRes.succeeded()) {
-								msg.setContent(swRes.result().body());
+		//
+		DeliveryOptions chOption = new DeliveryOptions();
+		chOption.setSendTimeout(3000);
+		chOption.addHeader("action", "getInnerNode");
 
-								String body = Json.encode(msg);
+		Future<Message<JsonObject>> chFuture = Future.future();
+
+		JsonObject message = new JsonObject();
+		message.put("userId", to);
+		eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+
+		//
+		chFuture.setHandler(r -> {
+			if (r.succeeded()) {
+				String innerHost = r.result().body().getString("host");
+				logger.info("to host={} phone={}", innerHost, to);
+				eb.<JsonObject>send(IMSessionVerticle.class.getName() + innerHost, p, option, res -> {
+					if (res.succeeded()) {
+						JsonObject res11 = res.result().body();
+						String toHandlerID = res11.getString("handlerID");
+						if (StringUtils.isNotEmpty(toHandlerID)) {
+							if (StringUtils.isNotEmpty(msg.getContent())) {// 敏感词过滤
+								DeliveryOptions swOption = new DeliveryOptions();
+								swOption.addHeader("action", SensitiveWordsVerticle.method.filterSensitiveWords);
+								swOption.setSendTimeout(3000);
+
+								eb.<String>send(SensitiveWordsVerticle.class.getName(), msg.getContent(), swOption,
+										swRes -> {
+											if (swRes.succeeded()) {
+												msg.setContent(swRes.result().body());
+
+												String body = Json.encode(msg);
+												int bodyLength = 0;
+												try {
+													bodyLength = Json.encode(msg).getBytes("UTF-8").length;
+												} catch (UnsupportedEncodingException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+
+												Buffer headerBuffer = MessageBuilder.buildMsgHeader(
+														MessageBuilder.HEADER_LENGTH, clientVersion, IMCmd.MSG_N,
+														bodyLength);
+
+												logger.info("sendMessage, toHandlerID={}body={}", toHandlerID,
+														body.toString());
+
+												eb.send(toHandlerID, headerBuffer.appendString(body));
+
+												// 只有聊天消息入库
+												if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+													saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+												}
+											} else {
+												logger.error("filterSensitiveWords, error={}",
+														swRes.cause().getMessage());
+											}
+										});
+							} else {
 								int bodyLength = 0;
 								try {
 									bodyLength = Json.encode(msg).getBytes("UTF-8").length;
@@ -96,53 +144,32 @@ public class C2CVerticle extends AbstractVerticle {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-
+								// 服务器透传
 								Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH,
-										clientVersion, IMCmd.MSG_N, bodyLength);
-
-								logger.info("sendMessage, toHandlerID={}body={}", toHandlerID, body.toString());
-
+										clientVersion, cmd, bodyLength);
+								String body = Json.encode(msg);
 								eb.send(toHandlerID, headerBuffer.appendString(body));
 
 								// 只有聊天消息入库
 								if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
 									saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
 								}
-							} else {
-								logger.error("filterSensitiveWords, error={}", swRes.cause().getMessage());
 							}
-						});
+						} else {
+							// ios - apns
+
+							logger.error("sendMessage, toHandlerID is null, toTel={}", to);
+							// 只有聊天消息入库
+							if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
+								saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
+							}
+						}
 					} else {
-						int bodyLength = 0;
-						try {
-							bodyLength = Json.encode(msg).getBytes("UTF-8").length;
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						// 服务器透传
-						Buffer headerBuffer = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-								cmd, bodyLength);
-						String body = Json.encode(msg);
-						eb.send(toHandlerID, headerBuffer.appendString(body));
-
-						// 只有聊天消息入库
-						if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-							saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
-						}
+						logger.error("sendMessage error.", res.cause());
 					}
-				} else {
-					// ios - apns
-
-					logger.error("sendMessage, toHandlerID is null, toTel={}", to);
-				}
-
-				// 只有聊天消息入库
-				// if (IMCmd.MONGO_CMD_SET.contains(cmd)) {
-				// saveData2Mongo(fromHandlerID, clientVersion, cmd, msg);
-				// }
+				});
 			} else {
-				logger.error("sendMessage error.", res.cause());
+				logger.error("IMConsistentHashingVerticle error={}", r.cause().getMessage());
 			}
 		});
 
@@ -185,24 +212,25 @@ public class C2CVerticle extends AbstractVerticle {
 		mongoOp.addHeader("action", MongoVerticle.method.saveData);
 		mongoOp.setSendTimeout(3000);
 
-		eb.<JsonObject>send(MongoVerticle.class.getName(), mongoMsg, mongoOp, mongoRes -> {
+		eb.<JsonObject>send(MongoVerticle.class.getName() + innerIP, mongoMsg, mongoOp, mongoRes -> {
 			if (mongoRes.succeeded()) {
 
-				SQIMBody ackMsg = new SQIMBody();
-				ackMsg.setMsgId(msg.getMsgId());
-				ackMsg.setTimeStamp(msg.getTimeStamp());
-
-				int ackMsgBodyLength = 0;
-				String ackMsgStr = Json.encode(msg);
-				try {
-					ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
-				} catch (Exception e) {
-					logger.error(e);
-				}
-				// 给FROM发A
-				Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-						cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
-				eb.send(toHandlerID, aMsgHeader.appendString(ackMsgStr));
+				// SQIMBody ackMsg = new SQIMBody();
+				// ackMsg.setMsgId(msg.getMsgId());
+				// ackMsg.setTimeStamp(msg.getTimeStamp());
+				//
+				// int ackMsgBodyLength = 0;
+				// String ackMsgStr = Json.encode(msg);
+				// try {
+				// ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
+				// } catch (Exception e) {
+				// logger.error(e);
+				// }
+				// // 给FROM发A
+				// Buffer aMsgHeader =
+				// MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+				// cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
+				// eb.send(toHandlerID, aMsgHeader.appendString(ackMsgStr));
 			} else {
 				logger.error(mongoRes.cause().getMessage());
 			}

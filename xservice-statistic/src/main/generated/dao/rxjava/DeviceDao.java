@@ -99,6 +99,16 @@ public class DeviceDao {
     }));
   }
 
+  public void updateDeviceByDeviceId(DeviceDto deviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) { 
+    delegate.updateDeviceByDeviceId(deviceDto, resultHandler);
+  }
+
+  public Single<BaseResponse> rxUpdateDeviceByDeviceId(DeviceDto deviceDto) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      updateDeviceByDeviceId(deviceDto, fut);
+    }));
+  }
+
 
   public static  DeviceDao newInstance(dao.DeviceDao arg) {
     return arg != null ? new DeviceDao(arg) : null;
