@@ -127,7 +127,7 @@ public class RestStatVerticle extends RestAPIVerticle {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
 		}
-
+		logger.info("appVersion="+appVersion);
 		int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
 
 		if (cmp < 0) {
