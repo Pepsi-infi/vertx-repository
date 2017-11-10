@@ -10,7 +10,7 @@ fi
 
 sleep 5s
 
-nohup /usr/local/jdk1.8/bin/java \
+nohup java \
 -server \
 -XX:+PrintGCApplicationStoppedTime \
 -XX:+PrintGCTimeStamps \
