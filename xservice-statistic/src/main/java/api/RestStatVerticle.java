@@ -3,6 +3,7 @@ package api;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dao.MsgStatResultDao;
+import io.netty.util.internal.StringUtil;
 import io.vertx.core.Future;
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
@@ -84,21 +85,22 @@ public class RestStatVerticle extends RestAPIVerticle {
 	}
 
 	private void reportUserDevice(RoutingContext context) {
-        DeviceDto userDeviceDto = buildDeviceDto(context);
-        logger.info("the request params : userDeviceDto : " + userDeviceDto);
-        if (null == userDeviceDto) {
-            paramBadRequest(context, "Required  parameters cannot be empty.");
-        } else {
-        	int cmp= VersionCompareUtil.hisCompare2Current("5.2.2", userDeviceDto.getAppVersion());
-        	if(cmp>=0){
-        		//当前版本号小于5.2.2,按照蚂蚁指纹来进行上报
-        		deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
-        	}else{
-	            //当前版本号大于5.2.2 add by ylf 按照设备id号来更新设备表的数据
-	            deviceService.reportDeviceByAddDeviceId(userDeviceDto,resultHandler(context, JsonUtil::encodePrettily));
-        	}
-        }
-    }
+		DeviceDto userDeviceDto = buildDeviceDto(context);
+		logger.info("the request params : userDeviceDto : " + userDeviceDto);
+		if (null == userDeviceDto) {
+			paramBadRequest(context, "Required  parameters cannot be empty.");
+		} else {
+			int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", userDeviceDto.getAppVersion());
+			if (cmp >= 0) {
+				// 当前版本号小于5.2.2,按照蚂蚁指纹来进行上报
+				deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
+			} else {
+				// 当前版本号大于5.2.2 add by ylf 按照设备id号来更新设备表的数据
+				deviceService.reportDeviceByAddDeviceId(userDeviceDto,
+						resultHandler(context, JsonUtil::encodePrettily));
+			}
+		}
+	}
 
 	/**
 	 * @param context
@@ -121,10 +123,19 @@ public class RestStatVerticle extends RestAPIVerticle {
 		String deviceId = context.request().formAttributes().get("deviceId");
 
 		if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType)
-				|| StringUtils.isBlank(osVersion) || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)
-				|| StringUtils.isBlank(deviceId)) {
+				|| StringUtils.isBlank(osVersion) || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
+		}
+
+		int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
+
+		if (cmp < 0) {
+			//当前版本号大于5.2.2,需要增加对appVersion的判断
+			if(StringUtil.isNullOrEmpty(deviceId)){
+				logger.error("deviceId is null");
+				return null;
+			}
 		}
 
 		userDeviceDto.setDeviceToken(deviceToken);
