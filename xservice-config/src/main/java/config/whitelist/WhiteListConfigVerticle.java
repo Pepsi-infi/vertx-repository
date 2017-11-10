@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
@@ -56,7 +57,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 				String action = headers.get("action");
 				switch (action) {
 				case "isWhiteListUser":
-					res.reply(isWhiteListUser(json.getInteger("uid")));
+					res.reply(isWhiteListUser(NumberUtils.toInt(json.getString("uid"))));
 					break;
 				default:
 					res.reply(1);// Fail!
