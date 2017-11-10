@@ -86,7 +86,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 									if (reply.succeeded()) {
 										result.put("code", 0);
 										result.put("time", System.currentTimeMillis());
-										result.put("data", reply.result().body() + ":" + socketPort);
+										result.put("data", reply.result().body().getString("host") + ":" + socketPort);
 
 										logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
 
