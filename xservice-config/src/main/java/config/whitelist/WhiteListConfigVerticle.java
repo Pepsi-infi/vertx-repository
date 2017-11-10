@@ -39,7 +39,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		vertx.setPeriodic(300000, handler -> {
+		vertx.setPeriodic(10000, handler -> {
 			logger.info("innitWhiteListUser timer run .....");
 			initWhiteListUser();
 		});
@@ -66,7 +66,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String select_white_list_user = "SELECT uid FROM im_white_list ";
+	private static final String select_white_list_user = "SELECT uid FROM socket_white_list";
 
 	public void initWhiteListUser() {
 		mySQLClient.getConnection(res -> {
