@@ -8,6 +8,8 @@ import com.dbay.apns4j.impl.ApnsServiceImpl;
 import com.dbay.apns4j.model.ApnsConfig;
 import com.dbay.apns4j.model.Feedback;
 import com.dbay.apns4j.model.Payload;
+import com.xiaomi.push.sdk.ErrorCode;
+import com.xiaomi.xmpush.server.Result;
 
 import cn.teaey.apns4j.Apns4j;
 import cn.teaey.apns4j.network.ApnsChannelFactory;
@@ -138,12 +140,41 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		// apns推送逻辑
 		// sendApns(deviceToken, title, body, msgbody, resultHandler);
-		sendApnsByDbay(deviceToken, title, body, msgbody, resultHandler);
+		vertx.executeBlocking(future -> {
+			try {
+				
+				logger.info("apns send params:deviceToken {} title {} body {} msgbody {}",deviceToken,title,body,msgbody);
+				boolean sendResult = sendApnsByDbay(deviceToken, title, body, msgbody);
+				future.complete(sendResult);
+			} catch (Exception e) {
+				logger.error("APNS推送调一场", e);
+				resultHandler.handle(Future.failedFuture(e.getMessage()));
+			}
+
+		}, res -> {
+			
+			if(res.succeeded()){
+				
+				boolean sendResult=(boolean) res.result();
+				
+				if (!sendResult) {
+					resultHandler.handle(Future.failedFuture("APNS PUSH FAILED"));
+					return;
+				}
+
+				resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+				
+			}else{
+				logger.error("APNS推送调用异常",res.cause());
+				resultHandler.handle(Future.failedFuture(res.cause()));
+			}
+	
+		});
+		//boolean sendResult= sendApnsByDbay(deviceToken, title, body, msgbody);
 
 	}
 
-	private void sendApnsByDbay(String deviceToken, String title, String body, String msgbody,
-			Handler<AsyncResult<BaseResponse>> resultHandler) {
+	private boolean sendApnsByDbay(String deviceToken, String title, String body, String msgbody) {
 
 		try {
 			Payload payload = new Payload();
@@ -163,11 +194,10 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			}
 		} catch (Exception e) {
 			logger.error("apns消息推送异常", e);
-			resultHandler.handle(Future.failedFuture(e));
-			return;
+			return false;
 		}
 		logger.info("apns消息推送成功");
-		resultHandler.handle(Future.succeededFuture(new BaseResponse()));
+		return true;
 	}
 
 	private void sendApns(String deviceToken, String title, String body, String msgbody,
