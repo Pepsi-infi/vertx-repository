@@ -60,20 +60,17 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream(keyStorePath);
 
-//		if ("dev".equals(PushConsts.ENV_PATH)) {
-//			devEnv = true;
-//			is = this.getClass().getResourceAsStream("/dev/apns.p12");
-//		}
-//
-//		if ("test".equals(PushConsts.ENV_PATH)) {
-//			devEnv = true;
-//			is = this.getClass().getResourceAsStream("/test/apns_developer.p12");
-//		}
-//
-//		if ("prod".equals(PushConsts.ENV_PATH)) {
-//			devEnv = false;
-//			is = this.getClass().getResourceAsStream("/prod/apns.p12");
-//		}
+		if ("dev".equals(PushConsts.ENV_PATH)) {
+			devEnv = true;
+		}
+
+		if ("test".equals(PushConsts.ENV_PATH)) {
+			devEnv = true;
+		}
+
+		if ("prod".equals(PushConsts.ENV_PATH)) {
+			devEnv = false;
+		}
 
 		if (is == null) {
 			logger.error("apns初始化失败 inputstream is null");
