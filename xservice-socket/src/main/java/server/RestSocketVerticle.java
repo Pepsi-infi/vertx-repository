@@ -111,6 +111,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 						result.put("data", oldSocket.getString(pos) + ":" + socketPort);
 
 						logger.info("getSocketHost, pos={}", pos);
+						context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
 					}
 				} else {
 					result.put("code", 500);
