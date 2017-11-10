@@ -2,6 +2,8 @@ package api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import constants.ChannelEnum;
 import dao.MsgStatResultDao;
 import io.netty.util.internal.StringUtil;
 import io.vertx.core.Future;
@@ -128,7 +130,14 @@ public class RestStatVerticle extends RestAPIVerticle {
 			return null;
 		}
 		logger.info("appVersion="+appVersion);
-		int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
+		
+		int cmp=0;
+		if((ChannelEnum.APNS.getType()+"").equals(channel)){
+			//apns 用appVersion来判断版本问题
+			cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
+		}else if((ChannelEnum.GCM.getType()+"").equals(channel)||(ChannelEnum.XIAOMI.getType()+"").equals(channel)){
+			//TODO gcm 或者 xiaomi 采用其他方式  目前默认是历史版本 所以会走之前的设备上报逻辑   版本控制方式需要再处理
+		}
 
 		if (cmp < 0) {
 			//当前版本号大于5.2.2,需要增加对appVersion的判断
