@@ -35,6 +35,8 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	public void start() throws Exception {
 		super.start();
 
+		logger.info("start ...");
+
 		eb = vertx.eventBus();
 		innerIP = IPUtil.getInnerIP();
 		socketPort = config().getInteger("tcp.port");
