@@ -1,10 +1,13 @@
 package server;
 
+import java.util.Random;
+
 import org.apache.commons.lang.StringUtils;
 
 import api.RestConstants;
 import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -26,12 +29,15 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 	private String innerIP;
 
+	private int socketPort;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
 		eb = vertx.eventBus();
 		innerIP = IPUtil.getInnerIP();
+		socketPort = config().getInteger("tcp.port");
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
@@ -50,38 +56,68 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	}
 
 	private void getSocketHost(RoutingContext context) {
-
 		String userId = context.request().params().get("userId");
 		String identity = context.request().params().get("identity");
 
 		JsonObject result = new JsonObject();
 
-		DeliveryOptions option = new DeliveryOptions();
-		option.setSendTimeout(3000);
-		option.addHeader("action", "getSocketNode");
-
-		JsonObject message = new JsonObject();
-		message.put("userId", userId);
 		if (StringUtils.isNotEmpty(userId)) {
-			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option, reply -> {
-				if (reply.succeeded()) {
-					result.put("code", 0);
-					result.put("time", System.currentTimeMillis());
-					// TODO
-					// result.put("data", reply.result().body());
-					result.put("data", "111.206.162.232:8088");
+			// 判断白名单
+			DeliveryOptions whiteListOp = new DeliveryOptions();
+			whiteListOp.setSendTimeout(3000);
+			whiteListOp.addHeader("action", "isWhiteListUser");
+			JsonObject whiteListMessage = new JsonObject();
+			whiteListMessage.put("uid", userId);
 
-					logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
+			eb.<JsonObject>send("config.whitelist.WhiteListConfigVerticle", whiteListMessage, whiteListOp, r -> {
+				if (r.succeeded()) {
+					JsonObject whiteListR = r.result().body();
+					if (whiteListR.getBoolean("result")) {
+						DeliveryOptions option = new DeliveryOptions();
+						option.setSendTimeout(3000);
+						option.addHeader("action", "getSocketNode");
 
-					context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
+						JsonObject message = new JsonObject();
+						message.put("userId", userId);
+						eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option,
+								reply -> {
+									if (reply.succeeded()) {
+										result.put("code", 0);
+										result.put("time", System.currentTimeMillis());
+										result.put("data", reply.result().body() + ":" + socketPort);
+
+										logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
+
+										context.response().putHeader("content-type", "application/json")
+												.end(result.encode(), ENCODE);
+									} else {
+										result.put("code", 500);
+										result.put("time", System.currentTimeMillis());
+										result.put("data", reply.cause().getMessage());
+										context.response().setStatusCode(500)
+												.putHeader("content-type", "application/json")
+												.end(result.encode(), ENCODE);
+									}
+								});
+					} else {
+						JsonArray oldSocket = config().getJsonArray("oldSocket");
+						Random rand = new Random();
+						int pos = rand.nextInt(oldSocket.size() - 1);
+
+						result.put("code", 0);
+						result.put("time", System.currentTimeMillis());
+						result.put("data", oldSocket.getString(pos) + ":" + socketPort);
+
+						logger.info("getSocketHost, pos={}", pos);
+					}
 				} else {
 					result.put("code", 500);
 					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.cause().getMessage());
 					context.response().setStatusCode(500).putHeader("content-type", "application/json")
 							.end(result.encode(), ENCODE);
 				}
 			});
+
 		} else {
 			result.put("code", 400);
 			result.put("time", System.currentTimeMillis());

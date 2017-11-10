@@ -3,14 +3,14 @@ package test;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.Vertx;
-import proxy.server.UdpCopyServerVerticle;
+import proxy.server.UdpProxyServerVerticle;
 
 public class Tester {
 
 	public static void main(String[] args) {
 		Vertx v = Vertx.vertx();
 
-		v.deployVerticle(UdpCopyServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		v.deployVerticle(UdpProxyServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
 	}
 
 	public static JsonObject config() {

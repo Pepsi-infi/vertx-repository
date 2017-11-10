@@ -86,6 +86,9 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		});
 	}
 
+	/**
+	 * Without port,only IP address.
+	 */
 	private void getNodesFromDiscovery() {
 		JsonObject filter = new JsonObject().put("type", config().getString("socket.server.type"));
 		discovery.getRecords(filter, result -> {
@@ -186,15 +189,16 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	 * @param key
 	 * @param nodes
 	 * @param resultHandler
+	 *            Without port,only IP address.
 	 */
 	public JsonObject getNode(String key) {
 		JsonObject result = new JsonObject();
 		Long hashedKey = hash(key);
 		Entry<Long, String> en = virtualNodes.ceilingEntry(hashedKey);
 		if (en == null) {
-			result.put("host", virtualNodes.firstEntry().getValue() + ":" + config().getInteger("tcp.port"));
+			result.put("host", virtualNodes.firstEntry().getValue());
 		} else {
-			result.put("host", en.getValue() + ":" + config().getInteger("tcp.port"));
+			result.put("host", en.getValue());
 		}
 
 		return result;

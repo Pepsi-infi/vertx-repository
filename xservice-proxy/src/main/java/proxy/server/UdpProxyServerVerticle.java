@@ -10,9 +10,9 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import utils.IPUtil;
 
-public class UdpCopyServerVerticle extends AbstractVerticle {
+public class UdpProxyServerVerticle extends AbstractVerticle {
 
-	private static final Logger logger = LoggerFactory.getLogger(UdpCopyServerVerticle.class);
+	private static final Logger logger = LoggerFactory.getLogger(UdpProxyServerVerticle.class);
 
 	private String innerIP;
 
@@ -32,12 +32,6 @@ public class UdpCopyServerVerticle extends AbstractVerticle {
 		count = 0;
 
 		logger.info("innerIP={}updPort={}config={}", innerIP, udpPort, config().encode());
-
-		oldUDPServer.addAll(config().getJsonArray("udp.server").getList());
-		newUDPServer.addAll(config().getJsonArray("new.udp.server").getList());
-
-		DatagramSocket oldSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
-		DatagramSocket newSender = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 
 		DatagramSocket receiver = vertx.createDatagramSocket(new DatagramSocketOptions().setReceiveBufferSize(204800));
 		receiver.listen(udpPort, innerIP, asyncResult -> {

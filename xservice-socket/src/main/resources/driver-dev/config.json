@@ -10,14 +10,19 @@
 	"unsubscribe": "/webservice/chat/userMsgUnsubscribe/",
 	"setClientOnline": "/webservice/chat/setclientonline/",
 	"setClientOffline": "/webservice/chat/setClientOffline/",
+	"_comment.socket": "",
 	"socket": [
 		{
-			"innerIP": "10.10.10.105",
-			"node": "111.206.162.235"
+			"innerIP": "10.20.0.11",
+			"node": "124.250.33.175"
 		},
 		{
-			"innerIP": "10.10.10.106",
-			"node": "111.206.162.232"
+			"innerIP": "10.20.0.12",
+			"node": "124.250.33.176"
 		}
+	],
+	"oldSocket": [
+		"111.206.162.232:8088",
+		"111.206.162.235:8088"
 	]
 }
