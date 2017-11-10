@@ -92,7 +92,15 @@ public class RestStatVerticle extends RestAPIVerticle {
 		if (null == userDeviceDto) {
 			paramBadRequest(context, "Required  parameters cannot be empty.");
 		} else {
-			int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", userDeviceDto.getAppVersion());
+			
+			int cmp=0;
+			if((ChannelEnum.APNS.getType()+"").equals(userDeviceDto.getChannel())){
+				//apns 用appVersion来判断版本问题
+				cmp = VersionCompareUtil.hisCompare2Current("5.2.2", userDeviceDto.getAppVersion());
+			}else if((ChannelEnum.GCM.getType()+"").equals(userDeviceDto.getChannel())||(ChannelEnum.XIAOMI.getType()+"").equals(userDeviceDto.getChannel())){
+				//TODO gcm 或者 xiaomi 采用其他方式  目前默认是历史版本 所以会走之前的设备上报逻辑   版本控制方式需要再处理
+			}
+			
 			if (cmp >= 0) {
 				// 当前版本号小于5.2.2,按照蚂蚁指纹来进行上报
 				deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
