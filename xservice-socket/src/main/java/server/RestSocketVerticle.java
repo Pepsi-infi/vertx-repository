@@ -60,8 +60,10 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	private void getSocketHost(RoutingContext context) {
 		String userId = context.request().params().get("userId");
 		String identity = context.request().params().get("identity");
+		logger.info("getSocketHost, userId={}identity={}", userId, identity);
 
 		JsonObject result = new JsonObject();
+		JsonObject data = new JsonObject();
 
 		if (StringUtils.isNotEmpty(userId)) {
 			// 判断白名单
@@ -86,7 +88,8 @@ public class RestSocketVerticle extends RestAPIVerticle {
 									if (reply.succeeded()) {
 										result.put("code", 0);
 										result.put("time", System.currentTimeMillis());
-										result.put("data", reply.result().body().getString("host") + ":" + socketPort);
+										result.put("data", data.put("host",
+												reply.result().body().getString("host") + ":" + socketPort));
 
 										logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
 
@@ -95,7 +98,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 									} else {
 										result.put("code", 500);
 										result.put("time", System.currentTimeMillis());
-										result.put("data", reply.cause().getMessage());
+										result.put("msg", reply.cause().getMessage());
 										context.response().setStatusCode(500)
 												.putHeader("content-type", "application/json")
 												.end(result.encode(), ENCODE);
@@ -108,7 +111,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 						result.put("code", 0);
 						result.put("time", System.currentTimeMillis());
-						result.put("data", oldSocket.getString(pos) + ":" + socketPort);
+						result.put("data", data.put("host", oldSocket.getString(pos) + ":" + socketPort));
 
 						logger.info("getSocketHost, pos={}", pos);
 						context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
