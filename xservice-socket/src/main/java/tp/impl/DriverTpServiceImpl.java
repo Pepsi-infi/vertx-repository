@@ -188,8 +188,8 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 			String userId = param.getString("userId");
 			String hash = param.getString("hash");
 			String ip = param.getString("ip");
-			String channelid = param.getString("channelid");
-			String mark = param.getString("mark");
+			String channelid = param.getString("cid");
+			String mark = param.getString("mid");
 			String ver = param.getString("ver");
 			String mode = param.getString("mode");
 

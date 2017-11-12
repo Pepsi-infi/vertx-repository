@@ -90,6 +90,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 					private int simpleHeartBeatCount = 0;
 
+					private String clientIP;
+
 					@Override
 					public void handle(Buffer buffer) {
 						if (buffer.toString().startsWith("get /mobile?")
@@ -103,6 +105,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							parser.fixedSizeMode(4);
 							logger.info("login, handlerID={} op={} buffer={}", handlerID, op, buffer);
 
+							clientIP = socket.remoteAddress().host();
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 
 							sendValidateOK(handlerID);
@@ -110,7 +113,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							String userId = paramMap.get("user");
 							cHash(socket.localAddress().host(), userId, handlerID);
 							loginSocketSession(innerIP, handlerID, userId);
-							loginConfirm(handlerID, paramMap);
+							loginConfirm(clientIP, handlerID, paramMap);
 							setClientOnline(userId);
 
 							break;
@@ -429,19 +432,23 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 	}
 
-	private void loginConfirm(String writeHandlerID, Map<String, String> paramMap) {
+	private void loginConfirm(String clientIP, String writeHandlerID, Map<String, String> paramMap) {
 		String userId = paramMap.get("user");
 		String hash = paramMap.get("hash");
 		String mid = paramMap.get("mid");
 		String cid = paramMap.get("cid");
 		String version = paramMap.get("ver");
 
+		String v = version.split(" ")[0];
+
 		JsonObject param = new JsonObject();
 		param.put("userId", userId);
 		param.put("hash", hash);
 		param.put("mid", mid);
 		param.put("cid", cid);
-		param.put("ver", version);
+		param.put("ver", v);
+		param.put("ip", clientIP);
+		param.put("mode", "0");
 
 		if ("driver-socket-server".equalsIgnoreCase(serverType)) {
 			dTpService.auth(param, res -> {
