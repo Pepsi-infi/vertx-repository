@@ -59,8 +59,9 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 	private void getSocketHost(RoutingContext context) {
 		String userId = context.request().params().get("userId");
+		String chatUserId = context.request().params().get("chatUserId");
 		String identity = context.request().params().get("identity");
-		logger.info("getSocketHost, userId={}identity={}", userId, identity);
+		logger.info("getSocketHost, userId={}chatUserId={}identity={}", userId, chatUserId, identity);
 
 		JsonObject result = new JsonObject();
 		JsonObject data = new JsonObject();
@@ -82,7 +83,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 						option.addHeader("action", "getSocketNode");
 
 						JsonObject message = new JsonObject();
-						message.put("userId", userId);
+						message.put("userId", chatUserId);
 						eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option,
 								reply -> {
 									if (reply.succeeded()) {
@@ -91,7 +92,8 @@ public class RestSocketVerticle extends RestAPIVerticle {
 										result.put("data", data.put("host",
 												reply.result().body().getString("host") + ":" + socketPort));
 
-										logger.info("getSocketHost, userId={}node={}", userId, reply.result().body());
+										logger.info("getSocketHost, chatUserId={}node={}", chatUserId,
+												reply.result().body());
 
 										context.response().putHeader("content-type", "application/json")
 												.end(result.encode(), ENCODE);
