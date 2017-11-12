@@ -53,7 +53,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 						try {
 							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
 							final String userId = String.valueOf(msgBody.get(0));// userId
-							String cmd = String.valueOf(msgBody.get(1));
+							Integer cmd = (Integer) msgBody.get(1);
 
 							//
 							DeliveryOptions option = new DeliveryOptions();
