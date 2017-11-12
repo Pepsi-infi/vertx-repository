@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.AbstractVerticle;
@@ -53,7 +54,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 						try {
 							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
 							final String userId = String.valueOf(msgBody.get(0));// userId
-							Integer cmd = (Integer) msgBody.get(1);
+							int cmd = NumberUtils.toInt(String.valueOf(msgBody.get(1)));
 
 							//
 							DeliveryOptions option = new DeliveryOptions();
