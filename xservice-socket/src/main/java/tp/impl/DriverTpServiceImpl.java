@@ -196,14 +196,9 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 			String requestURI = new StringBuffer("/webservice/chat/signinUserHash/").append("user=").append(userId)
 					.append("&hash=").append(hash).append("&ip=").append(ip).append("&channelid=").append(channelid)
 					.append("&mark=").append(mark).append("&ver=").append(ver).append("&mode=").append(mode).toString();
-			String encodeUrl = null;
-			try {
-				encodeUrl = URLEncoder.encode(requestURI, "utf-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error("auth, e={}", e.getMessage());
-			}
 
-			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, encodeUrl)
+			logger.info("auth, requestURI={}", requestURI);
+			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
 
 			httpRequest.subscribe(resp -> {
