@@ -202,7 +202,7 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 					logger.info("auth={}", resp.body());
 					future.complete(resp.body());
 				} else {
-					logger.error("auth={}", resp.statusMessage());
+					logger.error("auth, statusCode={}statusMessage={}", resp.statusCode(), resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
