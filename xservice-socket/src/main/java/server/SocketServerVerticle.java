@@ -136,7 +136,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 								updateOnlineSimple(innerIP, handlerID, message);
 								simpleHeartBeatCount++;
-								if (simpleHeartBeatCount == 10) {
+								if (simpleHeartBeatCount == 10 || simpleHeartBeatCount == 0) {
 									updateOnlineState(innerIP, handlerID, message);
 									simpleHeartBeatCount = 0;
 								}
