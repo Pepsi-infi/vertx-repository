@@ -81,7 +81,7 @@ public class TestSocketServerVerticle extends AbstractVerticle {
 				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
 
 				LocalDateTime now = LocalDateTime.now();
-				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				String date = now.format(format);
 
 				tpService.updateOnlineSimple(uid, date, message, result -> {

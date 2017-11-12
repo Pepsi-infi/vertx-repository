@@ -188,7 +188,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				String uid = res.getString("userId");
 
 				LocalDateTime now = LocalDateTime.now();
-				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				String date = now.format(format);
 				JsonObject data = null;
 				try {
@@ -243,7 +243,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					sendReLogin(handlerID, null);
 				} else {
 					LocalDateTime now = LocalDateTime.now();
-					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 					String date = now.format(format);
 					JsonObject data = null;
 					try {
