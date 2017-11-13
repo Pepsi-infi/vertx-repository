@@ -71,7 +71,7 @@ public class MessageSendVerticle extends AbstractVerticle {
 						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
 								.appendString(msg2Send.encode());
 						logger.info("sendMsg, userId={} innerIP={} handlerID={} header={} bf={}", userId, innerIP,
-								handlerID, msg2Send.encode().getBytes("UTF-8").length, bf);
+								handlerID, msg2Send.encode().getBytes("UTF-8").length, msg2Send.encode());
 					} catch (UnsupportedEncodingException e) {
 						logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
 					}

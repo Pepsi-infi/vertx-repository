@@ -1,0 +1,5 @@
+moduleFactory = service.groovy.VertxPropertiesModuleFactory
+moduleName = service.SensitiveWordService-module
+moduleVersion = 1.0
+extensionClasses = service.groovy.ImCommonLanguageService_GroovyExtension, service.groovy.SensitiveWordService_GroovyExtension
+staticExtensionClasses = 

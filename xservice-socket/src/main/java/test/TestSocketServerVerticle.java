@@ -21,8 +21,8 @@ import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 import io.vertx.core.parsetools.RecordParser;
 import logic.impl.SocketSessionVerticle;
-import tp.TpService;
-import tp.impl.TpServiceImpl;
+import tp.PassengerTpService;
+import tp.impl.PassengerTpServiceImpl;
 import util.ByteUtil;
 import utils.IPUtil;
 
@@ -36,12 +36,12 @@ public class TestSocketServerVerticle extends AbstractVerticle {
 
 	private EventBus eb;
 
-	private TpService tpService;
+	private PassengerTpService tpService;
 
 	@Override
 	public void start() throws Exception {
 		eb = vertx.eventBus();
-		tpService = TpService.createProxy(vertx);
+		tpService = PassengerTpService.createProxy(vertx);
 		String innerIP = IPUtil.getInnerIP();
 		logger.info("start...innerIP={}", innerIP);
 
@@ -81,7 +81,7 @@ public class TestSocketServerVerticle extends AbstractVerticle {
 				logger.info("getUidByHandlerID, handlerID={} userId={}", writeHandlerID, uid);
 
 				LocalDateTime now = LocalDateTime.now();
-				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				String date = now.format(format);
 
 				tpService.updateOnlineSimple(uid, date, message, result -> {
@@ -269,7 +269,7 @@ public class TestSocketServerVerticle extends AbstractVerticle {
 		JsonObject msg = new JsonObject();
 		msg.put("uid", message.getString(uid));
 
-		eb.send(TpServiceImpl.class.getName(), message, option);
+		eb.send(PassengerTpServiceImpl.class.getName(), message, option);
 	}
 
 	private void unsubscribe(String writeHandlerID, JsonObject message) {
@@ -280,7 +280,7 @@ public class TestSocketServerVerticle extends AbstractVerticle {
 		JsonObject msg = new JsonObject();
 		msg.put("uid", message.getString(uid));
 
-		eb.send(TpServiceImpl.class.getName(), message, option);
+		eb.send(PassengerTpServiceImpl.class.getName(), message, option);
 	}
 
 	/**
