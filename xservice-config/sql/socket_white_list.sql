@@ -30,11 +30,4 @@ CREATE TABLE `socket_white_list` (
   UNIQUE KEY `index_uid_type` (`uid`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
 
--- ----------------------------
---  Records of `im_white_list`
--- ----------------------------
-BEGIN;
-INSERT INTO `socket_white_list` VALUES ('1', '1', '1', '2017-11-06 18:06:06');
-COMMIT;
-
 SET FOREIGN_KEY_CHECKS = 1;

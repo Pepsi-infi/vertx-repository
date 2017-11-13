@@ -1,0 +1,25 @@
+{
+	"tcp.port": 8088,
+	"udp.port": 9099,
+	"socket.server.type": "driver-socket-server",
+	"car-api-host": "10.0.200.57",
+	"car-api-port": 80,
+	"_comment.socket": "",
+	"socket": [
+		{
+			"innerIP": "",
+			"node": "124.250.33.175"
+		},
+		{
+			"innerIP": "10.20.0.12",
+			"node": "124.250.33.176"
+		}
+	],
+	"oldSocket": [
+		"124.250.33.157",
+		"124.250.33.158",
+		"124.250.33.169",
+		"124.250.33.170"
+	],
+	"im.memory.size": 7680
+}
