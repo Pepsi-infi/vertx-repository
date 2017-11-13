@@ -40,7 +40,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 	public void start() throws Exception {
 		super.start();
 
-		vertx.setPeriodic(10000, handler -> {
+		vertx.setPeriodic(30000, handler -> {
 			logger.info("innitWhiteListUser timer run .....");
 			initWhiteListUser();
 		});
