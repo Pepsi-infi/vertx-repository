@@ -21,5 +21,6 @@
 		"124.250.33.169",
 		"124.250.33.170"
 	],
-	"im.memory.size": 7680
+	"im.memory.size": 7680,
+	"socket.http.port": 8081
 }

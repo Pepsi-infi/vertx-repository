@@ -25,5 +25,6 @@
 		"111.206.162.232",
 		"111.206.162.235"
 	],
-	"im.memory.size": 256
+	"im.memory.size": 256,
+	"socket.http.port": 1100
 }

@@ -31,6 +31,8 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 	private int socketPort;
 
+	private int socketHTTPPort;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -40,6 +42,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		eb = vertx.eventBus();
 		innerIP = IPUtil.getInnerIP();
 		socketPort = config().getInteger("tcp.port");
+		socketHTTPPort = config().getInteger("socket.http.port");
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
@@ -47,9 +50,9 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = getServerHost();
-		createHttpServer(router, serverHost, RestConstants.Socket.HTTP_PORT)
+		createHttpServer(router, serverHost, socketHTTPPort)
 				.compose(serverCreated -> publishHttpEndpoint(RestConstants.Socket.SERVICE_NAME, serverHost,
-						RestConstants.Socket.HTTP_PORT, RestConstants.Socket.SERVICE_ROOT))
+						socketHTTPPort, RestConstants.Socket.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
 	}
 
