@@ -112,7 +112,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 					} else {
 						JsonArray oldSocket = config().getJsonArray("oldSocket");
 						Random rand = new Random();
-						int pos = rand.nextInt(oldSocket.size() - 1);
+						int pos = rand.nextInt(oldSocket.size());
 
 						result.put("code", 0);
 						result.put("time", System.currentTimeMillis());
