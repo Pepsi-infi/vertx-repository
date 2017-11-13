@@ -1,8 +1,5 @@
 package tp.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import helper.XProxyHelper;
 import io.vertx.circuitbreaker.CircuitBreaker;
 import io.vertx.circuitbreaker.CircuitBreakerOptions;
@@ -53,7 +50,7 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 		JsonObject cbOptions = circuitObject != null ? circuitObject : new JsonObject();
 		CircuitBreakerOptions options = new CircuitBreakerOptions();
 		options.setMaxFailures(cbOptions.getInteger("max-failures", 3));
-		options.setTimeout(cbOptions.getLong("timeout", 5000L));
+		options.setTimeout(cbOptions.getLong("timeout", 3000L));
 		options.setFallbackOnFailure(true);
 		options.setResetTimeout(cbOptions.getLong("reset-timeout", 30000L));
 		String name = cbOptions.getString("name", "circuit-breaker");
@@ -79,7 +76,8 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 							resp.body());
 					future.complete(resp.body());
 				} else {
-					logger.error("updateOnlineState={}", resp.statusMessage());
+					logger.error("updateOnlineState, uid={}date={}content={}statusCode={}statusMessage={}", uid, date,
+							content.encode(), resp.statusCode(), resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
@@ -110,8 +108,8 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 							resp.body());
 					future.complete(resp.body());
 				} else {
-					logger.error("updateOnlineSimple, statusCode={} statusMessage={}", resp.statusCode(),
-							resp.statusMessage());
+					logger.error("updateOnlineSimple, uid={}date={}content={}statusCode={}statusMessage={}", uid, date,
+							content.encode(), resp.statusCode(), resp.statusMessage());
 					future.fail(resp.statusCode() + resp.statusMessage());
 				}
 			});
