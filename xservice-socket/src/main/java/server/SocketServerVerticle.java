@@ -49,6 +49,9 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 	private String serverType;
 
+	// TCP连接保活时间1个小时
+	private static final int KEEP_ALIVE_TIME_SECONDS = 3600;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -73,7 +76,8 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());
 
-		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("tcp.port"));
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("tcp.port"))
+				.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(new Handler<NetSocket>() {
