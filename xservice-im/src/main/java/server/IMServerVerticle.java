@@ -42,6 +42,9 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private String innerIP;
 	private Map<String, String> ipMap = new HashMap<String, String>();
 
+	// TCP连接保活时间1个小时
+	private static final int KEEP_ALIVE_TIME_SECONDS = 3600;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -58,7 +61,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
 
-		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"));
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"))
+				.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
 		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
@@ -210,8 +214,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 		eb.send(handlerID, aMsgHeader);
 
-//		sendTextNotification(handlerID, clientVersion, cmd);
-//		sendAd(handlerID, clientVersion, cmd);
+		// sendTextNotification(handlerID, clientVersion, cmd);
+		// sendAd(handlerID, clientVersion, cmd);
 	}
 
 	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
