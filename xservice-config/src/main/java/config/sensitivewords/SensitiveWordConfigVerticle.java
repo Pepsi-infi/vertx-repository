@@ -37,7 +37,7 @@ public class SensitiveWordConfigVerticle extends AbstractVerticle {
 
 		options.setSendTimeout(3000);
 
-		vertx.setPeriodic(10000, handler -> {
+		vertx.setPeriodic(60000, handler -> {
 			retriveSensitiveWord();
 		});
 	}
