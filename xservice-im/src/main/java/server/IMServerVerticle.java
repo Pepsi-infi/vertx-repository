@@ -61,7 +61,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
 
-		NetServerOptions options = new NetServerOptions().setPort(4321);
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"));
 		options.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
