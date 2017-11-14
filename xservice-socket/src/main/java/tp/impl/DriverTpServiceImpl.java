@@ -275,4 +275,36 @@ public class DriverTpServiceImpl extends AbstractVerticle implements DriverTpSer
 			}
 		});
 	}
+
+	@Override
+	public void updateMsgState(JsonObject param, Handler<AsyncResult<String>> result) {
+		circuitBreaker.<String>execute(future -> {
+			String userId = param.getString("userId");
+			String msgId = param.getString("msgId");
+
+			String requestURI = new StringBuffer("/webservice/chat/checkMsg/").append("chatUserId=").append(userId)
+					.append("&msgId=").append(msgId).toString();
+
+			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
+					.as(BodyCodec.string()).rxSend();
+
+			httpRequest.subscribe(resp -> {
+				if (resp.statusCode() == 200) {
+					logger.info("updateMsgState, uid={}&msgId={}, response={}", userId, msgId, resp.body());
+					future.complete(resp.body());
+				} else {
+					logger.error("updateMsgState, uid={}&msgId={}, statusCode={} statusMessage={}", userId, msgId,
+							resp.statusCode(), resp.statusMessage());
+					future.fail(resp.statusCode() + resp.statusMessage());
+				}
+			});
+		}).setHandler(ar -> {
+			if (ar.succeeded()) {
+				result.handle(Future.succeededFuture(ar.result()));
+			} else {
+				result.handle(Future.succeededFuture(null));
+			}
+		});
+
+	}
 }

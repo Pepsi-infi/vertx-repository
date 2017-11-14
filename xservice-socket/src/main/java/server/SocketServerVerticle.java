@@ -151,6 +151,9 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 18:// 取消订阅
 								unsubscribe(handlerID, message);
 								break;
+							case 313:
+								msgConfirm(handlerID, message);
+								break;
 							default:
 								break;
 							}
@@ -166,12 +169,14 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				socket.closeHandler(v -> {
 					setClientOffline(handlerID);
 					sessionLogout(handlerID);
+					socket.close();
 					logger.info("closeHandler, handlerID={}", handlerID);
 				});
 
 				socket.exceptionHandler(t -> {
 					setClientOffline(handlerID);
 					sessionLogout(handlerID);
+					socket.close();
 					logger.info("exceptionHandler, handlerID={}", handlerID);
 				});
 			}
@@ -681,6 +686,53 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
 			if (reply.succeeded()) {
 				logger.info("sessionLogout, {}", handlerID);
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void msgConfirm(String handlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				if (StringUtils.isEmpty(uid)) {
+					// uid is null, relogin.
+					sendReLogin(handlerID, null);
+				} else {
+					JsonObject msgConfirmParam = new JsonObject();
+					msgConfirmParam.put("userId", uid);
+					msgConfirmParam.put("msgId", message.getString("msgId"));
+
+					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+						dTpService.updateMsgState(msgConfirmParam, r -> {
+							if (r.succeeded()) {
+								logger.info("msgConfirm, handlerID={} userId={} result={}", handlerID, uid, r.result());
+							} else {
+								logger.error("msgConfirm, handlerID={} userId={} e={}", handlerID, uid,
+										r.cause().getMessage());
+							}
+						});
+					} else {
+						// pTpService.unsubscribe(msgConfirmParam, r -> {
+						// if (r.succeeded()) {
+						// logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid,
+						// r.result());
+						// } else {
+						// logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+						// r.cause().getMessage());
+						// }
+						// });
+					}
+				}
 			} else {
 				// TODO
 			}

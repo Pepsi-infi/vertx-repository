@@ -35,4 +35,6 @@ public interface DriverTpService {
 	void subscribe(JsonObject msg, Handler<AsyncResult<String>> result);
 
 	void unsubscribe(JsonObject msg, Handler<AsyncResult<String>> result);
+
+	void updateMsgState(JsonObject msg, Handler<AsyncResult<String>> result);
 }
