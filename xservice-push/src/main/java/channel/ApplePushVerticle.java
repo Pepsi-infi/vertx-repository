@@ -8,11 +8,8 @@ import com.dbay.apns4j.impl.ApnsServiceImpl;
 import com.dbay.apns4j.model.ApnsConfig;
 import com.dbay.apns4j.model.Feedback;
 import com.dbay.apns4j.model.Payload;
-import com.xiaomi.push.sdk.ErrorCode;
-import com.xiaomi.xmpush.server.Result;
 
 import cn.teaey.apns4j.Apns4j;
-import cn.teaey.apns4j.network.ApnsChannelFactory;
 import cn.teaey.apns4j.network.ApnsNettyChannel;
 import cn.teaey.apns4j.network.async.ApnsFuture;
 import cn.teaey.apns4j.protocol.ApnsPayload;
@@ -33,8 +30,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 	private static final Logger logger = LoggerFactory.getLogger(ApplePushVerticle.class);
 
 	private JsonObject config;
-
-	private ApnsChannelFactory apnsChannelFactory;
 
 	private ApnsNettyChannel apnsChannel;
 
@@ -57,7 +52,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		String keyStorePwd = config.getString("push.apns.keyStorePwd");
 		String keyStorePath = config.getString("push.apns.keyStorePath");
-		
+
 		boolean devEnv = false;
 
 		InputStream is = this.getClass().getClassLoader().getResourceAsStream(keyStorePath);
@@ -82,7 +77,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		if (apnsService == null) {
 			try {
 				ApnsConfig config = new ApnsConfig();
-//				is = new FileInputStream(new File(keyStorePath));
+				// is = new FileInputStream(new File(keyStorePath));
 				config.setKeyStore(is);
 				config.setDevEnv(devEnv);
 				config.setPassword(keyStorePwd);
@@ -142,8 +137,9 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		// sendApns(deviceToken, title, body, msgbody, resultHandler);
 		vertx.executeBlocking(future -> {
 			try {
-				
-				logger.info("apns send params:deviceToken {} title {} body {} msgbody {}",deviceToken,title,body,msgbody);
+
+				logger.info("apns send params:deviceToken {} title {} body {} msgbody {}", deviceToken, title, body,
+						msgbody);
 				boolean sendResult = sendApnsByDbay(deviceToken, title, body, msgbody);
 				future.complete(sendResult);
 			} catch (Exception e) {
@@ -152,25 +148,26 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			}
 
 		}, res -> {
-			
-			if(res.succeeded()){
-				
-				boolean sendResult=(boolean) res.result();
-				
+
+			if (res.succeeded()) {
+
+				boolean sendResult = (boolean) res.result();
+
 				if (!sendResult) {
 					resultHandler.handle(Future.failedFuture("APNS PUSH FAILED"));
 					return;
 				}
 
 				resultHandler.handle(Future.succeededFuture(new BaseResponse()));
-				
-			}else{
-				logger.error("APNS推送调用异常",res.cause());
+
+			} else {
+				logger.error("APNS推送调用异常", res.cause());
 				resultHandler.handle(Future.failedFuture(res.cause()));
 			}
-	
+
 		});
-		//boolean sendResult= sendApnsByDbay(deviceToken, title, body, msgbody);
+		// boolean sendResult= sendApnsByDbay(deviceToken, title, body,
+		// msgbody);
 
 	}
 

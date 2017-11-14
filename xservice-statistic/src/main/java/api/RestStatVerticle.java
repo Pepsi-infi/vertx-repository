@@ -30,6 +30,8 @@ import utils.VersionCompareUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lufei Date : 2017/7/25 11:40 Description :
@@ -92,17 +94,13 @@ public class RestStatVerticle extends RestAPIVerticle {
 		if (null == userDeviceDto) {
 			paramBadRequest(context, "Required  parameters cannot be empty.");
 		} else {
+
+			int cmp = getVersionCompareResult(userDeviceDto.getChannel() + "", userDeviceDto.getAppVersion());
 			
-			int cmp=0;
-			if((ChannelEnum.APNS.getType()+"").equals(userDeviceDto.getChannel())){
-				//apns 用appVersion来判断版本问题
-				cmp = VersionCompareUtil.hisCompare2Current("5.2.2", userDeviceDto.getAppVersion());
-			}else if((ChannelEnum.GCM.getType()+"").equals(userDeviceDto.getChannel())||(ChannelEnum.XIAOMI.getType()+"").equals(userDeviceDto.getChannel())){
-				//TODO gcm 或者 xiaomi 采用其他方式  目前默认是历史版本 所以会走之前的设备上报逻辑   版本控制方式需要再处理
-			}
-			
+			logger.info("cmp="+cmp);
+
 			if (cmp >= 0) {
-				// 当前版本号小于5.2.2,按照蚂蚁指纹来进行上报
+				// 当前版本号小于等于5.2.2,按照蚂蚁指纹来进行上报
 				deviceService.reportDevice(userDeviceDto, resultHandler(context, JsonUtil::encodePrettily));
 			} else {
 				// 当前版本号大于5.2.2 add by ylf 按照设备id号来更新设备表的数据
@@ -137,19 +135,13 @@ public class RestStatVerticle extends RestAPIVerticle {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
 		}
-		logger.info("appVersion="+appVersion);
-		
-		int cmp=0;
-		if((ChannelEnum.APNS.getType()+"").equals(channel)){
-			//apns 用appVersion来判断版本问题
-			cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
-		}else if((ChannelEnum.GCM.getType()+"").equals(channel)||(ChannelEnum.XIAOMI.getType()+"").equals(channel)){
-			//TODO gcm 或者 xiaomi 采用其他方式  目前默认是历史版本 所以会走之前的设备上报逻辑   版本控制方式需要再处理
-		}
+		logger.info("appVersion=" + appVersion);
+
+		int cmp = getVersionCompareResult(channel, appVersion);
 
 		if (cmp < 0) {
-			//当前版本号大于5.2.2,需要增加对appVersion的判断
-			if(StringUtil.isNullOrEmpty(deviceId)){
+			// 当前版本号大于5.2.2,需要增加对deviceId的判断
+			if (StringUtil.isNullOrEmpty(deviceId)) {
 				logger.error("deviceId is null");
 				return null;
 			}
@@ -182,6 +174,33 @@ public class RestStatVerticle extends RestAPIVerticle {
 			userDeviceDto.setIsAcceptPush(Integer.valueOf(isAcceptPush));
 		}
 		return userDeviceDto;
+	}
+
+	private int getVersionCompareResult(String channel, String appVersion) {
+		int cmp = 0;
+		if ((ChannelEnum.APNS.getType() + "").equals(channel) && matchVersion(appVersion)) {
+			// apns 用appVersion来判断版本问题
+			cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
+		} else if (((ChannelEnum.GCM.getType() + "").equals(channel)
+				|| (ChannelEnum.XIAOMI.getType() + "").equals(channel))) {
+			// 针对安卓版本做的适配 gcm 或者 xiaomi 采用其他方式 目前默认是历史版本 所以会走之前的设备上报逻辑
+			// 版本控制方式需要再处理
+			// 5.2.2版本之前（包括5.2.2）,安卓会传数字，5.2.2=43 该判断代表安卓端上送的是5.2.2之后的版本
+			if(matchVersion(appVersion)){
+				cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
+			}else{
+				//代表是之前安卓版本的逻辑
+				cmp=0;
+			}
+		}
+		return cmp;
+	}
+
+	private boolean matchVersion(String appVersion) {
+		String regex = "^([1-9][0-9]+)(\\.[1-9][0-9]+)(\\.[1-9][0-9]+)";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(appVersion);
+		return matcher.matches();
 	}
 
 	private void queryMsgStatResult(RoutingContext context) {
@@ -231,6 +250,15 @@ public class RestStatVerticle extends RestAPIVerticle {
 			msgStatDtos.add(statDto);
 		}
 		return msgStatDtos;
+	}
+
+	public static void main(String[] args) {
+
+		String regex = "^([1-9][0-9]+)(\\.[1-9][0-9]+)(\\.[1-9][0-9]+)";
+
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher("555.202.33");
+		System.out.println(matcher.matches());
 	}
 
 }
