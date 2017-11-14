@@ -44,8 +44,8 @@ public class StartVerticle extends AbstractVerticle {
 		//this.deployVerticle(ApnsVerticle.class.getName());
 		
 		//消息补发
-		this.deployVerticle(PassengerUnSendVerticle.class.getName());
-		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
+//		this.deployVerticle(PassengerUnSendVerticle.class.getName());
+//		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
 
 		// 提供其他非EventBus服务
 	}
