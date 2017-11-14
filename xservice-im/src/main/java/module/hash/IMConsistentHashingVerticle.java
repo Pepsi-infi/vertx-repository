@@ -176,7 +176,7 @@ public class IMConsistentHashingVerticle extends BaseServiceVerticle {
 		// result.put("host", en.getValue());
 		// }
 
-		logger.info("getIMNode, {}", innerJson.getString("host"));
+		logger.info("手机号对应的外网IP={}getIMNode, {}", key,innerJson.getString("host"));
 		result.put("host", ipMap.get(innerJson.getString("host")));
 
 		return result;

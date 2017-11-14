@@ -100,7 +100,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 							}
 						} else {
 							SQIMBody imMessage = Json.decodeValue(buffer, SQIMBody.class);
-							logger.info("imMessage body={}", imMessage.toString());
+							logger.info("cmd={},imMessage body={}", cmd,imMessage.toString());
 							switch (cmd) {
 							case IMCmd.HEART_BEAT:
 								heartBeat(handlerID, clientVersion, cmd);
@@ -162,10 +162,14 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				});
 				event.handler(parser);
 				event.closeHandler(v -> {
+					logger.info("socket 连接关闭");
 					socketClose(handlerID);
+					event.close();
 				});
 				event.exceptionHandler(t -> {
+					logger.info("socket 连接异常="+t.getMessage());
 					socketClose(handlerID);
+					event.close();
 				});
 			}
 		});
