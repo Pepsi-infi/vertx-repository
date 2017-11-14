@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import module.webclient.HttpRequestVerticle;
 import org.apache.commons.lang.StringUtils;
 
 import constants.IMCmd;
@@ -237,54 +238,79 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
 		JsonObject param = new JsonObject();
 
-		JsonObject header = new JsonObject();
-		header.put("clientVersion", clientVersion);
-		header.put("cmdId", cmd);
-		header.put("fromHandlerID", handlerID);
+		//查询真实手机号
+		JsonObject orderJson = new JsonObject();
+		orderJson.put("orderNo",imMessage.getSceneId());
 
-		param.put("header", header);
-		param.put("body", JsonObject.mapFrom(imMessage));
+		DeliveryOptions orderOption = new DeliveryOptions();
+		orderOption.addHeader("action", HttpRequestVerticle.HttpMethod.GET_REAL_PHONE);
+		orderOption.setSendTimeout(3000);
+		eb.<JsonObject>send(HttpRequestVerticle.class.getName(),orderJson,orderOption,res->{
+			if(res.succeeded()){
+				logger.info("查询 order api 结果="+res.result().toString());
+				JsonObject resJson = res.result().body();
 
-		DeliveryOptions option = new DeliveryOptions();
-		option.addHeader("action", C2CVerticle.method.sendMessage);
-		option.setSendTimeout(3000);
-
-		//
-		DeliveryOptions chOption = new DeliveryOptions();
-		chOption.setSendTimeout(3000);
-		chOption.addHeader("action", "getInnerNode");
-
-		Future<Message<JsonObject>> chFuture = Future.future();
-
-		JsonObject message = new JsonObject();
-		message.put("userId", imMessage.getToTel());
-		eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
-
-		chFuture.setHandler(a -> {
-			if (a.succeeded()) {
-				String innerHost = a.result().body().getString("host");
-				eb.send(C2CVerticle.class.getName() + innerHost, param, option);
+				if(HttpRequestVerticle.HttpResCode.SUCCESS_CODE.equals(resJson.getString("code")) && resJson.getValue("result") != null){
+					if(imMessage.getIdentity() == 0){
+						imMessage.setFromTel(resJson.getString("driverPhone"));
+						imMessage.setToTel(resJson.getString("customPhone"));
+					}else{
+						imMessage.setFromTel(resJson.getString("customPhone"));
+						imMessage.setToTel(resJson.getString("driverPhone"));
+					}
+				}
 			}
+			JsonObject header = new JsonObject();
+			header.put("clientVersion", clientVersion);
+			header.put("cmdId", cmd);
+			header.put("fromHandlerID", handlerID);
+
+			param.put("header", header);
+			param.put("body", JsonObject.mapFrom(imMessage));
+
+			DeliveryOptions option = new DeliveryOptions();
+			option.addHeader("action", C2CVerticle.method.sendMessage);
+			option.setSendTimeout(3000);
+
+			//
+			DeliveryOptions chOption = new DeliveryOptions();
+			chOption.setSendTimeout(3000);
+			chOption.addHeader("action", "getInnerNode");
+
+			Future<Message<JsonObject>> chFuture = Future.future();
+
+			JsonObject message = new JsonObject();
+			message.put("userId", imMessage.getToTel());
+			eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+
+			chFuture.setHandler(a -> {
+				if (a.succeeded()) {
+					String innerHost = a.result().body().getString("host");
+					eb.send(C2CVerticle.class.getName() + innerHost, param, option);
+				}
+			});
+			//
+
+			SQIMBody ackMsg = new SQIMBody();
+			ackMsg.setMsgId(imMessage.getMsgId());
+			ackMsg.setTimeStamp(System.currentTimeMillis());
+
+			int ackMsgBodyLength = 0;
+			String ackMsgStr = Json.encode(ackMsg);
+			try {
+				ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
+			} catch (Exception e) {
+				logger.error(e);
+			}
+			// 给FROM发A
+			Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+					cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
+
+			logger.info("ACK, cmd={}ackMsgStr={}", cmd, ackMsgStr);
+			eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
+
 		});
-		//
 
-		SQIMBody ackMsg = new SQIMBody();
-		ackMsg.setMsgId(imMessage.getMsgId());
-		ackMsg.setTimeStamp(System.currentTimeMillis());
-
-		int ackMsgBodyLength = 0;
-		String ackMsgStr = Json.encode(ackMsg);
-		try {
-			ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		// 给FROM发A
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
-
-		logger.info("ACK, cmd={}ackMsgStr={}", cmd, ackMsgStr);
-		eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
 	}
 
 	private void socketClose(String handlerID) {
