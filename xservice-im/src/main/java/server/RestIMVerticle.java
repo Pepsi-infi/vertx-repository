@@ -103,7 +103,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		logger.info("userTel={}", userTel);
 		httpResp.clear();
 		if (StringUtils.isNotEmpty(userTel)) {
-			userTel = userTel.replace("\"","");
+			if(userTel.contains("\"")){
+				userTel = userTel.replace("\"","");
+			}
 			logger.info("客户端请求获取外网IP,手机号="+userTel);
 			DeliveryOptions chOption = new DeliveryOptions();
 			chOption.setSendTimeout(3000);
