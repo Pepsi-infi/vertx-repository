@@ -251,16 +251,17 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		orderOption.setSendTimeout(3000);
 		eb.<JsonObject>send(HttpRequestVerticle.class.getName(),orderJson,orderOption,res->{
 			if(res.succeeded()){
-				logger.info("查询 order api 结果="+res.result().toString());
+				logger.info("查询 order api 结果="+res.result().body().toString());
 				JsonObject resJson = res.result().body();
 
 				if(HttpRequestVerticle.HttpResCode.SUCCESS_CODE.equals(resJson.getString("code")) && resJson.getValue("result") != null){
+					JsonObject relPhone = resJson.getJsonObject("result");
 					if(imMessage.getIdentity() == 0){
-						imMessage.setFromTel(resJson.getString("driverPhone"));
-						imMessage.setToTel(resJson.getString("customPhone"));
+						imMessage.setFromTel(relPhone.getString("driverPhone"));
+						imMessage.setToTel(relPhone.getString("customPhone"));
 					}else{
-						imMessage.setFromTel(resJson.getString("customPhone"));
-						imMessage.setToTel(resJson.getString("driverPhone"));
+						imMessage.setFromTel(relPhone.getString("customPhone"));
+						imMessage.setToTel(relPhone.getString("driverPhone"));
 					}
 				}
 			}

@@ -155,7 +155,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		}
 
 		FindOptions options = new FindOptions();
-		options.setLimit(100);
+		options.setLimit(200);
 
 		options.setSort(new JsonObject().put("timeStamp", 1));
 
