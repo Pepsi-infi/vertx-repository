@@ -23,12 +23,18 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 
 	private int count;
 
+	private String oldIP;
+	private String newIP;
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public void start() throws Exception {
 		innerIP = IPUtil.getInnerIP();
 		udpPort = config().getInteger("udp.port");
-		oldUDPServer = new ArrayList<String>();
-		newUDPServer = new ArrayList<String>();
+
+		oldUDPServer = config().getJsonArray("udp.server").getList();
+		newUDPServer = config().getJsonArray("new.udp.server").getList();
+
 		count = 0;
 
 		logger.info("innerIP={}updPort={}config={}", innerIP, udpPort, config().encode());
@@ -39,19 +45,19 @@ public class UdpProxyServerVerticle extends AbstractVerticle {
 				logger.info("UDP listening...");
 				receiver.handler(packet -> {
 					count++;
-					logger.info("UDP packet " + packet.data());
-					receiver.send(packet.data(), 9098, oldUDPServer.get(Math.abs(count % oldUDPServer.size())),
-							handler -> {
-								if (handler.succeeded()) {
+					oldIP = oldUDPServer.get(Math.abs(count % oldUDPServer.size()));
+					receiver.send(packet.data(), 9098, oldIP, handler -> {
+						if (handler.succeeded()) {
+							logger.info("UDP packet, oldIP={}data={}", oldIP, packet.data());
+						} else {
+							logger.error(handler.cause().getMessage());
+						}
+					});
 
-								} else {
-									logger.error(handler.cause().getMessage());
-								}
-							});
-
-					receiver.send(packet.data(), 9099, newUDPServer.get(Math.abs(count % newUDPServer.size())), r -> {
+					newIP = newUDPServer.get(Math.abs(count % newUDPServer.size()));
+					receiver.send(packet.data(), 9099, newIP, r -> {
 						if (r.succeeded()) {
-
+							logger.info("UDP packet, newIP={}data={}", newIP, packet.data());
 						} else {
 							logger.error(r.cause().getMessage());
 						}
