@@ -10,6 +10,7 @@ import module.persistence.MongoVerticle;
 import module.quickphrase.QuickPhraseVerticle;
 import module.sensitivewords.SensitiveWordsVerticle;
 import module.session.IMSessionVerticle;
+import module.webclient.HttpRequestVerticle;
 import server.IMServerVerticle;
 import server.RestIMVerticle;
 
@@ -33,6 +34,9 @@ public class StartVerticle extends AbstractVerticle {
 		 * Instance should be 1 because of ehcache.
 		 */
 		vertx.deployVerticle(IMSessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+
+		//部署HTTP vert 服务
+		vertx.deployVerticle(HttpRequestVerticle.class.getName(),new DeploymentOptions().setConfig(config()));
 	};
 
 	public static DeploymentOptions readBossOpts() {
