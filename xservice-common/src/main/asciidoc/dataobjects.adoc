@@ -35,6 +35,7 @@
 |[[appVersion]]`appVersion`|`String`|-
 |[[channel]]`channel`|`Number (Integer)`|-
 |[[createTime]]`createTime`|`String`|-
+|[[deviceId]]`deviceId`|`String`|-
 |[[deviceToken]]`deviceToken`|`String`|-
 |[[deviceType]]`deviceType`|`String`|-
 |[[id]]`id`|`Number (Long)`|-
