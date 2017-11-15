@@ -9,17 +9,12 @@ fi
 
 nohup java \
 -server \
--XX:+PrintGCApplicationStoppedTime \
--XX:+PrintGCTimeStamps \
--XX:+PrintGCDetails \
+-XX:+PrintGCApplicationStoppedTime -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Xloggc:${root_path}/gc.log \
 -Xms2g -Xmx2g -Xmn1380m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
+-XX:+UseG1GC \
 -XX:MaxDirectMemorySize=16g \
--XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
--XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
--XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
--XX:-UseCounterDecay \
+-XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
--Xloggc:${root_path}/gc.log \
 -Dlog.path=${root_path}/log \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
