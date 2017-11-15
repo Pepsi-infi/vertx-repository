@@ -78,8 +78,8 @@
 	"im.memory.size": 7680,
 	"im.http.port": 10001,
 	"order.api":{
-		//"host":"http://10.0.200.118",//生产
-		"host":"http://10.0.10.113:8095",//预生产
+		"host":"http://10.0.10.113:8095",
 		"path":"/virtualTrumpet/getIMVirtualPhone"
 	}
 }
+
