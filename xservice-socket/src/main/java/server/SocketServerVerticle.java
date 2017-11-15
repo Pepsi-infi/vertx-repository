@@ -397,9 +397,6 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 	}
 
 	private void sendReLogin(String writeHandlerID, String socketNode) {
-		if (StringUtils.isEmpty(socketNode)) {
-			socketNode = "111.206.162.232:8088";
-		}
 		JsonObject message = new JsonObject();
 		message.put("cmd", 57);
 		message.put("data", socketNode);
