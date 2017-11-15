@@ -33,6 +33,7 @@ import result.ResultData;
 import service.AdMessagePushService;
 import service.ApplePushService;
 import service.MsgRecordService;
+import service.PassengerUnSendService;
 import service.RedisService;
 import service.SocketPushService;
 import service.XiaoMiPushService;
@@ -59,6 +60,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 
 	private ApplePushService applePushService;
 
+	private PassengerUnSendService passengerUnSendService;
+
 	private String token;
 	private Integer channel;
 
@@ -66,7 +69,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 
 	@Override
 	public void start() throws Exception {
-		
+
 		super.start();
 
 		XProxyHelper.registerService(AdMessagePushService.class, vertx, this, AdMessagePushService.SERVICE_ADDRESS);
@@ -88,15 +91,16 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP)
+							.toString()));
 		} else {
 			JsonObject recieveMsg = null;
 			try {
 				recieveMsg = new JsonObject(httpMsg);
 			} catch (Exception e) {
 				logger.error("大后台广告消息推送异常", e);
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "data format is error", Collections.EMPTY_MAP).toString()));
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						"data format is error", Collections.EMPTY_MAP).toString()));
 			}
 			this.dealHttpMessage(recieveMsg, resultHandler);
 		}
@@ -105,9 +109,10 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private void dealHttpMessage(JsonObject receiveMsg, Handler<AsyncResult<String>> resultHandler) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
-		if (ResultData.FAIL == checkResult.getCode()) {			
+		if (ResultData.FAIL == checkResult.getCode()) {
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP)
+							.toString()));
 			return;
 		}
 
@@ -122,9 +127,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 				pushMsgToDownStream(receiveMsg, pushFuture.completer());
 			} else {
 				logger.error("验证重复推送：" + res.cause());
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
@@ -136,24 +140,39 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+				saveUnSendMsg(receiveMsg);
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
 		// 根据推送结果返回结果数据给http调用方
 		statFuture.setHandler(res -> {
 			if (res.succeeded()) {
-				resultHandler
-						.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
-			} else {
 				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+						new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
+			} else {
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
 		});
 
+	}
+
+	// 未推送成功的消息入库，用户上线继续推送
+	private void saveUnSendMsg(JsonObject srcMsg) {
+		try {
+			JsonObject param = new JsonObject();
+			param.put("msgId", srcMsg.getValue("msgId") + "");
+			param.put("phone", srcMsg.getString("phone"));
+			param.put("userId", srcMsg.getValue("customerId") + "");
+			param.put("expireTime", srcMsg.getValue("expireTime") + "");
+			param.put("content", srcMsg.toString());
+			param.put("callFlag", "1");
+			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
+		} catch (Exception e) {
+			logger.error("保存未推送成功的消息失败" + e);
+		}
 	}
 
 	public void responseSuccess(HttpServerResponse resp, String msg) {
@@ -240,11 +259,12 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		config = config().getJsonObject("push.config");
 		socketPushService = SocketPushService.createProxy(vertx);
 		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
-		//msgRecordService = MsgRecordService.createProxy(vertx);
+		// msgRecordService = MsgRecordService.createProxy(vertx);
 		redisService = RedisService.createProxy(vertx);
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
 		applePushService = ApplePushService.createProxy(vertx);
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx);
 	}
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {

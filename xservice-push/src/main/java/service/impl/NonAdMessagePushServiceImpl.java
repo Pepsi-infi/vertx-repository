@@ -1,5 +1,14 @@
 package service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import constant.PushConsts;
 import domain.MsgRecord;
 import enums.ErrorCodeEnum;
@@ -20,17 +29,19 @@ import iservice.DeviceService;
 import iservice.MsgStatService;
 import iservice.dto.DeviceDto;
 import iservice.dto.MsgStatDto;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import result.ResultData;
-import service.*;
+import service.ApplePushService;
+import service.MsgRecordService;
+import service.NonAdMessagePushService;
+import service.PassengerUnSendService;
+import service.RedisService;
+import service.SocketPushService;
+import service.XiaoMiPushService;
 import util.DateUtil;
 import util.Md5Util;
 import utils.BaseResponse;
 import utils.IPUtil;
 import xservice.RestAPIVerticle;
-
-import java.util.*;
 
 public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonAdMessagePushService {
 
@@ -49,6 +60,8 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 	private DeviceService deviceService;
 
 	private ApplePushService applePushService;
+
+	private PassengerUnSendService passengerUnSendService;
 
 	private String token;
 	private Integer channel;
@@ -132,6 +145,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
+				saveUnSendMsg(receiveMsg);
 				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
 						res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
 			}
@@ -148,6 +162,22 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 			}
 		});
 
+	}
+
+	// 未推送成功的消息入库，用户上线继续推送
+	private void saveUnSendMsg(JsonObject srcMsg) {
+		try {
+			JsonObject param = new JsonObject();
+			param.put("msgId", srcMsg.getValue("msgId") + "");
+			param.put("phone", srcMsg.getString("phone"));
+			param.put("userId", srcMsg.getValue("customerId") + "");
+			param.put("expireTime", srcMsg.getValue("expireTime") + "");
+			param.put("content", srcMsg.toString());
+			param.put("callFlag", "1");
+			passengerUnSendService.pushAddUnSendMsg(param, Future.future());
+		} catch (Exception e) {
+			logger.error("保存未推送成功的消息失败" + e);
+		}
 	}
 
 	private void checkSender(String senderId, String senderKey, Handler<AsyncResult<Void>> handler) {
@@ -272,6 +302,7 @@ public class NonAdMessagePushServiceImpl extends RestAPIVerticle implements NonA
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
 		applePushService = ApplePushService.createProxy(vertx);
+		passengerUnSendService = PassengerUnSendService.createProxy(vertx);
 	}
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {

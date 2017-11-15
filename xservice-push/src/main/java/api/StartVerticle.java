@@ -9,11 +9,11 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
-import push.apns.ApnsVerticle;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
+import service.impl.PassengerUnSendServiceImpl;
 import service.impl.RedisServiceImpl;
 import xservice.HttpClientVerticle;
 
@@ -42,6 +42,10 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(ConfigServiceImpl.class.getName());
 		//部署APNS Verticle
 		//this.deployVerticle(ApnsVerticle.class.getName());
+		
+		//消息补发
+		this.deployVerticle(PassengerUnSendVerticle.class.getName());
+		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
 
 		// 提供其他非EventBus服务
 	}
