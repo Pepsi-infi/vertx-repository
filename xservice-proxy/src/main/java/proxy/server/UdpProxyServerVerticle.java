@@ -1,6 +1,5 @@
 package proxy.server;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.vertx.core.AbstractVerticle;
