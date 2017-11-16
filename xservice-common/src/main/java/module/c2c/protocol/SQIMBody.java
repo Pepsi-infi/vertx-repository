@@ -263,12 +263,28 @@ public class SQIMBody {
 		this.height = height;
 	}
 
-	@Override
-	public String toString() {
-		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
-				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
-				+ ", content=" + content + ", jumpUrl=" + jumpUrl + ", timeStamp=" + timeStamp + ", lon=" + lon
-				+ ", lat=" + lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
-	}
-
+    @Override
+    public String toString() {
+        return "SQIMBody{" +
+                "userTel='" + userTel + '\'' +
+                ", fromTel='" + fromTel + '\'' +
+                ", identity=" + identity +
+                ", toTel='" + toTel + '\'' +
+                ", msgId='" + msgId + '\'' +
+                ", sceneId='" + sceneId + '\'' +
+                ", sceneType=" + sceneType +
+                ", msgType=" + msgType +
+                ", content='" + content + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", jumpUrl='" + jumpUrl + '\'' +
+                ", timeStamp=" + timeStamp +
+                ", lon=" + lon +
+                ", lat=" + lat +
+                ", sAddress='" + sAddress + '\'' +
+                ", address='" + address + '\'' +
+                ", duration=" + duration +
+                ", clientVersion='" + clientVersion + '\'' +
+                '}';
+    }
 }
