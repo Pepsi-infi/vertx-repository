@@ -10,5 +10,9 @@
 			"innerIP": "10.0.4.21",
 			"node": "124.250.33.161:10000"
 		}
-	]
+	],
+	"order.api":{
+		"host":"http://10.0.200.118",
+		"path":"/virtualTrumpet/getIMVirtualPhone"
+	}
 }

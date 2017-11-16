@@ -279,7 +279,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 								}
 								logger.info("getQuickPhrase success");
 							}else{
-								logger.error("getQuickPhrase failed={}",confRes.cause().getMessage());
+								logger.error("getQuickPhrase userId={} failed={}",userId,confRes.cause().getMessage());
 							}
 							httpResp.put("data", userQuickPhrase);
 							httpResp.put("msg", "成功");
@@ -289,6 +289,14 @@ public class RestIMVerticle extends RestAPIVerticle {
 							context.response().putHeader("content-type", "application/json; charset=utf-8")
 									.end(httpResp.encode());
 						});
+					}else{
+						httpResp.put("data", userQuickPhrase);
+						httpResp.put("msg", "成功");
+
+						logger.info("getQuickPhrase, result={}", res.result().body().encode());
+
+						context.response().putHeader("content-type", "application/json; charset=utf-8")
+								.end(httpResp.encode());
 					}
 
 				} else {

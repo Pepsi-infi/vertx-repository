@@ -13,4 +13,7 @@ public class EventbusAddressConstant {
 	public static final String quick_phrase_verticle = "module.quickphrase.QuickPhraseVerticle";
 
 	public static final String quick_phrase_config_verticle = "config.quickphrase.QuickPhraseConfigVerticle";
+
+	//HTTP请求verticle
+	public static final String HTTP_REQUEST_CLIENT_VERT = "module.webclient.HttpRequestVerticle";
 }
