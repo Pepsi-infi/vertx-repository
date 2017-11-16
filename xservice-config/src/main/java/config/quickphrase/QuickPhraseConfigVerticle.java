@@ -1,10 +1,10 @@
 package config.quickphrase;
 
 import constants.EventbusAddressConstant;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.MultiMap;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -41,8 +41,10 @@ public class QuickPhraseConfigVerticle extends AbstractVerticle {
 				String action = headers.get("action");
 				switch (action) {
 				case "retriveQuickPhrase":
-					int type = body.getInteger("type").intValue();
-					retriveQuickPhrase(type);
+					int type = Integer.parseInt(body.getString("type"));
+					retriveQuickPhrase(type,handler->{
+						res.reply(handler.result());
+					});
 					break;
 
 				default:
@@ -52,9 +54,9 @@ public class QuickPhraseConfigVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String select_quick_phrase = "SELECT content FROM im_common_language WHERE type = ? ORDER BY weight limit 10";
+	private static final String select_quick_phrase = "SELECT title,content FROM im_quick_phrase_model WHERE identity = ? ORDER BY sort limit 10";
 
-	public void retriveQuickPhrase(int type) {
+	public void retriveQuickPhrase(int type, Handler<AsyncResult<JsonObject>> handler) {
 		mySQLClient.getConnection(res -> {
 			if (res.succeeded()) {
 				SQLConnection connection = res.result();
@@ -67,9 +69,11 @@ public class QuickPhraseConfigVerticle extends AbstractVerticle {
 
 						JsonObject message = new JsonObject();
 						message.put("result", SQLRes.result().getRows());
-						eb.send(EventbusAddressConstant.quick_phrase_verticle, message, options);
+						//eb.send(EventbusAddressConstant.quick_phrase_verticle, message, options);
+						handler.handle(Future.succeededFuture(message));
 					} else {
 						logger.error("retriveQuickPhrase, result={}", SQLRes.cause().getMessage());
+						handler.handle(Future.failedFuture(SQLRes.cause()));
 					}
 				}).close();
 			} else {

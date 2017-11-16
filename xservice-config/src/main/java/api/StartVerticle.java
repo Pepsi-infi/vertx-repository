@@ -1,5 +1,6 @@
 package api;
 
+import config.quickphrase.QuickPhraseConfigVerticle;
 import config.sensitivewords.SensitiveWordConfigVerticle;
 import config.whitelist.WhiteListConfigVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -25,6 +26,7 @@ public class StartVerticle extends BaseServiceVerticle {
 
 		vertx.deployVerticle(SensitiveWordConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
 		vertx.deployVerticle(WhiteListConfigVerticle.class.getName(), readBossOpts().setConfig(config()));
+		vertx.deployVerticle(QuickPhraseConfigVerticle.class.getName(),readBossOpts().setConfig(config()));
 	}
 
 	public static DeploymentOptions readBossOpts() {

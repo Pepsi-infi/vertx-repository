@@ -73,6 +73,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 			@Override
 			public void handle(NetSocket event) {
+
 				String handlerID = event.writeHandlerID();
 
 				final RecordParser parser = RecordParser.newFixed(MessageBuilder.HEADER_LENGTH, null);

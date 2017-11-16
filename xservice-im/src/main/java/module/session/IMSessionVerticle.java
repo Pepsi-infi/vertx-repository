@@ -124,11 +124,11 @@ public class IMSessionVerticle extends AbstractVerticle {
 			this.sessionReverse.remove(handlerId);
 		} else {
 			// socket close
-			sessionReverse.remove(handlerId);
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {
 				sessionMap.remove(uid);
 			}
+			sessionReverse.remove(handlerId);
 		}
 
 		long end = System.currentTimeMillis();
