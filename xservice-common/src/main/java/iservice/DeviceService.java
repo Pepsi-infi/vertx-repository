@@ -1,17 +1,16 @@
 package iservice;
 
+import java.util.List;
+import java.util.Map;
+
 import helper.XProxyHelper;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.serviceproxy.ProxyHelper;
 import iservice.dto.DeviceDto;
 import utils.BaseResponse;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei

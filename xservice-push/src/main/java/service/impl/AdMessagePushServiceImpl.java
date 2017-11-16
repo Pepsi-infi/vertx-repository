@@ -21,6 +21,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -66,6 +67,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private Integer channel;
 
 	private JsonObject config;
+	
+	private JsonArray jsonArray=new JsonArray();
 
 	@Override
 	public void start() throws Exception {
@@ -137,6 +140,18 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		pushFuture.setHandler(res -> {
 			if (res.succeeded()) {
 				callStatPushMsg(receiveMsg, statFuture.completer());
+				
+				//批量上报，减小数据库压力
+				
+				Future<BaseResponse> batchStatFuture=Future.future();
+				jsonArray.add(receiveMsg);
+				if(jsonArray.size()==100){
+					
+				}
+				
+				
+				
+				
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
