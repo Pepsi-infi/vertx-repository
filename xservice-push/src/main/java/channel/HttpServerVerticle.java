@@ -1,5 +1,7 @@
 package channel;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
@@ -25,6 +27,10 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private ConfigService configService;
 
 	private JsonObject config;
+	
+	private final int max_msg_size=100000;
+	
+	private LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>(max_msg_size);
 
 	@Override
 	public void start() throws Exception {
@@ -62,6 +68,11 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private void pushAdMsg(RoutingContext context) {
 		logger.info("###pushAdMsg method start###");
 		HttpServerRequest request = context.request();
+		String msg=request.getParam("body");
+		if(!queue.offer(msg)){
+			//队列已经满了
+			logger.error("this mc message queue is full");
+		}
 		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
 		logger.info("###pushAdMsg method end###");
 	}
@@ -79,5 +90,21 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		HttpServerRequest request=context.request();
 		configService.getVerifyFromMsgCenter(request.getParam("senderId"),request.getParam("senderKey"),resultHandler(context));
 		logger.info("###getVerifyFromMsgCenter method end###");
+	}
+	
+	public static void main(String[] args) {
+		LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>(10);
+		
+		while(queue.offer("好好学习")){
+			System.out.println("队列大小："+queue.size());
+
+		}
+		System.out.println("队列大小："+queue.size());
+
+		System.out.println(queue.offer("1234"));
+		
+		System.out.println("队列大小："+queue.size());
+
+
 	}
 }
