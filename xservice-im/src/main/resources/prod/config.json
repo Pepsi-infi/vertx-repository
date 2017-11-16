@@ -78,7 +78,7 @@
 	"im.memory.size": 7680,
 	"im.http.port": 10001,
 	"order.api":{
-		"host":"http://10.0.10.113:8095",
+		"host":"http://10.0.200.118",
 		"path":"/virtualTrumpet/getIMVirtualPhone"
 	}
 }
