@@ -136,12 +136,22 @@ public class FileServerVerticle extends AbstractVerticle {
 
 									if("0000".equals(resJson.getString("code")) && resJson.getValue("result") != null){
 										JsonObject relPhone = resJson.getJsonObject("result");
-										if(msgBody.getIdentity() == 0){
-											msgBody.setFromTel(relPhone.getString("driverPhone"));
-											msgBody.setToTel(relPhone.getString("customPhone"));
+										if("44".equals(msgBody.getClientVersion())){
+											if(msgBody.getIdentity() == 0){
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}else{
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}
 										}else{
-											msgBody.setFromTel(relPhone.getString("customPhone"));
-											msgBody.setToTel(relPhone.getString("driverPhone"));
+											if(msgBody.getIdentity() == 0){
+												msgBody.setFromTel(relPhone.getString("driverPhone"));
+												msgBody.setToTel(relPhone.getString("customPhone"));
+											}else{
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}
 										}
 									}
 								}
@@ -236,6 +246,8 @@ public class FileServerVerticle extends AbstractVerticle {
 		msgBody.setMsgType(msgType);
 		msgBody.setSceneType(sceneType);
 		msgBody.setSceneId(sceneId);
+
+		msgBody.setClientVersion(attriMap.get("clientVersion"));
 
 		switch (msgType) {
 		case 2:// 1文本 2语音，content为语音下载地址 3定位 4图片 5视频

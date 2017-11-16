@@ -106,6 +106,19 @@ public class SQIMBody {
 	 */
 	private Integer duration;
 
+	/**
+	 * 乘客端版本号44 用于临时解决虚拟号问题
+	 */
+	private String clientVersion;
+
+	public String getClientVersion() {
+		return clientVersion;
+	}
+
+	public void setClientVersion(String clientVersion) {
+		this.clientVersion = clientVersion;
+	}
+
 	public String getUserTel() {
 		return userTel;
 	}
