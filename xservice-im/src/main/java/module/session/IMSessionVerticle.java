@@ -112,6 +112,8 @@ public class IMSessionVerticle extends AbstractVerticle {
 		if ((cost) > 20) {
 			logger.warn("setUserSocket, cost={}", cost);
 		}
+
+		logger.info("登录信息，手机号={},handlerID={}",uid,handlerId);
 		return 0;
 	}
 
@@ -122,6 +124,7 @@ public class IMSessionVerticle extends AbstractVerticle {
 			// logout
 			this.sessionMap.remove(uid);
 			this.sessionReverse.remove(handlerId);
+			logger.info("退出删除登录信息，uid={},handlerID={}",uid,handlerId);
 		} else {
 			// socket close
 			uid = sessionReverse.get(handlerId);
@@ -129,6 +132,7 @@ public class IMSessionVerticle extends AbstractVerticle {
 				sessionMap.remove(uid);
 			}
 			sessionReverse.remove(handlerId);
+			logger.info("socket 关闭，删除缓存信息uid={},handlerID={}",uid,handlerId);
 		}
 
 		long end = System.currentTimeMillis();
