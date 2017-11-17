@@ -1,6 +1,15 @@
 package channel;
 
+import java.util.Collections;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.alibaba.rocketmq.client.exception.MQBrokerException;
+import com.alibaba.rocketmq.client.exception.MQClientException;
+import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
+import com.alibaba.rocketmq.client.producer.SendResult;
+import com.alibaba.rocketmq.common.message.Message;
+import com.alibaba.rocketmq.remoting.exception.RemotingException;
 
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
@@ -14,6 +23,7 @@ import io.vertx.ext.web.handler.CorsHandler;
 import service.AdMessagePushService;
 import service.ConfigService;
 import service.NonAdMessagePushService;
+import util.HttpUtil;
 import xservice.RestAPIVerticle;
 
 public class HttpServerVerticle extends RestAPIVerticle {
@@ -28,11 +38,9 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 	private JsonObject config;
 	
-	private final int max_msg_size=100000;
+	//TODO 用RocketMQ来实现  接收到的消息就放入消息队列，消费过程中加入处理标识true，判断标识来分批消费 false，批量消费成功，标识置为true	
+	private DefaultMQProducer producer;
 	
-	private LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>(max_msg_size);
-	
-	//TODO 用RocketMQ来实现  接收到的消息就放入消息队列，消费过程中加入处理标识true，判断标识来分批消费 false，批量消费成功，标识置为true
 
 	@Override
 	public void start() throws Exception {
@@ -42,6 +50,21 @@ public class HttpServerVerticle extends RestAPIVerticle {
 
 		// 初始化化服务
 		this.initService();
+		
+		//初始化mq producer
+		this.initMQProducer();
+		
+		
+	}
+
+	private void initMQProducer() throws MQClientException {
+		int number=new Random().nextInt(1000);
+		producer=new DefaultMQProducer("mcMessageGroup"+number);
+		producer.setNamesrvAddr(config().getJsonObject("rocketMq.config").getString("mc.message.namesrvAddr"));
+		producer.setInstanceName("mcmessage"+number);
+		producer.setMaxMessageSize(1000);
+		producer.start();
+		logger.info("mq producer init success");
 	}
 
 	private void initWebService() {
@@ -70,13 +93,36 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private void pushAdMsg(RoutingContext context) {
 		logger.info("###pushAdMsg method start###");
 		HttpServerRequest request = context.request();
-		String msg=request.getParam("body");
-		if(!queue.offer(msg)){
-			//队列已经满了
-			logger.error("this mc message queue is full");
-		}
-		adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
-		logger.info("###pushAdMsg method end###");
+		String httpMsg=request.getParam("body");
+		Message msg=new Message(config().getJsonObject("rocketMq.config").getString("mc.ad.message.topic"), httpMsg.getBytes());
+//		vertx.executeBlocking(blockingCodeHandler->{
+//			SendResult result=null;
+//			try {
+//				result= producer.send(msg);
+//				HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
+//				logger.info("producer="+producer);
+//			} catch (Exception e) {
+//				logger.error("push msg 2 mq error,producer="+producer, e);
+//				HttpUtil.writeFailResponse2Client(context.response(),e.getMessage());
+//			}	
+//			blockingCodeHandler.complete(result);
+//		}, resultHandler->{
+//			
+//			SendResult result=(SendResult) resultHandler.result();
+//			HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
+//			
+//		});
+		try {
+			SendResult result= producer.send(msg);
+			HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
+			return;
+		} catch (Exception e) {
+			logger.error("push msg 2 mq error", e);
+			HttpUtil.writeFailResponse2Client(context.response(),e.getMessage());
+			return;
+		}	
+		//adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
+		//logger.info("###pushAdMsg method end###");
 	}
 
 	private void pushNonAdMsg(RoutingContext context) {

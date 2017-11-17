@@ -1,5 +1,7 @@
 package api;
 
+import com.message.push.MqVerticleTest;
+
 import channel.ApplePushVerticle;
 import channel.HttpServerVerticle;
 import channel.MiPushVerticle;
@@ -9,11 +11,11 @@ import io.vertx.core.Future;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.AbstractVerticle;
+import mq.AdMessageConsumerVerticle;
 import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
-import service.impl.PassengerUnSendServiceImpl;
 import service.impl.RedisServiceImpl;
 import xservice.HttpClientVerticle;
 
@@ -46,6 +48,8 @@ public class StartVerticle extends AbstractVerticle {
 		//消息补发
 //		this.deployVerticle(PassengerUnSendVerticle.class.getName());
 //		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
+		
+		this.deployVerticle(AdMessageConsumerVerticle.class.getName());
 
 		// 提供其他非EventBus服务
 	}

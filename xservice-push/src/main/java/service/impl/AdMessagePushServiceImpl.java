@@ -90,6 +90,13 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	}
 
 	public void pushMsg(String httpMsg, Handler<AsyncResult<String>> resultHandler) {
+		
+		if(1==1){
+			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP)
+								.toString()));
+			return;
+		}
+		
 		logger.info("接收到的消息内容：" + httpMsg);
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
