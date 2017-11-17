@@ -31,6 +31,8 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	private final int max_msg_size=100000;
 	
 	private LinkedBlockingQueue<String> queue=new LinkedBlockingQueue<>(max_msg_size);
+	
+	//TODO 用RocketMQ来实现  接收到的消息就放入消息队列，消费过程中加入处理标识true，判断标识来分批消费 false，批量消费成功，标识置为true
 
 	@Override
 	public void start() throws Exception {
