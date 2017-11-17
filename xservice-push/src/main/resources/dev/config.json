@@ -64,5 +64,9 @@
     "apple.test.apnsToken": "f476872c95b470282795ff92124ec9079c4935a8c181f1bdd10a6fb9ce0c28ce",
     "socket.test.customerId": "13666050",
     "socket.test.phone": "13621241006"
+  },
+  "rocketMq.config": {
+		"mc.message.namesrvAddr": "127.0.0.1:9876",
+		"drive.topic": "driver_info"
   }
 }
