@@ -195,6 +195,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 							JsonObject orderQuery = new JsonObject();
 							orderQuery.put("sceneId",sceneId);
+							orderQuery.put("msgType",1);
 
 							client.findWithOptions("message", orderQuery, options, orderRes -> {
 								if (orderRes.succeeded()) {
