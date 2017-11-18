@@ -2,6 +2,7 @@ package server;
 
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -147,12 +148,6 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		httpResp.clear();
 
-		JsonObject query = new JsonObject();
-		query.put("sceneId", orderNo);
-		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
-			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
-		}
-
 		FindOptions options = new FindOptions();
 		options.setLimit(200);
 
@@ -177,20 +172,79 @@ public class RestIMVerticle extends RestAPIVerticle {
 		fields.put("duration", 1);
 		options.setFields(fields);
 
-		client.findWithOptions("message", query, options, r -> {
-			if (r.succeeded()) {
-				logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
-				httpResp.put("code", 0);
-				httpResp.put("time", System.currentTimeMillis());
-				httpResp.put("data", r.result());
-				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
-			} else {
+		JsonObject query = new JsonObject();
+		//add by jhmi 兼容Android客户端订单号为0 的情况
+		if("0".equals(orderNo)){
+			if(StringUtils.isEmpty(timestamp) || 0 == NumberUtils.toLong(timestamp)){
+				logger.info("订单号 和 时间戳都为0 不查询数据库");
+				//没传时间戳，返回空
 				httpResp.put("code", 1);
 				httpResp.put("time", System.currentTimeMillis());
-				httpResp.put("message", r.cause().getMessage());
+				httpResp.put("message", "can't find offlinemsg");
 				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+			}else{
+				query.put("timeStamp",timestamp);
+
+				client.findWithOptions("message", query, options, r -> {
+					if (r.succeeded()) {
+						logger.info("查询订单号为0的离线消息, query={}size={}", query.encode(), r.result().size());
+						List<JsonObject> list = r.result();
+						if(list != null && list.size() == 1){
+							JsonObject dataJson = list.get(0);
+							String sceneId = dataJson.getString("sceneId");
+
+							JsonObject orderQuery = new JsonObject();
+							orderQuery.put("sceneId",sceneId);
+
+							client.findWithOptions("message", orderQuery, options, orderRes -> {
+								if (orderRes.succeeded()) {
+									logger.info("orderNo=0 findOffLineMessage, query={}size={}", orderQuery.encode(), orderRes.result().size());
+									httpResp.put("code", 0);
+									httpResp.put("time", System.currentTimeMillis());
+									httpResp.put("data", orderRes.result());
+									context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+								} else {
+									httpResp.put("code", 1);
+									httpResp.put("time", System.currentTimeMillis());
+									httpResp.put("message", orderRes.cause().getMessage());
+									context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+								}
+							});
+						}else{
+							httpResp.put("code", 0);
+							httpResp.put("time", System.currentTimeMillis());
+							httpResp.put("data", "");
+							context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+						}
+					} else {
+						httpResp.put("code", 1);
+						httpResp.put("time", System.currentTimeMillis());
+						httpResp.put("message", r.cause().getMessage());
+						context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+					}
+				});
 			}
-		});
+		}else{
+			query.put("sceneId", orderNo);
+			if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
+				query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
+			}
+
+			client.findWithOptions("message", query, options, r -> {
+				if (r.succeeded()) {
+					logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
+					httpResp.put("code", 0);
+					httpResp.put("time", System.currentTimeMillis());
+					httpResp.put("data", r.result());
+					context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+				} else {
+					httpResp.put("code", 1);
+					httpResp.put("time", System.currentTimeMillis());
+					httpResp.put("message", r.cause().getMessage());
+					context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+				}
+			});
+		}
 	}
 
 	public void getRecentMessage(RoutingContext context) {
