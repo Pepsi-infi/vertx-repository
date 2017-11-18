@@ -136,7 +136,7 @@ public class FileServerVerticle extends AbstractVerticle {
 
 									if("0000".equals(resJson.getString("code")) && resJson.getValue("result") != null){
 										JsonObject relPhone = resJson.getJsonObject("result");
-										if("44".equals(msgBody.getClientVersion()) || "79".equals(msgBody.getClientVersion())){
+										if("44".equals(msgBody.getClientVersion()) || "79".equals(msgBody.getClientVersion())  || "83".equals(msgBody.getClientVersion())){
 											if(msgBody.getIdentity() == 0){
 												msgBody.setFromTel(relPhone.getString("customPhone"));
 												msgBody.setToTel(relPhone.getString("driverPhone"));
