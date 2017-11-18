@@ -183,7 +183,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 				httpResp.put("message", "can't find offlinemsg");
 				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
 			}else{
-				query.put("timeStamp",timestamp);
+				query.put("timeStamp",NumberUtils.toLong(timestamp));
 
 				client.findWithOptions("message", query, options, r -> {
 					if (r.succeeded()) {
@@ -213,7 +213,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 						}else{
 							httpResp.put("code", 0);
 							httpResp.put("time", System.currentTimeMillis());
-							httpResp.put("data", "");
+							httpResp.put("data", new JsonArray());
 							context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
 						}
 					} else {
