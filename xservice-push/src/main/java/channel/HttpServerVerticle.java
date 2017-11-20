@@ -1,15 +1,12 @@
 package channel;
 
-import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
-import com.alibaba.rocketmq.remoting.exception.RemotingException;
 
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
@@ -41,11 +38,15 @@ public class HttpServerVerticle extends RestAPIVerticle {
 	//TODO 用RocketMQ来实现  接收到的消息就放入消息队列，消费过程中加入处理标识true，判断标识来分批消费 false，批量消费成功，标识置为true	
 	private DefaultMQProducer producer;
 	
+	private String adMsgTopic;
+	
 
 	@Override
 	public void start() throws Exception {
 		config = config().getJsonObject("push.config");
-
+		
+		adMsgTopic=config().getJsonObject("rocketMq.config").getString("mc.ad.message.topic");
+		
 		this.initWebService();
 
 		// 初始化化服务
@@ -94,32 +95,13 @@ public class HttpServerVerticle extends RestAPIVerticle {
 		logger.info("###pushAdMsg method start###");
 		HttpServerRequest request = context.request();
 		String httpMsg=request.getParam("body");
-		Message msg=new Message(config().getJsonObject("rocketMq.config").getString("mc.ad.message.topic"), httpMsg.getBytes());
-//		vertx.executeBlocking(blockingCodeHandler->{
-//			SendResult result=null;
-//			try {
-//				result= producer.send(msg);
-//				HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
-//				logger.info("producer="+producer);
-//			} catch (Exception e) {
-//				logger.error("push msg 2 mq error,producer="+producer, e);
-//				HttpUtil.writeFailResponse2Client(context.response(),e.getMessage());
-//			}	
-//			blockingCodeHandler.complete(result);
-//		}, resultHandler->{
-//			
-//			SendResult result=(SendResult) resultHandler.result();
-//			HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
-//			
-//		});
+		Message msg=new Message(adMsgTopic, httpMsg.getBytes());
 		try {
 			SendResult result= producer.send(msg);
 			HttpUtil.writeSuccessResponse2Client(context.response(), result.getSendStatus());
-			return;
 		} catch (Exception e) {
 			logger.error("push msg 2 mq error", e);
 			HttpUtil.writeFailResponse2Client(context.response(),e.getMessage());
-			return;
 		}	
 		//adMessagePushService.pushMsg(request.getParam("body"), resultHandler(context));
 		//logger.info("###pushAdMsg method end###");

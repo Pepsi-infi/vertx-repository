@@ -21,8 +21,6 @@ public class AdMessageConsumerVerticle extends AbstractVerticle {
 
 	private DefaultMQPushConsumer adMsgConsumer;
 
-	private boolean consumerFlag = true;
-
 	private AdMessagePushService adMessagePushService;
 
 	@Override
@@ -52,33 +50,25 @@ public class AdMessageConsumerVerticle extends AbstractVerticle {
 
 		@Override
 		public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-			MessageExt msg = null;
 
-			if (!consumerFlag) {
-				return ConsumeConcurrentlyStatus.RECONSUME_LATER;
-			}
-
-			msg = msgs.get(0);
+			MessageExt msg = msgs.get(0);
 
 			if (msg == null) {
 				return ConsumeConcurrentlyStatus.RECONSUME_LATER;
 			}
 
-			consumerFlag = false;
-
 			String httpMsg = new String(msg.getBody());
-			logger.info("开始消费数据：" + httpMsg);
 			Future<String> future = Future.future();
 			adMessagePushService.pushMsg(httpMsg, future.completer());
+			
 			future.setHandler(handler -> {
 				if (handler.succeeded()) {
-					logger.info("消费成功，flag变为true");
-					consumerFlag = true;
+					
 				} else {
-					logger.info("消费失败，flag变为false");
-					consumerFlag = false;
+					logger.info("消费失败,消费数据：" + httpMsg + "失败原因：" + handler.cause().getMessage());
 				}
 			});
+			
 			return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
 		}
 
