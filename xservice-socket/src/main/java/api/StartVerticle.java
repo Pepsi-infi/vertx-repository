@@ -25,7 +25,7 @@ public class StartVerticle extends AbstractVerticle {
 		vertx.deployVerticle(RestSocketVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		// Just one instance because of port conflicts.
-		vertx.deployVerticle(UdpServerVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
+		vertx.deployVerticle(UdpServerVerticle.class.getName(), readWorkerOpts().setConfig(config()));
 
 		// Just one instance because of ehcache.
 		vertx.deployVerticle(SocketSessionVerticle.class.getName(), new DeploymentOptions().setConfig(config()));
@@ -34,6 +34,13 @@ public class StartVerticle extends AbstractVerticle {
 	public static DeploymentOptions readBossOpts() {
 		DeploymentOptions options = new DeploymentOptions();
 		options.setInstances(Runtime.getRuntime().availableProcessors());
+
+		return options;
+	}
+
+	public static DeploymentOptions readWorkerOpts() {
+		DeploymentOptions options = new DeploymentOptions();
+		options.setWorker(true);
 
 		return options;
 	}
