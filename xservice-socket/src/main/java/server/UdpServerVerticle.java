@@ -1,13 +1,17 @@
 package server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
 import cluster.impl.SocketConsistentHashingVerticle;
+import de.ailis.pherialize.MixedArray;
+import de.ailis.pherialize.Pherialize;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.eventbus.DeliveryOptions;
@@ -17,7 +21,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.rxjava.core.Future;
-import serializer.SocketByteUtils;
 import utils.IPUtil;
 
 public class UdpServerVerticle extends AbstractVerticle {
@@ -38,12 +41,13 @@ public class UdpServerVerticle extends AbstractVerticle {
 			if (asyncResult.succeeded()) {
 				logger.info("UDP listening...");
 				socket.handler(packet -> {
+
 					logger.info("UDP packet " + packet.data());
 
-					Map<String, Object> map = null;
+					MixedArray map = null;
 
 					try {
-						map = (Map<String, Object>) SocketByteUtils.byteToObject(packet.data().getBytes());
+						map = Pherialize.unserialize(packet.data().toString()).toArray();
 					} catch (Exception e) {
 						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
 					}
@@ -52,7 +56,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 						logger.info("UDP Map " + map.toString());
 
 						try {
-							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
+							MixedArray msgBody = map.getArray("params");
 							final String userId = String.valueOf(msgBody.get(0));// userId
 							int cmd = NumberUtils.toInt(String.valueOf(msgBody.get(1)));
 
