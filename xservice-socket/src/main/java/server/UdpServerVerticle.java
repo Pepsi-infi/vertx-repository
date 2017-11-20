@@ -3,6 +3,7 @@ package server;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 
@@ -49,15 +50,15 @@ public class UdpServerVerticle extends AbstractVerticle {
 						option.setSendTimeout(3000);
 						option.addHeader("action", "unserialize");
 
-						Future<Message<JsonArray>> unsFuture = Future.future();
+						Future<Message<JsonObject>> unsFuture = Future.future();
 
-						eb.<JsonArray>send(SerialiazerVerticle.class.getName(), packet.data().toString(), option,
+						eb.<JsonObject>send(SerialiazerVerticle.class.getName(), packet.data().toString(), option,
 								unsFuture.completer());
 						unsFuture.setHandler(r -> {
 							if (r.succeeded()) {
-								JsonArray msgList = r.result().body();
+								JsonObject msgList = r.result().body();
 								if (msgList != null) {
-									List<Object> msgBody = msgList.getList();
+									List<Object> msgBody = msgList.getJsonArray("result").getList();
 									logger.info("UDP Map " + msgBody.toString());
 
 									try {

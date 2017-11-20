@@ -6,6 +6,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -39,13 +40,14 @@ public class SerialiazerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private JsonArray unserialize(String data) {
-		JsonArray msgBody = null;
+	private JsonObject unserialize(String data) {
+		JsonObject msgBody = null;
 		try {
+			msgBody = new JsonObject();
 			Map<String, Object> map = (Map<String, Object>) SocketByteUtils.byteToObject(data.getBytes());
-			msgBody = (JsonArray) map.get("params");
+			msgBody.put("result", map.get("params"));
 		} catch (Exception e) {
-			logger.error("unserialize, data={}e={}", data, e.getMessage());
+			logger.error("unserialize, data={} e={}", data, e.getMessage());
 		}
 
 		return msgBody;
