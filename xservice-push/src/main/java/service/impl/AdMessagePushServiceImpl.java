@@ -89,14 +89,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 
 	}
 
-	public void pushMsg(String httpMsg, Handler<AsyncResult<String>> resultHandler) {
-		
-		if(1==1){
-			resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP)
-								.toString()));
-			return;
-		}
-		
+	public void pushMsg(String httpMsg, Handler<AsyncResult<String>> resultHandler) {	
 		logger.info("接收到的消息内容：" + httpMsg);
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
@@ -146,19 +139,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		Future<BaseResponse> statFuture = Future.future();
 		pushFuture.setHandler(res -> {
 			if (res.succeeded()) {
-				callStatPushMsg(receiveMsg, statFuture.completer());
-				
-				//批量上报，减小数据库压力
-				
-				Future<BaseResponse> batchStatFuture=Future.future();
-				jsonArray.add(receiveMsg);
-				if(jsonArray.size()==100){
-					
-				}
-				
-				
-				
-				
+				callStatPushMsg(receiveMsg, statFuture.completer());								
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());

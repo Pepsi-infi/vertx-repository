@@ -15,6 +15,11 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import service.AdMessagePushService;
 
+/**
+ * 广告消息消费
+ * @author yanglf
+ *
+ */
 public class AdMessageConsumerVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdMessageConsumerVerticle.class);
@@ -26,7 +31,9 @@ public class AdMessageConsumerVerticle extends AbstractVerticle {
 	@Override
 	public void start() throws Exception {
 		super.start();
+		//初始化service
 		initService();
+		//初始化consumer
 		initConsumer();
 	}
 

@@ -143,7 +143,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 				boolean sendResult = sendApnsByDbay(deviceToken, title, body, msgbody);
 				future.complete(sendResult);
 			} catch (Exception e) {
-				logger.error("APNS推送调一场", e);
+				logger.error("APNS推送调用异常", e);
 				resultHandler.handle(Future.failedFuture(e.getMessage()));
 			}
 
