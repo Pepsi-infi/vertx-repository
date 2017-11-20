@@ -56,7 +56,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 						logger.info("UDP Map " + map.toString());
 
 						try {
-							ArrayList<Object> msgBody = (ArrayList<Object>) map.get("params");
+							MixedArray msgBody = map.getArray("params");
 							final String userId = String.valueOf(msgBody.get(0));// userId
 							int cmd = NumberUtils.toInt(String.valueOf(msgBody.get(1)));
 
