@@ -145,37 +145,102 @@ public class UdpServerVerticle extends AbstractVerticle {
 		});
 	}
 
-	private Map<String, Object> parseUDPData(Buffer buffer, int pos) {
+	private Map<String, Object> parseUDPData(Buffer buffer) {
 		Map<Integer, Object> parseResult = new HashMap<Integer, Object>();
 		Object obj;
 		int hv = 1;
+		int pos = 0;
+		int k;
+		int len;
+		StringBuffer sbu;
 		while (pos < buffer.length()) {
 			int b = buffer.getByte(pos) & 0xFF;
+			pos++;
 
 			switch (b) {
 			case __N:
-				obj = readNull(b, pos);
+				obj = readNull(b);
+				pos++;
 				parseResult.put(new Integer(hv++), obj);
 
 			case __b:
-				obj = readBoolean(b, pos);
+				obj = readBoolean(b);
+				pos++;
 				parseResult.put(new Integer(hv++), obj);
 
 			case __i:
-				obj = readInteger(buffer, pos);
+				StringBuffer sbi = new StringBuffer();
+				int i = buffer.getByte(pos) & 0xFF;
+				pos++;
+
+				while ((i != __Semicolon) && (i != __Colon)) {
+					sbi.append((char) i);
+					i = buffer.getByte(pos) & 0xFF;
+					pos++;
+				}
+
+				obj = readInteger(sbi.toString());
 				parseResult.put(new Integer(hv++), obj);
 
 			case __d:
-				obj = readDouble(buffer, pos);
+				StringBuffer sbd = new StringBuffer();
+				int j = buffer.getByte(pos) & 0xFF;
+				pos++;
+
+				while ((j != __Semicolon) && (j != __Colon)) {
+					sbd.append((char) j);
+					j = buffer.getByte(pos) & 0xFF;
+					pos++;
+				}
+
+				obj = readDouble(sbd.toString());
 				parseResult.put(new Integer(hv++), obj);
 
 			case __s:
-				obj = readString(buffer, pos);
+				StringBuffer sbs = new StringBuffer();
+				k = buffer.getByte(pos) & 0xFF;
+				pos++;
+
+				while ((k != __Semicolon) && (k != __Colon)) {
+					sbs.append((char) i);
+					k = buffer.getByte(pos) & 0xFF;
+					pos++;
+				}
+
+				len = Integer.parseInt(sbs.toString());
+				obj = buffer.getString(pos, pos + len, "UTF-8");
 				parseResult.put(new Integer(hv++), obj);
 
 			case __U:
-				obj = readUnicodeString(buffer, pos);
-				parseResult.put(new Integer(hv++), obj);
+				sbu = new StringBuffer();
+				k = buffer.getByte(pos) & 0xFF;
+				pos++;
+
+				while ((k != __Semicolon) && (k != __Colon)) {
+					sbu.append((char) i);
+					k = buffer.getByte(pos) & 0xFF;
+					pos++;
+				}
+
+				len = Integer.parseInt(sbu.toString());
+
+				int c;
+				byte[] byteArray = buffer.getBytes(pos, pos + len);
+				StringBuffer u = new StringBuffer(len);
+				for (int z = 0; z < len; z = z + 4) {
+					if ((c = byteArray[z]) == __Slash) {
+						char c1 = (char) byteArray[z];
+						char c2 = (char) byteArray[z + 1];
+						char c3 = (char) byteArray[z + 2];
+						char c4 = (char) byteArray[z + 3];
+
+						u.append((char) (Integer.parseInt(new String(new char[] { c1, c2, c3, c4 }), 16)));
+					} else {
+						u.append((char) c);
+					}
+				}
+
+				parseResult.put(new Integer(hv++), u.toString());
 
 			case __r:
 				return readRef(stream, ht, hv, rt);
@@ -199,23 +264,17 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 	}
 
-	private Object readNull(int b, int pos) {
-		pos++;
+	private Object readNull(int b) {
 		return null;
 	}
 
-	private Object readBoolean(int b, int pos) {
-		pos++;
+	private Object readBoolean(int b) {
 		Boolean bl = new Boolean(b == __1);
 
-		pos++;
 		return bl;
 	}
 
-	private Number readInteger(Buffer buffer, int pos) {
-		pos++;
-		String i = readNumber(buffer, pos);
-
+	private Number readInteger(String i) {
 		try {
 			return new Byte(i);
 		} catch (Exception e1) {
@@ -227,10 +286,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 		}
 	}
 
-	private Number readDouble(Buffer buffer, int pos) {
-		pos++;
-		String d = readNumber(buffer, pos);
-
+	private Number readDouble(String d) {
 		if (d.equals(__NAN)) {
 			return new Double(Double.NaN);
 		}
@@ -257,11 +313,8 @@ public class UdpServerVerticle extends AbstractVerticle {
 		}
 	}
 
-	private String readString(Buffer buffer, int pos) {
-		pos++;
-		int len = Integer.parseInt(readNumber(buffer, pos));
-
-		pos++;
+	private String readString(String s) {
+		int len = Integer.parseInt(s);
 		byte[] buf = new byte[len];
 
 		buf = buffer.getBytes(0, len);
@@ -304,7 +357,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 		return sb.toString();
 	}
 
-	private String readNumber(Buffer buffer, int pos) {
+	private String readNumber(Buffer buffer) {
 		StringBuffer sb = new StringBuffer();
 		int i = buffer.getByte(pos) & 0xFF;
 
