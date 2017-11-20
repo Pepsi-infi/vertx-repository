@@ -1,11 +1,11 @@
 package serializer;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.MultiMap;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -45,7 +45,7 @@ public class SerialiazerVerticle extends AbstractVerticle {
 		try {
 			msgBody = new JsonObject();
 			Map<String, Object> map = (Map<String, Object>) SocketByteUtils.byteToObject(data.getBytes());
-			msgBody.put("result", map.get("params"));
+			msgBody.put("result", (ArrayList) map.get("params"));
 		} catch (Exception e) {
 			logger.error("unserialize, data={} e={}", data, e.getMessage());
 		}
