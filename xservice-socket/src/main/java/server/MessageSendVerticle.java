@@ -35,7 +35,7 @@ public class MessageSendVerticle extends AbstractVerticle {
 			if (headers != null) {
 				String action = headers.get("action");
 				String userId = body.getString("userId");
-				String msg = body.getString("msg");
+				JsonObject msg = body.getJsonObject("msg");
 
 				switch (action) {
 				case "sendMsg":
@@ -49,7 +49,7 @@ public class MessageSendVerticle extends AbstractVerticle {
 		});
 	}
 
-	private JsonObject sendMsg(String userId, String msg2Send) {
+	private JsonObject sendMsg(String userId, JsonObject msg2Send) {
 		DeliveryOptions SocketSessionOption = new DeliveryOptions();
 		SocketSessionOption.setSendTimeout(3000);
 		SocketSessionOption.addHeader("action", "getHandlerIDByUid");
@@ -68,10 +68,10 @@ public class MessageSendVerticle extends AbstractVerticle {
 
 					Buffer bf = null;
 					try {
-						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.getBytes("UTF-8").length))
-								.appendString(msg2Send);
+						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.encode().getBytes("UTF-8").length))
+								.appendString(msg2Send.encode());
 						logger.info("sendMsg, userId={} innerIP={} handlerID={} header={} bf={}", userId, innerIP,
-								handlerID, msg2Send.getBytes("UTF-8").length, msg2Send);
+								handlerID, msg2Send.encode().getBytes("UTF-8").length, msg2Send.encode());
 					} catch (UnsupportedEncodingException e) {
 						logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
 					}
