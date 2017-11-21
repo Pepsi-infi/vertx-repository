@@ -51,6 +51,8 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
 		this.realInnerNodes = new ArrayList<String>();
+		this.virtualNodes = new TreeMap<Long, String>();
+		this.virtualInnerNodes = new TreeMap<Long, String>();
 
 		getNodesFromDiscovery();
 		initSocketNodes();
@@ -118,7 +120,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initSocketNodes() {
-//		virtualNodes = new TreeMap<Long, String>();
+		// virtualNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realSocketNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
@@ -132,7 +134,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟内网IP
 	 */
 	private void initInnerNodes() {
-//		virtualInnerNodes = new TreeMap<Long, String>();
+		// virtualInnerNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realInnerNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
