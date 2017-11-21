@@ -129,10 +129,11 @@ public class RestStatVerticle extends RestAPIVerticle {
 		String isAcceptPush = context.request().formAttributes().get("isAcceptPush");
 		// add by ylf
 		String deviceId = context.request().formAttributes().get("deviceId");
-		
-		//去除对蚂蚁指纹的约束
+
+		// 去除对蚂蚁指纹的约束,增加对deviceToken不为空值的约束判断
 		if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
-				|| StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+				|| StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)
+				|| StringUtils.isBlank(deviceToken)) {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
 		}
@@ -258,10 +259,10 @@ public class RestStatVerticle extends RestAPIVerticle {
 		String regex = "^([1-9]+[0-9]*)(\\.[1-9]*[0-9]+)(\\.[1-9]*[0-9]+)";
 
 		Pattern pattern = Pattern.compile(regex);
-		String input="05.02.01";
+		String input = "05.02.01";
 		Matcher matcher = pattern.matcher(input);
 		System.out.println(matcher.matches());
-				
+
 		int cmp = VersionCompareUtil.hisCompare2Current("5.2.2", input);
 		System.out.println(Integer.valueOf("00000"));
 		System.out.println(cmp);

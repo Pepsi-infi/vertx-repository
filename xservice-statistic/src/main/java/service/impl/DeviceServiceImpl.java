@@ -187,15 +187,23 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 						// 按照deviceId查询数据为空，说明该条数据可能是历史数据，则按照antFingerprint再进行一次查询
 						logger.info("the device data is not exist,deviceId=" + deviceDto.getDeviceId());
 						params.remove("deviceId");
-						params.put("antFingerprint", deviceDto.getAntFingerprint());
-						deviceDao.getDevice(params, antFingerprintFuture.completer());
+						
+						if(StringUtil.isNullOrEmpty(deviceDto.getAntFingerprint())){
+							//说明上送蚂蚁指纹为空，并且deviceId不存在，直接做新增操作
+							logger.info("antFingerprint in null:add new device 2 db");
+							deviceDao.addDevice(deviceDto, addFuture.completer());
+						}else{
+							params.put("antFingerprint", deviceDto.getAntFingerprint());
+							deviceDao.getDevice(params, antFingerprintFuture.completer());
 
-						dealAntFingerprintFuture(antFingerprintFuture, addFuture, updateFuture, result,deviceDto,baseResponse);
-
+							dealAntFingerprintFuture(antFingerprintFuture, addFuture, updateFuture, result,deviceDto,baseResponse);
+						}
+						
 					} else {
 
 						if (!StringUtil.isNullOrEmpty(deviceDto.getDeviceToken())) {
 							copyDevice(dbDevice, deviceDto);
+							logger.info("update deviceToken by deviceId");
 							deviceDao.updateDeviceByDeviceId(dbDevice, updateFuture.completer());
 						} else {
 							logger.error("request params is error:deviceToken is null");
@@ -248,11 +256,13 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 					if (StringUtil.isNullOrEmpty(dbDevice.getDeviceId())) {
 						// 说明该数据是历史数据,按照蚂蚁指纹将deviceId更新到库表中
 						copyDevice(dbDevice, deviceDto);
+						logger.info("update deviceToken by antFingerprint");
 						deviceDao.updateDevice(dbDevice, updateFuture.completer());
 					} else {
 						// 说明已经是新的数据，按照设备deviceId对数据库表进行更新操作
 						if (!StringUtil.isNullOrEmpty(deviceDto.getDeviceToken())) {
 							copyDevice(dbDevice, deviceDto);
+							logger.info("update deviceToken by deviceId");
 							deviceDao.updateDeviceByDeviceId(dbDevice, updateFuture.completer());
 						} else {
 							logger.error("request params is error:deviceToken is null");
