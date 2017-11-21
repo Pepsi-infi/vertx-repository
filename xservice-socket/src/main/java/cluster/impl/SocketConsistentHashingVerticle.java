@@ -56,11 +56,11 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		initSocketNodes();
 		initInnerNodes();
 
-		vertx.setPeriodic(3000, handler -> {
-			getNodesFromDiscovery();
-			initSocketNodes();
-			initInnerNodes();
-		});
+//		vertx.setPeriodic(3000, handler -> {
+//			getNodesFromDiscovery();
+//			initSocketNodes();
+//			initInnerNodes();
+//		});
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName() + innerIP, res -> {
