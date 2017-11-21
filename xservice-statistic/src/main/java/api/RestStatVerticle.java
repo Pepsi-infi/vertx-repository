@@ -132,7 +132,8 @@ public class RestStatVerticle extends RestAPIVerticle {
 
 		// 去掉对antFingerprint蚂蚁指纹的约束
 		if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
-				|| StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+				|| StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)
+				|| StringUtils.isBlank(deviceToken)) {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
 		}
