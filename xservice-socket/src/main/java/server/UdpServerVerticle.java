@@ -1,5 +1,6 @@
 package server;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 					MixedArray map = null;
 
 					try {
-						map = Pherialize.unserialize(packet.data().toString()).toArray();
+						map = Pherialize.unserialize(packet.data().toString(), Charset.forName("UTF-8")).toArray();
 					} catch (Exception e) {
 						logger.error("UDP unserialize packet={}e={}", packet.data(), e.getCause());
 					}
