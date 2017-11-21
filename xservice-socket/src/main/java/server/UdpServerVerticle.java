@@ -89,11 +89,15 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 									logger.info("UDP userId={}innerIP={}", userId, hostIP);
 
-									JsonObject data = JsonObject.mapFrom(msgBody.get(3));
+									JsonObject msgData = new JsonObject();
+									MixedArray bodyArray = msgBody.getArray(3);
+									msgData.put("nick", bodyArray.getString("nick"));
+									msgData.put("msgId", bodyArray.getString("msgId"));
+									msgData.put("body", bodyArray.getString("body"));
 
 									JsonObject msg2Send = new JsonObject();
 									msg2Send.put("cmd", cmd);
-									msg2Send.put("data", data);
+									msg2Send.put("data", msgData.encode());
 
 									JsonObject param = new JsonObject();
 									param.put("userId", userId);
