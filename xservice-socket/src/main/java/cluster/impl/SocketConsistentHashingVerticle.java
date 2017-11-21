@@ -56,11 +56,11 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		initSocketNodes();
 		initInnerNodes();
 
-//		vertx.setPeriodic(3000, handler -> {
-//			getNodesFromDiscovery();
-//			initSocketNodes();
-//			initInnerNodes();
-//		});
+		vertx.setPeriodic(3000, handler -> {
+			getNodesFromDiscovery();
+			initSocketNodes();
+			initInnerNodes();
+		});
 
 		eb = vertx.eventBus();
 		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName() + innerIP, res -> {
@@ -118,24 +118,28 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	 * 初始化虚拟节点
 	 */
 	private void initSocketNodes() {
-		virtualNodes = new TreeMap<Long, String>();
+//		virtualNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realSocketNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
 			}
 		}
+
+		logger.info("virtualNodes={}", virtualNodes.size());
 	}
 
 	/**
 	 * 初始化虚拟内网IP
 	 */
 	private void initInnerNodes() {
-		virtualInnerNodes = new TreeMap<Long, String>();
+//		virtualInnerNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realInnerNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
 			}
 		}
+
+		logger.info("virtualInnerNodes={}", virtualInnerNodes.size());
 	}
 
 	/**
