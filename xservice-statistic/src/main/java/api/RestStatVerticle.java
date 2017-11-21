@@ -198,7 +198,7 @@ public class RestStatVerticle extends RestAPIVerticle {
 	}
 
 	private boolean matchVersion(String appVersion) {
-		String regex = "^([1-9][0-9]+)(\\.[1-9][0-9]+)(\\.[1-9][0-9]+)";
+		String regex = "^([1-9][0-9]+)(\\.[1-9]?[0-9]+)(\\.[1-9]?[0-9]+)";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(appVersion);
 		return matcher.matches();
