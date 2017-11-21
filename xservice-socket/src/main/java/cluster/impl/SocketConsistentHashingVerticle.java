@@ -110,6 +110,8 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 				}
 			}
 		});
+
+		logger.info("realInnerNodes={} realSocketNodes={}", realInnerNodes.toString(), realSocketNodes.toString());
 	}
 
 	/**
