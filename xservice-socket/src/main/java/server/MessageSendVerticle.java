@@ -35,15 +35,11 @@ public class MessageSendVerticle extends AbstractVerticle {
 			if (headers != null) {
 				String action = headers.get("action");
 				String userId = body.getString("userId");
+				JsonObject msg = body.getJsonObject("msg");
 
 				switch (action) {
 				case "sendMsg":
-					JsonObject msg = body.getJsonObject("msg");
 					res.reply(sendMsg(userId, msg));
-					break;
-				case "sendMsgStr":
-					String msgStr = body.getString("msg");
-					res.reply(sendMsgStr(userId, msgStr));
 					break;
 				default:
 					res.reply(1);// Fail!
@@ -89,39 +85,4 @@ public class MessageSendVerticle extends AbstractVerticle {
 		return new JsonObject();
 	}
 
-	private JsonObject sendMsgStr(String userId, String msg2Send) {
-		DeliveryOptions SocketSessionOption = new DeliveryOptions();
-		SocketSessionOption.setSendTimeout(3000);
-		SocketSessionOption.addHeader("action", "getHandlerIDByUid");
-
-		JsonObject param = new JsonObject();
-		param.put("userId", userId);
-
-		Future<Message<JsonObject>> ssFuture = Future.future();
-		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, SocketSessionOption,
-				ssFuture.completer());
-
-		ssFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				if (res.result().body() != null) {
-					String handlerID = res.result().body().getString("handlerID");
-
-					Buffer bf = null;
-					try {
-						bf = Buffer.buffer(ByteUtil.intToBytes(msg2Send.getBytes("UTF-8").length))
-								.appendString(msg2Send);
-						logger.info("sendMsg, userId={} innerIP={} handlerID={} header={} bf={}", userId, innerIP,
-								handlerID, msg2Send.getBytes("UTF-8").length, msg2Send);
-					} catch (UnsupportedEncodingException e) {
-						logger.error("UnsupportedEncodingException, {}", e.getCause().getMessage());
-					}
-					eb.send(handlerID, bf);
-				}
-			} else {
-
-			}
-		});
-
-		return new JsonObject();
-	}
 }
