@@ -198,7 +198,7 @@ public class RestStatVerticle extends RestAPIVerticle {
 	}
 
 	private boolean matchVersion(String appVersion) {
-		String regex = "^([1-9][0-9]+)(\\.[1-9]?[0-9]+)(\\.[1-9]?[0-9]+)";
+		String regex = "^([1-9]+[0-9]*)(\\.[1-9]*[0-9]+)(\\.[1-9]*[0-9]+)";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(appVersion);
 		return matcher.matches();
@@ -255,10 +255,10 @@ public class RestStatVerticle extends RestAPIVerticle {
 
 	public static void main(String[] args) {
 
-		String regex = "^([1-9][0-9]+)(\\.[1-9][0-9]+)(\\.[1-9][0-9]+)";
+		String regex = "^([1-9]+[0-9]*)(\\.[1-9]*[0-9]+)(\\.[1-9]*[0-9]+)";
 
 		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher("555.202.33");
+		Matcher matcher = pattern.matcher("5.202.0");
 		System.out.println(matcher.matches());
 	}
 
