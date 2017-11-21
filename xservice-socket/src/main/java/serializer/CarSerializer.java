@@ -601,13 +601,19 @@ public class CarSerializer {
 	}
 
 	public static Object unserialize(byte[] ss, Class cls, String charset) throws IllegalAccessException {
-		int hv = 1;
+		Object result = null;
 		ByteArrayInputStream stream = new ByteArrayInputStream(ss);
-		Object result = unserialize(stream, new HashMap(), hv, new HashMap(), charset).value;
-
 		try {
-			stream.close();
+			int hv = 1;
+			result = unserialize(stream, new HashMap(), hv, new HashMap(), charset).value;
 		} catch (Exception e) {
+
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e) {
+
+			}
 		}
 		return cast(result, cls);
 	}
