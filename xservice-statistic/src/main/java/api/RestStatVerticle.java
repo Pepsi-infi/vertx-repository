@@ -96,8 +96,8 @@ public class RestStatVerticle extends RestAPIVerticle {
 		} else {
 
 			int cmp = getVersionCompareResult(userDeviceDto.getChannel() + "", userDeviceDto.getAppVersion());
-			
-			logger.info("cmp="+cmp);
+
+			logger.info("cmp=" + cmp);
 
 			if (cmp >= 0) {
 				// 当前版本号小于等于5.2.2,按照蚂蚁指纹来进行上报
@@ -130,8 +130,9 @@ public class RestStatVerticle extends RestAPIVerticle {
 		// add by ylf
 		String deviceId = context.request().formAttributes().get("deviceId");
 
-		if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(antFingerprint) || StringUtils.isBlank(osType)
-				|| StringUtils.isBlank(osVersion) || StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
+		// 去掉对antFingerprint蚂蚁指纹的约束
+		if (StringUtils.isBlank(deviceType) || StringUtils.isBlank(osType) || StringUtils.isBlank(osVersion)
+				|| StringUtils.isBlank(appVersion) || StringUtils.isBlank(appCode)) {
 			logger.warn("Required  parameters is empty. params : {}", Json.encode(context.request().formAttributes()));
 			return null;
 		}
@@ -186,11 +187,11 @@ public class RestStatVerticle extends RestAPIVerticle {
 			// 针对安卓版本做的适配 gcm 或者 xiaomi 采用其他方式 目前默认是历史版本 所以会走之前的设备上报逻辑
 			// 版本控制方式需要再处理
 			// 5.2.2版本之前（包括5.2.2）,安卓会传数字，5.2.2=43 该判断代表安卓端上送的是5.2.2之后的版本
-			if(matchVersion(appVersion)){
+			if (matchVersion(appVersion)) {
 				cmp = VersionCompareUtil.hisCompare2Current("5.2.2", appVersion);
-			}else{
-				//代表是之前安卓版本的逻辑
-				cmp=0;
+			} else {
+				// 代表是之前安卓版本的逻辑
+				cmp = 0;
 			}
 		}
 		return cmp;
