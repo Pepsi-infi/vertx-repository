@@ -98,8 +98,9 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 
 					@Override
 					public void handle(Buffer buffer) {
-						if (buffer.toString().startsWith("get /mobile?")
-								|| buffer.toString().contains("get /mobile?")) {
+						if (buffer.toString().startsWith("get /mobile?") || buffer.toString().contains("get /mobile?")
+								|| buffer.toString().startsWith("get /live?")
+								|| buffer.toString().contains("get /live?")) {
 							op = 1;
 						}
 
