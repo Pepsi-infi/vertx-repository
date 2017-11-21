@@ -17,6 +17,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import utils.IPUtil;
 
+import java.util.HashMap;
+
 public class IMSessionVerticle extends AbstractVerticle {
 
 	private static final Logger logger = LoggerFactory.getLogger(IMSessionVerticle.class);
@@ -129,7 +131,7 @@ public class IMSessionVerticle extends AbstractVerticle {
 			// socket close
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {
-				sessionMap.remove(uid);
+				sessionMap.remove(uid,handlerId);
 			}
 			sessionReverse.remove(handlerId);
 			logger.info("socket 关闭，删除缓存信息uid={},handlerID={}",uid,handlerId);
