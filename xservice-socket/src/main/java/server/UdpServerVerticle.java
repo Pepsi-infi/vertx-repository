@@ -102,7 +102,7 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 									JsonObject param = new JsonObject();
 									param.put("userId", userId);
-									param.put("msg", msg2Send);
+									param.put("msg", msg2Send.encode());
 
 									eb.<JsonObject>send(MessageSendVerticle.class.getName() + hostIP, param, msOption,
 											ssFuture.completer());

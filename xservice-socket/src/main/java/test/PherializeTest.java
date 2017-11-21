@@ -29,11 +29,16 @@ public class PherializeTest {
 		sss.put("msgId", a.getArray("params").getArray(3).getString("msgId"));
 		sss.put("body", a.getArray("params").getArray(3).getString("body"));
 
+		JsonObject msg2Send = new JsonObject();
+		msg2Send.put("cmd", cmd);
+		msg2Send.put("data", sss);
+
+		System.out.println("body " + a.getArray("params").getArray(3).getString("body"));
 		System.out.println(cmd);
 		System.out.println(data.encode());
 
 		System.out.println(a.getArray("params"));
 
-		System.out.println(sss.encode());
+		System.out.println("encode " + msg2Send.encode());
 	}
 }
