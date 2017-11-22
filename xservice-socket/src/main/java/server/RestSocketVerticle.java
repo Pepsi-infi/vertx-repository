@@ -118,7 +118,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 						result.put("time", System.currentTimeMillis());
 						result.put("data", data.put("host", oldSocket.getString(pos) + ":" + socketPort));
 
-						logger.info("getSocketHost, pos={}", pos);
+						logger.info("getSocketHost, host={}", oldSocket.getString(pos));
 						context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
 					}
 				} else {
