@@ -130,11 +130,11 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			this.sessionReverse.remove(handlerId);
 		} else {
 			// socket close
-			sessionReverse.remove(handlerId);
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {
-				sessionMap.remove(uid);
+				sessionMap.remove(uid, handlerId);
 			}
+			sessionReverse.remove(handlerId);
 		}
 
 		counter--;
