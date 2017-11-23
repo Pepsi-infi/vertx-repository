@@ -12,14 +12,10 @@ sleep 5s
 
 nohup /usr/local/jdk1.8/bin/java \
 -server \
--XX:+PrintGCApplicationStoppedTime \
--XX:+PrintGCTimeStamps \
--XX:+PrintGCDetails \
+-XX:+PrintGCApplicationStoppedTime -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Xloggc:${root_path}/gc.log \
 -Xms1g -Xmx1g -Xmn768m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
--XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch \
--XX:+UseParallelOldGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly \
--XX:MaxTenuringThreshold=2 -XX:+ExplicitGCInvokesConcurrent \
--XX:-UseCounterDecay \
+-XX:+UseG1GC \
+-XX:AutoBoxCacheMax=20000 -XX:+AlwaysPreTouch -XX:-UseCounterDecay \
 -Djava.net.preferIPv4Stack=true \
 -Xloggc:${root_path}/gc.log \
 -Dlog.path=${root_path}/log \
