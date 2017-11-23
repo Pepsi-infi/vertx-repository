@@ -19,7 +19,7 @@ nohup java \
 -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory \
 -Dlog4j.configurationFile=log4j2.xml \
 -Dvertx.zookeeper.config=zookeeper-prod.json \
--Dconfig=driver-prod \
+-Dconfig=passenger-prod \
 -jar ${root_path}/xservice-socket-fat.jar >> ${root_path}/nohup.out &
 
 exit 0
