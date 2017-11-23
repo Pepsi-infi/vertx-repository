@@ -117,6 +117,16 @@ public class RedisService {
     }));
   }
 
+  public void setNx(String key, String receiveMsg, long expire, Handler<AsyncResult<Long>> result) { 
+    delegate.setNx(key, receiveMsg, expire, result);
+  }
+
+  public Single<Long> rxSetNx(String key, String receiveMsg, long expire) { 
+    return Single.create(new io.vertx.rx.java.SingleOnSubscribeAdapter<>(fut -> {
+      setNx(key, receiveMsg, expire, fut);
+    }));
+  }
+
 
   public static  RedisService newInstance(service.RedisService arg) {
     return arg != null ? new RedisService(arg) : null;

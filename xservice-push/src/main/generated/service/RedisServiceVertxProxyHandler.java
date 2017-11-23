@@ -148,6 +148,10 @@ public class RedisServiceVertxProxyHandler extends ProxyHandler {
           service.rpush((java.lang.String)json.getValue("queue"), (java.lang.String)json.getValue("key"), createHandler(msg));
           break;
         }
+        case "setNx": {
+          service.setNx((java.lang.String)json.getValue("key"), (java.lang.String)json.getValue("receiveMsg"), json.getValue("expire") == null ? null : (json.getLong("expire").longValue()), createHandler(msg));
+          break;
+        }
         default: {
           throw new IllegalStateException("Invalid action: " + action);
         }

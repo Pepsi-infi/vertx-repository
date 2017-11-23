@@ -66,7 +66,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 
 	@Override
 	public void start() throws Exception {
-		
+
 		super.start();
 
 		XProxyHelper.registerService(AdMessagePushService.class, vertx, this, AdMessagePushService.SERVICE_ADDRESS);
@@ -88,15 +88,16 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		if (StringUtil.isNullOrEmpty(httpMsg)) {
 			logger.error("body is null");
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "body is null", Collections.EMPTY_MAP)
+							.toString()));
 		} else {
 			JsonObject recieveMsg = null;
 			try {
 				recieveMsg = new JsonObject(httpMsg);
 			} catch (Exception e) {
 				logger.error("大后台广告消息推送异常", e);
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "data format is error", Collections.EMPTY_MAP).toString()));
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						"data format is error", Collections.EMPTY_MAP).toString()));
 			}
 			this.dealHttpMessage(recieveMsg, resultHandler);
 		}
@@ -105,28 +106,58 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private void dealHttpMessage(JsonObject receiveMsg, Handler<AsyncResult<String>> resultHandler) {
 		// 验证必填项
 		ResultData checkResult = checkRecivedMsg(receiveMsg);
-		if (ResultData.FAIL == checkResult.getCode()) {			
+		if (ResultData.FAIL == checkResult.getCode()) {
 			resultHandler.handle(Future.succeededFuture(
-					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP).toString()));
+					new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), checkResult.getMsg(), Collections.EMPTY_MAP)
+							.toString()));
 			return;
 		}
 
 		// 验证消息是否重复推送
-		Future<BaseResponse> repeatFuture = Future.future();
+		// Future<BaseResponse> repeatFuture = Future.future();
 
 		// 推送给下游
 		Future<BaseResponse> pushFuture = Future.future();
-		checkRepeatMsg(receiveMsg, repeatFuture.completer());
-		repeatFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				pushMsgToDownStream(receiveMsg, pushFuture.completer());
+		// checkRepeatMsg(receiveMsg, repeatFuture.completer());
+
+		// 使用redis原子锁做幂等性处理
+		Future<Long> idempotenceFuture = Future.future();
+		makeMsgIdempotence(receiveMsg, idempotenceFuture.completer());
+
+		idempotenceFuture.setHandler(handler -> {
+			if (handler.succeeded()) {
+				Long setNxRes = handler.result();
+				if (setNxRes == 1) {
+					logger.info("消息幂等处理成功,返回成功到客户端");
+					resultHandler.handle(Future.succeededFuture(
+							new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
+					pushMsgToDownStream(receiveMsg, pushFuture.completer());
+				} else {
+					logger.error("消息并发异常,setNxResult=" + setNxRes);
+					resultHandler.handle(Future.succeededFuture(
+							new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), "并发异常：请勿重复调用", Collections.EMPTY_MAP)
+									.toString()));
+				}
+
 			} else {
-				logger.error("验证重复推送：" + res.cause());
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+				logger.error("消息幂等性处理异常：" + handler.cause());
+				resultHandler.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+						handler.cause().getMessage(), Collections.EMPTY_MAP).toString()));
+
 			}
+
 		});
+
+		// repeatFuture.setHandler(res -> {
+		// if (res.succeeded()) {
+		// pushMsgToDownStream(receiveMsg, pushFuture.completer());
+		// } else {
+		// logger.error("验证重复推送：" + res.cause());
+		// resultHandler.handle(Future.succeededFuture(new
+		// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+		// res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
+		// }
+		// });
 
 		// 消息推送成功后，调用上报消息接口
 		Future<BaseResponse> statFuture = Future.future();
@@ -136,23 +167,25 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
+				// resultHandler.handle(Future.succeededFuture(new
+				// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+				// res.cause().getMessage(),
+				// Collections.EMPTY_MAP).toString()));
 			}
 		});
 
-		// 根据推送结果返回结果数据给http调用方
-		statFuture.setHandler(res -> {
-			if (res.succeeded()) {
-				resultHandler
-						.handle(Future.succeededFuture(new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
-			} else {
-				resultHandler.handle(Future.succeededFuture(
-						new ResultData<Object>(ErrorCodeEnum.FAIL.getCode(), res.cause().getMessage(), Collections.EMPTY_MAP)
-								.toString()));
-			}
-		});
+		// 根据推送结果返回结果数据给http调用方 无需再根据上报结果返回到http调用方了
+		// statFuture.setHandler(res -> {
+		// if (res.succeeded()) {
+		// resultHandler.handle(Future.succeededFuture(
+		// new ResultData<Object>(ErrorCodeEnum.SUCCESS,
+		// Collections.EMPTY_MAP).toString()));
+		// } else {
+		// resultHandler.handle(Future.succeededFuture(new
+		// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
+		// res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
+		// }
+		// });
 
 	}
 
@@ -240,7 +273,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		config = config().getJsonObject("push.config");
 		socketPushService = SocketPushService.createProxy(vertx);
 		xiaomiPushService = XiaoMiPushService.createProxy(vertx);
-		//msgRecordService = MsgRecordService.createProxy(vertx);
+		// msgRecordService = MsgRecordService.createProxy(vertx);
 		redisService = RedisService.createProxy(vertx);
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
@@ -280,6 +313,39 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		}
 
 		return result;
+	}
+
+	/**
+	 * 对消息做幂等性处理
+	 * 
+	 * @param receiveMsg
+	 * @param resultHandler
+	 */
+	private void makeMsgIdempotence(JsonObject receiveMsg, Handler<AsyncResult<Long>> resultHandler) {
+
+		String msgId = receiveMsg.getValue("msgId") + "";
+		String customerId = receiveMsg.getValue("customerId") + "";
+		// 判断消息是否接收过
+		String redisMsgKey = PushConsts.AD_PASSENGER_MSG_PREFIX + msgId + "_" + customerId;
+		Long expireTime = receiveMsg.getLong("expireTime");
+		long expire = (expireTime - System.currentTimeMillis()) / 1000;
+		redisService.setNx(redisMsgKey, msgId, expire, resultHandler);
+
+		// redisFuture.setHandler(handler -> {
+		// if (handler.succeeded()) {
+		// // 验证redis
+		// String redisResult = handler.result();
+		// if (StringUtils.isNotBlank(redisResult)) {
+		// String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送msgId=" + msgId;
+		// resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
+		// return;
+		// }
+		// resultHandler.handle(Future.succeededFuture());
+		// } else {
+		// resultHandler.handle(Future.failedFuture(handler.cause()));
+		// }
+		// });
+
 	}
 
 	/**
