@@ -51,7 +51,8 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		}
 
 		WebClient webClient = WebClient.create(vertx);
-
+		
+		logger.info("apns send data:"+receiveMsg);
 		webClient.postAbs(appleUrl)
 				.putHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 				.addQueryParam("deviceToken", deviceToken)

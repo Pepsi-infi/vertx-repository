@@ -6,6 +6,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.serviceproxy.ProxyHelper;
 import utils.IPUtil;
 
@@ -49,5 +50,7 @@ public interface RedisService {
 	void lpush(String queue, String key, Handler<AsyncResult<Long>> result);
 
 	void rpush(String queue, String key, Handler<AsyncResult<Long>> result);
+
+	void setNx(String key, String receiveMsg, long expire, Handler<AsyncResult<Long>> result);
 
 }
