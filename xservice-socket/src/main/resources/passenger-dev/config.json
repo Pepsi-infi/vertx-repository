@@ -1,6 +1,7 @@
 {
 	"tcp.port": 8088,
 	"udp.port": 9099,
+	"socket.server.type": "passenger-socket-server",
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
 	"updateOnlineState": "/webservice/passenger/webservice/chat/updateOnlineState/",
@@ -8,5 +9,21 @@
 	"subscribe": "/webservice/passenger/webservice/chat/userMsgSubscribe/",
 	"unsubscribe": "/webservice/passenger/webservice/chat/userMsgUnsubscribe/",
 	"setClientOnline": "/webservice/passenger/webservice/chat/setclientonline/",
-	"setClientOffline": "/webservice/passenger/webservice/chat/setClientOffline/"
+	"setClientOffline": "/webservice/passenger/webservice/chat/setClientOffline/",
+	"socket": [
+		{
+			"innerIP": "",
+			"node": ""
+		},
+		{
+			"innerIP": "",
+			"node": ""
+		}
+	],
+	"oldSocket": [
+		"111.206.162.233",
+		"111.206.162.234"
+	],
+	"im.memory.size": 256,
+	"socket.http.port": 1100
 }
