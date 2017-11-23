@@ -92,7 +92,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				parser.setOutput(new Handler<Buffer>() {
 					private int op = 1;// 1 登录 2 header 3 body
 
-					private int simpleHeartBeatCount = 0;
+					private int simpleHeartBeatCount = -1;
 
 					private String clientIP;
 
@@ -139,12 +139,17 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								updateOnlineSimple(innerIP, handlerID, message);
-								simpleHeartBeatCount++;
-								if (simpleHeartBeatCount == 10 || simpleHeartBeatCount == 1) {
-									updateOnlineState(innerIP, handlerID, message);
+								if (simpleHeartBeatCount > 2) {
 									simpleHeartBeatCount = 0;
 								}
+								if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
+									updateOnlineState(innerIP, handlerID, message);
+									simpleHeartBeatCount++;
+								} else {
+									updateOnlineSimple(innerIP, handlerID, message);
+									simpleHeartBeatCount++;
+								}
+
 								break;
 							case 17:// 订阅
 								subscribe(handlerID, message);
