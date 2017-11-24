@@ -113,7 +113,9 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							clientIP = socket.remoteAddress().host();
 							Map<String, String> paramMap = URLRequest(buffer.toString());
 
-							sendValidateOK(handlerID);
+							if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+								sendValidateOK(handlerID);
+							}
 
 							String userId = paramMap.get("user");
 							cHash(socket.localAddress().host(), userId, handlerID);
