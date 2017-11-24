@@ -4,12 +4,6 @@
 	"socket.server.type": "passenger-socket-server",
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
-	"updateOnlineState": "/webservice/passenger/webservice/chat/updateOnlineState/",
-	"updateOnlineSimple": "/webservice/passenger/webservice/chat/updateSimpleOnlineState/",
-	"subscribe": "/webservice/passenger/webservice/chat/userMsgSubscribe/",
-	"unsubscribe": "/webservice/passenger/webservice/chat/userMsgUnsubscribe/",
-	"setClientOnline": "/webservice/passenger/webservice/chat/setclientonline/",
-	"setClientOffline": "/webservice/passenger/webservice/chat/setClientOffline/",
 	"socket": [
 		{
 			"innerIP": "10.20.0.13",

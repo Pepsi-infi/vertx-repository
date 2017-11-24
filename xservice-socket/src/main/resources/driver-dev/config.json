@@ -4,12 +4,6 @@
 	"socket.server.type": "driver-socket-server",
 	"car-api-host": "10.10.10.105",
 	"car-api-port": 18080,
-	"updateOnlineState": "/webservice/chat/updateOnlineState/",
-	"updateOnlineSimple": "/webservice/chat/updateSimpleOnlineState/",
-	"subscribe": "/webservice/chat/userMsgSubscribe/",
-	"unsubscribe": "/webservice/chat/userMsgUnsubscribe/",
-	"setClientOnline": "/webservice/chat/setclientonline/",
-	"setClientOffline": "/webservice/chat/setClientOffline/",
 	"_comment.socket": "",
 	"socket": [
 		{
