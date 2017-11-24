@@ -45,6 +45,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 
 		CAR_API_HOST = config().getString("car-api-host");
 		CAR_API_PORT = config().getInteger("car-api-port");
+		logger.info("config={} host={} port={}", config().encode(), CAR_API_HOST, CAR_API_PORT);
 	}
 
 	private CircuitBreaker createCircuitBreaker(Vertx vertx, JsonObject config) {
@@ -192,7 +193,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			String ver = param.getString("ver");
 			String mode = param.getString("mode");
 
-			String requestURI = new StringBuffer("/webservice/chat/signinUserHash/").append("user=").append(userId)
+			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/signinUserHash/").append("user=").append(userId)
 					.append("&hash=").append(hash).append("&ip=").append(ip).append("&channelid=").append(channelid)
 					.append("&mark=").append(mark).append("&ver=").append(ver).append("&mode=").append(mode).toString();
 
@@ -254,6 +255,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/setClientOffline/")
 					.append("uid=").append(userId).toString();
 
+			logger.info("setClientOffline, host={}port={}uri={}", CAR_API_HOST, CAR_API_PORT, requestURI);
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
 
