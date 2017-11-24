@@ -141,18 +141,25 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								updateOnlineSimple(innerIP, handlerID, message);
-								simpleHeartBeatCount++;
-								if (simpleHeartBeatCount == 10 || simpleHeartBeatCount == 1) {
-									updateOnlineState(innerIP, handlerID, message);
-									simpleHeartBeatCount = 0;
+								if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+									updateOnlineSimple(innerIP, handlerID, message);
+									simpleHeartBeatCount++;
+									if (simpleHeartBeatCount == 10 || simpleHeartBeatCount == 1) {
+										updateOnlineState(innerIP, handlerID, message);
+										simpleHeartBeatCount = 0;
+									}
 								}
+
 								break;
 							case 17:// 订阅
-								subscribe(handlerID, message);
+								if ("passenger-socket-server".equalsIgnoreCase(serverType)) {
+									subscribe(handlerID, message);
+								}
 								break;
 							case 18:// 取消订阅
-								unsubscribe(handlerID, message);
+								if ("passenger-socket-server".equalsIgnoreCase(serverType)) {
+									unsubscribe(handlerID, message);
+								}
 								break;
 							case 313:
 								msgConfirm(handlerID, message);
@@ -218,23 +225,13 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					}
 				}
 
-				if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-					dTpService.updateOnlineState(uid, date, data, result -> {
-						if (result.succeeded()) {
-							logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
-						} else {
-							logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
-						}
-					});
-				} else {
-					pTpService.updateOnlineState(uid, date, data, result -> {
-						if (result.succeeded()) {
-							logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
-						} else {
-							logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
-						}
-					});
-				}
+				dTpService.updateOnlineState(uid, date, data, result -> {
+					if (result.succeeded()) {
+						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
+					} else {
+						logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
+					}
+				});
 			} else {
 				// TODO
 			}
@@ -273,25 +270,14 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 						}
 					}
 
-					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-						dTpService.updateOnlineSimple(uid, date, data, result -> {
-							if (result.succeeded()) {
-								// TODO
-								logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
-							} else {
-								logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
-							}
-						});
-					} else {
-						pTpService.updateOnlineSimple(uid, date, data, result -> {
-							if (result.succeeded()) {
-								logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
-							} else {
-								logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
-							}
-						});
-					}
-
+					dTpService.updateOnlineSimple(uid, date, data, result -> {
+						if (result.succeeded()) {
+							// TODO
+							logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
+						} else {
+							logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
+						}
+					});
 				}
 			} else {
 				// TODO
@@ -601,25 +587,14 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 
-					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-						dTpService.subscribe(subscribeParam, r -> {
-							if (r.succeeded()) {
-								logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
-							} else {
-								logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
-										r.cause().getMessage());
-							}
-						});
-					} else {
-						pTpService.subscribe(subscribeParam, r -> {
-							if (r.succeeded()) {
-								logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
-							} else {
-								logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
-										r.cause().getMessage());
-							}
-						});
-					}
+					pTpService.subscribe(subscribeParam, r -> {
+						if (r.succeeded()) {
+							logger.info("subscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
+						} else {
+							logger.error("subscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
+						}
+					});
 				}
 			} else {
 				// TODO
@@ -647,27 +622,14 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					subscribeParam.put("userId", uid);
 					subscribeParam.put("data", message.getJsonObject("data").encode());
 
-					if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-						dTpService.unsubscribe(subscribeParam, r -> {
-							if (r.succeeded()) {
-								logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid,
-										r.result());
-							} else {
-								logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
-										r.cause().getMessage());
-							}
-						});
-					} else {
-						pTpService.unsubscribe(subscribeParam, r -> {
-							if (r.succeeded()) {
-								logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid,
-										r.result());
-							} else {
-								logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
-										r.cause().getMessage());
-							}
-						});
-					}
+					pTpService.unsubscribe(subscribeParam, r -> {
+						if (r.succeeded()) {
+							logger.info("unsubscribe, handlerID={} userId={} result={}", handlerID, uid, r.result());
+						} else {
+							logger.error("unsubscribe, handlerID={} userId={} e={}", handlerID, uid,
+									r.cause().getMessage());
+						}
+					});
 				}
 			} else {
 				// TODO
