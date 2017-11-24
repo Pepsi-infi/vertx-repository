@@ -77,7 +77,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		logger.info("start...innerIP={}ipMap={}", innerIP, ipMap.toString());
 
 		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("tcp.port"))
-				.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
+				.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS).setTcpKeepAlive(true);
 		NetServer server = vertx.createNetServer(options);
 
 		server.connectHandler(new Handler<NetSocket>() {
