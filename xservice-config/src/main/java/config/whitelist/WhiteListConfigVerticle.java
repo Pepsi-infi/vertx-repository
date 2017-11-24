@@ -74,7 +74,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String select_white_list_user = "SELECT uid FROM socket_white_list";
+	private static final String select_white_list_user = "SELECT uid, type FROM socket_white_list";
 
 	public void initWhiteListUser() {
 		mySQLClient.getConnection(res -> {
