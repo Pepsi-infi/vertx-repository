@@ -28,4 +28,6 @@ nohup /usr/local/jdk1.8/bin/java \
 
 sleep 2s
 
+set +x
+
 exit 0
