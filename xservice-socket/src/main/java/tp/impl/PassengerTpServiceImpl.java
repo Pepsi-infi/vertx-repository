@@ -120,6 +120,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			if (ar.succeeded()) {
 				result.handle(Future.succeededFuture(ar.result()));
 			} else {
+				logger.error("updateOnlineSimple, result={}", ar.cause().toString());
 				result.handle(Future.succeededFuture(null));
 			}
 		});
