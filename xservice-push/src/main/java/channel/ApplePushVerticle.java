@@ -138,8 +138,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		vertx.executeBlocking(future -> {
 			try {
 
-				logger.info("apns send params:deviceToken {} title {} body {} msgbody {}", deviceToken, title, body,
-						msgbody);
+				logger.info("apns send data:"+receiveMsg);
 				boolean sendResult = sendApnsByDbay(deviceToken, title, body, msgbody);
 				future.complete(sendResult);
 			} catch (Exception e) {
@@ -166,8 +165,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			}
 
 		});
-		// boolean sendResult= sendApnsByDbay(deviceToken, title, body,
-		// msgbody);
 
 	}
 

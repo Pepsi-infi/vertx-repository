@@ -30,13 +30,14 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
+		int memSize = config().getInteger("im.memory.size").intValue();
 		CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
 				.withCache("session",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(memSize, MemoryUnit.MB)))
 				.withCache("sessionReverse",
 						CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(2560, MemoryUnit.MB)))
+								ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(memSize, MemoryUnit.MB)))
 				.build(true);
 		sessionMap = cacheManager.getCache("session", String.class, String.class);
 		sessionReverse = cacheManager.getCache("sessionReverse", String.class, String.class);
@@ -108,12 +109,13 @@ public class SocketSessionVerticle extends AbstractVerticle {
 
 	public int setUserSocket(String userId, String handlerId) {
 		long start = System.currentTimeMillis();
-		logger.info("setUserSocket, handlerID={} userId={}", handlerId, userId);
 		this.sessionMap.put(userId, handlerId);
 		this.sessionReverse.put(handlerId, userId);
 
 		long end = System.currentTimeMillis();
-		logger.info("setUserSocket, handlerID={} userId={} waster={}", handlerId, userId, end - start);
+		if ((end - start) > 10) {
+			logger.warn("setUserSocket, handlerID={} userId={} waste={}", handlerId, userId, end - start);
+		}
 
 		counter++;
 		recounter++;
@@ -128,11 +130,11 @@ public class SocketSessionVerticle extends AbstractVerticle {
 			this.sessionReverse.remove(handlerId);
 		} else {
 			// socket close
-			sessionReverse.remove(handlerId);
 			uid = sessionReverse.get(handlerId);
 			if (uid != null) {
-				sessionMap.remove(uid);
+				sessionMap.remove(uid, handlerId);
 			}
+			sessionReverse.remove(handlerId);
 		}
 
 		counter--;

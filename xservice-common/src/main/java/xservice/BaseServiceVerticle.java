@@ -150,8 +150,8 @@ public class BaseServiceVerticle extends AbstractVerticle {
 		return publish(record);
 	}
 
-	protected Future<Void> publishSocketService(String name, String address, JsonObject metadata) {
-		Record record = new Record().setType("socket-server").setName(name)
+	protected Future<Void> publishSocketService(String name, String address, String type, JsonObject metadata) {
+		Record record = new Record().setType(type).setName(name)
 				.setLocation(new JsonObject().put(Record.ENDPOINT, address)).setMetadata(metadata);
 
 		return publish(record);

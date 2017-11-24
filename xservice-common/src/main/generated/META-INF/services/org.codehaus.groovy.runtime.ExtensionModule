@@ -1,0 +1,5 @@
+moduleFactory = iservice.groovy.VertxPropertiesModuleFactory
+moduleName = iservice.MsgStatService-module
+moduleVersion = 1.0
+extensionClasses = iservice.groovy.DeviceService_GroovyExtension, iservice.groovy.MsgStatService_GroovyExtension
+staticExtensionClasses = 

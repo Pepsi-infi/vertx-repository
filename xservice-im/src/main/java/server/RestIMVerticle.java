@@ -2,6 +2,7 @@ package server;
 
 import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +27,6 @@ import io.vertx.rxjava.ext.web.Router;
 import io.vertx.rxjava.ext.web.RoutingContext;
 import io.vertx.rxjava.ext.web.handler.BodyHandler;
 import module.hash.IMConsistentHashingVerticle;
-import module.health.HealthCheckHandler;
 import module.quickphrase.QuickPhraseVerticle;
 import rxjava.RestAPIVerticle;
 import utils.IPUtil;
@@ -69,6 +69,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 		router.route(RestIMConstants.SERVER).handler(this::getIMServer);
 
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE).handler(this::getOfflineMessage);
+		router.route(RestIMConstants.GET_RECENT_MESSAGE).handler(this::getRecentMessage);
 		router.route(RestIMConstants.GET_OFFLINE_MESSAGE_4_KF).handler(this::getOfflineMessage);
 
 		router.route(RestIMConstants.get_quick_phrase).handler(this::getQuickPhrase);
@@ -102,6 +103,10 @@ public class RestIMVerticle extends RestAPIVerticle {
 		logger.info("userTel={}", userTel);
 		httpResp.clear();
 		if (StringUtils.isNotEmpty(userTel)) {
+			if(userTel.contains("\"")){
+				userTel = userTel.replace("\"","");
+			}
+			logger.info("客户端请求获取外网IP,手机号="+userTel);
 			DeliveryOptions chOption = new DeliveryOptions();
 			chOption.setSendTimeout(3000);
 			chOption.addHeader("action", "getIMNode");
@@ -143,10 +148,116 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		httpResp.clear();
 
+		FindOptions options = new FindOptions();
+		options.setLimit(200);
+
+		options.setSort(new JsonObject().put("timeStamp", 1));
+
+		JsonObject fields = new JsonObject();
+		fields.put("_id", 0);
+		fields.put("msgId", 1);
+		fields.put("sceneType", 1);
+		fields.put("sceneId", 1);
+		fields.put("content", 1);
+		fields.put("msgType", 1);
+		fields.put("cmdId", 1);
+		fields.put("fromTel", 1);
+		fields.put("toTel", 1);
+		fields.put("timeStamp", 1);
+		fields.put("identity", 1);
+		fields.put("lon", 1);
+		fields.put("lat", 1);
+		fields.put("sAddress", 1);
+		fields.put("address", 1);
+		fields.put("duration", 1);
+		options.setFields(fields);
+
+		JsonObject query = new JsonObject();
+		//add by jhmi 兼容Android客户端订单号为0 的情况
+		if("0".equals(orderNo)){
+			if(StringUtils.isEmpty(timestamp) || 0 == NumberUtils.toLong(timestamp)){
+				logger.info("订单号 和 时间戳都为0 不查询数据库");
+				//没传时间戳，返回空
+				httpResp.put("code", 1);
+				httpResp.put("time", System.currentTimeMillis());
+				httpResp.put("message", "can't find offlinemsg");
+				context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+			}else{
+				query.put("timeStamp",NumberUtils.toLong(timestamp));
+
+				client.findWithOptions("message", query, options, r -> {
+					if (r.succeeded()) {
+						logger.info("查询订单号为0的离线消息, query={}size={}", query.encode(), r.result().size());
+						List<JsonObject> list = r.result();
+						if(list != null && list.size() == 1){
+							JsonObject dataJson = list.get(0);
+							String sceneId = dataJson.getString("sceneId");
+
+							JsonObject orderQuery = new JsonObject();
+							orderQuery.put("sceneId",sceneId);
+							orderQuery.put("msgType",1);
+
+							client.findWithOptions("message", orderQuery, options, orderRes -> {
+								if (orderRes.succeeded()) {
+									logger.info("orderNo=0 findOffLineMessage, query={}size={}", orderQuery.encode(), orderRes.result().size());
+									httpResp.put("code", 0);
+									httpResp.put("time", System.currentTimeMillis());
+									httpResp.put("data", orderRes.result());
+									context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+								} else {
+									httpResp.put("code", 1);
+									httpResp.put("time", System.currentTimeMillis());
+									httpResp.put("message", orderRes.cause().getMessage());
+									context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+								}
+							});
+						}else{
+							httpResp.put("code", 0);
+							httpResp.put("time", System.currentTimeMillis());
+							httpResp.put("data", new JsonArray());
+							context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+						}
+					} else {
+						httpResp.put("code", 1);
+						httpResp.put("time", System.currentTimeMillis());
+						httpResp.put("message", r.cause().getMessage());
+						context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+					}
+				});
+			}
+		}else{
+			query.put("sceneId", orderNo);
+			if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
+				query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
+			}
+
+			client.findWithOptions("message", query, options, r -> {
+				if (r.succeeded()) {
+					logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
+					httpResp.put("code", 0);
+					httpResp.put("time", System.currentTimeMillis());
+					httpResp.put("data", r.result());
+					context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+				} else {
+					httpResp.put("code", 1);
+					httpResp.put("time", System.currentTimeMillis());
+					httpResp.put("message", r.cause().getMessage());
+					context.response().putHeader("content-type", "application/json; charset=utf-8").end(httpResp.encode());
+				}
+			});
+		}
+	}
+
+	public void getRecentMessage(RoutingContext context) {
+		String orderNo = context.request().getParam("orderNo");
+		String timestamp = context.request().getParam("timestamp");// TODO
+
+		httpResp.clear();
+
 		JsonObject query = new JsonObject();
 		query.put("sceneId", orderNo);
 		if (StringUtils.isNotEmpty(timestamp) && 0 != NumberUtils.toLong(timestamp)) {
-			query.put("timeStamp", new JsonObject().put("$lt", NumberUtils.toLong(timestamp)));
+			query.put("timeStamp", new JsonObject().put("$gt", NumberUtils.toLong(timestamp)));
 		}
 
 		FindOptions options = new FindOptions();
@@ -175,7 +286,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 
 		client.findWithOptions("message", query, options, r -> {
 			if (r.succeeded()) {
-				logger.info("findOffLineMessage, query={}size={}", query.encode(), r.result().size());
+				logger.info("getRecentMessage, query={}size={}", query.encode(), r.result().size());
 				httpResp.put("code", 0);
 				httpResp.put("time", System.currentTimeMillis());
 				httpResp.put("data", r.result());
@@ -206,6 +317,7 @@ public class RestIMVerticle extends RestAPIVerticle {
 				if (res.succeeded()) {
 					httpResp.put("code", 0);
 					JsonArray userQuickPhrase = res.result().body().getJsonArray("result");
+					//如果用户配置的快捷短语少于10条，则用快捷短语模板补充
 					if (userQuickPhrase.size() < 10) {
 						DeliveryOptions cOption = new DeliveryOptions();
 						cOption.setSendTimeout(3000);
@@ -215,18 +327,33 @@ public class RestIMVerticle extends RestAPIVerticle {
 						cMsg.put("type", identity);
 						eb.send(EventbusAddressConstant.quick_phrase_config_verticle, cMsg, cOption, confRes -> {
 							if (confRes.succeeded()) {
-							} else {
-
+								JsonObject replyMsg = (JsonObject) confRes.result().body();
+								JsonArray jsonArray = replyMsg.getJsonArray("result");
+								if(!jsonArray.isEmpty()){
+									userQuickPhrase.addAll(jsonArray);
+								}
+								logger.info("getQuickPhrase success");
+							}else{
+								logger.error("getQuickPhrase userId={} failed={}",userId,confRes.cause().getMessage());
 							}
+							httpResp.put("data", userQuickPhrase);
+							httpResp.put("msg", "成功");
+
+							logger.info("getQuickPhrase, result={}", res.result().body().encode());
+
+							context.response().putHeader("content-type", "application/json; charset=utf-8")
+									.end(httpResp.encode());
 						});
+					}else{
+						httpResp.put("data", userQuickPhrase);
+						httpResp.put("msg", "成功");
+
+						logger.info("getQuickPhrase, result={}", res.result().body().encode());
+
+						context.response().putHeader("content-type", "application/json; charset=utf-8")
+								.end(httpResp.encode());
 					}
-					httpResp.put("data", res.result().body().getJsonArray("result"));
-					httpResp.put("msg", "成功");
 
-					logger.info("getQuickPhrase, result={}", res.result().body().encode());
-
-					context.response().putHeader("content-type", "application/json; charset=utf-8")
-							.end(httpResp.encode());
 				} else {
 					httpResp.put("code", 1);
 					httpResp.put("msg", res.cause().getMessage());
@@ -326,7 +453,9 @@ public class RestIMVerticle extends RestAPIVerticle {
 		if (StringUtils.isNotEmpty(ids)) {
 			try {
 				ids = URLDecoder.decode(ids, "utf-8");
-				ids = ids.substring(1, ids.length() - 1);
+				if(ids.startsWith("[")){
+					ids = ids.substring(1, ids.length() - 1);
+				}
 			} catch (Exception e) {
 				logger.error("delQuickPhrase, e={}", e.getMessage());
 			}

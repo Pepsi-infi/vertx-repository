@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import module.webclient.HttpRequestVerticle;
 import org.apache.commons.lang.StringUtils;
 
 import constants.IMCmd;
@@ -42,6 +43,9 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private String innerIP;
 	private Map<String, String> ipMap = new HashMap<String, String>();
 
+	// TCP连接保活时间1个小时
+	private static final int KEEP_ALIVE_TIME_SECONDS = 3600;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -58,7 +62,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 		logger.info("start ... ");
 		eb = vertx.eventBus();
 
-		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"));
+		NetServerOptions options = new NetServerOptions().setPort(config().getInteger("im.tcp.port"))
+				.setIdleTimeout(KEEP_ALIVE_TIME_SECONDS);
 		// options.setSsl(true).setPemKeyCertOptions(
 		// new
 		// PemKeyCertOptions().setKeyPath("server-key2.pem").setCertPath("server-cert.pem"));
@@ -68,6 +73,7 @@ public class IMServerVerticle extends BaseServiceVerticle {
 
 			@Override
 			public void handle(NetSocket event) {
+
 				String handlerID = event.writeHandlerID();
 
 				final RecordParser parser = RecordParser.newFixed(MessageBuilder.HEADER_LENGTH, null);
@@ -86,10 +92,17 @@ public class IMServerVerticle extends BaseServiceVerticle {
 							logger.info("imMessage header, headerLength={}clientVersion={}cmd={}bodyLength={}",
 									headerLength, clientVersion, cmd, bodyLength);
 
-							parser.fixedSizeMode(bodyLength);
+							if (bodyLength != 0) {
+								parser.fixedSizeMode(bodyLength);
+							} else {
+								parser.fixedSizeMode(MessageBuilder.HEADER_LENGTH);
+								bodyLength = -1;
+
+								heartBeat(handlerID, clientVersion, cmd);
+							}
 						} else {
 							SQIMBody imMessage = Json.decodeValue(buffer, SQIMBody.class);
-							logger.info("imMessage body={}", imMessage.toString());
+							logger.info("cmd={},imMessage body={}", cmd,imMessage.toString());
 							switch (cmd) {
 							case IMCmd.HEART_BEAT:
 								heartBeat(handlerID, clientVersion, cmd);
@@ -151,10 +164,14 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				});
 				event.handler(parser);
 				event.closeHandler(v -> {
+					logger.info("socket 连接关闭");
 					socketClose(handlerID);
+					event.close();
 				});
 				event.exceptionHandler(t -> {
+					logger.info("socket 连接异常="+t.getMessage());
 					socketClose(handlerID);
+					event.close();
 				});
 			}
 		});
@@ -203,8 +220,8 @@ public class IMServerVerticle extends BaseServiceVerticle {
 				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, 0);
 		eb.send(handlerID, aMsgHeader);
 
-		sendTextNotification(handlerID, clientVersion, cmd);
-		sendAd(handlerID, clientVersion, cmd);
+		// sendTextNotification(handlerID, clientVersion, cmd);
+		// sendAd(handlerID, clientVersion, cmd);
 	}
 
 	private void logout(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
@@ -226,52 +243,80 @@ public class IMServerVerticle extends BaseServiceVerticle {
 	private void msgRequest(String handlerID, int clientVersion, int cmd, int bodyLength, SQIMBody imMessage) {
 		JsonObject param = new JsonObject();
 
-		JsonObject header = new JsonObject();
-		header.put("clientVersion", clientVersion);
-		header.put("cmdId", cmd);
-		header.put("fromHandlerID", handlerID);
+		//查询真实手机号
+		JsonObject orderJson = new JsonObject();
+		orderJson.put("orderNo",imMessage.getSceneId());
 
-		param.put("header", header);
-		param.put("body", JsonObject.mapFrom(imMessage));
+		DeliveryOptions orderOption = new DeliveryOptions();
+		orderOption.addHeader("action", HttpRequestVerticle.HttpMethod.GET_REAL_PHONE);
+		orderOption.setSendTimeout(3000);
+		eb.<JsonObject>send(HttpRequestVerticle.class.getName(),orderJson,orderOption,res->{
+			if(res.succeeded()){
+				logger.info("查询 order api 结果="+res.result().body().toString());
+				JsonObject resJson = res.result().body();
 
-		DeliveryOptions option = new DeliveryOptions();
-		option.addHeader("action", C2CVerticle.method.sendMessage);
-		option.setSendTimeout(3000);
-
-		//
-		DeliveryOptions chOption = new DeliveryOptions();
-		chOption.setSendTimeout(3000);
-		chOption.addHeader("action", "getInnerNode");
-
-		Future<Message<JsonObject>> chFuture = Future.future();
-
-		JsonObject message = new JsonObject();
-		message.put("userId", imMessage.getToTel());
-		eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
-
-		chFuture.setHandler(a -> {
-			if (a.succeeded()) {
-				String innerHost = a.result().body().getString("host");
-				eb.send(C2CVerticle.class.getName() + innerHost, param, option);
+				if(HttpRequestVerticle.HttpResCode.SUCCESS_CODE.equals(resJson.getString("code")) && resJson.getValue("result") != null){
+					JsonObject relPhone = resJson.getJsonObject("result");
+					if(imMessage.getIdentity() == 0){
+						imMessage.setFromTel(relPhone.getString("driverPhone"));
+						imMessage.setToTel(relPhone.getString("customPhone"));
+					}else{
+						imMessage.setFromTel(relPhone.getString("customPhone"));
+						imMessage.setToTel(relPhone.getString("driverPhone"));
+					}
+				}
 			}
+			JsonObject header = new JsonObject();
+			header.put("clientVersion", clientVersion);
+			header.put("cmdId", cmd);
+			header.put("fromHandlerID", handlerID);
+
+			param.put("header", header);
+			param.put("body", JsonObject.mapFrom(imMessage));
+
+			DeliveryOptions option = new DeliveryOptions();
+			option.addHeader("action", C2CVerticle.method.sendMessage);
+			option.setSendTimeout(3000);
+
+			//
+			DeliveryOptions chOption = new DeliveryOptions();
+			chOption.setSendTimeout(3000);
+			chOption.addHeader("action", "getInnerNode");
+
+			Future<Message<JsonObject>> chFuture = Future.future();
+
+			JsonObject message = new JsonObject();
+			message.put("userId", imMessage.getToTel());
+			eb.<JsonObject>send(IMConsistentHashingVerticle.class.getName(), message, chOption, chFuture.completer());
+
+			chFuture.setHandler(a -> {
+				if (a.succeeded()) {
+					String innerHost = a.result().body().getString("host");
+					eb.send(C2CVerticle.class.getName() + innerHost, param, option);
+				}
+			});
+			//
+
+			SQIMBody ackMsg = new SQIMBody();
+			ackMsg.setMsgId(imMessage.getMsgId());
+			ackMsg.setTimeStamp(System.currentTimeMillis());
+
+			int ackMsgBodyLength = 0;
+			String ackMsgStr = Json.encode(ackMsg);
+			try {
+				ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
+			} catch (Exception e) {
+				logger.error(e);
+			}
+			// 给FROM发A
+			Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
+					cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
+
+			logger.info("ACK, cmd={}ackMsgStr={}", cmd, ackMsgStr);
+			eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
+
 		});
-		//
 
-		SQIMBody ackMsg = new SQIMBody();
-		ackMsg.setMsgId(imMessage.getMsgId());
-		ackMsg.setTimeStamp(System.currentTimeMillis());
-
-		int ackMsgBodyLength = 0;
-		String ackMsgStr = Json.encode(ackMsg);
-		try {
-			ackMsgBodyLength = ackMsgStr.getBytes("UTF-8").length;
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		// 给FROM发A
-		Buffer aMsgHeader = MessageBuilder.buildMsgHeader(MessageBuilder.HEADER_LENGTH, clientVersion,
-				cmd + MessageBuilder.MSG_ACK_CMD_RADIX, ackMsgBodyLength);
-		eb.send(handlerID, aMsgHeader.appendString(ackMsgStr));
 	}
 
 	private void socketClose(String handlerID) {

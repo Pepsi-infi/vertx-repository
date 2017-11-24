@@ -1,0 +1,5 @@
+moduleFactory = service.groovy.VertxPropertiesModuleFactory
+moduleName = service.TransferDeviceService-module
+moduleVersion = 1.0
+extensionClasses = dao.groovy.CarBizEuroDao_GroovyExtension, dao.groovy.DeviceDao_GroovyExtension, dao.groovy.MsgStatResultDao_GroovyExtension, service.groovy.MsgStatResultService_GroovyExtension, service.groovy.TransferDeviceService_GroovyExtension
+staticExtensionClasses = 

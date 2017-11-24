@@ -23,6 +23,8 @@ public class RestIMConstants {
 	 */
 	public static final String GET_OFFLINE_MESSAGE = "/mc-im/message/offline/get.json";
 
+	public static final String GET_RECENT_MESSAGE = "/mc-im/message/recent/get.json";
+
 	public static final String GET_OFFLINE_MESSAGE_4_KF = "/mc-im/kf/message/offline/get.json";
 
 	/**

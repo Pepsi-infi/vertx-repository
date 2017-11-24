@@ -3,7 +3,9 @@ package cluster.impl;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -15,6 +17,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.servicediscovery.Record;
+import utils.IPUtil;
 import xservice.BaseServiceVerticle;
 
 public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
@@ -37,13 +40,19 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 
 	private EventBus eb;
 
+	private String innerIP;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
+		innerIP = IPUtil.getInnerIP();
+
 		logger.info("start ... ");
 		this.realSocketNodes = new ArrayList<String>();
 		this.realInnerNodes = new ArrayList<String>();
+		this.virtualNodes = new TreeMap<Long, String>();
+		this.virtualInnerNodes = new TreeMap<Long, String>();
 
 		getNodesFromDiscovery();
 		initSocketNodes();
@@ -56,7 +65,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		});
 
 		eb = vertx.eventBus();
-		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName(), res -> {
+		eb.<JsonObject>consumer(SocketConsistentHashingVerticle.class.getName() + innerIP, res -> {
 			MultiMap headers = res.headers();
 			JsonObject param = res.body();
 			if (headers != null) {
@@ -79,49 +88,60 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		});
 	}
 
+	/**
+	 * Without port,only IP address.
+	 */
 	private void getNodesFromDiscovery() {
-		JsonObject filter = new JsonObject().put("type", "socket-server");
+		JsonObject filter = new JsonObject().put("type", config().getString("socket.server.type"));
 		discovery.getRecords(filter, result -> {
 			if (result.succeeded()) {
 				List<Record> records = result.result();
-				for (Record r : records) {
-					String publicAddress = r.getMetadata().getString("publicAddress");
+				List<Record> innerIpList = sortInnerIpAddress(records);
+				for (Record r : innerIpList) {
 					String innerIP = r.getMetadata().getString("innerIP");
-					if (!realSocketNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
-						realSocketNodes.add(publicAddress);
-					}
 					if (!realInnerNodes.contains(innerIP) && StringUtils.isNotEmpty(innerIP)) {
 						realInnerNodes.add(innerIP);
 					}
 				}
-				logger.info("realSocketNodes={}realInnerNodes={}", realSocketNodes.toString(),
-						realInnerNodes.toString());
+				List<Record> pubicIpList = sortPublicIpAddress(records);
+				for (Record r : pubicIpList) {
+					String publicAddress = r.getMetadata().getString("publicAddress");
+					if (!realSocketNodes.contains(publicAddress) && StringUtils.isNotEmpty(publicAddress)) {
+						realSocketNodes.add(publicAddress);
+					}
+				}
 			}
 		});
+
+		logger.info("realInnerNodes={} realSocketNodes={}", realInnerNodes.toString(), realSocketNodes.toString());
 	}
 
 	/**
 	 * 初始化虚拟节点
 	 */
 	private void initSocketNodes() {
-		virtualNodes = new TreeMap<Long, String>();
+		// virtualNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realSocketNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualNodes.put(hash("aa" + i + j), realSocketNodes.get(i));
 			}
 		}
+
+		logger.info("virtualNodes={}", virtualNodes.size());
 	}
 
 	/**
 	 * 初始化虚拟内网IP
 	 */
 	private void initInnerNodes() {
-		virtualInnerNodes = new TreeMap<Long, String>();
+		// virtualInnerNodes = new TreeMap<Long, String>();
 		for (int i = 0; i < realInnerNodes.size(); i++) {
 			for (int j = 0; j < length; j++) {
 				virtualInnerNodes.put(hash("aa" + i + j), realInnerNodes.get(i));
 			}
 		}
+
+		logger.info("virtualInnerNodes={}", virtualInnerNodes.size());
 	}
 
 	/**
@@ -175,6 +195,7 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 	 * @param key
 	 * @param nodes
 	 * @param resultHandler
+	 *            Without port,only IP address.
 	 */
 	public JsonObject getNode(String key) {
 		JsonObject result = new JsonObject();
@@ -206,5 +227,57 @@ public class SocketConsistentHashingVerticle extends BaseServiceVerticle {
 		}
 
 		return result;
+	}
+
+	/**
+	 * 按外网Ip排序
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private List<Record> sortPublicIpAddress(List<Record> list) {
+		Map<Double, Record> treeMap = new TreeMap<Double, Record>();
+		for (Record record : list) {
+			String ip = record.getMetadata().getString("publicAddress");
+			if (StringUtils.isNotEmpty(ip)) {
+				String[] str = ip.split("\\.");
+
+				double key = Double.parseDouble(str[0]) * 1000000 + Double.parseDouble(str[1]) * 1000
+						+ Double.parseDouble(str[2]) + Double.parseDouble(str[3]) * 0.001;
+				treeMap.put(key, record);
+			}
+		}
+		List<Record> ret = new ArrayList<Record>();
+		for (Iterator<Double> it = treeMap.keySet().iterator(); it.hasNext();) {
+			double key = it.next().doubleValue();
+			Record value = treeMap.get(key);
+			ret.add(value);
+		}
+		return ret;
+	}
+
+	/**
+	 * 按内网Ip排序
+	 * 
+	 * @param list
+	 * @return
+	 */
+	private List<Record> sortInnerIpAddress(List<Record> list) {
+		Map<Double, Record> treeMap = new TreeMap<Double, Record>();
+		for (Record record : list) {
+			String ip = record.getMetadata().getString("innerIP");
+			String[] str = ip.split("\\.");
+
+			double key = Double.parseDouble(str[0]) * 1000000 + Double.parseDouble(str[1]) * 1000
+					+ Double.parseDouble(str[2]) + Double.parseDouble(str[3]) * 0.001;
+			treeMap.put(key, record);
+		}
+		List<Record> ret = new ArrayList<Record>();
+		for (Iterator<Double> it = treeMap.keySet().iterator(); it.hasNext();) {
+			double key = it.next().doubleValue();
+			Record value = treeMap.get(key);
+			ret.add(value);
+		}
+		return ret;
 	}
 }

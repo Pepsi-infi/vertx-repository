@@ -1,10 +1,13 @@
 package server;
 
+import java.util.Random;
+
 import org.apache.commons.lang.StringUtils;
 
 import api.RestConstants;
 import cluster.impl.SocketConsistentHashingVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -24,11 +27,22 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 	private static final String ENCODE = "utf-8";
 
+	private String innerIP;
+
+	private int socketPort;
+
+	private int socketHTTPPort;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
 
+		logger.info("start ...");
+
 		eb = vertx.eventBus();
+		innerIP = IPUtil.getInnerIP();
+		socketPort = config().getInteger("tcp.port");
+		socketHTTPPort = config().getInteger("socket.http.port");
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
@@ -36,9 +50,9 @@ public class RestSocketVerticle extends RestAPIVerticle {
 		Future<Void> voidFuture = Future.future();
 
 		String serverHost = getServerHost();
-		createHttpServer(router, serverHost, RestConstants.Socket.HTTP_PORT)
+		createHttpServer(router, serverHost, socketHTTPPort)
 				.compose(serverCreated -> publishHttpEndpoint(RestConstants.Socket.SERVICE_NAME, serverHost,
-						RestConstants.Socket.HTTP_PORT, RestConstants.Socket.SERVICE_ROOT))
+						socketHTTPPort, RestConstants.Socket.SERVICE_ROOT))
 				.setHandler(voidFuture.completer());
 	}
 
@@ -47,32 +61,74 @@ public class RestSocketVerticle extends RestAPIVerticle {
 	}
 
 	private void getSocketHost(RoutingContext context) {
-
 		String userId = context.request().params().get("userId");
+		String chatUserId = context.request().params().get("chatUserId");
+		String identity = context.request().params().get("identity");
+		logger.info("getSocketHost, userId={}chatUserId={}identity={}", userId, chatUserId, identity);
 
 		JsonObject result = new JsonObject();
+		JsonObject data = new JsonObject();
 
-		DeliveryOptions option = new DeliveryOptions();
-		option.setSendTimeout(3000);
-		option.addHeader("action", "getSocketNode");
-
-		JsonObject message = new JsonObject();
-		message.put("userId", userId);
 		if (StringUtils.isNotEmpty(userId)) {
-			eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName(), message, option, reply -> {
-				if (reply.succeeded()) {
-					result.put("code", 0);
-					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.result().body());
-					context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
+			// 判断白名单
+			DeliveryOptions whiteListOp = new DeliveryOptions();
+			whiteListOp.setSendTimeout(3000);
+			whiteListOp.addHeader("action", "isWhiteListUser");
+			JsonObject whiteListMessage = new JsonObject();
+			whiteListMessage.put("uid", userId);
+
+			eb.<JsonObject>send("config.whitelist.WhiteListConfigVerticle", whiteListMessage, whiteListOp, r -> {
+				if (r.succeeded()) {
+					JsonObject whiteListR = r.result().body();
+					if (whiteListR.getBoolean("result")) {
+						DeliveryOptions option = new DeliveryOptions();
+						option.setSendTimeout(3000);
+						option.addHeader("action", "getSocketNode");
+
+						JsonObject message = new JsonObject();
+						message.put("userId", chatUserId);
+						eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option,
+								reply -> {
+									if (reply.succeeded()) {
+										result.put("code", 0);
+										result.put("time", System.currentTimeMillis());
+										result.put("data", data.put("host",
+												reply.result().body().getString("host") + ":" + socketPort));
+
+										logger.info("getSocketHost, chatUserId={}node={}", chatUserId,
+												reply.result().body());
+
+										context.response().putHeader("content-type", "application/json")
+												.end(result.encode(), ENCODE);
+									} else {
+										result.put("code", 500);
+										result.put("time", System.currentTimeMillis());
+										result.put("msg", reply.cause().getMessage());
+										context.response().setStatusCode(500)
+												.putHeader("content-type", "application/json")
+												.end(result.encode(), ENCODE);
+									}
+								});
+					} else {
+						JsonArray oldSocket = config().getJsonArray("oldSocket");
+						Random rand = new Random();
+						int pos = rand.nextInt(oldSocket.size());
+
+						result.put("code", 0);
+						result.put("time", System.currentTimeMillis());
+						result.put("data", data.put("host", oldSocket.getString(pos) + ":" + socketPort));
+
+						logger.info("getSocketHost, host={}", oldSocket.getString(pos));
+						context.response().putHeader("content-type", "application/json").end(result.encode(), ENCODE);
+					}
 				} else {
 					result.put("code", 500);
 					result.put("time", System.currentTimeMillis());
-					result.put("data", reply.cause().getMessage());
 					context.response().setStatusCode(500).putHeader("content-type", "application/json")
 							.end(result.encode(), ENCODE);
 				}
 			});
+
 		} else {
 			result.put("code", 400);
 			result.put("time", System.currentTimeMillis());

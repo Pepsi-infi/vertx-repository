@@ -1,0 +1,5 @@
+moduleFactory = tp.groovy.VertxPropertiesModuleFactory
+moduleName = tp.PassengerTpService-module
+moduleVersion = 1.0
+extensionClasses = tp.groovy.DriverTpService_GroovyExtension, tp.groovy.PassengerTpService_GroovyExtension
+staticExtensionClasses = 

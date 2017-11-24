@@ -121,14 +121,87 @@ public class FileServerVerticle extends AbstractVerticle {
 							option.setSendTimeout(3000);
 							option.addHeader("action", "getInnerNode");
 
-							JsonObject message = new JsonObject();
-							message.put("userId", msgBody.getToTel());
-							if (StringUtils.isNotEmpty(msgBody.getToTel())) {
-								eb.<JsonObject>send(EventbusAddressConstant.im_consistent_hash_verticle, message,
-										option, hashFuture.completer());
-							} else {
+							//查询toTel的真实手机号
+							JsonObject orderJson = new JsonObject();
+							orderJson.put("orderNo",msgBody.getSceneId());
 
-							}
+							DeliveryOptions orderOption = new DeliveryOptions();
+							orderOption.addHeader("action", "getRealPhone");
+							orderOption.setSendTimeout(3000);
+
+							eb.<JsonObject>send(EventbusAddressConstant.HTTP_REQUEST_CLIENT_VERT,orderJson,orderOption,realRes->{
+								if(realRes.succeeded()){
+									logger.info("FileVert查询 order api 结果="+realRes.result().body().toString());
+									JsonObject resJson = realRes.result().body();
+
+									if("0000".equals(resJson.getString("code")) && resJson.getValue("result") != null){
+										JsonObject relPhone = resJson.getJsonObject("result");
+										if("44".equals(msgBody.getClientVersion()) || "79".equals(msgBody.getClientVersion())  || "83".equals(msgBody.getClientVersion())){
+											if(msgBody.getIdentity() == 0){
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}else{
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}
+										}else{
+											if(msgBody.getIdentity() == 0){
+												msgBody.setFromTel(relPhone.getString("driverPhone"));
+												msgBody.setToTel(relPhone.getString("customPhone"));
+											}else{
+												msgBody.setFromTel(relPhone.getString("customPhone"));
+												msgBody.setToTel(relPhone.getString("driverPhone"));
+											}
+										}
+									}
+								}
+								JsonObject message = new JsonObject();
+								message.put("userId", msgBody.getToTel());
+								if (StringUtils.isNotEmpty(msgBody.getToTel())) {
+									eb.<JsonObject>send(EventbusAddressConstant.im_consistent_hash_verticle, message,
+											option, hashFuture.completer());
+								} else {
+
+								}
+
+								hashFuture.setHandler(res -> {
+									logger.info("msgRequest, hashFuture={}", res.result().body().encode());
+									if (res.succeeded()) {
+										JsonObject param = new JsonObject();
+
+										SQIMHeader header = new SQIMHeader();
+										header.setHeaderLength(MessageBuilder.HEADER_LENGTH);
+										header.setClientVersion(
+												NumberUtils.toInt(request.getFormAttribute("clientVersion")));
+										header.setCmdId(IMCmd.MSG_N);
+
+										int bodyLength = 0;
+										try {
+											bodyLength = Json.encode(msgBody).getBytes("utf-8").length;
+										} catch (Exception e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+										header.setBodyLength(bodyLength);
+
+										param.put("header", JsonObject.mapFrom(header));
+										param.put("body", JsonObject.mapFrom(msgBody));
+
+										DeliveryOptions c2cOption = new DeliveryOptions();
+										c2cOption.addHeader("action", "sendMessage");
+										c2cOption.setSendTimeout(1000);
+										eb.send(EventbusAddressConstant.c2c_verticle
+												+ res.result().body().getString("host"), param, c2cOption);
+									}
+								});
+
+								JsonObject response = new JsonObject();
+								response.put("code", 0);
+								response.put("time", System.currentTimeMillis());
+								request.response().putHeader("content-type", "application/json; charset=utf-8")
+										.end(response.encode());
+
+							});
 
 							// amr->mp3 transcoding
 //							if (msgBody.getMsgType() != null && 2 == msgBody.getMsgType().intValue()) {
@@ -139,42 +212,6 @@ public class FileServerVerticle extends AbstractVerticle {
 //								eb.send("file.transcoding.Transcoding", date + "/" + uuid, tsOption);
 //							}
 
-							hashFuture.setHandler(res -> {
-								logger.info("msgRequest, hashFuture={}", res.result().body().encode());
-								if (res.succeeded()) {
-									JsonObject param = new JsonObject();
-
-									SQIMHeader header = new SQIMHeader();
-									header.setHeaderLength(MessageBuilder.HEADER_LENGTH);
-									header.setClientVersion(
-											NumberUtils.toInt(request.getFormAttribute("clientVersion")));
-									header.setCmdId(IMCmd.MSG_N);
-
-									int bodyLength = 0;
-									try {
-										bodyLength = Json.encode(msgBody).getBytes("utf-8").length;
-									} catch (Exception e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									header.setBodyLength(bodyLength);
-
-									param.put("header", JsonObject.mapFrom(header));
-									param.put("body", JsonObject.mapFrom(msgBody));
-
-									DeliveryOptions c2cOption = new DeliveryOptions();
-									c2cOption.addHeader("action", "sendMessage");
-									c2cOption.setSendTimeout(1000);
-									eb.send(EventbusAddressConstant.c2c_verticle
-											+ res.result().body().getString("host"), param, c2cOption);
-								}
-							});
-
-							JsonObject response = new JsonObject();
-							response.put("code", 0);
-							response.put("time", System.currentTimeMillis());
-							request.response().putHeader("content-type", "application/json; charset=utf-8")
-									.end(response.encode());
 						});
 					});
 
@@ -209,6 +246,8 @@ public class FileServerVerticle extends AbstractVerticle {
 		msgBody.setMsgType(msgType);
 		msgBody.setSceneType(sceneType);
 		msgBody.setSceneId(sceneId);
+
+		msgBody.setClientVersion(attriMap.get("clientVersion"));
 
 		switch (msgType) {
 		case 2:// 1文本 2语音，content为语音下载地址 3定位 4图片 5视频

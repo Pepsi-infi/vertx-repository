@@ -22,6 +22,7 @@ import logic.impl.SocketSessionVerticle;
 import rx.Single;
 import server.RestSocketVerticle;
 import server.SocketServerVerticle;
+import socket.heartbeat.HeartBeat;
 
 public class Tester {
 	

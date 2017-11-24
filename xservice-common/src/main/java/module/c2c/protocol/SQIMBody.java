@@ -106,6 +106,19 @@ public class SQIMBody {
 	 */
 	private Integer duration;
 
+	/**
+	 * 乘客端版本号44 用于临时解决虚拟号问题
+	 */
+	private String clientVersion;
+
+	public String getClientVersion() {
+		return clientVersion;
+	}
+
+	public void setClientVersion(String clientVersion) {
+		this.clientVersion = clientVersion;
+	}
+
 	public String getUserTel() {
 		return userTel;
 	}
@@ -250,12 +263,28 @@ public class SQIMBody {
 		this.height = height;
 	}
 
-	@Override
-	public String toString() {
-		return "SQIMBody [userTel=" + userTel + ", fromTel=" + fromTel + ", identity=" + identity + ", toTel=" + toTel
-				+ ", msgId=" + msgId + ", sceneId=" + sceneId + ", sceneType=" + sceneType + ", msgType=" + msgType
-				+ ", content=" + content + ", jumpUrl=" + jumpUrl + ", timeStamp=" + timeStamp + ", lon=" + lon
-				+ ", lat=" + lat + ", sAddress=" + sAddress + ", address=" + address + ", duration=" + duration + "]";
-	}
-
+    @Override
+    public String toString() {
+        return "SQIMBody{" +
+                "userTel='" + userTel + '\'' +
+                ", fromTel='" + fromTel + '\'' +
+                ", identity=" + identity +
+                ", toTel='" + toTel + '\'' +
+                ", msgId='" + msgId + '\'' +
+                ", sceneId='" + sceneId + '\'' +
+                ", sceneType=" + sceneType +
+                ", msgType=" + msgType +
+                ", content='" + content + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", jumpUrl='" + jumpUrl + '\'' +
+                ", timeStamp=" + timeStamp +
+                ", lon=" + lon +
+                ", lat=" + lat +
+                ", sAddress='" + sAddress + '\'' +
+                ", address='" + address + '\'' +
+                ", duration=" + duration +
+                ", clientVersion='" + clientVersion + '\'' +
+                '}';
+    }
 }

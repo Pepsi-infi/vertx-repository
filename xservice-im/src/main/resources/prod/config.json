@@ -76,5 +76,10 @@
 	"service.host": "127.0.0.1",
 	"im.tcp.port": 11000,
 	"im.memory.size": 7680,
-	"im.http.port": 10001
+	"im.http.port": 10001,
+	"order.api":{
+		"host":"http://10.0.200.118",
+		"path":"/virtualTrumpet/getIMVirtualPhone"
+	}
 }
+
