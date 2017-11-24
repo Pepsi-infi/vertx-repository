@@ -255,7 +255,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID, null);
+					sendReLogin(handlerID, ipMap.get(innerIP));
 				} else {
 					LocalDateTime now = LocalDateTime.now();
 					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -595,7 +595,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID, null);
+					sendReLogin(handlerID, ipMap.get(innerIP));
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
@@ -641,7 +641,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID, null);
+					sendReLogin(handlerID, ipMap.get(innerIP));
 				} else {
 					JsonObject subscribeParam = new JsonObject();
 					subscribeParam.put("userId", uid);
@@ -706,7 +706,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 				String uid = res.getString("userId");
 				if (StringUtils.isEmpty(uid)) {
 					// uid is null, relogin.
-					sendReLogin(handlerID, null);
+					sendReLogin(handlerID, ipMap.get(innerIP));
 				} else {
 					JsonObject msgConfirmParam = new JsonObject();
 					msgConfirmParam.put("userId", uid);
