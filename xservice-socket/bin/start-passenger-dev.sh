@@ -10,7 +10,7 @@ fi
 
 sleep 5s
 
-nohup java \
+nohup /usr/local/jdk1.8/bin/java \
 -server \
 -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -Xloggc:${root_path}/gc.log \
 -Xms1g -Xmx1g -Xmn768m -Xss256K -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m \
