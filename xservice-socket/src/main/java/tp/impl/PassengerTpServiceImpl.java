@@ -52,8 +52,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 		JsonObject circuitObject = config.getJsonObject("circuit-breaker");
 		JsonObject cbOptions = circuitObject != null ? circuitObject : new JsonObject();
 		CircuitBreakerOptions options = new CircuitBreakerOptions();
-		options.setMaxFailures(cbOptions.getInteger("max-failures", 3));
-		options.setTimeout(cbOptions.getLong("timeout", 10000L));
+		options.setMaxFailures(cbOptions.getInteger("max-failures", 20));
+		options.setTimeout(cbOptions.getLong("timeout", 3000L));
 		options.setFallbackOnFailure(true);
 		options.setResetTimeout(cbOptions.getLong("reset-timeout", 30000L));
 		String name = cbOptions.getString("name", "circuit-breaker");
@@ -193,9 +193,10 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			String ver = param.getString("ver");
 			String mode = param.getString("mode");
 
-			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/signinUserHash/").append("user=").append(userId)
-					.append("&hash=").append(hash).append("&ip=").append(ip).append("&channelid=").append(channelid)
-					.append("&mark=").append(mark).append("&ver=").append(ver).append("&mode=").append(mode).toString();
+			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/signinUserHash/")
+					.append("user=").append(userId).append("&hash=").append(hash).append("&ip=").append(ip)
+					.append("&channelid=").append(channelid).append("&mark=").append(mark).append("&ver=").append(ver)
+					.append("&mode=").append(mode).toString();
 
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
