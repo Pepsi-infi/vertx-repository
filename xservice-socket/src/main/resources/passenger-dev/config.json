@@ -12,12 +12,12 @@
 	"setClientOffline": "/webservice/passenger/webservice/chat/setClientOffline/",
 	"socket": [
 		{
-			"innerIP": "",
-			"node": ""
+			"innerIP": "10.20.0.13",
+			"node": "124.250.33.181"
 		},
 		{
-			"innerIP": "",
-			"node": ""
+			"innerIP": "10.0.40.10",
+			"node": "124.250.33.182"
 		}
 	],
 	"oldSocket": [
