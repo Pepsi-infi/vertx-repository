@@ -94,6 +94,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
 	@Override
 	public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
+		logger.info("DeviceService.queryDevices started");
 		Future<DeviceDto> resultFuture = Future.future();
 		deviceDao.getDevice(param, resultFuture.completer());
 		resultFuture.setHandler(handler -> {
