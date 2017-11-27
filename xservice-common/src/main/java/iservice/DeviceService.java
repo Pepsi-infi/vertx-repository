@@ -1,6 +1,8 @@
 package iservice;
 
-import helper.XProxyHelper;
+import java.util.List;
+import java.util.Map;
+
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -9,9 +11,6 @@ import io.vertx.core.Vertx;
 import io.vertx.serviceproxy.ProxyHelper;
 import iservice.dto.DeviceDto;
 import utils.BaseResponse;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei
@@ -26,7 +25,8 @@ public interface DeviceService {
     public static final String SERVICE_ADDRESS = "http-device-eb-service";
 
     static DeviceService createProxy(Vertx vertx) {
-        return XProxyHelper.createProxy(DeviceService.class, DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
+        //return XProxyHelper.createProxy(DeviceService.class, DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
+        return ProxyHelper.createProxy(DeviceService.class, vertx, DeviceService.SERVICE_ADDRESS);
     }
 
 

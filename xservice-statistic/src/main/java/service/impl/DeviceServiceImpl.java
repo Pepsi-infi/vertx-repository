@@ -9,6 +9,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.serviceproxy.ProxyHelper;
 import iservice.DeviceService;
 import iservice.dto.DeviceDto;
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +32,8 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 	public void start() throws Exception {
 		super.start();
 
-		XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
+		//XProxyHelper.registerService(DeviceService.class, vertx, this, DeviceService.SERVICE_ADDRESS);
+		ProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
 		publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
 		deviceDao = DeviceDao.createProxy(vertx.getDelegate());
 	}
