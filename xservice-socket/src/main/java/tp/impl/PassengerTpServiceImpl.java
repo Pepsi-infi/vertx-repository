@@ -45,14 +45,15 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 
 		CAR_API_HOST = config().getString("car-api-host");
 		CAR_API_PORT = config().getInteger("car-api-port");
+		logger.info("config={} host={} port={}", config().encode(), CAR_API_HOST, CAR_API_PORT);
 	}
 
 	private CircuitBreaker createCircuitBreaker(Vertx vertx, JsonObject config) {
 		JsonObject circuitObject = config.getJsonObject("circuit-breaker");
 		JsonObject cbOptions = circuitObject != null ? circuitObject : new JsonObject();
 		CircuitBreakerOptions options = new CircuitBreakerOptions();
-		options.setMaxFailures(cbOptions.getInteger("max-failures", 3));
-		options.setTimeout(cbOptions.getLong("timeout", 3000L));
+		options.setMaxFailures(cbOptions.getInteger("max-failures", 20));
+		options.setTimeout(cbOptions.getLong("timeout", 30000L));
 		options.setFallbackOnFailure(true);
 		options.setResetTimeout(cbOptions.getLong("reset-timeout", 30000L));
 		String name = cbOptions.getString("name", "circuit-breaker");
@@ -69,8 +70,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, config().getString("updateOnlineState")).as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateOnlineState/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineState, uid={}&time={}&msg={}, response={}", uid,
@@ -101,8 +102,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			form.add("msg", Utils.normalizePath(content.encode()).substring(1));
 
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, config().getString("updateOnlineSimple")).as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/updateSimpleOnlineState/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("updateOnlineSimple, uid={}&time={}&msg={}, response={}", uid,
@@ -119,6 +120,7 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			if (ar.succeeded()) {
 				result.handle(Future.succeededFuture(ar.result()));
 			} else {
+				logger.error("updateOnlineSimple, result={}", ar.cause().getMessage());
 				result.handle(Future.succeededFuture(null));
 			}
 		});
@@ -133,8 +135,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			logger.info("subscribe, uid={} data={}", msg.getString("userId"), msg.getString("data"));
 
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, config().getString("subscribe")).as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgSubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					logger.info("subscribe, {}", resp.body());
@@ -159,8 +161,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			form.set("uid", msg.getString("userId"));
 			form.set("msg", Utils.normalizePath(msg.getString("data")).substring(1));
 			Single<HttpResponse<String>> httpRequest = webClient
-					.post(CAR_API_PORT, CAR_API_HOST, config().getString("unsubscribe")).as(BodyCodec.string())
-					.rxSendForm(form);
+					.post(CAR_API_PORT, CAR_API_HOST, "/webservice/passenger/webservice/chat/userMsgUnsubscribe/")
+					.as(BodyCodec.string()).rxSendForm(form);
 			httpRequest.subscribe(resp -> {
 				if (resp.statusCode() == 200) {
 					future.complete(resp.body());
@@ -192,9 +194,10 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 			String ver = param.getString("ver");
 			String mode = param.getString("mode");
 
-			String requestURI = new StringBuffer("/webservice/chat/signinUserHash/").append("user=").append(userId)
-					.append("&hash=").append(hash).append("&ip=").append(ip).append("&channelid=").append(channelid)
-					.append("&mark=").append(mark).append("&ver=").append(ver).append("&mode=").append(mode).toString();
+			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/signinUserHash/")
+					.append("user=").append(userId).append("&hash=").append(hash).append("&ip=").append(ip)
+					.append("&channelid=").append(channelid).append("&mark=").append(mark).append("&ver=").append(ver)
+					.append("&mode=").append(mode).toString();
 
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
@@ -221,8 +224,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 		circuitBreaker.<String>execute(future -> {
 			String userId = param.getString("userId");
 
-			String requestURI = new StringBuffer(config().getString("setClientOnline")).append("uid=").append(userId)
-					.toString();
+			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/setclientonline/")
+					.append("uid=").append(userId).toString();
 
 			logger.info("setClientOnline, host={}port={}uri={}", CAR_API_HOST, CAR_API_PORT, requestURI);
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
@@ -251,9 +254,10 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 		circuitBreaker.<String>execute(future -> {
 			String userId = param.getString("userId");
 
-			String requestURI = new StringBuffer(config().getString("setClientOffline")).append("uid=").append(userId)
-					.toString();
+			String requestURI = new StringBuffer("/webservice/passenger/webservice/chat/setClientOffline/")
+					.append("uid=").append(userId).toString();
 
+			logger.info("setClientOffline, host={}port={}uri={}", CAR_API_HOST, CAR_API_PORT, requestURI);
 			Single<HttpResponse<String>> httpRequest = webClient.get(CAR_API_PORT, CAR_API_HOST, requestURI)
 					.as(BodyCodec.string()).rxSend();
 

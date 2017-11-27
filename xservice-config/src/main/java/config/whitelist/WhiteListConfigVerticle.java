@@ -34,7 +34,11 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 
 	private JsonArray params = new JsonArray();
 
-	private Set<Integer> whiteListSet = new HashSet<Integer>();
+	private Set<Integer> driverSet = new HashSet<Integer>();
+
+	private Set<Integer> passengerSet = new HashSet<Integer>();
+	private static final int TYPE_DRIVER = 1;
+	private static final int TYPE_PASSENGER = 2;
 
 	@Override
 	public void start() throws Exception {
@@ -59,6 +63,9 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 				case "isWhiteListUser":
 					res.reply(isWhiteListUser(NumberUtils.toInt(json.getString("uid"))));
 					break;
+				case "whiteListPassenger":
+					res.reply(whiteListPassenger(NumberUtils.toInt(json.getString("uid"))));
+					break;
 				default:
 					res.reply(1);// Fail!
 					break;
@@ -67,7 +74,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 		});
 	}
 
-	private static final String select_white_list_user = "SELECT uid FROM socket_white_list";
+	private static final String select_white_list_user = "SELECT uid, type FROM socket_white_list";
 
 	public void initWhiteListUser() {
 		mySQLClient.getConnection(res -> {
@@ -81,7 +88,11 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 						List<JsonObject> rows = SQLRes.result().getRows();
 						if (CollectionUtils.isNotEmpty(rows)) {
 							for (JsonObject json : rows) {
-								whiteListSet.add(json.getInteger("uid"));
+								if (TYPE_DRIVER == json.getInteger("type").intValue()) {
+									driverSet.add(json.getInteger("uid"));
+								} else if (TYPE_PASSENGER == json.getInteger("type").intValue()) {
+									passengerSet.add(json.getInteger("uid"));
+								}
 							}
 						}
 					} else {
@@ -102,7 +113,7 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 	 */
 	public JsonObject isWhiteListUser(Integer uid) {
 		JsonObject message = new JsonObject();
-		if (whiteListSet.contains(uid)) {
+		if (driverSet.contains(uid)) {
 			message.put("result", true);
 		} else {
 			message.put("result", false);
@@ -110,4 +121,13 @@ public class WhiteListConfigVerticle extends AbstractVerticle {
 		return message;
 	}
 
+	public JsonObject whiteListPassenger(Integer uid) {
+		JsonObject message = new JsonObject();
+		if (passengerSet.contains(uid)) {
+			message.put("result", true);
+		} else {
+			message.put("result", false);
+		}
+		return message;
+	}
 }

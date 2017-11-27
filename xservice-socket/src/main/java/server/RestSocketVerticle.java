@@ -3,6 +3,7 @@ package server;
 import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import api.RestConstants;
 import cluster.impl.SocketConsistentHashingVerticle;
@@ -46,6 +47,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 
 		Router router = Router.router(vertx);
 		router.route(RestConstants.Socket.GET_SOCKET_HOST).handler(this::getSocketHost);
+		router.route(RestConstants.Socket.GET_SOCKET_HOST_PASSENGER).handler(this::getSocketHost);
 		router.route(RestConstants.Socket.SOCKET_STATUS).handler(this::socketStatus);
 		Future<Void> voidFuture = Future.future();
 
@@ -73,7 +75,11 @@ public class RestSocketVerticle extends RestAPIVerticle {
 			// 判断白名单
 			DeliveryOptions whiteListOp = new DeliveryOptions();
 			whiteListOp.setSendTimeout(3000);
-			whiteListOp.addHeader("action", "isWhiteListUser");
+			if (0 == NumberUtils.toInt(identity)) {// 司机
+				whiteListOp.addHeader("action", "isWhiteListUser");
+			} else if (1 == NumberUtils.toInt(identity)) {
+				whiteListOp.addHeader("action", "whiteListPassenger");
+			}
 			JsonObject whiteListMessage = new JsonObject();
 			whiteListMessage.put("uid", userId);
 
