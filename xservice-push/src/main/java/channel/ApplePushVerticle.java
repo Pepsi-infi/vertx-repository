@@ -90,37 +90,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 
 		logger.info("apns初始化成功");
 
-		// String keyStorePwd = config.getString("push.apns.keyStorePwd");
-		// String keyStorePath = config.getString("push.apns.keyStorePath");
-		// logger.info("keyStorePath="+keyStorePath);
-		//
-		// ApnsGateway gateway = null;
-		// if ("dev".equals(PushConsts.ENV_PATH)) {
-		// gateway = ApnsGateway.DEVELOPMENT;
-		// }
-		//
-		// if ("prod".equals(PushConsts.ENV_PATH)) {
-		// gateway = ApnsGateway.PRODUCTION;
-		// }
-		//
-		// if (gateway == null) {
-		// logger.error("apns service init error:ApnsGateway is null");
-		// return;
-		// }
-		//
-		// try {
-		// apnsChannelFactory =
-		// Apns4j.newChannelFactoryBuilder().keyStoreMeta(keyStorePath).keyStorePwd(keyStorePwd)
-		// .apnsGateway(gateway).build();
-		// apnsChannel = apnsChannelFactory.newChannel(keyStorePath,
-		// keyStorePwd);
-		// apnsService = new ApnsService(3, apnsChannelFactory, 3, keyStorePath,
-		// keyStorePwd);
-		// } catch (Exception e) {
-		// logger.error("apns config init fail", e);
-		// }
-		// logger.info("apns config init success");
-
 	}
 
 	@Override
@@ -165,8 +134,7 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			}
 
 		});
-		// boolean sendResult= sendApnsByDbay(deviceToken, title, body,
-		// msgbody);
+		
 
 	}
 
