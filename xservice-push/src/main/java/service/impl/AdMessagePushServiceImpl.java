@@ -295,21 +295,6 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		long expire = (expireTime - System.currentTimeMillis()) / 1000;
 		redisService.setNx(redisMsgKey, msgId, expire, resultHandler);
 
-		// redisFuture.setHandler(handler -> {
-		// if (handler.succeeded()) {
-		// // 验证redis
-		// String redisResult = handler.result();
-		// if (StringUtils.isNotBlank(redisResult)) {
-		// String repeatRecivedErrorMsg = "这个消息已发送过，禁止重复发送msgId=" + msgId;
-		// resultHandler.handle(Future.failedFuture(repeatRecivedErrorMsg));
-		// return;
-		// }
-		// resultHandler.handle(Future.succeededFuture());
-		// } else {
-		// resultHandler.handle(Future.failedFuture(handler.cause()));
-		// }
-		// });
-
 	}
 
 	/**
