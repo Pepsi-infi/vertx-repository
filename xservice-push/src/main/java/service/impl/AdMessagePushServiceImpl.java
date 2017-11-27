@@ -113,12 +113,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			return;
 		}
 
-		// 验证消息是否重复推送
-		// Future<BaseResponse> repeatFuture = Future.future();
-
 		// 推送给下游
 		Future<BaseResponse> pushFuture = Future.future();
-		// checkRepeatMsg(receiveMsg, repeatFuture.completer());
 
 		// 使用redis原子锁做幂等性处理
 		Future<Long> idempotenceFuture = Future.future();
@@ -148,17 +144,6 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 
 		});
 
-		// repeatFuture.setHandler(res -> {
-		// if (res.succeeded()) {
-		// pushMsgToDownStream(receiveMsg, pushFuture.completer());
-		// } else {
-		// logger.error("验证重复推送：" + res.cause());
-		// resultHandler.handle(Future.succeededFuture(new
-		// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
-		// res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
-		// }
-		// });
-
 		// 消息推送成功后，调用上报消息接口
 		Future<BaseResponse> statFuture = Future.future();
 		pushFuture.setHandler(res -> {
@@ -167,25 +152,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 			} else {
 				// 输出推送时的错误
 				logger.error("调用推送时出错：" + pushFuture.cause());
-				// resultHandler.handle(Future.succeededFuture(new
-				// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
-				// res.cause().getMessage(),
-				// Collections.EMPTY_MAP).toString()));
 			}
 		});
-
-		// 根据推送结果返回结果数据给http调用方 无需再根据上报结果返回到http调用方了
-		// statFuture.setHandler(res -> {
-		// if (res.succeeded()) {
-		// resultHandler.handle(Future.succeededFuture(
-		// new ResultData<Object>(ErrorCodeEnum.SUCCESS,
-		// Collections.EMPTY_MAP).toString()));
-		// } else {
-		// resultHandler.handle(Future.succeededFuture(new
-		// ResultData<Object>(ErrorCodeEnum.FAIL.getCode(),
-		// res.cause().getMessage(), Collections.EMPTY_MAP).toString()));
-		// }
-		// });
 
 	}
 
@@ -205,10 +173,6 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	 */
 	private void callStatPushMsg(JsonObject receiveMsg, Handler<AsyncResult<BaseResponse>> resultHandler) {
 		String msgId = receiveMsg.getValue("msgId") + "";
-		String customerId = receiveMsg.getValue("customerId") + "";
-		// 推送成功的消息把msgId保存到redis,用来防止重复推送
-		Future<Void> setRedisFuture = Future.future();
-		this.setMsgToRedis(msgId, customerId, receiveMsg.getLong("expireTime"), setRedisFuture.completer());
 
 		// 已推送消息上报接口
 		List<MsgStatDto> msgList = new ArrayList<>();
@@ -231,11 +195,11 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		logger.info("已推送消息上报msgId=" + msgId + ",JsonDetail:" + Json.encode(msgStatDto));
 		msgStatService.statPushMsg(msgList, statRes -> {
 			if (statRes.succeeded()) {
-				logger.info("已推送消息上报成功msgId=" + msgId);
 				String result = statRes.result();
-				exeStatPushMsgResult(msgId, result, resultHandler);
+				logger.info("推送消息上报结果：" + result + "msg=" + receiveMsg);
+				// exeStatPushMsgResult(msgId, result, resultHandler);
 			} else {
-				logger.error("已推送消息上报调用异常msgId=" + msgId, statRes.cause());
+				logger.error("已推送消息上报调用异常msg=" + receiveMsg, statRes.cause());
 				resultHandler.handle(Future.failedFuture(statRes.cause()));
 			}
 		});
