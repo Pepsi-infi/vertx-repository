@@ -3,7 +3,9 @@
 	"udp.port": 9099,
 	"socket.server.type": "passenger-socket-server",
 	"car-api-host": "10.0.200.57",
+	"passenger-car-api-host": "10.0.200.54",
 	"car-api-port": 80,
+	"passenger-car-api-port": 80,
 	"_comment.socket": "",
 	"socket": [
 		{
