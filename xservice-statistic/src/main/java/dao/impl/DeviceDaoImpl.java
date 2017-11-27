@@ -133,6 +133,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 	@Override
 	public void queryDevices(Map<String, String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler) {
+		logger.info("DeviceDaoImpl.queryDevices method started");
 		String sql = Sql.QUERY_USER_DEVICE;
 		StringBuilder sb = new StringBuilder();
 		String phone = MapUtils.getString(params, "phone");
@@ -160,7 +161,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				});
 				resultHandler.handle(Future.succeededFuture(deviceDtos));
 			} else {
-				logger.error(result.cause());
+				logger.error("query device error",result.cause());
 				resultHandler.handle(Future.failedFuture(result.cause()));
 			}
 		});
