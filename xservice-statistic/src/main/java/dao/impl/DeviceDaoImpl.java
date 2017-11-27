@@ -52,6 +52,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
 		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
+		logger.info("device sql client init success!!!");
 	}
 
 	@Override

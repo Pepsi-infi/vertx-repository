@@ -36,6 +36,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 		XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
 		publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
 		deviceDao = DeviceDao.createProxy(vertx.getDelegate());
+		logger.info("deviceDao init success!!!");
 	}
 
 	@Override
