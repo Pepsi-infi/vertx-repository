@@ -53,6 +53,7 @@ public class RestStatVerticle extends RestAPIVerticle {
         router.post(StatRestConstants.Stat.PUSH_MSG_REPORT).handler(this::statPushMsg);
         router.route(StatRestConstants.Stat.QUERY_PUSH_MSG_STAT).handler(this::queryMsgStatResult);
         router.post(StatRestConstants.Device.DEVICE_REPORT).handler(this::reportUserDevice);
+        router.post("/getDevice.json").handler(this::getDeviceByPhone);
         Future<Void> voidFuture = Future.future();
 
         String serverHost = this.getServerHost();
@@ -156,6 +157,16 @@ public class RestStatVerticle extends RestAPIVerticle {
         }
         msgStatResultDao.queryMsgStatResultByPage(params, NumberUtils.toInt(page), NumberUtils.toInt(size), resultHandler(context, JsonUtil::encodePrettily));
 
+    }
+    
+    private void getDeviceByPhone(RoutingContext context) {
+    	String phone = context.request().params().get("phone");
+    	logger.info("query getDeviceByPhone phone: {}", phone);
+    	Map<String, String> params = Maps.newHashMap();
+    	if (StringUtils.isNotBlank(phone)) {
+    		params.put("phone", phone);
+    	}    	
+    	deviceService.queryDevices(params, resultHandler(context, JsonUtil::encodePrettily));
     }
 
 
