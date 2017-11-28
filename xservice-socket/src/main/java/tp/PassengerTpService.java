@@ -15,7 +15,7 @@ public interface PassengerTpService {
 
 	static final String SERVICE_NAME = PassengerTpService.class.getName();
 
-	static final String SERVICE_ADDRESS = PassengerTpService.class.getName();
+	static final String SERVICE_ADDRESS = PassengerTpService.class.getName() + "passenger";
 
 	static PassengerTpService createProxy(Vertx vertx) {
 		return ProxyHelper.createProxy(PassengerTpService.class, vertx, SERVICE_ADDRESS,

@@ -55,6 +55,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 		publishEventBusService(DeviceDao.SERVICE_NAME, DeviceDao.SERVICE_ADDRESS, DeviceDao.class);
 
 		client = MySQLClient.createNonShared(vertx, config().getJsonObject("mysql").getJsonObject("mc-device"));
+		logger.info("device sql client init success!!!");
 	}
 
 	@Override
@@ -105,6 +106,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 	@Override
 	public void getDevice(Map<String, String> params, Handler<AsyncResult<DeviceDto>> resultHandler) {
+		logger.info("DeviceDao.getDevice method started");
 		String sql = Sql.QUERY_USER_DEVICE;
 		StringBuilder sb = new StringBuilder();
 		String antFingerprint = MapUtils.getString(params, "antFingerprint");
@@ -133,7 +135,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				resultHandler.handle(
 						Future.succeededFuture(CollectionUtils.isNotEmpty(deviceDtos) ? deviceDtos.get(0) : null));
 			} else {
-				logger.error(result.cause());
+				logger.error("getDevice by phone error",result.cause());
 				resultHandler.handle(Future.failedFuture(result.cause()));
 			}
 		});
@@ -141,6 +143,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 	@Override
 	public void queryDevices(Map<String, String> params, Handler<AsyncResult<List<DeviceDto>>> resultHandler) {
+		logger.info("DeviceDaoImpl.queryDevices method started");
 		String sql = Sql.QUERY_USER_DEVICE;
 		StringBuilder sb = new StringBuilder();
 		String phone = MapUtils.getString(params, "phone");
@@ -168,7 +171,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				});
 				resultHandler.handle(Future.succeededFuture(deviceDtos));
 			} else {
-				logger.error(result.cause());
+				logger.error("query device error",result.cause());
 				resultHandler.handle(Future.failedFuture(result.cause()));
 			}
 		});
