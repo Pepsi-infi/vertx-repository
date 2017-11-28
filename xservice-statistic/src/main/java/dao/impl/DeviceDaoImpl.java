@@ -101,6 +101,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 
 	@Override
 	public void getDevice(Map<String, String> params, Handler<AsyncResult<DeviceDto>> resultHandler) {
+		logger.info("DeviceDao.getDevice method started");
 		String sql = Sql.QUERY_USER_DEVICE;
 		StringBuilder sb = new StringBuilder();
 		String antFingerprint = MapUtils.getString(params, "antFingerprint");
@@ -125,7 +126,7 @@ public class DeviceDaoImpl extends BaseDaoVerticle implements DeviceDao {
 				resultHandler.handle(
 						Future.succeededFuture(CollectionUtils.isNotEmpty(deviceDtos) ? deviceDtos.get(0) : null));
 			} else {
-				logger.error(result.cause());
+				logger.error("getDevice by phone error",result.cause());
 				resultHandler.handle(Future.failedFuture(result.cause()));
 			}
 		});
