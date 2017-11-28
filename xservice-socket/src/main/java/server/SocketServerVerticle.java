@@ -141,18 +141,18 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-									if (simpleHeartBeatCount > 2) {
-										simpleHeartBeatCount = 0;
-									}
-									if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
-										updateOnlineState(innerIP, handlerID, message);
-										simpleHeartBeatCount++;
-									} else {
-										updateOnlineSimple(innerIP, handlerID, message);
-										simpleHeartBeatCount++;
-									}
+								// if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+								if (simpleHeartBeatCount > 2) {
+									simpleHeartBeatCount = 0;
 								}
+								if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
+									updateOnlineState(innerIP, handlerID, message);
+									simpleHeartBeatCount++;
+								} else {
+									updateOnlineSimple(innerIP, handlerID, message);
+									simpleHeartBeatCount++;
+								}
+								// }
 
 								break;
 							case 17:// 订阅
