@@ -141,18 +141,29 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 							case 14:// heart beat
 								heartBeat(handlerID);
 
-								// if ("driver-socket-server".equalsIgnoreCase(serverType)) {
-								if (simpleHeartBeatCount > 2) {
-									simpleHeartBeatCount = 0;
-								}
-								if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
-									updateOnlineState(innerIP, handlerID, message);
-									simpleHeartBeatCount++;
+								if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+									if (simpleHeartBeatCount > 2) {
+										simpleHeartBeatCount = 0;
+									}
+									if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
+										driverUpdateOnlineState(innerIP, handlerID, message);
+										simpleHeartBeatCount++;
+									} else {
+										driverUpdateOnlineSimple(innerIP, handlerID, message);
+										simpleHeartBeatCount++;
+									}
 								} else {
-									updateOnlineSimple(innerIP, handlerID, message);
-									simpleHeartBeatCount++;
+									if (simpleHeartBeatCount > 2) {
+										simpleHeartBeatCount = 0;
+									}
+									if (simpleHeartBeatCount == 2 || simpleHeartBeatCount == -1) {
+										passengerUpdateOnlineState(innerIP, handlerID, message);
+										simpleHeartBeatCount++;
+									} else {
+										passengerUpdateOnlineSimple(innerIP, handlerID, message);
+										simpleHeartBeatCount++;
+									}
 								}
-								// }
 
 								break;
 							case 17:// 订阅
@@ -200,7 +211,7 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		server.listen();
 	}
 
-	private void updateOnlineState(String innerIP, String writeHandlerID, JsonObject message) {
+	private void driverUpdateOnlineState(String innerIP, String writeHandlerID, JsonObject message) {
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
 		option.addHeader("action", "getUidByHandlerID");
@@ -242,7 +253,49 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 		});
 	}
 
-	private void updateOnlineSimple(String innerIP, String handlerID, JsonObject message) {
+	private void passengerUpdateOnlineState(String innerIP, String writeHandlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", writeHandlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+
+				LocalDateTime now = LocalDateTime.now();
+				DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				String date = now.format(format);
+				JsonObject data = null;
+				try {
+					data = message.getJsonObject("data");
+				} catch (Exception e) {
+					try {
+						HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
+								HeartBeat.class);
+						data = JsonObject.mapFrom(hb);
+					} catch (Exception e1) {
+						logger.error(e1);
+					}
+				}
+
+				pTpService.updateOnlineState(uid, date, data, result -> {
+					if (result.succeeded()) {
+						logger.info("updateOnlineState, handlerID={} result={}", writeHandlerID, result.result());
+					} else {
+						logger.error("updateOnlineState, handlerID={} result={}", writeHandlerID, result.cause());
+					}
+				});
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void driverUpdateOnlineSimple(String innerIP, String handlerID, JsonObject message) {
 		DeliveryOptions option = new DeliveryOptions();
 		option.setSendTimeout(3000);
 		option.addHeader("action", "getUidByHandlerID");
@@ -275,6 +328,53 @@ public class SocketServerVerticle extends BaseServiceVerticle {
 					}
 
 					dTpService.updateOnlineSimple(uid, date, data, result -> {
+						if (result.succeeded()) {
+							// TODO
+							logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
+						} else {
+							logger.error("updateOnlineSimple, handlerID={} result={}", handlerID, result.cause());
+						}
+					});
+				}
+			} else {
+				// TODO
+			}
+		});
+	}
+
+	private void passengerUpdateOnlineSimple(String innerIP, String handlerID, JsonObject message) {
+		DeliveryOptions option = new DeliveryOptions();
+		option.setSendTimeout(3000);
+		option.addHeader("action", "getUidByHandlerID");
+
+		JsonObject param = new JsonObject();
+		param.put("handlerID", handlerID);
+
+		eb.<JsonObject>send(SocketSessionVerticle.class.getName() + innerIP, param, option, reply -> {
+			if (reply.succeeded()) {
+				JsonObject res = reply.result().body();
+				String uid = res.getString("userId");
+				if (StringUtils.isEmpty(uid)) {
+					// uid is null, relogin.
+					sendReLogin(handlerID, ipMap.get(innerIP));
+				} else {
+					LocalDateTime now = LocalDateTime.now();
+					DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+					String date = now.format(format);
+					JsonObject data = null;
+					try {
+						data = message.getJsonObject("data");
+					} catch (Exception e) {
+						try {
+							HeartBeat hb = Json.mapper.readValue(message.getString("data").replace("\\\\", ""),
+									HeartBeat.class);
+							data = JsonObject.mapFrom(hb);
+						} catch (Exception e1) {
+							logger.error(e1);
+						}
+					}
+
+					pTpService.updateOnlineSimple(uid, date, data, result -> {
 						if (result.succeeded()) {
 							// TODO
 							logger.info("updateOnlineSimple, handlerID={} result={}", handlerID, result.result());
