@@ -1,7 +1,13 @@
 package service.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import dao.DeviceDao;
 import helper.XProxyHelper;
 import io.vertx.core.AsyncResult;
@@ -11,12 +17,8 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import iservice.DeviceService;
 import iservice.dto.DeviceDto;
-import org.apache.commons.lang.StringUtils;
 import rxjava.BaseServiceVerticle;
 import utils.BaseResponse;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by lufei Date : 2017/7/27 10:09 Description :
@@ -34,6 +36,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 		XProxyHelper.registerService(DeviceService.class, vertx.getDelegate(), this, DeviceService.SERVICE_ADDRESS);
 		publishEventBusService(DeviceService.SERVICE_NAME, DeviceService.SERVICE_ADDRESS, DeviceService.class);
 		deviceDao = DeviceDao.createProxy(vertx.getDelegate());
+		logger.info("deviceDao init success!!!");
 	}
 
 	@Override
@@ -91,6 +94,7 @@ public class DeviceServiceImpl extends BaseServiceVerticle implements DeviceServ
 
 	@Override
 	public void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
+		logger.info("DeviceService.queryDevices started");
 		Future<DeviceDto> resultFuture = Future.future();
 		deviceDao.getDevice(param, resultFuture.completer());
 		resultFuture.setHandler(handler -> {

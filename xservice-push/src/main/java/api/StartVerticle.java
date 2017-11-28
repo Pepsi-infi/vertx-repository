@@ -33,15 +33,13 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(SocketVerticle.class.getName());
 		this.deployVerticle(ApplePushVerticle.class.getName());
 
-		//this.deployVerticle(MessagePushContainer.class.getName());
 		this.deployVerticle(HttpClientVerticle.class.getName());
-		//this.deployVerticle(MessagePushNonAdver.class.getName());
 		this.deployVerticle(HttpServerVerticle.class.getName());
 		this.deployVerticle(AdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(NonAdMessagePushServiceImpl.class.getName());
 		this.deployVerticle(ConfigServiceImpl.class.getName());
 		//部署APNS Verticle
-		this.deployVerticle(ApnsVerticle.class.getName());
+		//this.deployVerticle(ApnsVerticle.class.getName());
 
 		// 提供其他非EventBus服务
 	}
