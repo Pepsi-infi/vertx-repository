@@ -130,7 +130,8 @@ public class RedisServiceImpl extends BaseServiceVerticle implements RedisServic
 		redisCluster.setnx(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, value, handler -> {
 			if (handler.succeeded()) {
 
-				redisCluster.setex(key, expire, value, setHandler -> {
+				int intExpire=Integer.valueOf(((Long) expire).toString());
+				redisCluster.expire(PushConsts.REDIS_PREFIX_MESSAGE_CENTER + key, intExpire, setHandler -> {
 
 					if (setHandler.succeeded()) {
 						result.handle(Future.succeededFuture(handler.result()));
