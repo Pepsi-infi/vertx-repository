@@ -3,16 +3,18 @@
 	"udp.port": 9099,
 	"socket.server.type": "passenger-socket-server",
 	"car-api-host": "10.0.200.57",
+	"passenger-car-api-host": "10.0.200.54",
 	"car-api-port": 80,
+	"passenger-car-api-port": 80,
 	"_comment.socket": "",
 	"socket": [
 		{
-			"innerIP": "10.0.4.27",
-			"node": "124.250.33.179"
+			"innerIP": "10.0.4.29",
+			"node": "124.250.33.184"
 		},
 		{
-			"innerIP": "10.0.4.28",
-			"node": "124.250.33.180"
+			"innerIP": "10.0.4.30",
+			"node": "124.250.33.185"
 		}
 	],
 	"oldSocket": [

@@ -90,8 +90,18 @@ public class UdpServerVerticle extends AbstractVerticle {
 
 									JsonObject msgData = new JsonObject();
 									MixedArray bodyArray = msgBody.getArray(3);
-									msgData.put("nick", bodyArray.getString("nick"));
-									msgData.put("msgId", bodyArray.getString("msgId"));
+
+									String msgId = bodyArray.getString("msgId");
+									msgData.put("msgId", msgId);
+
+									String nick = null;
+									try {
+										nick = bodyArray.getString("nick");
+									} catch (Exception e) {
+										logger.error("nick is null. msgId={}", msgId);
+									}
+
+									msgData.put("nick", nick);
 									msgData.put("body", bodyArray.getString("body"));
 
 									JsonObject msg2Send = new JsonObject();

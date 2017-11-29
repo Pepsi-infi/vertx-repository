@@ -13,13 +13,21 @@ import tp.impl.PassengerTpServiceImpl;
 
 public class StartVerticle extends AbstractVerticle {
 
+	private String serverType;
+
 	public void start() throws Exception {
+
+		serverType = config().getString("socket.server.type");
+
 		vertx.deployVerticle(SocketConsistentHashingVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(SocketServerVerticle.class.getName(), readBossOpts().setConfig(config()));
 
-		vertx.deployVerticle(PassengerTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
-		vertx.deployVerticle(DriverTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		if ("driver-socket-server".equalsIgnoreCase(serverType)) {
+			vertx.deployVerticle(DriverTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		} else {
+			vertx.deployVerticle(PassengerTpServiceImpl.class.getName(), readBossOpts().setConfig(config()));
+		}
 		vertx.deployVerticle(MessageSendVerticle.class.getName(), readBossOpts().setConfig(config()));
 
 		vertx.deployVerticle(RestSocketVerticle.class.getName(), readBossOpts().setConfig(config()));

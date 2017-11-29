@@ -43,8 +43,8 @@ public class PassengerTpServiceImpl extends AbstractVerticle implements Passenge
 		XProxyHelper.registerService(PassengerTpService.class, vertx.getDelegate(), this,
 				PassengerTpService.SERVICE_ADDRESS);
 
-		CAR_API_HOST = config().getString("car-api-host");
-		CAR_API_PORT = config().getInteger("car-api-port");
+		CAR_API_HOST = config().getString("passenger-car-api-host");
+		CAR_API_PORT = config().getInteger("passenger-car-api-port");
 		logger.info("config={} host={} port={}", config().encode(), CAR_API_HOST, CAR_API_PORT);
 	}
 
