@@ -14,6 +14,7 @@ import service.impl.AdMessagePushServiceImpl;
 import service.impl.ConfigServiceImpl;
 import service.impl.MsgRecordServiceImpl;
 import service.impl.NonAdMessagePushServiceImpl;
+import service.impl.PassengerUnSendServiceImpl;
 import service.impl.RedisServiceImpl;
 import xservice.HttpClientVerticle;
 
@@ -40,6 +41,8 @@ public class StartVerticle extends AbstractVerticle {
 		this.deployVerticle(ConfigServiceImpl.class.getName());
 		//部署APNS Verticle
 		//this.deployVerticle(ApnsVerticle.class.getName());
+		//消息补发
+		this.deployVerticle(PassengerUnSendServiceImpl.class.getName());
 
 		// 提供其他非EventBus服务
 	}

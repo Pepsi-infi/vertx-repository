@@ -33,6 +33,7 @@ import result.ResultData;
 import service.AdMessagePushService;
 import service.ApplePushService;
 import service.MsgRecordService;
+import service.PassengerUnSendService;
 import service.RedisService;
 import service.SocketPushService;
 import service.XiaoMiPushService;
@@ -63,6 +64,8 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 	private Integer channel;
 
 	private JsonObject config;
+	
+	private PassengerUnSendService passengerUnSendService;
 
 	@Override
 	public void start() throws Exception {
@@ -127,7 +130,11 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 					logger.info("消息幂等处理成功,返回成功到客户端");
 					resultHandler.handle(Future.succeededFuture(
 							new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
-					pushMsgToDownStream(receiveMsg, pushFuture.completer());
+					if(1==1){
+						pushFuture.fail("fail");
+					}else{
+						pushMsgToDownStream(receiveMsg, pushFuture.completer());
+					}
 				} else {
 					logger.error("消息并发异常,setNxResult=" + setNxRes);
 					resultHandler.handle(Future.succeededFuture(
@@ -151,9 +158,24 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 				callStatPushMsg(receiveMsg, statFuture.completer());
 			} else {
 				// 输出推送时的错误
-				logger.error("调用推送时出错：" + pushFuture.cause());
+				logger.error("推送失败，消息入库：" + pushFuture.cause());
+				saveUnSendMsg(receiveMsg);
 			}
 		});
+
+	}
+
+	private void saveUnSendMsg(JsonObject srcMsg) {
+		// 未推送成功的消息入库，用户上线继续推送
+		Future<String> unsendFuture=Future.future();
+		JsonObject param = new JsonObject();
+		param.put("msgId", srcMsg.getValue("msgId") + "");
+		param.put("phone", srcMsg.getString("phone"));
+		param.put("userId", srcMsg.getValue("customerId") + "");
+		param.put("expireTime", srcMsg.getValue("expireTime") + "");
+		param.put("content", srcMsg.toString());
+		param.put("callFlag", "1");
+		passengerUnSendService.pushAddUnSendMsg(param, unsendFuture.completer());
 
 	}
 
@@ -242,6 +264,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 		msgStatService = MsgStatService.createProxy(vertx);
 		deviceService = DeviceService.createProxy(vertx);
 		applePushService = ApplePushService.createProxy(vertx);
+		passengerUnSendService=PassengerUnSendService.createProxy(vertx);
 	}
 
 	private ResultData checkRecivedMsg(JsonObject receiveMsg) {
