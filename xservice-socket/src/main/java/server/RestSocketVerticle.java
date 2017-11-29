@@ -92,7 +92,7 @@ public class RestSocketVerticle extends RestAPIVerticle {
 						option.addHeader("action", "getSocketNode");
 
 						JsonObject message = new JsonObject();
-						message.put("userId", chatUserId);
+						message.put("userId", userId);
 						eb.<JsonObject>send(SocketConsistentHashingVerticle.class.getName() + innerIP, message, option,
 								reply -> {
 									if (reply.succeeded()) {
