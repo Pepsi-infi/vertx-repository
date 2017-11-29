@@ -56,7 +56,9 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 			result.handle(Future.failedFuture("非广告类消息msgId不做处理"));
 			return;
 		}
+		//构建统计redisKey
 		String msgSendKey = CacheConstants.getPushMsgKey(msgStatDto);
+		//采用的是redis的hash数据结构做的数据上报，fields中存放的是同一个key中的所有field集合
 		List<String> fields = getFieldsForMsgStat(msgStatDto);
 		if (CollectionUtils.isEmpty(fields)) {
 			logger.warn("the msgStat:{} need stat is null ", msgStatDto);
@@ -83,6 +85,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 			for (String field : fields) {
 				Future<Long> fieldSetFuture = Future.future();
 				futures.add(fieldSetFuture);
+				//对同一个key中的不同属性字段执行上报+1的操作  msgSendKey=CacheConstants.getPushMsgKey(msgStatDto); field=getFieldsForMsgStat(msgStatDto); 1.推送 2.到达 3.点击
 				redisClient.hincrby(msgSendKey, field, 1, fieldSetFuture.completer());
 				fieldSetFuture.setHandler(handler -> {
 					if (handler.succeeded()) {
@@ -201,7 +204,7 @@ public class MsgStatServiceImpl extends BaseServiceVerticle implements MsgStatSe
 	private boolean isAllowMsgId(MsgStatDto msgStatDto){
 		if(msgStatDto != null){
 			String msgId = msgStatDto.getMsgId();
-			System.out.println(msgId);
+			logger.info(msgId);
 			//如果msgId为空或者不是纯数字，不做处理
 			if(StringUtils.isNotBlank(msgId) && msgId.length() < 10 && msgId.matches("^[0-9]*$") ){
 				return true;
