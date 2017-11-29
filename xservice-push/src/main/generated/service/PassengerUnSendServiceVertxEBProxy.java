@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package iservice;
+package service;
 
-import iservice.DeviceService;
+import service.PassengerUnSendService;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.Future;
@@ -33,31 +33,29 @@ import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import java.util.List;
-import iservice.DeviceService;
-import utils.BaseResponse;
-import java.util.Map;
 import io.vertx.core.Vertx;
-import iservice.dto.DeviceDto;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import service.PassengerUnSendService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceServiceVertxEBProxy implements DeviceService {
+public class PassengerUnSendServiceVertxEBProxy implements PassengerUnSendService {
 
   private Vertx _vertx;
   private String _address;
   private DeliveryOptions _options;
   private boolean closed;
 
-  public DeviceServiceVertxEBProxy(Vertx vertx, String address) {
+  public PassengerUnSendServiceVertxEBProxy(Vertx vertx, String address) {
     this(vertx, address, null);
   }
 
-  public DeviceServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
+  public PassengerUnSendServiceVertxEBProxy(Vertx vertx, String address, DeliveryOptions options) {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
@@ -67,57 +65,110 @@ public class DeviceServiceVertxEBProxy implements DeviceService {
     } catch (IllegalStateException ex) {}
   }
 
-  public void reportDevice(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("userDeviceDto", userDeviceDto == null ? null : userDeviceDto.toJson());
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "reportDevice");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
-                      }
-    });
-  }
-
-  public void queryDevices(Map<String,String> param, Handler<AsyncResult<List<DeviceDto>>> result) {
-    if (closed) {
-      result.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
-      return;
-    }
-    JsonObject _json = new JsonObject();
-    _json.put("param", new JsonObject(convertMap(param)));
-    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "queryDevices");
-    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
-      if (res.failed()) {
-        result.handle(Future.failedFuture(res.cause()));
-      } else {
-        result.handle(Future.succeededFuture(res.result().body().stream().map(o -> o instanceof Map ? new DeviceDto(new JsonObject((Map) o)) : new DeviceDto((JsonObject) o)).collect(Collectors.toList())));
-      }
-    });
-  }
-
-  public void reportDeviceByAddDeviceId(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler) {
+  public void getUnSendMsg(JsonObject param, Handler<AsyncResult<List<JsonObject>>> resultHandler) {
     if (closed) {
       resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
     }
     JsonObject _json = new JsonObject();
-    _json.put("userDeviceDto", userDeviceDto == null ? null : userDeviceDto.toJson());
+    _json.put("param", param);
     DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
-    _deliveryOptions.addHeader("action", "reportDeviceByAddDeviceId");
-    _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {
+    _deliveryOptions.addHeader("action", "getUnSendMsg");
+    _vertx.eventBus().<JsonArray>send(_address, _json, _deliveryOptions, res -> {
       if (res.failed()) {
         resultHandler.handle(Future.failedFuture(res.cause()));
       } else {
-        resultHandler.handle(Future.succeededFuture(res.result().body() == null ? null : new BaseResponse(res.result().body())));
-                      }
+        resultHandler.handle(Future.succeededFuture(convertList(res.result().body().getList())));
+      }
+    });
+  }
+
+  public void addUnSendMsg(JsonObject param, Handler<AsyncResult<Integer>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", param);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "addUnSendMsg");
+    _vertx.eventBus().<Integer>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void delExpireUnSendMsg(Handler<AsyncResult<Integer>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "delExpireUnSendMsg");
+    _vertx.eventBus().<Integer>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void delUnSendMsg(JsonObject param, Handler<AsyncResult<Integer>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", param);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "delUnSendMsg");
+    _vertx.eventBus().<Integer>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void pushUnSendMsg(String phone, Handler<AsyncResult<String>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("phone", phone);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "pushUnSendMsg");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
+    });
+  }
+
+  public void pushAddUnSendMsg(JsonObject param, Handler<AsyncResult<String>> resultHandler) {
+    if (closed) {
+      resultHandler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
+      return;
+    }
+    JsonObject _json = new JsonObject();
+    _json.put("param", param);
+    DeliveryOptions _deliveryOptions = (_options != null) ? new DeliveryOptions(_options) : new DeliveryOptions();
+    _deliveryOptions.addHeader("action", "pushAddUnSendMsg");
+    _vertx.eventBus().<String>send(_address, _json, _deliveryOptions, res -> {
+      if (res.failed()) {
+        resultHandler.handle(Future.failedFuture(res.cause()));
+      } else {
+        resultHandler.handle(Future.succeededFuture(res.result().body()));
+      }
     });
   }
 

@@ -14,9 +14,9 @@
 * under the License.
 */
 
-package dao;
+package service;
 
-import dao.DeviceDao;
+import service.PassengerUnSendService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
@@ -40,38 +40,36 @@ import io.vertx.serviceproxy.ProxyHandler;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import java.util.List;
-import utils.BaseResponse;
-import java.util.Map;
 import io.vertx.core.Vertx;
-import iservice.dto.DeviceDto;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
-import dao.DeviceDao;
 import io.vertx.core.Handler;
+import service.PassengerUnSendService;
 
 /*
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class DeviceDaoVertxProxyHandler extends ProxyHandler {
+public class PassengerUnSendServiceVertxProxyHandler extends ProxyHandler {
 
   public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
 
   private final Vertx vertx;
-  private final DeviceDao service;
+  private final PassengerUnSendService service;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service) {
     this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
   }
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, long timeoutInSecond) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
-  public DeviceDaoVertxProxyHandler(Vertx vertx, DeviceDao service, boolean topLevel, long timeoutSeconds) {
+  public PassengerUnSendServiceVertxProxyHandler(Vertx vertx, PassengerUnSendService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
     this.timeoutSeconds = timeoutSeconds;
@@ -126,74 +124,28 @@ public class DeviceDaoVertxProxyHandler extends ProxyHandler {
       accessed();
       switch (action) {
 
-        case "addDevice": {
-          service.addDevice(json.getJsonObject("deviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("deviceDto")), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+        case "getUnSendMsg": {
+          service.getUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createListHandler(msg));
           break;
         }
-        case "updateDevice": {
-          service.updateDevice(json.getJsonObject("deviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("deviceDto")), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+        case "addUnSendMsg": {
+          service.addUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
-        case "getDevice": {
-          service.getDevice(convertMap(json.getJsonObject("params").getMap()), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+        case "delExpireUnSendMsg": {
+          service.delExpireUnSendMsg(createHandler(msg));
           break;
         }
-        case "queryDevices": {
-          service.queryDevices(convertMap(json.getJsonObject("params").getMap()), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(new JsonArray(res.result().stream().map(DeviceDto::toJson).collect(Collectors.toList())));
-            }
-         });
+        case "delUnSendMsg": {
+          service.delUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
-        case "updateDeviceByDeviceId": {
-          service.updateDeviceByDeviceId(json.getJsonObject("deviceDto") == null ? null : new iservice.dto.DeviceDto(json.getJsonObject("deviceDto")), res -> {
-            if (res.failed()) {
-              if (res.cause() instanceof ServiceException) {
-                msg.reply(res.cause());
-              } else {
-                msg.reply(new ServiceException(-1, res.cause().getMessage()));
-              }
-            } else {
-              msg.reply(res.result() == null ? null : res.result().toJson());
-            }
-         });
+        case "pushUnSendMsg": {
+          service.pushUnSendMsg((java.lang.String)json.getValue("phone"), createHandler(msg));
+          break;
+        }
+        case "pushAddUnSendMsg": {
+          service.pushAddUnSendMsg((io.vertx.core.json.JsonObject)json.getValue("param"), createHandler(msg));
           break;
         }
         default: {
