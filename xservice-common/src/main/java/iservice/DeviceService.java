@@ -41,4 +41,11 @@ public interface DeviceService {
      * @param result
      */
     void queryDevices(Map<String, String> param, Handler<AsyncResult<List<DeviceDto>>> result);
+
+    /**
+     * 增加设备号，按照该方式进行上报
+     * @param userDeviceDto
+     * @param resultHandler
+     */
+	void reportDeviceByAddDeviceId(DeviceDto userDeviceDto, Handler<AsyncResult<BaseResponse>> resultHandler);
 }

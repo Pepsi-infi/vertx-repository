@@ -35,6 +35,8 @@ public class DeviceDto {
 	private String createTime;
 	// 更新时间
 	private String updateTime;
+	// 设备号
+	private String deviceId;
 
 	public Long getId() {
 		return id;
@@ -147,6 +149,15 @@ public class DeviceDto {
 	public void setUpdateTime(String updateTime) {
 		this.updateTime = updateTime;
 	}
+	
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
 
 	public DeviceDto() {
 		super();
@@ -190,6 +201,8 @@ public class DeviceDto {
 			return false;
 		if (appVersion != null ? !appVersion.equals(deviceDto.appVersion) : deviceDto.appVersion != null)
 			return false;
+		if (deviceId != null ? !deviceId.equals(deviceDto.deviceId) : deviceDto.deviceId != null)
+			return false;
 		return antFingerprint != null ? antFingerprint.equals(deviceDto.antFingerprint)
 				: deviceDto.antFingerprint == null;
 
@@ -207,6 +220,7 @@ public class DeviceDto {
 		result = 31 * result + (appCode != null ? appCode.hashCode() : 0);
 		result = 31 * result + (appVersion != null ? appVersion.hashCode() : 0);
 		result = 31 * result + (antFingerprint != null ? antFingerprint.hashCode() : 0);
+		result = 31 * result + (deviceId != null ? deviceId.hashCode() : 0);
 		return result;
 	}
 
@@ -227,6 +241,7 @@ public class DeviceDto {
 		sb.append(", isAcceptPush=").append(isAcceptPush);
 		sb.append(", createTime='").append(createTime).append('\'');
 		sb.append(", updateTime='").append(updateTime).append('\'');
+		sb.append(", deviceId='").append(deviceId).append('\'');
 		sb.append('}');
 		return sb.toString();
 	}

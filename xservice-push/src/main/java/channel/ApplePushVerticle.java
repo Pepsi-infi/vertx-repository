@@ -9,10 +9,6 @@ import com.dbay.apns4j.model.ApnsConfig;
 import com.dbay.apns4j.model.Feedback;
 import com.dbay.apns4j.model.Payload;
 
-import cn.teaey.apns4j.Apns4j;
-import cn.teaey.apns4j.network.ApnsNettyChannel;
-import cn.teaey.apns4j.network.async.ApnsFuture;
-import cn.teaey.apns4j.protocol.ApnsPayload;
 import constant.PushConsts;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -30,10 +26,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 	private static final Logger logger = LoggerFactory.getLogger(ApplePushVerticle.class);
 
 	private JsonObject config;
-
-	private ApnsNettyChannel apnsChannel;
-
-	// private ApnsService apnsService;
 
 	private IApnsService apnsService;
 
@@ -103,10 +95,8 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		String msgbody = receiveMsg.toString();
 
 		// apns推送逻辑
-		// sendApns(deviceToken, title, body, msgbody, resultHandler);
 		vertx.executeBlocking(future -> {
 			try {
-
 				logger.info("apns send data:" + receiveMsg);
 				boolean sendResult = sendApnsByDbay(deviceToken, title, body, msgbody);
 				future.complete(sendResult);
@@ -134,7 +124,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 			}
 
 		});
-		
 
 	}
 
@@ -162,26 +151,6 @@ public class ApplePushVerticle extends BaseServiceVerticle implements ApplePushS
 		}
 		logger.info("apns消息推送成功");
 		return true;
-	}
-
-	private void sendApns(String deviceToken, String title, String body, String msgbody,
-			Handler<AsyncResult<BaseResponse>> resultHandler) {
-
-		ApnsPayload apnsPayload = Apns4j.newPayload().alertTitle(title).alertBody(body).extend("msgbody", msgbody)
-				.sound("default");
-
-		logger.info("apns send data,deviceToken:" + deviceToken + ",apnsPayload:" + apnsPayload);
-		ApnsFuture result = apnsChannel.send(deviceToken, apnsPayload);
-
-		if (result == null) {
-			logger.error("apns push error:result is null");
-			resultHandler.handle(Future.failedFuture("apns result is null"));
-			return;
-		}
-
-		logger.info("apns push result:" + result);
-		resultHandler.handle(Future.succeededFuture(new BaseResponse()));
-
 	}
 
 	// 测试专用，防止消息推送到线上用户
