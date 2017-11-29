@@ -130,11 +130,7 @@ public class AdMessagePushServiceImpl extends BaseServiceVerticle implements AdM
 					logger.info("消息幂等处理成功,返回成功到客户端");
 					resultHandler.handle(Future.succeededFuture(
 							new ResultData<Object>(ErrorCodeEnum.SUCCESS, Collections.EMPTY_MAP).toString()));
-					if(1==1){
-						pushFuture.fail("fail");
-					}else{
-						pushMsgToDownStream(receiveMsg, pushFuture.completer());
-					}
+					pushMsgToDownStream(receiveMsg, pushFuture.completer());
 				} else {
 					logger.error("消息并发异常,setNxResult=" + setNxRes);
 					resultHandler.handle(Future.succeededFuture(
